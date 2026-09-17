@@ -1,0 +1,36 @@
+.home-hero {
+  padding-block: var(--space-2xl) var(--space-xl);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.home-hero__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-width: 720px;
+}
+
+.home-hero__kicker {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-gold);
+}
+
+.home-hero__title {
+  font-size: var(--text-3xl);
+}
+
+.home-hero__lede {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-style: italic;
+  color: var(--color-text-secondary);
+  line-height: var(--leading-snug);
+}
+
+.home-hero__actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+  flex-wrap: wrap;
+}

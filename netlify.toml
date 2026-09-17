@@ -1,0 +1,10 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+# Client-side routing fallback so React Router handles deep links.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

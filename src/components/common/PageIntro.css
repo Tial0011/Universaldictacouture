@@ -1,0 +1,18 @@
+.page-intro {
+  padding-block: var(--space-xl) var(--space-lg);
+  max-width: 760px;
+}
+
+.page-intro__eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-gold);
+  margin-bottom: var(--space-2xs);
+}
+
+.page-intro__description {
+  margin-top: var(--space-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--text-md);
+  line-height: var(--leading-relaxed);
+}

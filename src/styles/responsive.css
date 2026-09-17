@@ -1,0 +1,24 @@
+/*
+  Breakpoint reference (mobile-first; author each component starting
+  from the smallest viewport, then layer min-width queries on top):
+
+  --bp-sm: 480px   phones, landscape
+  --bp-md: 768px   tablets
+  --bp-lg: 1024px  small laptops
+  --bp-xl: 1280px  desktop
+
+  These are documented values, not custom media-query units (CSS
+  cannot store a length inside a media query via a var()), so use the
+  literal pixel values below when writing queries in component CSS:
+
+  @media (min-width: 480px)  { ... }
+  @media (min-width: 768px)  { ... }
+  @media (min-width: 1024px) { ... }
+  @media (min-width: 1280px) { ... }
+*/
+
+@media (max-width: 767px) {
+  .container {
+    padding-inline: var(--content-padding-inline);
+  }
+}
