@@ -1,0 +1,254 @@
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  /* Keep in-page anchors clear of the sticky header */
+  scroll-padding-top: calc(var(--header-height) + var(--space-sm));
+  /* Reserve scrollbar space so short/long pages don't shift sideways */
+  scrollbar-gutter: stable;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+ul[class],
+ol[class] {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+img,
+picture,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  padding: 0;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  margin: var(--space-lg) 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ---------- Base ---------- */
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-wrap: break-word;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: var(--color-wine);
+  color: var(--color-ivory);
+}
+
+/* ---------- Typography ----------
+   Cormorant Garamond = editorial/display headings only.
+   Inter = everything practical (body, nav, buttons, labels, forms). */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--text-3xl);
+}
+
+h2 {
+  font-size: var(--text-2xl);
+}
+
+h3 {
+  font-size: var(--text-xl);
+}
+
+/* Cormorant is light at small sizes, so h4 steps up in weight */
+h4 {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+}
+
+p {
+  max-width: var(--measure);
+  text-wrap: pretty;
+}
+
+strong,
+b {
+  font-weight: var(--weight-semibold);
+}
+
+small {
+  font-size: var(--text-sm);
+}
+
+/* Optional typographic helpers */
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-lead {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-style: italic;
+  line-height: var(--leading-snug);
+}
+
+.text-caption {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Links ----------
+   Chrome links (nav, buttons, cards, list-based menus) carry no
+   underline and are styled by their own component. Links inside running
+   text — paragraphs, captions, definitions, or any .prose block — and
+   any link given .link are wine + underlined, so they never rely on
+   colour alone. */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(p, blockquote, figcaption, dd) a:not([class]),
+.prose a:not([class]),
+.link {
+  color: var(--color-brand);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition: color var(--duration-fast) var(--ease-standard),
+    text-decoration-thickness var(--duration-fast) var(--ease-standard);
+}
+
+:where(p, blockquote, figcaption, dd) a:not([class]):active,
+.prose a:not([class]):active,
+.link:active {
+  color: var(--color-brand-hover);
+}
+
+@media (hover: hover) {
+  :where(p, blockquote, figcaption, dd) a:not([class]):hover,
+  .prose a:not([class]):hover,
+  .link:hover {
+    color: var(--color-brand-hover);
+    text-decoration-thickness: 2px;
+  }
+}
+
+/* ---------- Focus ----------
+   One consistent, high-contrast ring for every interactive element.
+   Only shown for keyboard/assistive focus (:focus-visible). */
+:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline-color: Highlight;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- State utilities ---------- */
+.is-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.error-text {
+  color: var(--color-brand);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}

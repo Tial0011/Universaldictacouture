@@ -1,26 +1,103 @@
-import { Link } from "react-router-dom";
-import Button from "../../components/common/Button";
+import { useEffect, useState } from "react";
+import HeroCarousel from "../../components/home/HeroCarousel";
+import TrustStrip from "../../components/home/TrustStrip";
+import DiscoveryModule from "../../components/discovery/DiscoveryModule";
+import NewIn from "../../components/home/NewIn";
+import CustomStylePromo from "../../components/home/CustomStylePromo";
+import ReviewsPreview from "../../components/home/ReviewsPreview";
+import StyleCircle from "../../components/home/StyleCircle";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { useCatalogue } from "../../hooks/useCatalogue";
+import { useDocumentMeta } from "../../hooks/useDocumentMeta";
+import {
+  APPROVED_HERO_COPY,
+  buildOccasionDiscovery,
+  fetchDiscoveryModule,
+  fetchHeroSlides,
+  fetchPublishedReviews,
+} from "../../services/content";
+import { selectNewIn } from "../../services/products";
 import "./Home.css";
+import "../../components/home/home-sections.css";
+
+const FALLBACK_SLIDE = [
+  {
+    id: "approved-primary",
+    concept: "ready-to-wear",
+    ...APPROVED_HERO_COPY,
+    image: null,
+    order: 0,
+  },
+];
 
 export default function Home() {
+  const { products, isLoading, error } = useCatalogue();
+  const [slides, setSlides] = useState(FALLBACK_SLIDE);
+  const [discovery, setDiscovery] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [isHeroReady, setIsHeroReady] = useState(false);
+
+  useDocumentMeta({
+    title: "Universal Dicta Couture — Aso Oke for every occasion",
+    description:
+      "Beautifully crafted Aso Oke for every occasion. Classic, elegant and proudly Nigerian.",
+    canonicalPath: "/",
+  });
+
+  useEffect(() => {
+    let active = true;
+
+    fetchHeroSlides()
+      .then((result) => {
+        if (active && result.length) setSlides(result);
+      })
+      .finally(() => {
+        if (active) setIsHeroReady(true);
+      });
+
+    fetchDiscoveryModule("home").then((module) => {
+      if (active && module) setDiscovery(module);
+    });
+
+    fetchPublishedReviews(3).then((entries) => {
+      if (active) setReviews(entries);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Admin-managed discovery wins; otherwise the module is built from
+  // occasions that genuinely exist in the published catalogue.
+  const discoveryModule = discovery ?? buildOccasionDiscovery(products);
+  const newInProducts = selectNewIn(products, 8);
+
   return (
-    <section className="home-hero">
-      <div className="container home-hero__inner">
-        <p className="home-hero__kicker">Universal Dicta Couture</p>
-        <h1 className="home-hero__title">Contemporary fashion, rooted in Aso Oke heritage</h1>
-        <p className="home-hero__lede">
-          The collection, custom styling, and stories that make up this house
-          are being prepared for launch.
-        </p>
-        <div className="home-hero__actions">
-          <Link to="/shop">
-            <Button variant="primary">Visit the shop</Button>
-          </Link>
-          <Link to="/about">
-            <Button variant="secondary">About the house</Button>
-          </Link>
+    <>
+      {isHeroReady ? (
+        <HeroCarousel slides={slides} />
+      ) : (
+        <div className="home-hero-placeholder">
+          <LoadingSpinner label="Loading featured collections" />
         </div>
-      </div>
-    </section>
+      )}
+
+      <TrustStrip />
+
+      {discoveryModule ? (
+        <div className="home-section container">
+          <DiscoveryModule module={discoveryModule} />
+        </div>
+      ) : null}
+
+      <NewIn products={newInProducts} isLoading={isLoading} error={error} />
+
+      <CustomStylePromo />
+
+      <ReviewsPreview entries={reviews} />
+
+      <StyleCircle />
+    </>
   );
 }

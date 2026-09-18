@@ -1,0 +1,73 @@
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+main {
+  flex: 1;
+}
+
+/* ---------- Containers & rhythm ---------- */
+.container {
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin-inline: auto;
+  padding-inline: var(--content-padding-inline);
+}
+
+.container--narrow {
+  max-width: calc(var(--content-narrow-width) + (var(--content-padding-inline) * 2));
+}
+
+.section {
+  padding-block: var(--section-space);
+}
+
+/* Vertical rhythm between direct children; override with --stack-space */
+.stack > * + * {
+  margin-top: var(--stack-space, var(--space-sm));
+}
+
+/* Restrained gold accent: a short rule, never text */
+.accent-rule {
+  display: block;
+  width: 3rem;
+  height: 2px;
+  border: 0;
+  background-color: var(--color-accent);
+}
+
+/* ---------- Accessibility utilities ---------- */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-sm);
+  top: -100px;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-sm);
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-control);
+  z-index: var(--z-toast);
+  transition: top var(--duration-fast) var(--ease-standard);
+}
+
+.skip-link:focus {
+  top: var(--space-sm);
+}

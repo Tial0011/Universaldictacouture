@@ -1,37 +1,63 @@
 /*
   Universal Dicta Couture — Design Tokens
-  Locked brand system (Sections 1–4 of spec). Do not introduce new
-  colors or typefaces without an update to the specification.
+  Section 1: Brand & Global Design System.
+
+  Only the six brand colours below are "brand" colours. Everything
+  else in this file is either a semantic alias of one of them, a
+  derived state (hover, tint, border), or a non-colour token. Do not
+  add new brand colours or typefaces without a specification update.
 */
 
 :root {
-  /* Brand colors */
-  --color-wine: #601013;
-  --color-gold: #b08d57;
-  --color-ivory: #fbf8f2;
-  --color-white: #ffffff;
-  --color-ink: #1f1f1f;
-  --color-gray: #6b6b6b;
+  color-scheme: light;
 
-  /* Semantic aliases */
+  /* ---------- Brand colours (locked) ---------- */
+  --color-wine: #601013;   /* Primary Brand Wine */
+  --color-gold: #b08d57;   /* Luxury Gold Accent — restrained, never body text */
+  --color-ivory: #fbf8f2;  /* Warm Ivory — main page background */
+  --color-white: #ffffff;  /* Pure White — surfaces */
+  --color-ink: #1f1f1f;    /* Near Black — primary text */
+  --color-gray: #6b6b6b;   /* Muted Gray — secondary text */
+
+  /* ---------- Semantic aliases ---------- */
   --color-bg: var(--color-ivory);
   --color-surface: var(--color-white);
   --color-text-primary: var(--color-ink);
   --color-text-secondary: var(--color-gray);
-  --color-accent: var(--color-gold);
+  --color-text-on-brand: var(--color-white);
   --color-brand: var(--color-wine);
+  --color-accent: var(--color-gold); /* decorative only: rules, underlines, indicators */
 
-  /* Interaction states */
-  --color-focus-ring: var(--color-gold);
-  --color-border: rgba(31, 31, 31, 0.12);
-  --color-border-strong: rgba(31, 31, 31, 0.22);
+  /* ---------- Derived states ---------- */
+  --color-brand-hover: #4d0d0f;               /* Wine darkened ~20% — hover/pressed only */
+  --color-brand-tint: rgba(96, 16, 19, 0.06); /* Wine at 6% — subtle hover wash */
+
+  /* Contrast notes (WCAG 2.x, measured):
+     ink on ivory 15.6:1 · gray on ivory 5.0:1 · wine on ivory 12.5:1
+     white on wine 13.3:1 · gold on ivory 2.9:1 (fails text AND
+     component contrast, so gold is never used for text or for
+     anything the user must perceive in order to operate the UI). */
+
+  /* Focus: wine is used because gold on ivory is only 2.9:1. */
+  --color-focus-ring: var(--color-wine);
+  --color-focus-ring-inverse: var(--color-ivory); /* for use on wine surfaces */
+
+  /* Borders */
+  --color-border: rgba(31, 31, 31, 0.12);         /* decorative hairlines & dividers */
+  --color-border-strong: rgba(31, 31, 31, 0.22);  /* emphasised dividers */
+  --color-border-control: rgba(31, 31, 31, 0.55); /* form controls — ≥3.6:1 (WCAG 1.4.11) */
+
   --color-overlay: rgba(31, 17, 18, 0.5);
 
-  /* Typography */
-  --font-display: "Cormorant Garamond", "Times New Roman", serif;
-  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* ---------- Typography ---------- */
+  --font-display: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  /* Type scale (fluid, mobile-first) */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  /* Fluid type scale (mobile-first) */
   --text-xs: clamp(0.75rem, 0.72rem + 0.15vw, 0.8125rem);
   --text-sm: clamp(0.875rem, 0.84rem + 0.15vw, 0.9375rem);
   --text-base: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
@@ -41,16 +67,17 @@
   --text-2xl: clamp(2.25rem, 1.8rem + 2vw, 3.5rem);
   --text-3xl: clamp(2.75rem, 2.1rem + 3vw, 4.5rem);
 
-  --leading-tight: 1.15;
+  --leading-tight: 1.15;   /* display headings */
   --leading-snug: 1.35;
-  --leading-normal: 1.6;
-  --leading-relaxed: 1.75;
+  --leading-normal: 1.6;   /* body */
+  --leading-relaxed: 1.75; /* long-form / lead paragraphs */
 
   --tracking-tight: -0.01em;
   --tracking-normal: 0;
   --tracking-wide: 0.03em;
+  --tracking-caps: 0.14em; /* only for the approved all-caps brand declaration */
 
-  /* Spacing scale */
+  /* ---------- Spacing scale ---------- */
   --space-3xs: 0.25rem;
   --space-2xs: 0.5rem;
   --space-xs: 0.75rem;
@@ -61,25 +88,47 @@
   --space-2xl: 6rem;
   --space-3xl: 8rem;
 
-  /* Layout */
+  --section-space: clamp(3rem, 2rem + 5vw, 6rem); /* vertical padding between page sections */
+
+  /* ---------- Layout ---------- */
   --content-max-width: 1240px;
+  --content-narrow-width: 760px;
   --content-padding-inline: clamp(1.25rem, 4vw, 3rem);
   --measure: 65ch;
 
-  /* Radii & elevation */
+  /* Minimum interactive target (44px, WCAG 2.5.5 / Apple HIG) */
+  --touch-target: 2.75rem;
+
+  /* ---------- Logo sizing ----------
+     The official wordmark has a small "DICTA COUTURE" line, so it must
+     not be rendered below --logo-min-height or that line becomes
+     illegible. Keep at least --space-xs of clear space around it. */
+  --logo-min-height: 48px;
+  --logo-height-header: 56px;
+  --logo-height-footer: 56px;
+  --header-height: calc(var(--logo-height-header) + (var(--space-2xs) * 2) + 1px);
+
+  /* ---------- Radii ----------
+     Tailored, restrained corners: crisp on controls, a touch softer
+     on surfaces. Pills are reserved for small tags/chips. */
   --radius-sm: 2px;
   --radius-md: 4px;
   --radius-lg: 8px;
+  --radius-pill: 999px;
+  --radius-control: var(--radius-sm);  /* buttons, inputs, selects */
+  --radius-surface: var(--radius-md);  /* cards, panels */
+
+  /* ---------- Elevation (warm-tinted, used sparingly) ---------- */
   --shadow-soft: 0 8px 24px rgba(31, 17, 18, 0.08);
   --shadow-lifted: 0 16px 40px rgba(31, 17, 18, 0.14);
 
-  /* Motion */
+  /* ---------- Motion ---------- */
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --duration-fast: 150ms;
   --duration-base: 250ms;
   --duration-slow: 400ms;
 
-  /* Z-index scale */
+  /* ---------- Z-index scale ---------- */
   --z-nav: 100;
   --z-overlay: 200;
   --z-modal: 300;

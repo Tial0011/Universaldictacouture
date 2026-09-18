@@ -1,24 +1,109 @@
 .site-footer {
   border-top: 1px solid var(--color-border);
-  margin-top: var(--space-2xl);
+  margin-top: var(--section-space);
+  background-color: var(--color-white);
 }
 
 .site-footer__inner {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3xs);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-lg);
   padding-block: var(--space-lg);
 }
 
 .site-footer__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2xs);
+}
+
+.site-footer__tagline {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-caps);
+  color: var(--color-brand);
+}
+
+.site-footer__declaration {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-caps);
+  color: var(--color-text-secondary);
+}
+
+.site-footer__line {
+  max-width: 34ch;
   font-family: var(--font-display);
   font-size: var(--text-md);
+  font-style: italic;
+  line-height: var(--leading-snug);
+}
+
+.site-footer__heading {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  margin-bottom: var(--space-2xs);
+}
+
+.site-footer__contact .site-footer__heading + .site-footer__heading,
+.site-footer__address + .site-footer__heading {
+  margin-top: var(--space-md);
+}
+
+.site-footer__nav ul,
+.site-footer__social {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer__nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+}
+
+@media (hover: hover) {
+  .site-footer__nav a:hover {
+    color: var(--color-brand);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+}
+
+.site-footer__address {
+  font-style: normal;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.site-footer__address p {
+  margin-bottom: var(--space-3xs);
+}
+
+.site-footer__social {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.site-footer__base {
+  padding-bottom: var(--space-lg);
+}
+
+.site-footer__legal {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
 @media (min-width: 768px) {
   .site-footer__inner {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+    grid-template-columns: 1.4fr 1fr 1fr 1.3fr;
+    gap: var(--space-md);
   }
 }

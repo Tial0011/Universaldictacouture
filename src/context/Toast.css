@@ -1,0 +1,35 @@
+.toast-region {
+  position: fixed;
+  left: 50%;
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+  display: flex;
+  justify-content: center;
+  width: min(100% - 2rem, 30rem);
+  pointer-events: none;
+}
+
+.toast {
+  margin: 0;
+  max-width: 100%;
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-ink);
+  color: var(--color-white);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-lifted);
+  text-align: center;
+}
+
+.toast--error {
+  background: var(--color-brand);
+}
+
+/* Clear of the mobile bottom navigation and the chat launcher. */
+@media (max-width: 767px) {
+  .toast-region {
+    bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+}

@@ -1,9 +1,14 @@
+import { Link } from "react-router-dom";
 import "./Button.css";
 
 /**
- * Shared button component. Use `variant="primary"` for the main
- * action on a screen, `secondary` for supporting actions, and
- * `ghost` for low-emphasis/text-style actions.
+ * Shared button. Renders the right semantic element:
+ *  - <button>   default (actions)
+ *  - <Link>     when `to` is given (internal navigation)
+ *  - <a>        when `href` is given (external links)
+ * Never nest a <button> inside a link.
+ *
+ * `variant`: "primary" (main action), "secondary" (supporting), "ghost" (low emphasis).
  */
 export default function Button({
   children,
@@ -11,17 +16,38 @@ export default function Button({
   type = "button",
   isLoading = false,
   disabled = false,
+  to,
+  href,
+  className = "",
   ...rest
 }) {
+  const classes = `btn btn--${variant}${className ? ` ${className}` : ""}`;
+
+  if (to) {
+    return (
+      <Link to={to} className={classes} {...rest}>
+        {children}
+      </Link>
+    );
+  }
+
+  if (href) {
+    return (
+      <a href={href} className={classes} {...rest}>
+        {children}
+      </a>
+    );
+  }
+
   return (
     <button
       type={type}
-      className={`btn btn--${variant}`}
+      className={classes}
       disabled={disabled || isLoading}
-      aria-busy={isLoading}
+      aria-busy={isLoading || undefined}
       {...rest}
     >
-      {isLoading ? "Please wait…" : children}
+      {children}
     </button>
   );
 }

@@ -9,8 +9,8 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 2px solid var(--color-border);
-  border-top-color: var(--color-gold);
+  border: 2px solid var(--color-border-strong);
+  border-top-color: var(--color-brand);
   animation: loading-spin 900ms linear infinite;
 }
 
@@ -20,10 +20,12 @@
   }
 }
 
+/* Reduced motion: a static mark instead of a spinning one */
 @media (prefers-reduced-motion: reduce) {
   .loading-spinner__mark {
     animation: none;
-    border-top-color: var(--color-border);
-    border-right-color: var(--color-gold);
+    border-color: var(--color-border-strong);
+    border-top-color: var(--color-brand);
+    border-right-color: var(--color-brand);
   }
 }

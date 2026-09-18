@@ -1,52 +1,86 @@
+/* Button foundations: sizing, states and variants. */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2xs);
+  min-height: var(--touch-target);
+  padding: 0.7em 1.75em;
   font-family: var(--font-body);
   font-size: var(--text-sm);
-  font-weight: 500;
+  font-weight: var(--weight-medium);
+  line-height: 1.2;
   letter-spacing: var(--tracking-wide);
-  padding: 0.85em 1.8em;
-  border-radius: var(--radius-sm);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
   border: 1px solid transparent;
+  border-radius: var(--radius-control);
   transition: background-color var(--duration-base) var(--ease-standard),
     color var(--duration-base) var(--ease-standard),
     border-color var(--duration-base) var(--ease-standard);
-  white-space: nowrap;
 }
 
-.btn:disabled {
+.btn:disabled,
+.btn[aria-disabled="true"] {
   opacity: 0.55;
   cursor: not-allowed;
 }
 
+.btn[aria-busy="true"] {
+  cursor: progress;
+}
+
+/* Primary: wine fill */
 .btn--primary {
   background-color: var(--color-brand);
-  color: var(--color-white);
+  border-color: var(--color-brand);
+  color: var(--color-text-on-brand);
 }
 
-.btn--primary:hover:not(:disabled) {
-  background-color: #4a0c0e;
+.btn--primary:active:not(:disabled) {
+  background-color: var(--color-brand-hover);
+  border-color: var(--color-brand-hover);
 }
 
+/* Secondary: wine outline */
 .btn--secondary {
   background-color: transparent;
-  color: var(--color-brand);
   border-color: var(--color-brand);
+  color: var(--color-brand);
 }
 
-.btn--secondary:hover:not(:disabled) {
+.btn--secondary:active:not(:disabled) {
   background-color: var(--color-brand);
-  color: var(--color-white);
+  color: var(--color-text-on-brand);
 }
 
+/* Ghost: text-style action */
 .btn--ghost {
   background-color: transparent;
   color: var(--color-text-primary);
-  padding-inline: var(--space-2xs);
+  padding-inline: var(--space-xs);
 }
 
-.btn--ghost:hover:not(:disabled) {
+.btn--ghost:active:not(:disabled) {
   color: var(--color-brand);
+  background-color: var(--color-brand-tint);
+}
+
+/* Hover only where hover exists, so touch screens don't get stuck states */
+@media (hover: hover) {
+  .btn--primary:hover:not(:disabled) {
+    background-color: var(--color-brand-hover);
+    border-color: var(--color-brand-hover);
+  }
+
+  .btn--secondary:hover:not(:disabled) {
+    background-color: var(--color-brand);
+    color: var(--color-text-on-brand);
+  }
+
+  .btn--ghost:hover:not(:disabled) {
+    color: var(--color-brand);
+    background-color: var(--color-brand-tint);
+  }
 }

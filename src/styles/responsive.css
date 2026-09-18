@@ -1,24 +1,25 @@
 /*
-  Breakpoint reference (mobile-first; author each component starting
-  from the smallest viewport, then layer min-width queries on top):
+  Responsive foundations — mobile-first. Author each component for the
+  smallest viewport, then layer min-width queries on top.
 
-  --bp-sm: 480px   phones, landscape
-  --bp-md: 768px   tablets
-  --bp-lg: 1024px  small laptops
-  --bp-xl: 1280px  desktop
+  Breakpoints (documented values; CSS cannot put a var() inside a
+  media query, so use the literal pixel values):
 
-  These are documented values, not custom media-query units (CSS
-  cannot store a length inside a media query via a var()), so use the
-  literal pixel values below when writing queries in component CSS:
-
-  @media (min-width: 480px)  { ... }
-  @media (min-width: 768px)  { ... }
-  @media (min-width: 1024px) { ... }
-  @media (min-width: 1280px) { ... }
+    480px   phones, landscape
+    768px   tablets  — desktop header/navigation switches on here
+    1024px  small laptops
+    1280px  desktop
 */
 
-@media (max-width: 767px) {
-  .container {
-    padding-inline: var(--content-padding-inline);
+/* Larger tap targets on touch-first devices */
+@media (pointer: coarse) {
+  :root {
+    --touch-target: 3rem;
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --logo-height-header: 68px;
   }
 }

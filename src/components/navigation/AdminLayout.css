@@ -2,10 +2,11 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .admin-layout__sidebar {
-  background-color: var(--color-white);
+  background-color: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   padding: var(--space-md) var(--content-padding-inline);
 }
@@ -13,22 +14,40 @@
 .admin-layout__title {
   font-family: var(--font-display);
   font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   margin-bottom: var(--space-sm);
 }
 
 .admin-layout__sidebar nav ul {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-sm);
+  gap: var(--space-2xs) var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .admin-layout__sidebar nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target);
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
 }
 
 .admin-layout__sidebar nav a.is-active {
   color: var(--color-brand);
+  font-weight: var(--weight-medium);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.4em;
+}
+
+@media (hover: hover) {
+  .admin-layout__sidebar nav a:hover {
+    color: var(--color-brand);
+  }
 }
 
 .admin-layout__content {
@@ -50,5 +69,7 @@
 
   .admin-layout__sidebar nav ul {
     flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 0;
   }
 }

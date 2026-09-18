@@ -1,0 +1,26 @@
+/*
+  Logo sizing rules
+  - Height is set from a token; width follows the artwork's aspect ratio
+    (the width/height attributes on the <img> reserve the space).
+  - Never render below --logo-min-height: the "DICTA COUTURE" line
+    becomes illegible.
+  - Keep at least --space-xs of clear space on every side.
+  - The artwork is wine + near-black on transparent: use it on ivory or
+    white only, never on wine or photography.
+*/
+.logo {
+  --logo-height: var(--logo-height-header);
+  display: block;
+  height: max(var(--logo-height), var(--logo-min-height));
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.logo--header {
+  --logo-height: var(--logo-height-header);
+}
+
+.logo--footer {
+  --logo-height: var(--logo-height-footer);
+}

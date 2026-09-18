@@ -30,7 +30,7 @@ export default function App() {
         <Route path="/shop" element={<Shop />} />
         <Route path="/shop/:productId" element={<ProductDetails />} />
         <Route path="/custom-style" element={<CustomStyle />} />
-        <Route path="/reviews" element={<ReviewsFeeds />} />
+        <Route path="/reviews-feeds" element={<ReviewsFeeds />} />
         <Route path="/chats" element={<Chats />} />
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={<Profile />} />
