@@ -1,7 +1,13 @@
 import { getFirestore } from "firebase/firestore";
-import app from "./config";
+import app, { isFirebaseConfigured } from "./config";
 
-export const db = getFirestore(app);
+/**
+ * The shared Firestore instance, or null while Firebase is
+ * unconfigured. Every caller in src/services already checks
+ * isFirebaseConfigured before touching it, so an unconfigured build
+ * simply reports its truthful unavailable state instead of crashing.
+ */
+export const db = isFirebaseConfigured ? getFirestore(app) : null;
 
 // Collection-specific query/mutation helpers belong in src/services,
 // built on top of this shared Firestore instance. Keep this file

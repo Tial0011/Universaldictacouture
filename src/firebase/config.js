@@ -20,7 +20,22 @@ export const isFirebaseConfigured = Boolean(
   firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId
 );
 
-// Guard against re-initialization during HMR.
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+/**
+ * The Firebase app, or null when no configuration was supplied.
+ *
+ * Firebase is only initialized when real values are present. Calling
+ * initializeApp with undefined values succeeds but leaves an app whose
+ * services throw on first use (auth/invalid-api-key), which took the
+ * whole frontend down before any configuration existed. Guarding here
+ * keeps the site viewable without credentials; supplying the
+ * VITE_FIREBASE_* variables is all that is needed to switch Firebase
+ * back on — nothing downstream changes.
+ */
+// getApps()/getApp() also guard against re-initialization during HMR.
+const app = isFirebaseConfigured
+  ? getApps().length
+    ? getApp()
+    : initializeApp(firebaseConfig)
+  : null;
 
 export default app;
