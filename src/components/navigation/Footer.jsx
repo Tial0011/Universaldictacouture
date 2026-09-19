@@ -1,8 +1,15 @@
 import { Link } from "react-router-dom";
+import Button from "../common/Button";
 import Logo from "../brand/Logo";
 import { BRAND } from "../brand/brandLanguage";
 import { SOCIAL_LINKS } from "../../config/socialLinks";
-import { FacebookIcon, InstagramIcon, LinkedInIcon, WhatsAppIcon } from "./icons/SocialIcons";
+import {
+  FacebookIcon,
+  InstagramIcon,
+  LinkedInIcon,
+  WhatsAppIcon,
+  ChatBubbleIcon,
+} from "./icons/SocialIcons";
 import "./Footer.css";
 
 /** Approved navigation destinations only — no invented routes. */
@@ -28,7 +35,7 @@ const NAV_GROUPS = [
   },
   {
     id: "info",
-    heading: "Information",
+    heading: "Explore",
     links: [
       { to: "/", label: "Home" },
       { to: "/about", label: "About Us" },
@@ -65,7 +72,7 @@ function FooterNavGroup({ heading, links }) {
  *  a non-interactive placeholder — never a fake clickable link. */
 function SocialItem({ id, name, url }) {
   const IconComponent = SOCIAL_ICONS[id];
-  const icon = <IconComponent size={19} />;
+  const icon = <IconComponent size={18} />;
 
   if (url) {
     return (
@@ -94,48 +101,24 @@ export default function Footer() {
 
   return (
     <footer className="site-footer surface--brand">
-      <div className="container site-footer__brand-block">
-        {/* The wordmark artwork is wine + near-black on transparent (see
-            Logo.css) and is only legible on a light surface, so it sits on
-            a small ivory plaque here rather than directly on the wine
-            footer background. */}
-        <div className="site-footer__logo-plaque">
-          <Logo size="footer" className="site-footer__logo" />
-        </div>
-        <p className="site-footer__tagline">{BRAND.tagline}</p>
-        <p className="site-footer__line">{BRAND.supportingLine}</p>
-        <p className="site-footer__declaration">{BRAND.declaration}</p>
-      </div>
+      <div className="container site-footer__top">
+        {/* Left: brand mark, footer headline, social row. */}
+        <div className="site-footer__brand-block">
+          {/* The wordmark artwork is wine + near-black on transparent
+              (see Logo.css) and is only legible on a light surface, so
+              it sits on a small ivory plaque here rather than directly
+              on the wine footer background. */}
+          <div className="site-footer__logo-plaque">
+            <Logo size="footer" className="site-footer__logo" />
+          </div>
+          <p className="site-footer__headline">
+            {BRAND.footerHeadline.split("\n").map((line, i) => (
+              <span key={i} className="site-footer__headline-line">
+                {line}
+              </span>
+            ))}
+          </p>
 
-      <hr className="site-footer__divider accent-rule" aria-hidden="true" />
-
-      <div className="container site-footer__grid">
-        <nav aria-label="Footer navigation" className="site-footer__nav-groups">
-          {NAV_GROUPS.map((group) => (
-            <FooterNavGroup key={group.id} heading={group.heading} links={group.links} />
-          ))}
-        </nav>
-
-        <div className="footer-group footer-group--static">
-          <h2 className="footer-group__heading footer-group__heading--static">Contact</h2>
-          <address className="site-footer__address">
-            <p>Ogun State, Nigeria</p>
-            <p>
-              <a className="link" href="mailto:universaldictacouture@gmail.com">
-                universaldictacouture@gmail.com
-              </a>
-            </p>
-            <p>
-              <a className="link" href="tel:09061959388">
-                09061959388
-              </a>
-            </p>
-            <p>8:00 AM–6:00 PM</p>
-          </address>
-        </div>
-
-        <div className="footer-group footer-group--static">
-          <h2 className="footer-group__heading footer-group__heading--static">Follow Us</h2>
           <ul className="footer-social">
             {SOCIAL_LINKS.map((entry) => (
               <li key={entry.id}>
@@ -144,20 +127,53 @@ export default function Footer() {
             ))}
           </ul>
         </div>
-      </div>
 
-      <div className="site-footer__base">
-        <div className="container site-footer__base-row">
-          <p className="site-footer__legal">
-            &copy; {year} {BRAND.name}. All rights reserved.
-          </p>
+        {/* Right: collapsible nav rows + contact, decorative flourish. */}
+        <div className="site-footer__links">
+          <nav aria-label="Footer navigation" className="site-footer__nav-groups">
+            {NAV_GROUPS.map((group) => (
+              <FooterNavGroup key={group.id} heading={group.heading} links={group.links} />
+            ))}
+
+            <details className="footer-group">
+              <summary className="footer-group__heading">Contact</summary>
+              <address className="site-footer__address">
+                <p>Ogun State, Nigeria</p>
+                <p>
+                  <a className="link" href="mailto:universaldictacouture@gmail.com">
+                    universaldictacouture@gmail.com
+                  </a>
+                </p>
+                <p>
+                  <a className="link" href="tel:09061959388">
+                    09061959388
+                  </a>
+                </p>
+                <p>8:00 AM–6:00 PM</p>
+              </address>
+            </details>
+          </nav>
+
           {/* Decorative typographic flourish only — not a signature. No
-              authentic signature asset exists, so per the brief this is an
-              abstract monogram treatment rather than an invented one. */}
+              authentic signature asset exists, so per the brief this is
+              an abstract monogram treatment rather than an invented one. */}
           <span className="site-footer__flourish" aria-hidden="true">
             UDC
           </span>
         </div>
+      </div>
+
+      <div className="container site-footer__cta-row">
+        <Button to="/chats" variant="primary" className="site-footer__cta">
+          <ChatBubbleIcon size={18} />
+          Chat with Dicta Couturier
+        </Button>
+      </div>
+
+      <div className="site-footer__base">
+        <p className="container site-footer__legal">
+          &copy; {year} {BRAND.name}. All rights reserved.
+        </p>
       </div>
     </footer>
   );

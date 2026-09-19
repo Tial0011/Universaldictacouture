@@ -60,3 +60,15 @@ export function WhatsAppIcon(props) {
     </svg>
   );
 }
+
+/** Simple chat-bubble mark for the footer's "Chat with Dicta Couturier"
+ *  call-to-action button. Original geometry, not traced from any icon set. */
+export function ChatBubbleIcon(props) {
+  return (
+    <svg {...common} width={props.size ?? 18} height={props.size ?? 18} className={props.className}>
+      <path d="M4 5.5h16v10H9.5L5.5 19v-3.5H4v-10Z" />
+      <path d="M8 9.5h8" />
+      <path d="M8 12.5h5" />
+    </svg>
+  );
+}

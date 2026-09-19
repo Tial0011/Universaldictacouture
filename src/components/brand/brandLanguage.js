@@ -9,4 +9,7 @@ export const BRAND = {
   tagline: "WEAR CULTURE, PRESERVE HERITAGE!",
   declaration: "UNAPOLOGETICALLY INDIGENOUS. UNIVERSALLY TAILORED.",
   supportingLine: "Honouring the future through our everyday wear of Aso Oke!",
+  // Footer-specific brand line, given explicitly in the footer brief —
+  // shown under the logo in the footer only.
+  footerHeadline: "More Than Fashion.\nA Heritage You Wear.",
 };
