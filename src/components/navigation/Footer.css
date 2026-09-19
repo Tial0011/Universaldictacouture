@@ -41,7 +41,9 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-xs);
-  flex: 1 1 auto;
+  /* Even 50/50 split with the nav column — an invisible centre line
+     down the footer, matched below at tablet/desktop. */
+  flex: 1 1 50%;
   min-width: 0;
 }
 
@@ -76,7 +78,10 @@
 
 .site-footer__legal {
   margin: 0;
-  font-size: var(--text-xs);
+  /* Smaller than the --text-xs token (which has a 0.8125rem ceiling)
+     so the copyright line stays on one line in its half of the
+     footer instead of wrapping or crowding the social row. */
+  font-size: 0.6875rem;
   color: var(--on-brand-faint);
 }
 
@@ -86,7 +91,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-2xs);
-  flex: 1 1 auto;
+  flex: 1 1 50%;
   min-width: 0;
 }
 
@@ -246,24 +251,18 @@
 .site-footer__cta-row {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  justify-content: flex-end;
   padding-bottom: var(--space-lg);
 }
 
-/* Invisible column that matches the brand block's width in the row
-   above, so the CTA occupies exactly the nav column's box. */
-.site-footer__cta-spacer {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
 /* Local override: bright red pill (see --footer-cta-red above),
-   matching the reference's call-to-action button — sized to its
-   content and aligned under the signature, never stretched full-width. */
+   matching the reference's call-to-action button — short, sized to
+   its content, and pinned to the right edge rather than stretched. */
 .site-footer__cta.btn--primary {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   width: auto;
   justify-content: center;
+  padding-inline: var(--space-md);
   border-radius: var(--radius-pill);
   background-color: var(--footer-cta-red);
   border-color: var(--footer-cta-red);
@@ -287,10 +286,6 @@
   .site-footer__top {
     align-items: flex-start;
     padding-block: var(--space-xl) var(--space-lg);
-  }
-
-  .site-footer__brand-block {
-    flex: 0 1 22rem;
   }
 
   .site-footer__logo {
@@ -349,10 +344,6 @@
      open state, without altering that state. */
   .footer-group > ul {
     display: block !important;
-  }
-
-  .site-footer__cta-spacer {
-    flex: 0 1 22rem;
   }
 
   .site-footer__cta.btn--primary {

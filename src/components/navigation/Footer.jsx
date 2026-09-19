@@ -163,9 +163,6 @@ export default function Footer() {
       </div>
 
       <div className="container site-footer__cta-row">
-        {/* Mirrors the brand column's width above so the CTA starts on the
-            same left edge as the Shop / Customer Care / Policies rows. */}
-        <div className="site-footer__cta-spacer" aria-hidden="true" />
         <Button to="/chats" variant="primary" className="site-footer__cta">
           <ChatBubbleIcon size={18} />
           Chat with Dicta Couturier
