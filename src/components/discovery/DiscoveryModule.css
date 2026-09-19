@@ -1,6 +1,64 @@
+.discovery__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
 .discovery__title {
   font-size: var(--text-xl);
-  margin-bottom: var(--space-md);
+  margin: 0;
+}
+
+.discovery__view-all {
+  flex: 0 0 auto;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-brand);
+  white-space: nowrap;
+}
+
+@media (hover: hover) {
+  .discovery__view-all:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+}
+
+/* ---------- Homepage variant: circular portraits in a scrolling row,
+   matching the reference's "Shop by Occasion" treatment. Scoped to
+   .discovery--home so the Shop page's square grid is untouched. ---------- */
+.discovery--home .discovery__list {
+  display: flex;
+  gap: var(--space-md);
+  overflow-x: auto;
+  padding-bottom: var(--space-3xs);
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.discovery--home .discovery__list > li {
+  flex: 0 0 auto;
+  width: 6.5rem;
+  scroll-snap-align: start;
+}
+
+.discovery--home .discovery__media {
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+}
+
+.discovery--home .discovery__name {
+  font-size: var(--text-xs);
+}
+
+@media (min-width: 640px) {
+  .discovery--home .discovery__list > li {
+    width: 8rem;
+  }
 }
 
 .discovery__groups {

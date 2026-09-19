@@ -12,7 +12,7 @@ import "./DiscoveryModule.css";
  * valid destination are filtered out upstream, so anything reaching
  * this component is safe to render.
  */
-export default function DiscoveryModule({ module, headingLevel = "h2", className = "" }) {
+export default function DiscoveryModule({ module, headingLevel = "h2", className = "", viewAllTo }) {
   const [activeGroup, setActiveGroup] = useState(module?.groups?.[0]?.id ?? "");
   const Heading = headingLevel;
 
@@ -26,9 +26,16 @@ export default function DiscoveryModule({ module, headingLevel = "h2", className
 
   return (
     <section className={`discovery ${className}`.trim()} aria-labelledby={`discovery-${module.id}`}>
-      <Heading id={`discovery-${module.id}`} className="discovery__title">
-        {module.title}
-      </Heading>
+      <div className="discovery__head">
+        <Heading id={`discovery-${module.id}`} className="discovery__title">
+          {module.title}
+        </Heading>
+        {viewAllTo ? (
+          <Link className="discovery__view-all" to={viewAllTo}>
+            View all
+          </Link>
+        ) : null}
+      </div>
 
       {module.groups?.length > 1 ? (
         <div className="discovery__groups" role="tablist" aria-label={`${module.title} groups`}>

@@ -279,8 +279,25 @@
     box-shadow: 0 -5px 20px rgba(31, 17, 18, .06);
   }
 
-  .site-header__mobile-bottom a { font-size: var(--text-xs); color: var(--color-text-secondary); text-align: center; }
-  .site-header__chat-launcher { display: none; }
+  .site-header__mobile-bottom a {
+    flex-direction: column;
+    gap: .2rem;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    text-align: center;
+    min-height: 0;
+  }
+
+  /* Reference shows the floating launcher on mobile too, sitting just
+     above the fixed tab bar rather than hidden — so it stays visible
+     here and is only repositioned, not removed. */
+  .site-header__chat-launcher {
+    right: max(.75rem, env(safe-area-inset-right));
+    bottom: calc(60px + env(safe-area-inset-bottom) + .75rem);
+    padding: .55rem .8rem;
+    font-size: .65rem;
+    gap: .4rem;
+  }
 
   body { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
 }

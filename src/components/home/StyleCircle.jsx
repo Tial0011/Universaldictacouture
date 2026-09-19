@@ -50,7 +50,7 @@ export default function StyleCircle() {
   };
 
   return (
-    <section className="style-circle" aria-labelledby="home-style-circle">
+    <section className="style-circle surface--brand" aria-labelledby="home-style-circle">
       <div className="container style-circle__inner">
         <h2 id="home-style-circle">Style Circle</h2>
         <p className="style-circle__intro">

@@ -193,6 +193,29 @@ export function buildOccasionDiscovery(products, title = "Shop by Occasion") {
   return { id: "occasion-fallback", title, groups: [], items };
 }
 
+/**
+ * Custom Style homepage promotion image. Admin-managed, single
+ * document; returns a null image (never a stand-in photo) when
+ * nothing has been published yet or Firebase is disabled.
+ */
+export async function fetchCustomStylePromo() {
+  const fallback = { image: null };
+  if (!isFirebaseConfigured) return fallback;
+
+  try {
+    const snapshot = await getDocs(
+      query(collection(db, "homeSections"), where("section", "==", "customStyle"), limit(1))
+    );
+    const entry = snapshot.docs[0];
+    if (!entry) return fallback;
+    const data = entry.data() ?? {};
+    return { image: normaliseImage(data.image) };
+  } catch (error) {
+    if (import.meta.env.DEV) console.error(error);
+    return fallback;
+  }
+}
+
 /** Published review / feed entries for the homepage preview. */
 export async function fetchPublishedReviews(max = 3) {
   if (!isFirebaseConfigured) return [];

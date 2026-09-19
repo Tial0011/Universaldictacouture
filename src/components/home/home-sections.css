@@ -1,51 +1,78 @@
 /* ---------- Trust / service strip ---------- */
-.trust-strip {
-  background-color: var(--color-white);
-  border-bottom: 1px solid var(--color-border);
+/* Floating card that overlaps the bottom edge of the hero, the way
+   the reference layers it — pulled up with a negative margin so the
+   page reads Hero → (card sits across the seam) → the rest. */
+.trust-strip-wrap {
+  position: relative;
+  z-index: 1;
+  margin-top: -2.25rem;
+  margin-bottom: var(--space-sm);
 }
 
-.trust-strip__list {
+.trust-strip {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-2xs) var(--space-sm);
+  gap: var(--space-sm) var(--space-2xs);
   margin: 0;
-  padding-block: var(--space-sm);
+  padding: var(--space-sm) var(--space-xs);
   list-style: none;
-}
-
-.trust-strip__item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: var(--touch-target);
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  letter-spacing: var(--tracking-wide);
-  text-align: center;
-  color: var(--color-text-secondary);
+  background-color: var(--color-white);
+  border-radius: var(--radius-surface);
+  box-shadow: var(--shadow-soft);
 }
 
 .trust-strip__item:last-child:nth-child(odd) {
   grid-column: 1 / -1;
 }
 
-.trust-strip__link {
-  display: inline-flex;
+.trust-strip__link,
+.trust-strip__static {
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: var(--space-3xs);
   min-height: var(--touch-target);
+  text-align: center;
+  color: var(--color-text-primary);
+}
+
+.trust-strip__link svg,
+.trust-strip__static svg {
   color: var(--color-brand);
+}
+
+.trust-strip__link span,
+.trust-strip__static span {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
   font-weight: var(--weight-medium);
-  text-decoration: underline;
-  text-underline-offset: 0.25em;
+  letter-spacing: var(--tracking-normal);
+  line-height: var(--leading-snug);
+}
+
+@media (hover: hover) {
+  .trust-strip__link:hover {
+    color: var(--color-brand);
+  }
 }
 
 @media (min-width: 900px) {
-  .trust-strip__list {
+  .trust-strip-wrap {
+    margin-top: -3rem;
+  }
+
+  .trust-strip {
     grid-template-columns: repeat(5, minmax(0, 1fr));
+    padding: var(--space-md) var(--space-lg);
   }
 
   .trust-strip__item:last-child:nth-child(odd) {
     grid-column: auto;
+  }
+
+  .trust-strip__link span,
+  .trust-strip__static span {
+    font-size: var(--text-xs);
   }
 }
 
@@ -85,44 +112,57 @@
 
 /* ---------- Custom Style promotion ---------- */
 .custom-promo {
-  background-color: var(--color-brand);
-  color: var(--color-text-on-brand);
+  background-color: var(--color-ivory);
 }
 
 .custom-promo__inner {
+  display: grid;
+  gap: var(--space-md);
+  padding-block: var(--section-space);
+}
+
+.custom-promo__media {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-surface);
+}
+
+.custom-promo__copy {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-sm);
-  padding-block: var(--section-space);
 }
 
 .custom-promo h2 {
-  color: inherit;
+  margin: 0;
   font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
+}
+
+.custom-promo__secondary {
+  display: block;
+  font-style: italic;
+  color: var(--color-accent);
 }
 
 .custom-promo p {
+  margin: 0;
   max-width: 46ch;
   font-size: var(--text-md);
   line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
 }
 
-.custom-promo .btn--primary {
-  background-color: var(--color-white);
-  border-color: var(--color-white);
-  color: var(--color-brand);
-}
+@media (min-width: 768px) {
+  .custom-promo__inner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+    gap: var(--space-xl);
+  }
 
-.custom-promo :focus-visible {
-  outline-color: var(--color-focus-ring-inverse);
-}
-
-@media (hover: hover) {
-  .custom-promo .btn--primary:hover:not(:disabled) {
-    background-color: var(--color-ivory);
-    border-color: var(--color-ivory);
-    color: var(--color-brand);
+  .custom-promo__media {
+    aspect-ratio: 3 / 4;
   }
 }
 
@@ -162,9 +202,14 @@
 }
 
 /* ---------- Style Circle ---------- */
-.style-circle {
-  background-color: var(--color-white);
-  border-block: 1px solid var(--color-border);
+/* Wine surface (see .surface--brand in surfaces.css) so the page
+   flows Reviews & Feeds (white) → Style Circle (wine) → Footer
+   (wine) instead of jumping straight from white into the footer.
+   The form's label/status text needs the light-on-wine overrides
+   below since .form-control's own light background keeps the input
+   itself readable without any change. */
+.style-circle .field__label {
+  color: inherit;
 }
 
 .style-circle__inner {
@@ -181,7 +226,7 @@
 
 .style-circle__intro {
   max-width: 48ch;
-  color: var(--color-text-secondary);
+  color: var(--on-brand-muted, rgba(251, 248, 242, 0.72));
 }
 
 .style-circle__form {
@@ -197,14 +242,31 @@
   flex: 1;
 }
 
+/* The button's default fill is the same wine as this section's
+   background, so it needs the light/on-brand swap used elsewhere
+   (see the footer's own CTA and the old custom-promo button). */
+.style-circle .btn--primary {
+  background-color: var(--color-white);
+  border-color: var(--color-white);
+  color: var(--color-brand);
+}
+
+@media (hover: hover) {
+  .style-circle .btn--primary:hover:not(:disabled) {
+    background-color: var(--color-ivory);
+    border-color: var(--color-ivory);
+    color: var(--color-brand);
+  }
+}
+
 .style-circle__status {
   min-height: 1.5rem;
   font-size: var(--text-sm);
-  color: var(--color-text-secondary);
+  color: var(--on-brand-muted, rgba(251, 248, 242, 0.72));
 }
 
 .style-circle__status--error {
-  color: var(--color-brand);
+  color: var(--color-accent);
   font-weight: var(--weight-medium);
 }
 

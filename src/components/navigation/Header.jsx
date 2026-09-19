@@ -43,11 +43,13 @@ function Icon({ name, size = 20 }) {
     menu: <><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></>,
     close: <><path d="m6 6 12 12" /><path d="M18 6 6 18" /></>,
     chat: <><path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 8.8 8.8 0 0 1-3.3-.7L4 20l1.5-4.1A7.2 7.2 0 0 1 4.5 12 7.5 7.5 0 0 1 12 4.5a7.5 7.5 0 0 1 8 7Z" /><path d="M8 11.5h.01M12 11.5h.01M16 11.5h.01" /></>,
+    home: <><path d="M4 11.5 12 4l8 7.5" /><path d="M6 10v9.5h12V10" /><path d="M9.75 19.5V14h4.5v5.5" /></>,
+    bag: <><path d="M7 8.5V7a5 5 0 0 1 10 0v1.5" /><path d="M5.5 8.5h13l.9 12.2a1.5 1.5 0 0 1-1.5 1.6H6.1a1.5 1.5 0 0 1-1.5-1.6Z" /></>,
   };
   return <svg {...common}>{paths[name]}</svg>;
 }
 
-function HeaderLink({ to, label, end = false, onNavigate }) {
+function HeaderLink({ to, label, end = false, onNavigate, icon }) {
   return (
     <NavLink
       to={to}
@@ -55,7 +57,8 @@ function HeaderLink({ to, label, end = false, onNavigate }) {
       onClick={onNavigate}
       className={({ isActive }) => (isActive ? "is-active" : undefined)}
     >
-      {label}
+      {icon ? <Icon name={icon} size={22} /> : null}
+      <span>{label}</span>
     </NavLink>
   );
 }
@@ -204,10 +207,10 @@ export default function Header() {
       </div>
 
       <nav className="site-header__mobile-bottom" aria-label="Mobile primary navigation">
-        <HeaderLink to="/" label="Home" end />
-        <HeaderLink to="/shop" label="Shop" />
-        <HeaderLink to="/chats" label="Chats" />
-        <HeaderLink to="/my-closet" label="My Closet" />
+        <HeaderLink to="/" label="Home" icon="home" end />
+        <HeaderLink to="/shop" label="Shop" icon="bag" />
+        <HeaderLink to="/chats" label="Chats" icon="chat" />
+        <HeaderLink to="/my-closet" label="My Closet" icon="closet" />
       </nav>
 
       <NavLink className="site-header__chat-launcher" to="/chats" aria-label="Chat with Dicta Couturier">

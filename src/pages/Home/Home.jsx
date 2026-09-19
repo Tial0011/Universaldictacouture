@@ -12,6 +12,7 @@ import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import {
   APPROVED_HERO_COPY,
   buildOccasionDiscovery,
+  fetchCustomStylePromo,
   fetchDiscoveryModule,
   fetchHeroSlides,
   fetchPublishedReviews,
@@ -35,6 +36,7 @@ export default function Home() {
   const [slides, setSlides] = useState(FALLBACK_SLIDE);
   const [discovery, setDiscovery] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [customStyleImage, setCustomStyleImage] = useState(null);
   const [isHeroReady, setIsHeroReady] = useState(false);
 
   useDocumentMeta({
@@ -63,6 +65,10 @@ export default function Home() {
       if (active) setReviews(entries);
     });
 
+    fetchCustomStylePromo().then((result) => {
+      if (active) setCustomStyleImage(result.image);
+    });
+
     return () => {
       active = false;
     };
@@ -87,13 +93,13 @@ export default function Home() {
 
       {discoveryModule ? (
         <div className="home-section container">
-          <DiscoveryModule module={discoveryModule} />
+          <DiscoveryModule module={discoveryModule} className="discovery--home" viewAllTo="/shop" />
         </div>
       ) : null}
 
       <NewIn products={newInProducts} isLoading={isLoading} error={error} />
 
-      <CustomStylePromo />
+      <CustomStylePromo image={customStyleImage} />
 
       <ReviewsPreview entries={reviews} />
 
