@@ -84,7 +84,7 @@
 .site-footer__links {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: var(--space-2xs);
   flex: 1 1 auto;
   min-width: 0;
@@ -106,7 +106,7 @@
 .footer-group__heading {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: var(--space-2xs);
   min-height: 2.25rem;
   font-family: var(--font-body);
@@ -116,7 +116,7 @@
   color: var(--color-white);
   cursor: pointer;
   list-style: none;
-  text-align: right;
+  text-align: left;
 }
 
 .footer-group__heading::-webkit-details-marker {
@@ -143,16 +143,51 @@
   margin: 0;
   padding: 0 0 var(--space-2xs);
   list-style: none;
-  text-align: right;
+  text-align: left;
 }
 
 .footer-group a {
   display: inline-flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   min-height: 2rem;
   font-size: var(--text-sm);
   color: var(--on-brand-muted);
+}
+
+/* ---------- Direct page rows (About Us / Our Story / Policies) ----------
+   Same row rhythm as a collapsible group, but each is a plain link, so
+   the chevron points right (navigation) instead of down (expand). */
+.footer-direct__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2xs);
+  min-height: 2.25rem;
+  padding-block: var(--space-3xs);
+  border-top: 1px solid var(--on-brand-border);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-white);
+  text-align: left;
+}
+
+.footer-direct__link::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+}
+
+@media (hover: hover) {
+  .footer-direct__link:hover {
+    color: var(--color-accent);
+  }
 }
 
 @media (hover: hover) {
@@ -163,30 +198,8 @@
   }
 }
 
-.site-footer__address {
-  font-style: normal;
-  font-size: var(--text-sm);
-  color: var(--on-brand-muted);
-  text-align: right;
-  padding-bottom: var(--space-2xs);
-}
-
-.site-footer__address p {
-  margin-bottom: var(--space-3xs);
-}
-
-.site-footer__address .link {
-  text-decoration-color: var(--on-brand-border-strong);
-}
-
-@media (hover: hover) {
-  .site-footer__address .link:hover {
-    color: var(--color-accent);
-  }
-}
-
 /* Signature, cropped from the client's reference design — decorative
-   only, sits under the Shop/Customer Care/Explore/Contact rows. */
+   only, sits under the Shop/Customer Care/About Us rows. */
 .site-footer__flourish {
   display: block;
   width: 9rem;
@@ -232,15 +245,26 @@
 /* ---------- CTA row ---------- */
 .site-footer__cta-row {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-sm);
   padding-bottom: var(--space-lg);
+}
+
+/* Invisible column that matches the brand block's width in the row
+   above, so the CTA occupies exactly the nav column's box. */
+.site-footer__cta-spacer {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 /* Local override: bright red pill (see --footer-cta-red above),
    matching the reference's call-to-action button — sized to its
    content and aligned under the signature, never stretched full-width. */
 .site-footer__cta.btn--primary {
+  flex: 1 1 auto;
   width: auto;
+  justify-content: center;
+  border-radius: var(--radius-pill);
   background-color: var(--footer-cta-red);
   border-color: var(--footer-cta-red);
   color: var(--color-white);
@@ -278,6 +302,26 @@
     gap: var(--space-lg);
   }
 
+  /* From tablet up the three direct pages read as a third column. */
+  .footer-direct {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  .footer-direct__link {
+    min-height: 0;
+    padding-block: 0;
+    border-top: 0;
+    justify-content: flex-start;
+    font-weight: var(--weight-regular, 400);
+    color: var(--on-brand-muted);
+  }
+
+  .footer-direct__link::after {
+    display: none;
+  }
+
   .footer-group {
     border-top: 0;
     padding-block: 0;
@@ -303,9 +347,12 @@
      tablet width up the full footer nav should read as always-open
      columns — so their content is shown regardless of the element's
      open state, without altering that state. */
-  .footer-group > ul,
-  .footer-group > address {
+  .footer-group > ul {
     display: block !important;
+  }
+
+  .site-footer__cta-spacer {
+    flex: 0 1 22rem;
   }
 
   .site-footer__cta.btn--primary {

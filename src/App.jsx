@@ -10,6 +10,8 @@ import CustomStyle from "./pages/CustomStyle/CustomStyle";
 import ReviewsFeeds from "./pages/ReviewsFeeds/ReviewsFeeds";
 import Chats from "./pages/Chats/Chats";
 import About from "./pages/About/About";
+import OurStory from "./pages/OurStory/OurStory";
+import Policies from "./pages/Policies/Policies";
 import Profile from "./pages/Profile/Profile";
 import SavedPieces from "./pages/SavedPieces/SavedPieces";
 import MyCloset from "./pages/MyCloset/MyCloset";
@@ -33,6 +35,8 @@ export default function App() {
         <Route path="/reviews-feeds" element={<ReviewsFeeds />} />
         <Route path="/chats" element={<Chats />} />
         <Route path="/about" element={<About />} />
+        <Route path="/our-story" element={<OurStory />} />
+        <Route path="/policies" element={<Policies />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/saved-pieces" element={<SavedPieces />} />
         <Route path="/my-closet" element={<MyCloset />} />

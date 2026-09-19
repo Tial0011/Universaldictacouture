@@ -71,7 +71,7 @@ export default function Home() {
   // Admin-managed discovery wins; otherwise the module is built from
   // occasions that genuinely exist in the published catalogue.
   const discoveryModule = discovery ?? buildOccasionDiscovery(products);
-  const newInProducts = selectNewIn(products, 8);
+  const newInProducts = selectNewIn(products, 6);
 
   return (
     <>

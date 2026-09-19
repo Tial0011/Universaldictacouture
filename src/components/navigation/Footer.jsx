@@ -34,14 +34,14 @@ const NAV_GROUPS = [
       { to: "/my-closet", label: "My Closet" },
     ],
   },
-  {
-    id: "info",
-    heading: "Explore",
-    links: [
-      { to: "/", label: "Home" },
-      { to: "/about", label: "About Us" },
-    ],
-  },
+];
+
+/** Single-destination footer rows (no dropdown) — they navigate
+ *  straight to their page rather than expanding a list. */
+const DIRECT_LINKS = [
+  { to: "/about", label: "About Us" },
+  { to: "/our-story", label: "Our Story" },
+  { to: "/policies", label: "Policies" },
 ];
 
 const SOCIAL_ICONS = {
@@ -134,30 +134,20 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* Right: collapsible nav rows + contact, then the signature. */}
+        {/* Right: collapsible nav rows + direct pages, then the signature. */}
         <div className="site-footer__links">
           <nav aria-label="Footer navigation" className="site-footer__nav-groups">
             {NAV_GROUPS.map((group) => (
               <FooterNavGroup key={group.id} heading={group.heading} links={group.links} />
             ))}
 
-            <details className="footer-group">
-              <summary className="footer-group__heading">Contact</summary>
-              <address className="site-footer__address">
-                <p>Ogun State, Nigeria</p>
-                <p>
-                  <a className="link" href="mailto:universaldictacouture@gmail.com">
-                    universaldictacouture@gmail.com
-                  </a>
-                </p>
-                <p>
-                  <a className="link" href="tel:09061959388">
-                    09061959388
-                  </a>
-                </p>
-                <p>8:00 AM–6:00 PM</p>
-              </address>
-            </details>
+            <div className="footer-direct">
+              {DIRECT_LINKS.map((link) => (
+                <Link key={link.to} to={link.to} className="footer-direct__link">
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           </nav>
 
           {/* Cropped from the client-provided reference design (not
@@ -173,6 +163,9 @@ export default function Footer() {
       </div>
 
       <div className="container site-footer__cta-row">
+        {/* Mirrors the brand column's width above so the CTA starts on the
+            same left edge as the Shop / Customer Care / Policies rows. */}
+        <div className="site-footer__cta-spacer" aria-hidden="true" />
         <Button to="/chats" variant="primary" className="site-footer__cta">
           <ChatBubbleIcon size={18} />
           Chat with Dicta Couturier
