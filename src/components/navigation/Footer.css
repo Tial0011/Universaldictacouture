@@ -1,21 +1,30 @@
+/*
+  Footer.
+  Background stays warm ivory/white rather than the reference
+  mockup's wine block: the logo artwork is documented (Logo.css) as
+  wine + near-black on transparent, safe only on ivory or white —
+  never on wine — so a dark-wine footer would make it illegible.
+  Premium/editorial feel instead comes from generous spacing, the
+  display-font supporting line, and a thin gold divider.
+*/
 .site-footer {
-  border-top: 1px solid var(--color-border);
   margin-top: var(--section-space);
-  background-color: var(--color-white);
+  background-color: var(--color-ivory);
+  border-top: 1px solid var(--color-border);
 }
 
-.site-footer__inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-lg);
-  padding-block: var(--space-lg);
-}
-
-.site-footer__brand {
+/* ---------- Brand block ---------- */
+.site-footer__brand-block {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-2xs);
+  text-align: center;
+  padding-block: var(--space-lg) var(--space-md);
+}
+
+.site-footer__logo {
+  margin-bottom: var(--space-3xs);
 }
 
 .site-footer__tagline {
@@ -26,6 +35,15 @@
   color: var(--color-brand);
 }
 
+.site-footer__line {
+  max-width: 34ch;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-style: italic;
+  line-height: var(--leading-snug);
+  color: var(--color-text-primary);
+}
+
 .site-footer__declaration {
   font-family: var(--font-body);
   font-size: var(--text-xs);
@@ -33,35 +51,89 @@
   color: var(--color-text-secondary);
 }
 
-.site-footer__line {
-  max-width: 34ch;
-  font-family: var(--font-display);
-  font-size: var(--text-md);
-  font-style: italic;
-  line-height: var(--leading-snug);
+.site-footer__divider {
+  width: 4rem;
+  height: 2px;
+  margin: 0 auto;
+  background-color: var(--color-accent);
+  opacity: 0.6;
 }
 
-.site-footer__heading {
+/* ---------- Nav / contact / social grid ---------- */
+.site-footer__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 var(--space-md);
+  padding-block: var(--space-sm) var(--space-md);
+}
+
+.site-footer__nav-groups {
+  display: flex;
+  flex-direction: column;
+}
+
+/* One nav group (Shop / Customer Care / Information) or a static
+   group (Contact / Follow Us) — same divided-row treatment on mobile. */
+.footer-group {
+  border-top: 1px solid var(--color-border);
+  padding-block: var(--space-2xs);
+}
+
+.footer-group--static {
+  padding-block: var(--space-md);
+}
+
+.footer-group__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  min-height: var(--touch-target);
   font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-wide);
-  margin-bottom: var(--space-2xs);
-}
-
-.site-footer__contact .site-footer__heading + .site-footer__heading,
-.site-footer__address + .site-footer__heading {
-  margin-top: var(--space-md);
-}
-
-.site-footer__nav ul,
-.site-footer__social {
-  margin: 0;
-  padding: 0;
+  color: var(--color-brand);
+  cursor: pointer;
   list-style: none;
 }
 
-.site-footer__nav a {
+.footer-group__heading::-webkit-details-marker {
+  display: none;
+}
+
+/* Simple CSS chevron — rotates open/closed, no icon asset needed. */
+.footer-group__heading::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.footer-group[open] > .footer-group__heading::after {
+  transform: rotate(225deg);
+}
+
+.footer-group__heading--static {
+  margin: 0;
+  cursor: default;
+}
+
+.footer-group__heading--static::after {
+  display: none;
+}
+
+.footer-group ul {
+  margin: 0;
+  padding: 0 0 var(--space-sm);
+  list-style: none;
+}
+
+.footer-group a {
   display: inline-flex;
   align-items: center;
   min-height: var(--touch-target);
@@ -70,7 +142,7 @@
 }
 
 @media (hover: hover) {
-  .site-footer__nav a:hover {
+  .footer-group a:hover {
     color: var(--color-brand);
     text-decoration: underline;
     text-underline-offset: 0.25em;
@@ -81,29 +153,114 @@
   font-style: normal;
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
+  padding-top: var(--space-2xs);
 }
 
 .site-footer__address p {
   margin-bottom: var(--space-3xs);
 }
 
-.site-footer__social {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
+/* ---------- Social ---------- */
+.footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  margin: 0;
+  padding-top: var(--space-2xs);
+  list-style: none;
 }
 
+.footer-social__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  color: var(--color-brand);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-pill);
+}
+
+.footer-social__link--pending {
+  opacity: 0.4;
+  cursor: default;
+}
+
+@media (hover: hover) {
+  a.footer-social__link:hover {
+    color: var(--color-white);
+    background-color: var(--color-brand);
+    border-color: var(--color-brand);
+  }
+}
+
+/* ---------- Copyright ---------- */
 .site-footer__base {
-  padding-bottom: var(--space-lg);
+  border-top: 1px solid var(--color-border);
+  padding-block: var(--space-sm);
 }
 
 .site-footer__legal {
-  font-size: var(--text-sm);
+  text-align: center;
+  font-size: var(--text-xs);
   color: var(--color-text-secondary);
 }
 
+/* ---------- Desktop: multi-column, static headings ---------- */
 @media (min-width: 768px) {
-  .site-footer__inner {
-    grid-template-columns: 1.4fr 1fr 1fr 1.3fr;
-    gap: var(--space-md);
+  .site-footer__brand-block {
+    padding-block: var(--space-xl) var(--space-lg);
+  }
+
+  .site-footer__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) 1.2fr 1fr;
+    align-items: start;
+    gap: var(--space-md) var(--space-lg);
+    padding-block: var(--space-lg) var(--space-md);
+  }
+
+  /* The <nav> wrapper drops out of the box model so its three groups
+     become direct grid items, sitting alongside Contact and Follow Us. */
+  .site-footer__nav-groups {
+    display: contents;
+  }
+
+  .footer-group,
+  .footer-group--static {
+    border-top: 0;
+    padding-block: 0;
+  }
+
+  .footer-group__heading {
+    min-height: 0;
+    margin-bottom: var(--space-sm);
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .footer-group__heading::after {
+    display: none;
+  }
+
+  .footer-group ul {
+    padding-bottom: 0;
+  }
+
+  .footer-group a {
+    min-height: 2.1rem;
+  }
+
+  .site-footer__address {
+    padding-top: 0;
+  }
+
+  .footer-social {
+    padding-top: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-group__heading::after {
+    transition: none;
   }
 }
