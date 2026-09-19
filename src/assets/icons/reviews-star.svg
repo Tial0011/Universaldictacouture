@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <!--
+    Outlined five-point star for "Reviews" — plain geometry (a single
+    ten-vertex star polygon, unfilled), not a filled/solid star and not
+    a library glyph. Uses currentColor so it inherits the brand wine.
+  -->
+  <path
+    d="M12 4.1 13.94 9.73 19.89 9.84 15.14 13.42 16.88 19.11 12 15.7 7.12 19.11 8.86 13.42 4.11 9.84 10.06 9.73 Z"
+    stroke="currentColor"
+    stroke-width="1.4"
+    stroke-linejoin="round"
+  />
+</svg>

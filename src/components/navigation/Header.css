@@ -62,7 +62,6 @@
 .site-header__primary a,
 .site-header__tool,
 .site-header__icon-button,
-.site-header__mobile-reviews,
 .site-header__mobile-bottom a,
 .site-header__drawer a {
   min-height: var(--touch-target);
@@ -163,7 +162,7 @@
   .site-header__primary a:hover,
   .site-header__tool:hover,
   .site-header__icon-button:hover,
-  .site-header__mobile-reviews:hover,
+  .site-header__action:hover,
   .site-header__mobile-bottom a:hover,
   .site-header__drawer a:hover {
     color: var(--color-brand);
@@ -188,25 +187,62 @@
   .site-header__mobile-top {
     min-height: 64px;
     display: grid;
-    grid-template-columns: var(--touch-target) minmax(0, 1fr) var(--touch-target) var(--touch-target) auto;
+    grid-template-columns: var(--touch-target) minmax(0, 1fr) auto;
     align-items: center;
-    gap: .2rem;
+    gap: .25rem;
   }
 
   .site-header__mobile-brand { justify-self: center; max-width: 150px; overflow: hidden; }
   .site-header__mobile-brand .logo { height: 48px; width: auto; }
 
-  .site-header__icon-button,
-  .site-header__mobile-reviews {
-    color: var(--color-text-primary);
+  /* Hamburger — wine/red, thin strokes, no fill. */
+  .site-header__icon-button {
+    color: var(--color-brand);
     background: transparent;
     border: 0;
-    padding: 0 .25rem;
+    padding: 0 .2rem;
     font: inherit;
-    font-size: var(--text-xs);
   }
 
-  .site-header__mobile-reviews { white-space: nowrap; }
+  /* Search / Custom Style / Reviews, right-aligned as one group so the
+     three sit together the way the reference shows them. */
+  .site-header__mobile-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: clamp(.35rem, 2.5vw, .75rem);
+    min-width: 0;
+  }
+
+  .site-header__action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .2rem;
+    min-height: var(--touch-target);
+    padding: 0 .15rem;
+    color: var(--color-brand);
+    background: transparent;
+    border: 0;
+    font-family: var(--font-body);
+  }
+
+  .site-header__action span {
+    font-size: 0.6rem;
+    font-weight: var(--weight-medium);
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .site-header__action--icon-only {
+    flex-direction: row;
+  }
+
+  @media (max-width: 360px) {
+    .site-header__mobile-actions { gap: .3rem; }
+    .site-header__action span { font-size: 0.56rem; }
+  }
 
   .site-header__drawer {
     max-height: 0;

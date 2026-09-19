@@ -1,6 +1,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import Logo from "../brand/Logo";
+import CustomStyleIcon from "./icons/CustomStyleIcon";
+import ReviewsIcon from "./icons/ReviewsIcon";
 import "./Header.css";
 
 const PRIMARY_LINKS = [
@@ -14,6 +16,8 @@ const PRIMARY_LINKS = [
 
 const MOBILE_DRAWER_LINKS = [
   { to: "/custom-style", label: "Custom Style" },
+  { to: "/reviews-feeds", label: "Reviews & Feeds" },
+  { to: "/saved-pieces", label: "Saved Pieces" },
   { to: "/about", label: "About" },
   { to: "/profile", label: "Profile" },
 ];
@@ -161,15 +165,24 @@ export default function Header() {
             <Logo size="header" />
           </NavLink>
 
-          <NavLink className="site-header__icon-button" to="/shop" aria-label="Product Search" title="Product Search">
-            <Icon name="search" />
-          </NavLink>
-          <NavLink className="site-header__icon-button" to="/saved-pieces" aria-label="Saved Pieces" title="Saved Pieces">
-            <Icon name="heart" />
-          </NavLink>
-          <NavLink className="site-header__mobile-reviews" to="/reviews-feeds" aria-label="Reviews & Feeds" title="Reviews & Feeds">
-            Reviews
-          </NavLink>
+          <div className="site-header__mobile-actions">
+            <NavLink
+              className="site-header__action site-header__action--icon-only"
+              to="/shop"
+              aria-label="Search"
+              title="Search"
+            >
+              <Icon name="search" size={20} />
+            </NavLink>
+            <NavLink className="site-header__action" to="/custom-style" aria-label="Custom Style">
+              <CustomStyleIcon size={21} />
+              <span>Custom Style</span>
+            </NavLink>
+            <NavLink className="site-header__action" to="/reviews-feeds" aria-label="Reviews">
+              <ReviewsIcon size={19} />
+              <span>Reviews</span>
+            </NavLink>
+          </div>
         </div>
 
         <div

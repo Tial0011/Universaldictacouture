@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <!--
+    Original "Custom Style" mark for Universal Dicta Couture:
+    a slender wand rising toward the upper right, a small faceted
+    diamond at its tip, and two sparkle accents above it. Drawn from
+    scratch as plain geometry (a stroked line, a diamond quad and two
+    four-point sparkle curves) — not derived from any icon library.
+    Uses currentColor so it inherits the brand wine wherever it's placed.
+  -->
+  <path d="M5.4 19.4 15 9.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+  <path d="M16.35 6.9 17.5 8.05 16.35 9.2 15.2 8.05 Z" fill="currentColor" />
+  <path d="M19.6 2.6 C 19.89 4.62 19.89 4.62 20.75 5.3 C 19.89 5.97 19.89 5.97 19.6 8.0 C 19.31 5.97 19.31 5.97 18.45 5.3 C 19.31 4.62 19.31 4.62 19.6 2.6 Z" fill="currentColor" />
+  <path d="M14.9 4.95 C 15.05 5.96 15.05 5.96 15.5 6.3 C 15.05 6.64 15.05 6.64 14.9 7.65 C 14.75 6.64 14.75 6.64 14.3 6.3 C 14.75 5.96 14.75 5.96 14.9 4.95 Z" fill="currentColor" />
+</svg>
