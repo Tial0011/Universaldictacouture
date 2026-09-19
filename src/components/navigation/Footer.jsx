@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import Button from "../common/Button";
 import Logo from "../brand/Logo";
 import { BRAND } from "../brand/brandLanguage";
 import { SOCIAL_LINKS } from "../../config/socialLinks";
@@ -8,7 +7,6 @@ import {
   InstagramIcon,
   LinkedInIcon,
   WhatsAppIcon,
-  ChatBubbleIcon,
 } from "./icons/SocialIcons";
 import footerSignature from "../../assets/brand/footer-signature.png";
 import "./Footer.css";
@@ -106,13 +104,10 @@ export default function Footer() {
       <div className="container site-footer__top">
         {/* Left: brand mark, footer headline, social row, copyright. */}
         <div className="site-footer__brand-block">
-          {/* The wordmark artwork is wine + near-black on transparent
-              (see Logo.css) and is only legible on a light surface, so
-              it sits on a small ivory plaque here rather than directly
-              on the wine footer background. */}
-          <div className="site-footer__logo-plaque">
-            <Logo size="footer" className="site-footer__logo" />
-          </div>
+          {/* White knockout of the wordmark (see logoAsset.js) sits
+              directly on the wine footer background — no plaque
+              needed since this variant is already legible on wine. */}
+          <Logo size="footer" variant="white" className="site-footer__logo" />
           <p className="site-footer__headline">
             {BRAND.footerHeadline.split("\n").map((line, i) => (
               <span key={i} className="site-footer__headline-line">
@@ -128,6 +123,13 @@ export default function Footer() {
               </li>
             ))}
           </ul>
+
+          <p className="site-footer__phone">
+            Mobile:{" "}
+            <a className="link" href="tel:+2349061959388">
+              09061959388
+            </a>
+          </p>
 
           <p className="site-footer__legal">
             &copy; {year} {BRAND.name}. All rights reserved.
@@ -160,13 +162,6 @@ export default function Footer() {
             className="site-footer__flourish"
           />
         </div>
-      </div>
-
-      <div className="container site-footer__cta-row">
-        <Button to="/chats" variant="primary" className="site-footer__cta">
-          <ChatBubbleIcon size={18} />
-          Chat with Dicta Couturier
-        </Button>
       </div>
     </footer>
   );

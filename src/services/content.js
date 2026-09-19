@@ -12,6 +12,7 @@
 import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { isFirebaseConfigured } from "../firebase/config";
+import heroReadyToWear from "../assets/images/hero/hero-ready-to-wear.jpg";
 
 /** The only hero concepts the specification approves. */
 export const APPROVED_HERO_CONCEPTS = [
@@ -64,7 +65,7 @@ export async function fetchHeroSlides() {
       id: "approved-primary",
       concept: "ready-to-wear",
       ...APPROVED_HERO_COPY,
-      image: null,
+      image: { url: heroReadyToWear, publicId: "", alt: "" },
       order: 0,
     },
   ];

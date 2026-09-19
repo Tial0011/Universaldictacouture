@@ -19,12 +19,6 @@
   --on-brand-faint: rgba(251, 248, 242, 0.45);
   --on-brand-border: rgba(251, 248, 242, 0.18);
   --on-brand-border-strong: rgba(251, 248, 242, 0.32);
-  /* One-off accent, not a global design-system colour: sampled from
-     the client's reference mockup's CTA button, which is a brighter,
-     more saturated red than the page's wine (so the button reads as
-     a clear call to action against the wine footer). Used only here. */
-  --footer-cta-red: #94081a;
-  --footer-cta-red-active: #7a0615;
 }
 
 /* ---------- Top: brand column + nav column, side by side from mobile up ---------- */
@@ -47,17 +41,6 @@
   min-width: 0;
 }
 
-/* Ivory plaque so the wine/ink wordmark artwork stays legible on the
-   wine footer background (see Logo.css: never render it on wine). */
-.site-footer__logo-plaque {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-2xs) var(--space-xs);
-  background-color: var(--color-ivory);
-  border-radius: var(--radius-surface);
-}
-
 .site-footer__logo {
   margin: 0;
   --logo-height: 38px;
@@ -74,6 +57,24 @@
 
 .site-footer__headline-line {
   display: block;
+}
+
+.site-footer__phone {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--on-brand-muted);
+}
+
+.site-footer__phone .link {
+  color: inherit;
+  font-weight: var(--weight-medium);
+}
+
+@media (hover: hover) {
+  .site-footer__phone .link:hover {
+    color: var(--color-accent);
+  }
 }
 
 .site-footer__legal {
@@ -247,40 +248,6 @@
   }
 }
 
-/* ---------- CTA row ---------- */
-.site-footer__cta-row {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-bottom: var(--space-lg);
-}
-
-/* Local override: bright red pill (see --footer-cta-red above),
-   matching the reference's call-to-action button — short, sized to
-   its content, and pinned to the right edge rather than stretched. */
-.site-footer__cta.btn--primary {
-  flex: 0 0 auto;
-  width: auto;
-  justify-content: center;
-  padding-inline: var(--space-md);
-  border-radius: var(--radius-pill);
-  background-color: var(--footer-cta-red);
-  border-color: var(--footer-cta-red);
-  color: var(--color-white);
-}
-
-.site-footer__cta.btn--primary:active:not(:disabled) {
-  background-color: var(--footer-cta-red-active);
-  border-color: var(--footer-cta-red-active);
-}
-
-@media (hover: hover) {
-  .site-footer__cta.btn--primary:hover {
-    background-color: var(--footer-cta-red-active);
-    border-color: var(--footer-cta-red-active);
-  }
-}
-
 /* ---------- Tablet / desktop ---------- */
 @media (min-width: 768px) {
   .site-footer__top {
@@ -344,10 +311,6 @@
      open state, without altering that state. */
   .footer-group > ul {
     display: block !important;
-  }
-
-  .site-footer__cta.btn--primary {
-    padding-inline: var(--space-lg);
   }
 }
 

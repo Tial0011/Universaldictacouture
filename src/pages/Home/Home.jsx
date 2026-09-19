@@ -9,6 +9,7 @@ import StyleCircle from "../../components/home/StyleCircle";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { useCatalogue } from "../../hooks/useCatalogue";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
+import heroReadyToWear from "../../assets/images/hero/hero-ready-to-wear.jpg";
 import {
   APPROVED_HERO_COPY,
   buildOccasionDiscovery,
@@ -26,7 +27,7 @@ const FALLBACK_SLIDE = [
     id: "approved-primary",
     concept: "ready-to-wear",
     ...APPROVED_HERO_COPY,
-    image: null,
+    image: { url: heroReadyToWear, publicId: "", alt: "" },
     order: 0,
   },
 ];

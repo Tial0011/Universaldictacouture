@@ -5,8 +5,9 @@
   - Never render below --logo-min-height: the "DICTA COUTURE" line
     becomes illegible.
   - Keep at least --space-xs of clear space on every side.
-  - The artwork is wine + near-black on transparent: use it on ivory or
-    white only, never on wine or photography.
+  - The default artwork is wine + near-black on transparent: use it on
+    ivory or white only, never on wine or photography. On a wine
+    surface, use <Logo variant="white" /> instead (see logoAsset.js).
 */
 .logo {
   --logo-height: var(--logo-height-header);
