@@ -231,14 +231,16 @@
 
 /* ---------- CTA row ---------- */
 .site-footer__cta-row {
+  display: flex;
+  justify-content: flex-end;
   padding-bottom: var(--space-lg);
 }
 
 /* Local override: bright red pill (see --footer-cta-red above),
-   matching the reference's call-to-action button. Full-width on
-   mobile per the reference composition. */
+   matching the reference's call-to-action button — sized to its
+   content and aligned under the signature, never stretched full-width. */
 .site-footer__cta.btn--primary {
-  width: 100%;
+  width: auto;
   background-color: var(--footer-cta-red);
   border-color: var(--footer-cta-red);
   color: var(--color-white);
@@ -306,13 +308,7 @@
     display: block !important;
   }
 
-  .site-footer__cta-row {
-    display: flex;
-    justify-content: flex-end;
-  }
-
   .site-footer__cta.btn--primary {
-    width: auto;
     padding-inline: var(--space-lg);
   }
 }
