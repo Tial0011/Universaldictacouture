@@ -20,7 +20,7 @@ const NAV_GROUPS = [
     id: "care",
     heading: "Customer Care",
     links: [
-      { to: "/chats", label: "Chats" },
+      { to: "/chats", label: "Chat with Dicta Couturier" },
       { to: "/profile", label: "Profile" },
       { to: "/saved-pieces", label: "Saved Pieces" },
       { to: "/my-closet", label: "My Closet" },
@@ -29,7 +29,10 @@ const NAV_GROUPS = [
   {
     id: "info",
     heading: "Information",
-    links: [{ to: "/about", label: "About Us" }],
+    links: [
+      { to: "/", label: "Home" },
+      { to: "/about", label: "About Us" },
+    ],
   },
 ];
 
@@ -90,15 +93,21 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="site-footer">
+    <footer className="site-footer surface--brand">
       <div className="container site-footer__brand-block">
-        <Logo size="footer" className="site-footer__logo" />
+        {/* The wordmark artwork is wine + near-black on transparent (see
+            Logo.css) and is only legible on a light surface, so it sits on
+            a small ivory plaque here rather than directly on the wine
+            footer background. */}
+        <div className="site-footer__logo-plaque">
+          <Logo size="footer" className="site-footer__logo" />
+        </div>
         <p className="site-footer__tagline">{BRAND.tagline}</p>
         <p className="site-footer__line">{BRAND.supportingLine}</p>
         <p className="site-footer__declaration">{BRAND.declaration}</p>
       </div>
 
-      <div className="site-footer__divider" aria-hidden="true" />
+      <hr className="site-footer__divider accent-rule" aria-hidden="true" />
 
       <div className="container site-footer__grid">
         <nav aria-label="Footer navigation" className="site-footer__nav-groups">
@@ -117,7 +126,7 @@ export default function Footer() {
               </a>
             </p>
             <p>
-              <a className="link" href="tel:+2349061959388">
+              <a className="link" href="tel:09061959388">
                 09061959388
               </a>
             </p>
@@ -138,9 +147,17 @@ export default function Footer() {
       </div>
 
       <div className="site-footer__base">
-        <p className="container site-footer__legal">
-          &copy; {year} {BRAND.name}. All rights reserved.
-        </p>
+        <div className="container site-footer__base-row">
+          <p className="site-footer__legal">
+            &copy; {year} {BRAND.name}. All rights reserved.
+          </p>
+          {/* Decorative typographic flourish only — not a signature. No
+              authentic signature asset exists, so per the brief this is an
+              abstract monogram treatment rather than an invented one. */}
+          <span className="site-footer__flourish" aria-hidden="true">
+            UDC
+          </span>
+        </div>
       </div>
     </footer>
   );

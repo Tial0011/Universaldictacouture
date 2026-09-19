@@ -1,16 +1,24 @@
 /*
-  Footer.
-  Background stays warm ivory/white rather than the reference
-  mockup's wine block: the logo artwork is documented (Logo.css) as
-  wine + near-black on transparent, safe only on ivory or white —
-  never on wine — so a dark-wine footer would make it illegible.
-  Premium/editorial feel instead comes from generous spacing, the
-  display-font supporting line, and a thin gold divider.
+  Footer — premium wine surface.
+  `.surface--brand` (see surfaces.css) supplies the wine background,
+  the on-brand text colour, the inverse focus ring, and the `.link`
+  colour override. Everything below layers spacing, hierarchy and the
+  restrained gold accent on top of that — no new colours are added:
+  only --color-wine / --color-ivory / --color-white / --color-gold at
+  varying opacity for text hierarchy on the dark surface.
 */
 .site-footer {
   margin-top: var(--section-space);
-  background-color: var(--color-ivory);
-  border-top: 1px solid var(--color-border);
+}
+
+/* Secondary text on the wine surface can't use --color-text-secondary
+   (grey; too low-contrast on wine), so it steps down opacity on the
+   on-brand ivory/white instead — still comfortably AA. */
+.site-footer {
+  --on-brand-muted: rgba(251, 248, 242, 0.72);
+  --on-brand-faint: rgba(251, 248, 242, 0.45);
+  --on-brand-border: rgba(251, 248, 242, 0.18);
+  --on-brand-border-strong: rgba(251, 248, 242, 0.32);
 }
 
 /* ---------- Brand block ---------- */
@@ -23,8 +31,20 @@
   padding-block: var(--space-lg) var(--space-md);
 }
 
+/* Ivory plaque so the wine/ink wordmark artwork stays legible on the
+   wine footer background (see Logo.css: never render it on wine). */
+.site-footer__logo-plaque {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs) var(--space-md);
+  margin-bottom: var(--space-2xs);
+  background-color: var(--color-ivory);
+  border-radius: var(--radius-surface);
+}
+
 .site-footer__logo {
-  margin-bottom: var(--space-3xs);
+  margin: 0;
 }
 
 .site-footer__tagline {
@@ -32,7 +52,7 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-caps);
-  color: var(--color-brand);
+  color: var(--color-white);
 }
 
 .site-footer__line {
@@ -41,22 +61,20 @@
   font-size: var(--text-md);
   font-style: italic;
   line-height: var(--leading-snug);
-  color: var(--color-text-primary);
+  color: var(--color-white);
 }
 
 .site-footer__declaration {
   font-family: var(--font-body);
   font-size: var(--text-xs);
   letter-spacing: var(--tracking-caps);
-  color: var(--color-text-secondary);
+  color: var(--on-brand-muted);
 }
 
 .site-footer__divider {
   width: 4rem;
-  height: 2px;
   margin: 0 auto;
-  background-color: var(--color-accent);
-  opacity: 0.6;
+  opacity: 0.8;
 }
 
 /* ---------- Nav / contact / social grid ---------- */
@@ -75,7 +93,7 @@
 /* One nav group (Shop / Customer Care / Information) or a static
    group (Contact / Follow Us) — same divided-row treatment on mobile. */
 .footer-group {
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--on-brand-border);
   padding-block: var(--space-2xs);
 }
 
@@ -93,7 +111,7 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-wide);
-  color: var(--color-brand);
+  color: var(--color-white);
   cursor: pointer;
   list-style: none;
 }
@@ -138,12 +156,12 @@
   align-items: center;
   min-height: var(--touch-target);
   font-size: var(--text-sm);
-  color: var(--color-text-primary);
+  color: var(--on-brand-muted);
 }
 
 @media (hover: hover) {
   .footer-group a:hover {
-    color: var(--color-brand);
+    color: var(--color-accent);
     text-decoration: underline;
     text-underline-offset: 0.25em;
   }
@@ -152,12 +170,22 @@
 .site-footer__address {
   font-style: normal;
   font-size: var(--text-sm);
-  color: var(--color-text-secondary);
+  color: var(--on-brand-muted);
   padding-top: var(--space-2xs);
 }
 
 .site-footer__address p {
   margin-bottom: var(--space-3xs);
+}
+
+.site-footer__address .link {
+  text-decoration-color: var(--on-brand-border-strong);
+}
+
+@media (hover: hover) {
+  .site-footer__address .link:hover {
+    color: var(--color-accent);
+  }
 }
 
 /* ---------- Social ---------- */
@@ -176,8 +204,8 @@
   justify-content: center;
   width: var(--touch-target);
   height: var(--touch-target);
-  color: var(--color-brand);
-  border: 1px solid var(--color-border-control);
+  color: var(--color-white);
+  border: 1px solid var(--on-brand-border-strong);
   border-radius: var(--radius-pill);
 }
 
@@ -188,22 +216,39 @@
 
 @media (hover: hover) {
   a.footer-social__link:hover {
-    color: var(--color-white);
-    background-color: var(--color-brand);
-    border-color: var(--color-brand);
+    color: var(--color-brand);
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
   }
 }
 
-/* ---------- Copyright ---------- */
+/* ---------- Copyright / base row ---------- */
 .site-footer__base {
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--on-brand-border);
   padding-block: var(--space-sm);
 }
 
-.site-footer__legal {
+.site-footer__base-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2xs);
   text-align: center;
+}
+
+.site-footer__legal {
   font-size: var(--text-xs);
-  color: var(--color-text-secondary);
+  color: var(--on-brand-faint);
+}
+
+/* Restrained gold monogram — decorative only, not a real signature. */
+.site-footer__flourish {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-accent);
+  opacity: 0.8;
 }
 
 /* ---------- Desktop: multi-column, static headings ---------- */
@@ -256,6 +301,12 @@
 
   .footer-social {
     padding-top: 0;
+  }
+
+  .site-footer__base-row {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
   }
 }
 
