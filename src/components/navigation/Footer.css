@@ -1,27 +1,30 @@
 /*
   Footer — premium wine surface, two-column mobile arrangement
-  (brand + social on the left, collapsible nav rows on the right),
-  matching the approved reference layout.
+  (brand + social + copyright on the left, collapsible nav rows +
+  signature on the right), matching the approved reference layout.
 
   `.surface--brand` (see surfaces.css) supplies the wine background,
   the on-brand text colour, the inverse focus ring, and the `.link`
-  colour override. Everything below layers spacing, hierarchy and the
-  restrained gold accent on top of that — no new colours are added:
-  only --color-wine / --color-ivory / --color-white / --color-gold at
-  varying opacity for text hierarchy on the dark surface.
+  colour override. Most of what follows layers spacing, hierarchy and
+  the restrained gold accent on top of that using only existing
+  tokens (wine / ivory / white / gold at varying opacity). The one
+  exception is --footer-cta-red below — see its comment.
 */
 .site-footer {
   margin-top: var(--section-space);
 }
 
-/* Secondary text on the wine surface can't use --color-text-secondary
-   (grey; too low-contrast on wine), so it steps down opacity on the
-   on-brand ivory/white instead — still comfortably AA. */
 .site-footer {
   --on-brand-muted: rgba(251, 248, 242, 0.72);
   --on-brand-faint: rgba(251, 248, 242, 0.45);
   --on-brand-border: rgba(251, 248, 242, 0.18);
   --on-brand-border-strong: rgba(251, 248, 242, 0.32);
+  /* One-off accent, not a global design-system colour: sampled from
+     the client's reference mockup's CTA button, which is a brighter,
+     more saturated red than the page's wine (so the button reads as
+     a clear call to action against the wine footer). Used only here. */
+  --footer-cta-red: #94081a;
+  --footer-cta-red-active: #7a0615;
 }
 
 /* ---------- Top: brand column + nav column, side by side from mobile up ---------- */
@@ -69,6 +72,12 @@
 
 .site-footer__headline-line {
   display: block;
+}
+
+.site-footer__legal {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--on-brand-faint);
 }
 
 /* ---------- Nav column ---------- */
@@ -176,15 +185,14 @@
   }
 }
 
-/* Restrained gold monogram, sitting under the nav column — decorative
-   only, not a real signature (see brief: no authentic asset exists). */
+/* Signature, cropped from the client's reference design — decorative
+   only, sits under the Shop/Customer Care/Explore/Contact rows. */
 .site-footer__flourish {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: var(--text-sm);
-  letter-spacing: var(--tracking-wide);
-  color: var(--color-accent);
-  opacity: 0.85;
+  display: block;
+  width: 9rem;
+  max-width: 100%;
+  height: auto;
+  opacity: 0.9;
 }
 
 /* ---------- Social row ---------- */
@@ -223,39 +231,32 @@
 
 /* ---------- CTA row ---------- */
 .site-footer__cta-row {
-  padding-bottom: var(--space-md);
+  padding-bottom: var(--space-lg);
 }
 
-/* Local override: the shared .btn--primary is wine-on-wine here, so the
-   footer's own CTA inverts to an ivory pill for contrast against the
-   wine surface. Full-width, matching the reference composition. */
+/* Local override: bright red pill (see --footer-cta-red above),
+   matching the reference's call-to-action button. Full-width on
+   mobile per the reference composition. */
 .site-footer__cta.btn--primary {
   width: 100%;
-  background-color: var(--color-ivory);
-  border-color: var(--color-ivory);
-  color: var(--color-brand);
+  background-color: var(--footer-cta-red);
+  border-color: var(--footer-cta-red);
+  color: var(--color-white);
+}
+
+.site-footer__cta.btn--primary:active:not(:disabled) {
+  background-color: var(--footer-cta-red-active);
+  border-color: var(--footer-cta-red-active);
 }
 
 @media (hover: hover) {
   .site-footer__cta.btn--primary:hover {
-    background-color: var(--color-white);
-    border-color: var(--color-white);
+    background-color: var(--footer-cta-red-active);
+    border-color: var(--footer-cta-red-active);
   }
 }
 
-/* ---------- Copyright ---------- */
-.site-footer__base {
-  border-top: 1px solid var(--on-brand-border);
-  padding-block: var(--space-sm);
-}
-
-.site-footer__legal {
-  text-align: center;
-  font-size: var(--text-xs);
-  color: var(--on-brand-faint);
-}
-
-/* ---------- Tablet / desktop: roomier columns, groups always open ---------- */
+/* ---------- Tablet / desktop ---------- */
 @media (min-width: 768px) {
   .site-footer__top {
     align-items: flex-start;
@@ -293,6 +294,16 @@
 
   .footer-group ul {
     padding-bottom: 0;
+  }
+
+  /* The nav rows stay collapsed as <details> elements (no `open`
+     attribute) so mobile defaults to closed dropdowns, but from
+     tablet width up the full footer nav should read as always-open
+     columns — so their content is shown regardless of the element's
+     open state, without altering that state. */
+  .footer-group > ul,
+  .footer-group > address {
+    display: block !important;
   }
 
   .site-footer__cta-row {

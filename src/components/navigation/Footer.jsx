@@ -10,6 +10,7 @@ import {
   WhatsAppIcon,
   ChatBubbleIcon,
 } from "./icons/SocialIcons";
+import footerSignature from "../../assets/brand/footer-signature.png";
 import "./Footer.css";
 
 /** Approved navigation destinations only — no invented routes. */
@@ -51,11 +52,12 @@ const SOCIAL_ICONS = {
 };
 
 /** One footer nav group. A native <details> gives an accessible,
- *  keyboard-operable collapse on mobile with no extra JS; CSS forces
- *  it open and hides the toggle affordance from tablet width up. */
+ *  keyboard-operable collapse with no extra JS. Closed by default on
+ *  every breakpoint — the desktop layout forces the content visible
+ *  with CSS (see Footer.css) without changing the underlying state. */
 function FooterNavGroup({ heading, links }) {
   return (
-    <details className="footer-group" open>
+    <details className="footer-group">
       <summary className="footer-group__heading">{heading}</summary>
       <ul>
         {links.map((link) => (
@@ -102,7 +104,7 @@ export default function Footer() {
   return (
     <footer className="site-footer surface--brand">
       <div className="container site-footer__top">
-        {/* Left: brand mark, footer headline, social row. */}
+        {/* Left: brand mark, footer headline, social row, copyright. */}
         <div className="site-footer__brand-block">
           {/* The wordmark artwork is wine + near-black on transparent
               (see Logo.css) and is only legible on a light surface, so
@@ -126,9 +128,13 @@ export default function Footer() {
               </li>
             ))}
           </ul>
+
+          <p className="site-footer__legal">
+            &copy; {year} {BRAND.name}. All rights reserved.
+          </p>
         </div>
 
-        {/* Right: collapsible nav rows + contact, decorative flourish. */}
+        {/* Right: collapsible nav rows + contact, then the signature. */}
         <div className="site-footer__links">
           <nav aria-label="Footer navigation" className="site-footer__nav-groups">
             {NAV_GROUPS.map((group) => (
@@ -154,12 +160,15 @@ export default function Footer() {
             </details>
           </nav>
 
-          {/* Decorative typographic flourish only — not a signature. No
-              authentic signature asset exists, so per the brief this is
-              an abstract monogram treatment rather than an invented one. */}
-          <span className="site-footer__flourish" aria-hidden="true">
-            UDC
-          </span>
+          {/* Cropped from the client-provided reference design (not
+              recreated) — see note to the client about sourcing a
+              proper high-resolution/vector version. */}
+          <img
+            src={footerSignature}
+            alt=""
+            aria-hidden="true"
+            className="site-footer__flourish"
+          />
         </div>
       </div>
 
@@ -168,12 +177,6 @@ export default function Footer() {
           <ChatBubbleIcon size={18} />
           Chat with Dicta Couturier
         </Button>
-      </div>
-
-      <div className="site-footer__base">
-        <p className="container site-footer__legal">
-          &copy; {year} {BRAND.name}. All rights reserved.
-        </p>
       </div>
     </footer>
   );
