@@ -1,32 +1,25 @@
 /* ---------- Trust / service strip ---------- */
-/* Floating card that overlaps the bottom edge of the hero, the way
-   the reference layers it — pulled up with a negative margin so the
-   page reads Hero → (card sits across the seam) → the rest. */
+/* Sits directly in the page flow right after the hero — no floating
+   card, no background plate, just part of the page like the section
+   below it. All five items stay inline and static (no horizontal
+   scroll); they shrink to fit rather than overflow. */
 .trust-strip-wrap {
-  position: relative;
-  z-index: 1;
-  margin-top: -2.25rem;
-  margin-bottom: var(--space-sm);
+  margin-block: var(--space-sm);
 }
 
 .trust-strip {
   display: flex;
-  gap: var(--space-md);
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: var(--space-3xs);
   margin: 0;
-  padding: var(--space-sm) var(--space-xs);
+  padding: 0;
   list-style: none;
-  background-color: var(--color-white);
-  border-radius: var(--radius-surface);
-  box-shadow: var(--shadow-soft);
-  overflow-x: auto;
-  scroll-snap-type: x proximity;
-  -webkit-overflow-scrolling: touch;
 }
 
 .trust-strip__item {
-  flex: 0 0 auto;
-  width: 5.75rem;
-  scroll-snap-align: start;
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .trust-strip__link,
@@ -34,7 +27,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-3xs);
+  gap: 0.2rem;
   min-height: var(--touch-target);
   text-align: center;
   color: var(--color-text-primary);
@@ -44,27 +37,30 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  flex: 0 0 auto;
+  width: 1.9rem;
+  height: 1.9rem;
   border-radius: 50%;
   background-color: var(--color-brand);
   color: var(--color-white);
 }
 
+.trust-strip__badge svg {
+  width: 14px;
+  height: 14px;
+}
+
 .trust-strip__label {
   font-family: var(--font-body);
-  font-size: 0.7rem;
+  font-size: 0.55rem;
   font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-normal);
+  letter-spacing: 0;
   line-height: var(--leading-snug);
   color: var(--color-text-primary);
 }
 
 .trust-strip__caption {
-  font-family: var(--font-body);
-  font-size: 0.625rem;
-  line-height: var(--leading-snug);
-  color: var(--color-text-secondary);
+  display: none;
 }
 
 @media (hover: hover) {
@@ -77,32 +73,34 @@
   }
 }
 
-@media (min-width: 900px) {
-  .trust-strip-wrap {
-    margin-top: -3rem;
-  }
-
-  .trust-strip {
-    justify-content: space-between;
-    overflow: visible;
-    padding: var(--space-md) var(--space-lg);
-  }
-
-  .trust-strip__item {
-    width: auto;
-  }
-
+@media (min-width: 640px) {
   .trust-strip__badge {
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .trust-strip__badge svg {
+    width: 20px;
+    height: 20px;
   }
 
   .trust-strip__label {
     font-size: var(--text-xs);
+    letter-spacing: var(--tracking-normal);
   }
 
   .trust-strip__caption {
+    display: block;
+    font-family: var(--font-body);
     font-size: 0.6875rem;
+    line-height: var(--leading-snug);
+    color: var(--color-text-secondary);
+  }
+}
+
+@media (min-width: 900px) {
+  .trust-strip {
+    gap: var(--space-sm);
   }
 }
 
