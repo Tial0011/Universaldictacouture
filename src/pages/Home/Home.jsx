@@ -39,7 +39,11 @@ export default function Home() {
   const [slides, setSlides] = useState(FALLBACK_SLIDE);
   const [discovery, setDiscovery] = useState(null);
   const [reviews, setReviews] = useState([]);
-  const [customStyleImage, setCustomStyleImage] = useState(null);
+  const [customStyleImage, setCustomStyleImage] = useState({
+    url: heroReadyToWear,
+    publicId: "",
+    alt: "",
+  });
   const [isHeroReady, setIsHeroReady] = useState(false);
 
   useDocumentMeta({
@@ -69,7 +73,7 @@ export default function Home() {
     });
 
     fetchCustomStylePromo().then((result) => {
-      if (active) setCustomStyleImage(result.image);
+      if (active && result.image) setCustomStyleImage(result.image);
     });
 
     return () => {

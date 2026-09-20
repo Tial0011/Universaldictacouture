@@ -1,0 +1,22 @@
+.view-all-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: var(--touch-target);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-brand);
+  white-space: nowrap;
+}
+
+.view-all-link svg {
+  flex: 0 0 auto;
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .view-all-link:hover svg {
+    transform: translateX(2px);
+  }
+}

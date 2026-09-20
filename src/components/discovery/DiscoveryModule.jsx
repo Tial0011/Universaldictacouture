@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import ProductImage from "../product/ProductImage";
+import ViewAllLink from "../common/ViewAllLink";
 import "./DiscoveryModule.css";
 
 /**
@@ -30,17 +31,21 @@ export default function DiscoveryModule({
 
   if (!module || !items.length) return null;
 
+  // The last word of the title gets the accent colour (e.g. "Shop by
+  // Occasion" → "Occasion" in wine) — a display treatment only, the
+  // title text itself is unchanged.
+  const titleWords = module.title.trim().split(" ");
+  const titleLead = titleWords.slice(0, -1).join(" ");
+  const titleAccent = titleWords.slice(-1).join(" ");
+
   return (
     <section className={`discovery ${className}`.trim()} aria-labelledby={`discovery-${module.id}`}>
       <div className="discovery__head">
         <Heading id={`discovery-${module.id}`} className="discovery__title">
-          {module.title}
+          {titleLead ? `${titleLead} ` : ""}
+          <span className="discovery__title-accent">{titleAccent}</span>
         </Heading>
-        {viewAllTo ? (
-          <Link className="discovery__view-all" to={viewAllTo}>
-            View all
-          </Link>
-        ) : null}
+        {viewAllTo ? <ViewAllLink to={viewAllTo} /> : null}
       </div>
 
       {module.groups?.length > 1 ? (

@@ -59,7 +59,7 @@ export default function StyleCircle() {
 
         <form className="style-circle__form" onSubmit={handleSubmit} noValidate>
           <div className="field style-circle__field">
-            <label className="field__label" htmlFor={fieldId}>
+            <label className="field__label visually-hidden" htmlFor={fieldId}>
               Email address
             </label>
             <input
@@ -68,6 +68,7 @@ export default function StyleCircle() {
               type="email"
               name="email"
               autoComplete="email"
+              placeholder="Enter your email address"
               value={email}
               onChange={(event) => {
                 setEmail(event.target.value);
