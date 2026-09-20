@@ -14,7 +14,5 @@ export const SOCIAL_LINKS = [
   { id: "facebook", name: "Facebook", url: "https://www.facebook.com/adurayemibenardo.akinola" },
   { id: "instagram", name: "Instagram", url: "https://www.instagram.com/dicta_couture?igsh=dzZuazl6NG5na3Zs" },
   { id: "linkedin", name: "LinkedIn", url: "https://linkedin.com/in/benedicta-akinola-088979248" },
-  // No official WhatsApp URL provided yet — left blank intentionally.
-  // Fill in here (do not derive it from the phone number) once available.
-  { id: "whatsapp", name: "WhatsApp", url: "" },
+  { id: "whatsapp", name: "WhatsApp", url: "https://wa.me/2349061959388" },
 ];

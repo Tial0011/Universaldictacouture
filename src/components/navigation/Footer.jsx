@@ -124,13 +124,6 @@ export default function Footer() {
             ))}
           </ul>
 
-          <p className="site-footer__phone">
-            Mobile:{" "}
-            <a className="link" href="tel:+2349061959388">
-              09061959388
-            </a>
-          </p>
-
           <p className="site-footer__legal">
             &copy; {year} {BRAND.name}. All rights reserved.
           </p>

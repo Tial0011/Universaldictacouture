@@ -59,24 +59,6 @@
   display: block;
 }
 
-.site-footer__phone {
-  margin: 0;
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  color: var(--on-brand-muted);
-}
-
-.site-footer__phone .link {
-  color: inherit;
-  font-weight: var(--weight-medium);
-}
-
-@media (hover: hover) {
-  .site-footer__phone .link:hover {
-    color: var(--color-accent);
-  }
-}
-
 .site-footer__legal {
   margin: 0;
   /* Smaller than the --text-xs token (which has a 0.8125rem ceiling)
