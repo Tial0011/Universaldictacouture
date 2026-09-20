@@ -1,25 +1,56 @@
 import { Link } from "react-router-dom";
 
-/** The approved service/trust items — no guarantees, percentages or
- *  payment instructions are added to them. */
+/**
+ * The approved service/trust items. Titles are the approved copy
+ * unchanged; captions are short, generic supporting phrases only —
+ * no percentages, timelines or service-tier claims that aren't
+ * already stated elsewhere in the approved brand copy.
+ */
 const ITEMS = [
-  { id: "delivery", label: "Nationwide & International Delivery", icon: "truck" },
-  { id: "transfer", label: "Bank Transfer Only", icon: "shield" },
-  { id: "authentic", label: "Authentic Aso Oke", icon: "diamond" },
-  { id: "custom", label: "Custom Style", icon: "hanger", to: "/custom-style" },
-  { id: "chat", label: "Chat with Dicta Couturier", icon: "headset", to: "/chats" },
+  {
+    id: "delivery",
+    label: "Nationwide & International Delivery",
+    caption: "Delivered to your door",
+    icon: "truck",
+  },
+  {
+    id: "transfer",
+    label: "Bank Transfer Only",
+    caption: "Simple & secure",
+    icon: "shield",
+  },
+  {
+    id: "authentic",
+    label: "Authentic Aso Oke",
+    caption: "Genuine heritage fabric",
+    icon: "diamond",
+  },
+  {
+    id: "custom",
+    label: "Custom Style",
+    caption: "Made for you",
+    icon: "hanger",
+    to: "/custom-style",
+  },
+  {
+    id: "chat",
+    label: "Dicta Couturier",
+    caption: "Here to help",
+    icon: "headset",
+    to: "/chats",
+  },
 ];
 
 /* Simple line icons, drawn to the same stroke/viewBox convention as
    the header's icon set — no colourful emoji, no icon library. */
 function TrustIcon({ name }) {
   const common = {
-    width: 22,
-    height: 22,
+    width: 20,
+    height: 20,
     viewBox: "0 0 24 24",
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: "1.5",
+    strokeWidth: "1.6",
     strokeLinecap: "round",
     strokeLinejoin: "round",
     "aria-hidden": "true",
@@ -72,8 +103,11 @@ export default function TrustStrip() {
         {ITEMS.map((item) => {
           const content = (
             <>
-              <TrustIcon name={item.icon} />
-              <span>{item.label}</span>
+              <span className="trust-strip__badge">
+                <TrustIcon name={item.icon} />
+              </span>
+              <span className="trust-strip__label">{item.label}</span>
+              <span className="trust-strip__caption">{item.caption}</span>
             </>
           );
           return (

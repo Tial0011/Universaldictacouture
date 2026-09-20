@@ -195,6 +195,27 @@ export function buildOccasionDiscovery(products, title = "Shop by Occasion") {
 }
 
 /**
+ * The five approved occasions with no photography yet — used only
+ * when neither an admin discovery module nor the published catalogue
+ * has anything to show, so the section still appears (with an
+ * illustration standing in per item; see OccasionIllustration) rather
+ * than being invisible until photos exist. These are the approved
+ * taxonomy, not invented categories.
+ */
+export function approvedOccasionPlaceholders(title = "Shop by Occasion") {
+  const items = APPROVED_OCCASION_EXAMPLES.map((occasion, index) => ({
+    id: `occasion-${index}`,
+    name: occasion,
+    image: null,
+    destination: `/shop?occasion=${encodeURIComponent(occasion)}`,
+    group: "",
+    order: index,
+    published: true,
+  }));
+  return { id: "occasion-approved", title, groups: [], items };
+}
+
+/**
  * Custom Style homepage promotion image. Admin-managed, single
  * document; returns a null image (never a stand-in photo) when
  * nothing has been published yet or Firebase is disabled.

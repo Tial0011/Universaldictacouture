@@ -51,6 +51,17 @@
   border-radius: 50%;
 }
 
+.occasion-illustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-ivory);
+  color: var(--color-brand);
+  border-radius: 50%;
+}
+
 .discovery--home .discovery__name {
   font-size: var(--text-xs);
 }

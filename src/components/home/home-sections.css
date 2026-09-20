@@ -25,7 +25,7 @@
 
 .trust-strip__item {
   flex: 0 0 auto;
-  width: 5.25rem;
+  width: 5.75rem;
   scroll-snap-align: start;
 }
 
@@ -40,22 +40,39 @@
   color: var(--color-text-primary);
 }
 
-.trust-strip__link svg,
-.trust-strip__static svg {
-  color: var(--color-brand);
+.trust-strip__badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: var(--color-brand);
+  color: var(--color-white);
 }
 
-.trust-strip__link span,
-.trust-strip__static span {
+.trust-strip__label {
   font-family: var(--font-body);
   font-size: 0.7rem;
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-normal);
   line-height: var(--leading-snug);
+  color: var(--color-text-primary);
+}
+
+.trust-strip__caption {
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  line-height: var(--leading-snug);
+  color: var(--color-text-secondary);
 }
 
 @media (hover: hover) {
-  .trust-strip__link:hover {
+  .trust-strip__link:hover .trust-strip__badge {
+    background-color: var(--color-brand-hover);
+  }
+
+  .trust-strip__link:hover .trust-strip__label {
     color: var(--color-brand);
   }
 }
@@ -75,9 +92,17 @@
     width: auto;
   }
 
-  .trust-strip__link span,
-  .trust-strip__static span {
+  .trust-strip__badge {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .trust-strip__label {
     font-size: var(--text-xs);
+  }
+
+  .trust-strip__caption {
+    font-size: 0.6875rem;
   }
 }
 

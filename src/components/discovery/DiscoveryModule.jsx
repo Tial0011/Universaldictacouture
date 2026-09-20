@@ -12,7 +12,13 @@ import "./DiscoveryModule.css";
  * valid destination are filtered out upstream, so anything reaching
  * this component is safe to render.
  */
-export default function DiscoveryModule({ module, headingLevel = "h2", className = "", viewAllTo }) {
+export default function DiscoveryModule({
+  module,
+  headingLevel = "h2",
+  className = "",
+  viewAllTo,
+  renderMedia,
+}) {
   const [activeGroup, setActiveGroup] = useState(module?.groups?.[0]?.id ?? "");
   const Heading = headingLevel;
 
@@ -65,11 +71,13 @@ export default function DiscoveryModule({ module, headingLevel = "h2", className
           <li key={item.id}>
             <Link to={item.destination} className="discovery__item">
               <span className="discovery__media">
-                <ProductImage
-                  image={item.image}
-                  alt=""
-                  transformation="w_420,h_420,c_fill,g_auto,q_auto,f_auto"
-                />
+                {(renderMedia && renderMedia(item)) ?? (
+                  <ProductImage
+                    image={item.image}
+                    alt=""
+                    transformation="w_420,h_420,c_fill,g_auto,q_auto,f_auto"
+                  />
+                )}
               </span>
               <span className="discovery__name">{item.name}</span>
             </Link>

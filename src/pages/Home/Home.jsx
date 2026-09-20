@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import HeroCarousel from "../../components/home/HeroCarousel";
 import TrustStrip from "../../components/home/TrustStrip";
 import DiscoveryModule from "../../components/discovery/DiscoveryModule";
+import OccasionIllustration from "../../components/discovery/OccasionIllustration";
 import NewIn from "../../components/home/NewIn";
 import CustomStylePromo from "../../components/home/CustomStylePromo";
 import ReviewsPreview from "../../components/home/ReviewsPreview";
@@ -12,6 +13,7 @@ import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import heroReadyToWear from "../../assets/images/hero/hero-ready-to-wear.jpg";
 import {
   APPROVED_HERO_COPY,
+  approvedOccasionPlaceholders,
   buildOccasionDiscovery,
   fetchCustomStylePromo,
   fetchDiscoveryModule,
@@ -75,9 +77,12 @@ export default function Home() {
     };
   }, []);
 
-  // Admin-managed discovery wins; otherwise the module is built from
-  // occasions that genuinely exist in the published catalogue.
-  const discoveryModule = discovery ?? buildOccasionDiscovery(products);
+  // Admin-managed discovery wins; then whatever occasions genuinely
+  // exist in the published catalogue; otherwise the approved
+  // occasions still show, illustrated rather than photographed,
+  // until real photos are published for them.
+  const discoveryModule =
+    discovery ?? buildOccasionDiscovery(products) ?? approvedOccasionPlaceholders();
   const newInProducts = selectNewIn(products, 6);
 
   return (
@@ -94,7 +99,14 @@ export default function Home() {
 
       {discoveryModule ? (
         <div className="home-section container">
-          <DiscoveryModule module={discoveryModule} className="discovery--home" viewAllTo="/shop" />
+          <DiscoveryModule
+            module={discoveryModule}
+            className="discovery--home"
+            viewAllTo="/shop"
+            renderMedia={(item) =>
+              item.image ? null : <OccasionIllustration name={item.name} />
+            }
+          />
         </div>
       ) : null}
 
