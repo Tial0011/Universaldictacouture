@@ -18,6 +18,7 @@ export default function NewIn({
   isLoading,
   error,
   fallbackImage = null,
+  isSample = false,
   viewAllTo = "/shop?newin=1",
 }) {
   const [activeCategory, setActiveCategory] = useState("all");
@@ -81,6 +82,12 @@ export default function NewIn({
             </li>
           ))}
         </ul>
+      ) : null}
+
+      {!isLoading && !error && isSample ? (
+        <p className="home-section__note home-section__note--preview">
+          Preview pieces. Your real pieces replace these as soon as they are published.
+        </p>
       ) : null}
     </section>
   );

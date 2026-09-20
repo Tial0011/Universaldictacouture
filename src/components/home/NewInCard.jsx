@@ -70,19 +70,21 @@ export default function NewInCard({ product, fallbackImage = null, imageLoading 
             sizes="(min-width: 1280px) 16vw, (min-width: 640px) 30vw, 45vw"
           />
         </Link>
-        <button
-          type="button"
-          className={`menu-card__save${saved ? " is-saved" : ""}`}
-          onClick={handleSave}
-          aria-pressed={saved}
-          aria-label={
-            saved
-              ? `Remove ${product.name} from Saved Pieces`
-              : `Save ${product.name} to Saved Pieces`
-          }
-        >
-          <HeartIcon filled={saved} />
-        </button>
+        {product.isSample ? null : (
+          <button
+            type="button"
+            className={`menu-card__save${saved ? " is-saved" : ""}`}
+            onClick={handleSave}
+            aria-pressed={saved}
+            aria-label={
+              saved
+                ? `Remove ${product.name} from Saved Pieces`
+                : `Save ${product.name} to Saved Pieces`
+            }
+          >
+            <HeartIcon filled={saved} />
+          </button>
+        )}
       </div>
 
       <div className="menu-card__body">

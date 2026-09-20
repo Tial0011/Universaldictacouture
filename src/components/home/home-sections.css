@@ -134,6 +134,12 @@
   color: var(--color-text-secondary);
 }
 
+.home-section__note--preview {
+  margin-top: var(--space-sm);
+  font-size: var(--text-sm);
+  font-style: italic;
+}
+
 /* ---------- Custom Style promotion ----------
    A warm banner: photograph on the left melting into a brown
    gradient, copy on the right. The browns are mixed from the locked

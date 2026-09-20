@@ -21,6 +21,7 @@ import {
   fetchPublishedReviews,
 } from "../../services/content";
 import { selectNewIn } from "../../services/products";
+import { SAMPLE_PIECES, SAMPLE_PIECES_ENABLED } from "../../services/samplePieces";
 import "./Home.css";
 import "../../components/home/home-sections.css";
 
@@ -87,7 +88,12 @@ export default function Home() {
   // until real photos are published for them.
   const discoveryModule =
     discovery ?? buildOccasionDiscovery(products) ?? approvedOccasionPlaceholders();
-  const newInProducts = selectNewIn(products, 6);
+  const realNewIn = selectNewIn(products, 6);
+  // In preview mode, an unreachable or still-empty catalogue is covered
+  // by sample pieces so the section is never blank (see samplePieces.js).
+  const showSamples =
+    SAMPLE_PIECES_ENABLED && !isLoading && (Boolean(error) || realNewIn.length === 0);
+  const newInProducts = showSamples ? SAMPLE_PIECES : realNewIn;
   // "View all" goes to the New In filter only when pieces are actually
   // flagged New In; otherwise the section is showing the newest pieces
   // and the whole collection is the honest destination.
@@ -123,7 +129,8 @@ export default function Home() {
       <NewIn
         products={newInProducts}
         isLoading={isLoading}
-        error={error}
+        error={showSamples ? null : error}
+        isSample={showSamples}
         fallbackImage={heroImage}
         viewAllTo={hasFlaggedNewIn ? "/shop?newin=1" : "/shop"}
       />
