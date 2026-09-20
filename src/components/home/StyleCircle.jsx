@@ -52,9 +52,9 @@ export default function StyleCircle() {
   return (
     <section className="style-circle surface--brand" aria-labelledby="home-style-circle">
       <div className="container style-circle__inner">
-        <h2 id="home-style-circle">Style Circle</h2>
+        <h2 id="home-style-circle">Join Our Style Circle</h2>
         <p className="style-circle__intro">
-          Join the Style Circle for new pieces and styling notes from Universal Dicta Couture.
+          Be the first to see our new arrivals, exclusive offers and style inspiration.
         </p>
 
         <form className="style-circle__form" onSubmit={handleSubmit} noValidate>

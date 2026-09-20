@@ -69,7 +69,11 @@
   color: var(--color-white);
 }
 
+/* A short rule leads the eyebrow: "— PREMIUM ASO OKE". */
 .hero__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
   margin: 0;
   font-family: var(--font-body);
   font-size: var(--text-xs);
@@ -78,10 +82,22 @@
   color: var(--color-brand);
 }
 
+.hero__eyebrow::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 2.25rem;
+  height: 1px;
+  background-color: currentColor;
+}
+
 .hero__headline {
   margin: 0;
   font-size: var(--text-3xl);
   line-height: var(--leading-tight);
+}
+
+.hero__line {
+  display: block;
 }
 
 .hero__secondary {
@@ -211,5 +227,48 @@
 @media (prefers-reduced-motion: reduce) {
   .hero__slide {
     transition: none;
+  }
+}
+
+/* ---------- Gold + white treatment on photographic slides ----------
+   Gold is decorative on the ivory page (2.9:1), but on the dark wash
+   over the photograph a lightened gold reads clearly, so the eyebrow
+   (with its rule) and the italic second line take it there. The
+   second button turns white to match. A slide without imagery keeps
+   the wine treatment above. */
+.hero__media:has(.product-image:not(.product-image--empty)) + .hero__content {
+  --hero-gold: color-mix(in srgb, var(--color-gold) 82%, var(--color-white));
+}
+
+.hero__media:has(.product-image:not(.product-image--empty)) + .hero__content .hero__eyebrow {
+  color: var(--hero-gold);
+}
+
+/* Large italic text can carry a richer, truer gold than the small eyebrow. */
+.hero__media:has(.product-image:not(.product-image--empty)) + .hero__content .hero__secondary {
+  color: color-mix(in srgb, var(--color-gold) 94%, var(--color-white));
+}
+
+.hero__media:has(.product-image:not(.product-image--empty)) + .hero__content .hero__headline {
+  text-shadow: 0 2px 18px rgba(31, 17, 18, 0.35);
+}
+
+.hero__media:has(.product-image:not(.product-image--empty)) + .hero__content .btn--secondary {
+  color: var(--color-white);
+  background-color: transparent;
+  border-color: rgba(255, 255, 255, 0.9);
+}
+
+.hero__media:has(.product-image:not(.product-image--empty)) + .hero__content .btn--secondary:active:not(:disabled) {
+  color: var(--color-brand);
+  background-color: var(--color-white);
+  border-color: var(--color-white);
+}
+
+@media (hover: hover) {
+  .hero__media:has(.product-image:not(.product-image--empty)) + .hero__content .btn--secondary:hover:not(:disabled) {
+    color: var(--color-brand);
+    background-color: var(--color-white);
+    border-color: var(--color-white);
   }
 }

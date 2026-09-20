@@ -73,9 +73,15 @@ export async function fetchPublishedProducts() {
   }
 }
 
-/** Published products flagged New In, newest first. */
+/**
+ * Published products flagged New In, newest first. When nothing has
+ * been flagged yet, the most recently published pieces stand in, so
+ * the homepage section is never empty while the catalogue is not —
+ * "New In" is, honestly, the newest pieces.
+ */
 export function selectNewIn(products, max = 8) {
-  return sortByNewest(products.filter((product) => product.isNewIn)).slice(0, max);
+  const flagged = products.filter((product) => product.isNewIn);
+  return sortByNewest(flagged.length ? flagged : products).slice(0, max);
 }
 
 export function sortByNewest(products) {

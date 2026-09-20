@@ -13,7 +13,7 @@ import PillTabs from "../common/PillTabs";
  * invented) lets the visitor narrow the six shown. Each piece is a
  * menu-style card (see NewInCard) ending in a View Piece button.
  */
-export default function NewIn({ products, isLoading, error }) {
+export default function NewIn({ products, isLoading, error, viewAllTo = "/shop?newin=1" }) {
   const [activeCategory, setActiveCategory] = useState("all");
 
   const categories = useMemo(() => {
@@ -36,7 +36,7 @@ export default function NewIn({ products, isLoading, error }) {
     <section className="home-section container" aria-labelledby="home-new-in">
       <div className="home-section__head">
         <h2 id="home-new-in">New In</h2>
-        <ViewAllLink to="/shop?newin=1" />
+        <ViewAllLink to={viewAllTo} />
       </div>
 
       {!isLoading && !error && categories.length > 1 ? (

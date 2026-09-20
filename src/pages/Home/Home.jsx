@@ -88,6 +88,10 @@ export default function Home() {
   const discoveryModule =
     discovery ?? buildOccasionDiscovery(products) ?? approvedOccasionPlaceholders();
   const newInProducts = selectNewIn(products, 6);
+  // "View all" goes to the New In filter only when pieces are actually
+  // flagged New In; otherwise the section is showing the newest pieces
+  // and the whole collection is the honest destination.
+  const hasFlaggedNewIn = products.some((product) => product.isNewIn);
 
   return (
     <>
@@ -114,7 +118,12 @@ export default function Home() {
         </div>
       ) : null}
 
-      <NewIn products={newInProducts} isLoading={isLoading} error={error} />
+      <NewIn
+        products={newInProducts}
+        isLoading={isLoading}
+        error={error}
+        viewAllTo={hasFlaggedNewIn ? "/shop?newin=1" : "/shop"}
+      />
 
       <CustomStylePromo image={customStyleImage} />
 

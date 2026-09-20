@@ -42,6 +42,23 @@ function Chevron({ direction }) {
   );
 }
 
+/**
+ * Two- or three-word headlines ("Timeless Tradition") stack one word
+ * per line, as in the design. Anything longer wraps naturally so an
+ * admin-written headline never turns into a tall column of words.
+ * A real space is kept between the words for screen readers.
+ */
+function HeadlineLines({ text }) {
+  const words = String(text).trim().split(/\s+/);
+  if (words.length < 2 || words.length > 3) return text;
+  return words.map((word, wordIndex) => (
+    <span key={`${word}-${wordIndex}`}>
+      {wordIndex > 0 ? " " : null}
+      <span className="hero__line">{word}</span>
+    </span>
+  ));
+}
+
 export default function HeroCarousel({ slides }) {
   const [index, setIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -130,7 +147,7 @@ export default function HeroCarousel({ slides }) {
             <div className="container hero__content">
               <p className="hero__eyebrow">{item.eyebrow}</p>
               <h1 className="hero__headline">
-                {item.headline}
+                <HeadlineLines text={item.headline} />
                 <span className="hero__secondary">{item.secondary}</span>
               </h1>
               <p className="hero__body">{item.body}</p>

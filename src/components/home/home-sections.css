@@ -1,20 +1,27 @@
 /* ---------- Trust / service strip ---------- */
-/* Sits directly in the page flow right after the hero — no floating
-   card, no background plate, just part of the page like the section
-   below it. All five items stay inline and static (no horizontal
-   scroll); they shrink to fit rather than overflow. */
+/* A softly rounded white panel that rises over the bottom edge of the
+   hero (as in the reference). All five items stay inline and static
+   (no horizontal scroll); they shrink to fit rather than overflow. */
 .trust-strip-wrap {
-  margin-block: var(--space-sm);
+  position: relative;
+  z-index: 2;
+  margin-top: calc(var(--space-sm) * -1);
+  margin-bottom: var(--space-sm);
 }
 
-.trust-strip {
+/* Prefixed so it outranks the reset's `ul[class] { padding: 0 }`. */
+.trust-strip-wrap .trust-strip {
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
   gap: var(--space-3xs);
   margin: 0;
-  padding: 0;
+  padding: var(--space-sm) var(--space-2xs);
   list-style: none;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius-lg) * 2);
+  box-shadow: var(--shadow-soft);
 }
 
 .trust-strip__item {
@@ -99,7 +106,7 @@
 }
 
 @media (min-width: 900px) {
-  .trust-strip {
+  .trust-strip-wrap .trust-strip {
     gap: var(--space-sm);
   }
 }
