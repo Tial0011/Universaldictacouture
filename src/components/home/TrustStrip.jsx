@@ -98,31 +98,33 @@ function TrustIcon({ name }) {
 
 export default function TrustStrip() {
   return (
-    <section className="trust-strip-wrap container" aria-label="Service information">
-      <ul className="trust-strip">
-        {ITEMS.map((item) => {
-          const content = (
-            <>
-              <span className="trust-strip__badge">
-                <TrustIcon name={item.icon} />
-              </span>
-              <span className="trust-strip__label">{item.label}</span>
-              <span className="trust-strip__caption">{item.caption}</span>
-            </>
-          );
-          return (
-            <li key={item.id} className="trust-strip__item">
-              {item.to ? (
-                <Link to={item.to} className="trust-strip__link">
-                  {content}
-                </Link>
-              ) : (
-                <span className="trust-strip__static">{content}</span>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+    <section className="trust-strip-wrap" aria-label="Service information">
+      <div className="container">
+        <ul className="trust-strip">
+          {ITEMS.map((item) => {
+            const content = (
+              <>
+                <span className="trust-strip__badge">
+                  <TrustIcon name={item.icon} />
+                </span>
+                <span className="trust-strip__label">{item.label}</span>
+                <span className="trust-strip__caption">{item.caption}</span>
+              </>
+            );
+            return (
+              <li key={item.id} className="trust-strip__item">
+                {item.to ? (
+                  <Link to={item.to} className="trust-strip__link">
+                    {content}
+                  </Link>
+                ) : (
+                  <span className="trust-strip__static">{content}</span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </section>
   );
 }

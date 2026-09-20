@@ -103,8 +103,10 @@ export function normaliseProduct(id, raw) {
 
   const imageSource = Array.isArray(raw.images) ? raw.images : raw.images ? [raw.images] : [];
   const images = imageSource.map(normaliseImage).filter(Boolean);
+  // A piece with no uploaded photo yet is still publishable: the
+  // storefront supplies a stand-in image (see NewInCard) rather than
+  // hiding the piece.
   const primaryImage = normaliseImage(raw.primaryImage) || images[0] || null;
-  if (!primaryImage) return null;
 
   const options = normaliseOptions(raw.options);
   const variants = normaliseVariants(raw.variants);
@@ -128,7 +130,7 @@ export function normaliseProduct(id, raw) {
     name,
     href: `/shop/${encodeURIComponent(slug)}`,
     image: primaryImage,
-    images: images.length ? images : [primaryImage],
+    images: images.length ? images : primaryImage ? [primaryImage] : [],
     minPrice,
     maxPrice,
     hasVariablePricing: maxPrice > minPrice,

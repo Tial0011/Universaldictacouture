@@ -1,12 +1,17 @@
 /* ---------- Trust / service strip ---------- */
-/* A softly rounded white panel that rises over the bottom edge of the
-   hero (as in the reference). All five items stay inline and static
-   (no horizontal scroll); they shrink to fit rather than overflow. */
+/* A full-width white sheet with softly rounded top corners that rises
+   over the bottom edge of the hero (as in the reference). The icons
+   sit inside the normal content width; all five stay inline and static
+   (no horizontal scroll) and shrink to fit rather than overflow. */
 .trust-strip-wrap {
   position: relative;
   z-index: 2;
-  margin-top: calc(var(--space-sm) * -1);
+  margin-top: calc(var(--space-md) * -1);
   margin-bottom: var(--space-sm);
+  padding-block: var(--space-sm);
+  background-color: var(--color-surface);
+  border-radius: calc(var(--radius-lg) * 2.5) calc(var(--radius-lg) * 2.5) 0 0;
+  box-shadow: 0 -8px 24px rgba(31, 17, 18, 0.1);
 }
 
 /* Prefixed so it outranks the reset's `ul[class] { padding: 0 }`. */
@@ -16,12 +21,8 @@
   justify-content: space-between;
   gap: var(--space-3xs);
   margin: 0;
-  padding: var(--space-sm) var(--space-2xs);
+  padding: 0;
   list-style: none;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: calc(var(--radius-lg) * 2);
-  box-shadow: var(--shadow-soft);
 }
 
 .trust-strip__item {

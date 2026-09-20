@@ -91,6 +91,8 @@ export default function Home() {
   // "View all" goes to the New In filter only when pieces are actually
   // flagged New In; otherwise the section is showing the newest pieces
   // and the whole collection is the honest destination.
+  // Pieces without an uploaded photo borrow the hero photograph.
+  const heroImage = slides.find((slide) => slide.image)?.image ?? FALLBACK_SLIDE[0].image;
   const hasFlaggedNewIn = products.some((product) => product.isNewIn);
 
   return (
@@ -122,6 +124,7 @@ export default function Home() {
         products={newInProducts}
         isLoading={isLoading}
         error={error}
+        fallbackImage={heroImage}
         viewAllTo={hasFlaggedNewIn ? "/shop?newin=1" : "/shop"}
       />
 
