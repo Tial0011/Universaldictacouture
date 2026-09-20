@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import StitchArrowIcon from "./icons/StitchArrowIcon";
 import "./ViewAllLink.css";
 
 /**
@@ -10,21 +11,7 @@ export default function ViewAllLink({ to, className = "", children = "View all" 
   return (
     <Link className={`view-all-link ${className}`.trim()} to={to}>
       {children}
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <path d="M5 12h13" />
-        <path d="m13 6 6 6-6 6" />
-      </svg>
+      <StitchArrowIcon size={16} />
     </Link>
   );
 }

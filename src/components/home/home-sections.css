@@ -126,59 +126,157 @@
   color: var(--color-text-secondary);
 }
 
-/* ---------- Custom Style promotion ---------- */
+/* ---------- Custom Style promotion ----------
+   A warm banner: photograph on the left melting into a brown
+   gradient, copy on the right. The browns are mixed from the locked
+   wine + gold tokens rather than introducing new colours. The two
+   halves stay side by side on phones (as in the reference) and the
+   image column simply grows on larger screens. Text sits on the
+   darker end of the gradient so it stays readable. */
 .custom-promo {
-  background-color: var(--color-ivory);
+  --promo-brown-light: color-mix(in srgb, var(--color-wine) 52%, var(--color-gold));
+  --promo-brown-deep: color-mix(in srgb, var(--color-wine) 74%, var(--color-gold));
+  --promo-gold-text: color-mix(in srgb, var(--color-gold) 66%, var(--color-white));
+  --promo-cta-red: #94081a; /* same vivid CTA red the Style Circle uses on wine */
+  --promo-cta-red-active: #7a0615;
+
+  position: relative;
+  overflow: hidden;
+  color: var(--color-ivory);
+  background: linear-gradient(100deg, var(--promo-brown-light) 0%, var(--promo-brown-deep) 100%);
 }
 
 .custom-promo__inner {
   display: grid;
-  gap: var(--space-md);
-  padding-block: var(--section-space);
+  grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+  align-items: stretch;
+  max-width: var(--content-max-width);
+  min-height: 15.5rem;
+  margin-inline: auto;
 }
 
 .custom-promo__media {
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  border-radius: var(--radius-surface);
+  position: relative;
+  min-height: 100%;
+  /* The photo fades out toward the copy, so there is no hard edge. */
+  -webkit-mask-image: linear-gradient(to right, #000 62%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 62%, transparent 100%);
+}
+
+.custom-promo__media .product-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 42% 22%;
+}
+
+.custom-promo__media .product-image--empty {
+  display: block;
+  background-color: transparent;
 }
 
 .custom-promo__copy {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-sm);
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-md) var(--space-sm) var(--space-md) var(--space-2xs);
 }
 
 .custom-promo h2 {
   margin: 0;
-  font-size: var(--text-2xl);
+  font-size: clamp(1.5rem, 1.15rem + 1.9vw, 2.75rem);
+  font-weight: var(--weight-medium);
   line-height: var(--leading-tight);
+  color: var(--color-ivory);
 }
 
 .custom-promo__secondary {
   display: block;
   font-style: italic;
-  color: var(--color-accent);
+  font-weight: var(--weight-regular);
+  color: var(--promo-gold-text);
 }
 
 .custom-promo p {
   margin: 0;
-  max-width: 46ch;
-  font-size: var(--text-md);
-  line-height: var(--leading-relaxed);
-  color: var(--color-text-secondary);
+  max-width: 44ch;
+  font-size: clamp(0.8125rem, 0.75rem + 0.35vw, 1.0625rem);
+  line-height: var(--leading-normal);
+  color: rgba(251, 248, 242, 0.92);
+}
+
+.custom-promo__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  min-height: var(--touch-target);
+  margin-top: var(--space-2xs);
+  padding: 0.6em 0.9em;
+  font-family: var(--font-body);
+  font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.9375rem);
+  font-weight: var(--weight-medium);
+  line-height: 1.2;
+  letter-spacing: var(--tracking-normal);
+  text-align: center;
+  color: var(--color-white);
+  background-color: var(--promo-cta-red);
+  border: 1px solid rgba(251, 248, 242, 0.65);
+  border-radius: var(--radius-md);
+  box-shadow: 0 6px 16px rgba(31, 17, 18, 0.25);
+  transition: background-color var(--duration-base) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard);
+}
+
+.custom-promo__cta-icon {
+  flex: 0 0 auto;
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.custom-promo__cta:active {
+  background-color: var(--promo-cta-red-active);
+}
+
+.custom-promo :focus-visible {
+  outline-color: var(--color-focus-ring-inverse);
+}
+
+@media (hover: hover) {
+  .custom-promo__cta:hover {
+    background-color: var(--promo-cta-red-active);
+    border-color: var(--color-ivory);
+  }
+
+  .custom-promo__cta:hover .custom-promo__cta-icon {
+    transform: translateX(3px);
+  }
 }
 
 @media (min-width: 768px) {
+  .custom-promo__cta {
+    padding: 0.7em 1.4em;
+    letter-spacing: var(--tracking-wide);
+  }
+
   .custom-promo__inner {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    align-items: center;
-    gap: var(--space-xl);
+    min-height: 22rem;
   }
 
   .custom-promo__media {
-    aspect-ratio: 3 / 4;
+    /* On wide screens the photo also dissolves on its left edge. */
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14%, #000 66%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 14%, #000 66%, transparent 100%);
+  }
+
+  .custom-promo__copy {
+    gap: var(--space-sm);
+    padding-block: var(--space-lg);
+    padding-left: var(--space-md);
   }
 }
 

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import ProductGrid from "../product/ProductGrid";
+import NewInCard from "./NewInCard";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ViewAllLink from "../common/ViewAllLink";
 import PillTabs from "../common/PillTabs";
@@ -10,7 +10,8 @@ import PillTabs from "../common/PillTabs";
  * marked New In — when there are none, the section says so rather
  * than filling the grid. When the New In pieces span more than one
  * category, a small tab menu (real categories only — nothing
- * invented) lets the visitor narrow the six shown.
+ * invented) lets the visitor narrow the six shown. Each piece is a
+ * menu-style card (see NewInCard) ending in a View Piece button.
  */
 export default function NewIn({ products, isLoading, error }) {
   const [activeCategory, setActiveCategory] = useState("all");
@@ -63,7 +64,13 @@ export default function NewIn({ products, isLoading, error }) {
       ) : null}
 
       {!isLoading && !error && products.length > 0 ? (
-        <ProductGrid products={visibleProducts} label="New In" />
+        <ul className="menu-grid" aria-label="New In">
+          {visibleProducts.map((product, index) => (
+            <li key={product.id}>
+              <NewInCard product={product} imageLoading={index < 4 ? "eager" : "lazy"} />
+            </li>
+          ))}
+        </ul>
       ) : null}
     </section>
   );

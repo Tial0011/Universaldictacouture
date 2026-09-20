@@ -1,0 +1,251 @@
+/* ---------- New In menu-card grid ----------
+   Two across on phones (as in the reference), three on tablets, and
+   six in one row on wide screens — six pieces are shown, so the
+   4/5-column product grid would strand an orphan row. */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu-grid > li {
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .menu-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-md);
+  }
+}
+
+@media (min-width: 1280px) {
+  .menu-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Card ---------- */
+.menu-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--space-2xs);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2px 10px rgba(31, 17, 18, 0.05);
+  container: menu-card / inline-size;
+  transition: box-shadow var(--duration-base) var(--ease-standard),
+    transform var(--duration-base) var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .menu-card:hover {
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-2px);
+  }
+}
+
+.menu-card__media {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-bg);
+  border-radius: var(--radius-md);
+}
+
+.menu-card__media-link {
+  display: block;
+  aspect-ratio: 1 / 1;
+}
+
+.menu-card__media .product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.menu-card__media .product-image--empty {
+  display: block;
+  background-color: var(--color-bg);
+}
+
+.menu-card__save {
+  position: absolute;
+  top: var(--space-3xs);
+  right: var(--space-3xs);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  color: var(--color-text-primary);
+  background-color: transparent;
+  border-radius: var(--radius-pill);
+  isolation: isolate;
+}
+
+/* The visible disc is smaller than the 44px tap target, so the image
+   stays the hero while the control stays easy to hit. */
+.menu-card__save::before {
+  content: "";
+  position: absolute;
+  inset: 0.4rem;
+  z-index: -1;
+  background-color: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--color-border);
+  border-radius: inherit;
+}
+
+.menu-card__save.is-saved {
+  color: var(--color-brand);
+}
+
+.menu-card__save.is-saved::before {
+  border-color: var(--color-brand);
+}
+
+@media (hover: hover) {
+  .menu-card__save:hover {
+    color: var(--color-brand);
+  }
+}
+
+/* ---------- Body ---------- */
+.menu-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-3xs) var(--space-3xs);
+}
+
+.menu-card__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-normal);
+}
+
+.menu-card__name a {
+  color: var(--color-text-primary);
+}
+
+@media (hover: hover) {
+  .menu-card__name a:hover {
+    color: var(--color-brand);
+  }
+}
+
+/* Price ······· mark — the menu line. */
+.menu-card__line {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0;
+}
+
+.menu-card__price {
+  flex: 0 0 auto;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.menu-card__from {
+  font-weight: var(--weight-regular);
+  color: var(--color-text-secondary);
+}
+
+.menu-card__leader {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 0;
+  border-bottom: 2px dotted var(--color-border-strong);
+  transform: translateY(2px);
+}
+
+.menu-card__mark {
+  display: inline-flex;
+  flex: 0 0 auto;
+  color: var(--color-brand);
+}
+
+/* ---------- View Piece ---------- */
+.menu-card__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  width: 100%;
+  min-height: var(--touch-target);
+  /* auto keeps every card's button on one line when names wrap unevenly */
+  margin-top: auto;
+  padding: 0.55em 1em;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-wide);
+  white-space: nowrap;
+  color: var(--color-text-on-brand);
+  background-color: var(--color-brand);
+  border: 1px solid var(--color-brand);
+  border-radius: var(--radius-control);
+  transition: background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard);
+}
+
+.menu-card__cta-icon {
+  flex: 0 0 auto;
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.menu-card__cta:active {
+  background-color: var(--color-brand-hover);
+  border-color: var(--color-brand-hover);
+}
+
+@media (hover: hover) {
+  .menu-card__cta:hover {
+    background-color: var(--color-brand-hover);
+    border-color: var(--color-brand-hover);
+  }
+
+  .menu-card__cta:hover .menu-card__cta-icon {
+    transform: translateX(3px);
+  }
+}
+
+/* Six across on wide screens makes each card narrow: a slightly
+   smaller price keeps "From ₦…" and the mark on one line. */
+@media (min-width: 1280px) {
+  .menu-card__price {
+    font-size: var(--text-xs);
+  }
+}
+
+/* Very narrow cards (small phones): drop the leader + mark and tighten
+   the button so nothing wraps or overflows. */
+@container menu-card (max-width: 9.5rem) {
+  .menu-card__leader,
+  .menu-card__mark {
+    display: none;
+  }
+
+  .menu-card__cta {
+    gap: 0.25rem;
+    padding-inline: 0.5em;
+  }
+
+  .menu-card__cta-icon {
+    width: 14px;
+    height: 14px;
+  }
+}
