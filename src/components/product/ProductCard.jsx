@@ -1,12 +1,16 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import ProductImage from "./ProductImage";
+import StitchArrowIcon from "../common/icons/StitchArrowIcon";
 import { useSavedPieces } from "../../context/SavedPiecesContext";
-import { ADD_RESULT, useCloset } from "../../context/ClosetContext";
 import { useToast } from "../../context/ToastContext";
-import { resolveSelections } from "../../services/productModel";
 import { formatNaira } from "../../utils/formatters";
 import "./ProductCard.css";
+
+// Wide "swatch" crop in the grid (matches --product-card-media-ratio in
+// ProductCard.css — change the two together), square beside the text
+// in the list view.
+const GRID_IMAGE = "w_720,ar_3:1,c_fill,g_auto,q_auto,f_auto";
+const LIST_IMAGE = "w_480,ar_1:1,c_fill,g_auto,q_auto,f_auto";
 
 function HeartIcon({ filled }) {
   return (
@@ -27,6 +31,13 @@ function HeartIcon({ filled }) {
   );
 }
 
+/** "Deep Burgundy – Traditional Weave": colour, then weave, when the piece has them. */
+function buildSubtitle(product) {
+  const colour = (product.colour ?? []).slice(0, 2).join(", ");
+  const fabric = product.fabric?.[0] ?? "";
+  return [colour, fabric].filter(Boolean).join(" – ");
+}
+
 function ProductPrice({ product }) {
   const price = formatNaira(product.minPrice);
   const unit = product.unitLabel ? ` ${product.unitLabel}` : "";
@@ -35,7 +46,9 @@ function ProductPrice({ product }) {
     return (
       <p className="product-card__price">
         <span className="visually-hidden">Price from </span>
-        <span aria-hidden="true">From </span>
+        <span className="product-card__from" aria-hidden="true">
+          From{" "}
+        </span>
         {price}
         {unit}
       </p>
@@ -50,16 +63,19 @@ function ProductPrice({ product }) {
   );
 }
 
-export default function ProductCard({ product, imageLoading = "lazy" }) {
+/**
+ * Shop product card. One clear action — View Piece — because sizes and
+ * other required choices are made on Product Details; the heart saves
+ * the piece for later. `view` switches between the two-up grid card and
+ * the horizontal list-row card.
+ */
+export default function ProductCard({ product, view = "grid", imageLoading = "lazy" }) {
   const { isSaved, toggleSaved, isPersistent } = useSavedPieces();
-  const { addToCloset } = useCloset();
   const { showToast } = useToast();
-  const navigate = useNavigate();
-  const [isAdding, setIsAdding] = useState(false);
 
   const saved = isSaved(product.id);
-  const { isComplete } = resolveSelections(product);
   const isSample = Boolean(product.isSample);
+  const subtitle = buildSubtitle(product);
 
   const handleSave = () => {
     const nowSaved = toggleSaved(product.id);
@@ -72,40 +88,20 @@ export default function ProductCard({ product, imageLoading = "lazy" }) {
     );
   };
 
-  const handleAddToCloset = async () => {
-    // Required choices are made on Product Details, so the visitor is
-    // taken there instead of a line being created without them.
-    if (!isComplete) {
-      navigate(`${product.href}?choose=1`);
-      return;
-    }
-
-    setIsAdding(true);
-    try {
-      const result = await addToCloset(product);
-      if (result.status === ADD_RESULT.ADDED) {
-        showToast("Piece added to your Closet.");
-      } else if (result.status === ADD_RESULT.NEEDS_SELECTION) {
-        navigate(`${product.href}?choose=1`);
-      } else if (result.status === ADD_RESULT.UNAVAILABLE) {
-        showToast("This piece is no longer available.", "error");
-      } else {
-        showToast("This piece could not be added right now. Please try again.", "error");
-      }
-    } finally {
-      setIsAdding(false);
-    }
-  };
-
   return (
-    <article className="product-card">
+    <article className={`product-card${view === "list" ? " product-card--list" : ""}`}>
       <div className="product-card__media">
         <Link to={product.href} className="product-card__media-link" tabIndex={-1} aria-hidden="true">
           <ProductImage
             image={product.image}
             alt={product.name}
+            transformation={view === "list" ? LIST_IMAGE : GRID_IMAGE}
             loading={imageLoading}
-            sizes="(min-width: 1280px) 20vw, (min-width: 768px) 30vw, 45vw"
+            sizes={
+              view === "list"
+                ? "(min-width: 640px) 220px, 40vw"
+                : "(min-width: 1280px) 20vw, (min-width: 768px) 30vw, 45vw"
+            }
           />
         </Link>
         {isSample ? null : (
@@ -125,18 +121,13 @@ export default function ProductCard({ product, imageLoading = "lazy" }) {
         <h3 className="product-card__name">
           <Link to={product.href}>{product.name}</Link>
         </h3>
+        {subtitle ? <p className="product-card__subtitle">{subtitle}</p> : null}
         <ProductPrice product={product} />
-        {isSample ? null : (
-          <button
-            type="button"
-            className="product-card__closet"
-            onClick={handleAddToCloset}
-            disabled={isAdding}
-            aria-busy={isAdding || undefined}
-          >
-            Add to Closet
-          </button>
-        )}
+        <Link to={product.href} className="product-card__cta">
+          <span>View Piece</span>
+          <StitchArrowIcon size={16} className="product-card__cta-icon" />
+          <span className="visually-hidden"> {product.name}</span>
+        </Link>
       </div>
     </article>
   );

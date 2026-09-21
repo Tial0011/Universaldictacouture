@@ -1,9 +1,9 @@
+/* ---------- Intro ---------- */
 .shop__intro {
-  padding-block: var(--space-lg) var(--space-md);
+  padding-block: var(--space-sm) var(--space-sm);
 }
 
 .shop__breadcrumb {
-  display: none;
   margin-bottom: var(--space-2xs);
 }
 
@@ -27,26 +27,54 @@
 
 .shop__breadcrumb a {
   color: var(--color-text-secondary);
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
+}
+
+.shop__breadcrumb [aria-current="page"] {
+  color: var(--color-brand);
+  font-weight: var(--weight-medium);
+}
+
+@media (hover: hover) {
+  .shop__breadcrumb a:hover {
+    color: var(--color-brand);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
 }
 
 .shop__title {
   font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  color: var(--color-brand);
+}
+
+.shop__lede,
+.shop__tagline {
+  /* Short display lines — not subject to the body-copy measure. */
+  max-width: none;
 }
 
 .shop__lede {
-  margin-top: var(--space-2xs);
-  color: var(--color-text-secondary);
+  margin-top: var(--space-3xs);
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  line-height: var(--leading-snug);
+  color: var(--color-text-primary);
+  text-wrap: balance;
 }
 
-.shop__help {
+.shop__tagline {
   margin-top: var(--space-2xs);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  text-wrap: balance;
 }
 
 .shop__discovery {
-  padding-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
 }
 
 .shop__layout {
@@ -62,6 +90,7 @@
   display: none;
 }
 
+/* ---------- Toolbar: search (on request), Filters, Sort, layout ---------- */
 .shop__toolbar {
   display: flex;
   flex-direction: column;
@@ -80,19 +109,143 @@
 
 .shop__controls {
   display: flex;
-  align-items: center;
-  gap: var(--space-2xs);
+  align-items: stretch;
+  gap: 0.375rem;
 }
 
 .shop__filter-button {
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-xs);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  color: var(--color-text-on-brand);
+  background: var(--color-brand);
+  border: 1px solid var(--color-brand);
+  border-radius: var(--radius-lg);
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.shop__filter-button:active {
+  background: var(--color-brand-hover);
+}
+
+@media (hover: hover) {
+  .shop__filter-button:hover {
+    background: var(--color-brand-hover);
+    border-color: var(--color-brand-hover);
+  }
 }
 
 .shop__sort {
-  flex: 1;
+  position: relative;
+  flex: 1 1 0;
   min-width: 0;
+  border-radius: var(--radius-lg);
 }
 
+.shop__sort:focus-within {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.shop__sort-face {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  height: 100%;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-2xs) 0 var(--space-xs);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-control);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* On narrow phones the room goes to the value ("Newest First",
+   "Price Low to High") so it is never clipped; the prefix returns
+   as soon as it fits. */
+.shop__sort-prefix {
+  display: none;
+  flex: 0 0 auto;
+  color: var(--color-text-secondary);
+}
+
+@media (min-width: 430px) {
+  .shop__sort-prefix {
+    display: inline;
+  }
+}
+
+.shop__sort-value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.shop__sort-face svg {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+/* The real control: invisible, but it fills the box so a tap opens the
+   native picker. Its own text stays 16px so iOS does not zoom in. */
+.shop__sort-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  font-size: 1rem;
+  opacity: 0;
+  cursor: pointer;
+  appearance: none;
+}
+
+.shop__view {
+  flex: 0 0 auto;
+  display: flex;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-lg);
+}
+
+.shop__view-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  min-height: var(--touch-target);
+  color: var(--color-text-primary);
+  background: transparent;
+  border: 0;
+}
+
+/* Active state is the tint, the wine icon and aria-pressed — not
+   colour alone. */
+.shop__view-button.is-active {
+  color: var(--color-brand);
+  background: var(--color-brand-tint-strong);
+}
+
+@media (hover: hover) {
+  .shop__view-button:not(.is-active):hover {
+    color: var(--color-brand);
+    background: var(--color-brand-tint);
+  }
+}
+
+/* ---------- Results ---------- */
 .shop__count {
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
@@ -119,6 +272,37 @@
   margin-bottom: 0;
 }
 
+.shop__load-more-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  min-height: var(--touch-target);
+  padding: 0 var(--space-lg);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-brand);
+  background: var(--color-surface);
+  border: 1px solid var(--color-brand);
+  border-radius: var(--radius-pill);
+  transition: background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.shop__load-more-button:active {
+  color: var(--color-text-on-brand);
+  background: var(--color-brand);
+}
+
+@media (hover: hover) {
+  .shop__load-more-button:hover {
+    color: var(--color-text-on-brand);
+    background: var(--color-brand);
+  }
+}
+
 .shop__preview-note {
   margin-top: var(--space-sm);
   font-style: italic;
@@ -140,8 +324,7 @@
   letter-spacing: var(--tracking-wide);
 }
 
-.shop-filters__clear,
-.filter-chips__clear {
+.shop-filters__clear {
   min-height: var(--touch-target);
   padding-inline: var(--space-2xs);
   font-family: var(--font-body);
@@ -186,36 +369,89 @@
   margin-top: var(--space-2xs);
 }
 
-/* ---------- Active chips ---------- */
-.filter-chips__list {
+/* ---------- Active filters ---------- */
+.filter-chips {
+  margin-bottom: var(--space-sm);
+}
+
+/* Label, chips, Clear All. The chips wrap inside their own list, so on
+   a phone they stack beside the label while Clear All stays pinned to
+   the right; on wider screens it is all one line. */
+.filter-chips__row {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: var(--space-2xs);
+}
+
+.filter-chips__label {
+  flex: 0 0 auto;
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-2xs);
-  margin: 0 0 var(--space-sm);
+  min-height: var(--touch-target);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+}
+
+.filter-chips__list {
+  flex: 1 1 8rem;
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .filter-chips__chip {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--space-2xs);
   min-height: var(--touch-target);
-  padding-inline: var(--space-sm);
+  padding-inline: var(--space-xs);
   font-family: var(--font-body);
   font-size: var(--text-sm);
-  color: var(--color-text-primary);
-  background: var(--color-white);
-  border: 1px solid var(--color-border-control);
+  color: var(--color-brand);
+  background: transparent;
+  border: 0;
+  isolation: isolate;
+}
+
+/* The visible pill is shorter than the tap target. */
+.filter-chips__chip::before {
+  content: "";
+  position: absolute;
+  inset: 0.5rem 0;
+  z-index: -1;
+  background: var(--color-brand-tint-strong);
   border-radius: var(--radius-pill);
 }
 
+.filter-chips__x {
+  font-size: 1.15em;
+  line-height: 1;
+}
+
 @media (hover: hover) {
-  .filter-chips__chip:hover {
-    color: var(--color-brand);
-    border-color: var(--color-brand);
+  .filter-chips__chip:hover::before {
+    background: rgba(96, 16, 19, 0.16);
   }
+}
+
+.filter-chips__clear {
+  margin-left: auto;
+  min-height: var(--touch-target);
+  padding-inline: var(--space-2xs);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-brand);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  background: none;
+  border: 0;
 }
 
 /* ---------- Mobile drawer ---------- */
@@ -279,8 +515,12 @@
 }
 
 @media (min-width: 768px) {
-  .shop__breadcrumb {
-    display: block;
+  .shop__intro {
+    padding-block: var(--space-md) var(--space-sm);
+  }
+
+  .shop__tagline {
+    font-size: var(--text-sm);
   }
 
   .shop__toolbar {
@@ -298,9 +538,9 @@
     flex: 0 0 auto;
   }
 
-  .shop__sort .form-control {
-    width: auto;
-    min-width: 12rem;
+  .shop__sort {
+    flex: 0 0 auto;
+    min-width: 13rem;
   }
 
   .filter-drawer__body {

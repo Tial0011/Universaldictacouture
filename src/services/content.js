@@ -237,6 +237,79 @@ export function approvedOccasionPlaceholders(title = "Shop by Occasion") {
 }
 
 /**
+ * Shop discovery: three tabs — Occasion, Style, Fabric & Pattern — each
+ * built from values that genuinely exist on the given pieces, so a
+ * tile never leads to an empty result. Occasion keeps to the approved
+ * occasions (in their approved order); Style and Fabric & Pattern list
+ * whatever the pieces carry, most-used first. Each tile borrows the
+ * photograph of the first piece that has that value.
+ *
+ * Tabs with nothing behind them are left out, and null is returned
+ * when no tab has anything (callers then fall back to the approved
+ * occasion placeholders).
+ */
+const SHOP_DISCOVERY_GROUPS = [
+  { id: "occasion", label: "Occasion", key: "occasion", param: "occasion", approved: APPROVED_OCCASION_EXAMPLES },
+  { id: "style", label: "Style", key: "style", param: "style" },
+  { id: "fabric", label: "Fabric & Pattern", key: "fabric", param: "fabric" },
+];
+
+const SHOP_DISCOVERY_MAX_PER_GROUP = 12;
+
+export function buildShopDiscovery(products, title = "Shop By") {
+  const groups = [];
+  const items = [];
+
+  SHOP_DISCOVERY_GROUPS.forEach((group) => {
+    // Keyed case-insensitively (Shop filters match that way too), but
+    // shown in the casing first seen.
+    const found = new Map();
+
+    products.forEach((product) => {
+      (product[group.key] ?? []).forEach((raw) => {
+        const trimmed = String(raw).trim();
+        if (!trimmed) return;
+
+        const approvedName = group.approved?.find(
+          (name) => name.toLowerCase() === trimmed.toLowerCase()
+        );
+        if (group.approved && !approvedName) return;
+
+        const name = approvedName ?? trimmed;
+        const entry = found.get(name.toLowerCase()) ?? { name, count: 0, image: null };
+        entry.count += 1;
+        if (!entry.image && product.image) entry.image = product.image;
+        found.set(name.toLowerCase(), entry);
+      });
+    });
+
+    if (!found.size) return;
+
+    const ordered = group.approved
+      ? group.approved
+          .map((name) => found.get(name.toLowerCase()))
+          .filter(Boolean)
+      : [...found.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+
+    groups.push({ id: group.id, label: group.label, order: groups.length });
+    ordered.slice(0, SHOP_DISCOVERY_MAX_PER_GROUP).forEach((entry, index) => {
+      items.push({
+        id: `${group.id}-${index}`,
+        name: entry.name,
+        image: entry.image,
+        destination: `/shop?${group.param}=${encodeURIComponent(entry.name)}`,
+        group: group.id,
+        order: index,
+        published: true,
+      });
+    });
+  });
+
+  if (!items.length) return null;
+  return { id: "shop-discovery", title, groups, items };
+}
+
+/**
  * Custom Style homepage promotion image. Admin-managed, single
  * document; returns a null image (never a stand-in photo) when
  * nothing has been published yet or Firebase is disabled.

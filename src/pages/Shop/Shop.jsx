@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import ProductGrid from "../../components/product/ProductGrid";
 import DiscoveryModule from "../../components/discovery/DiscoveryModule";
@@ -6,14 +6,21 @@ import ShopFilters from "../../components/shop/ShopFilters";
 import FilterDrawer from "../../components/shop/FilterDrawer";
 import FilterChips from "../../components/shop/FilterChips";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
+import {
+  ChevronDownIcon,
+  GridViewIcon,
+  ListViewIcon,
+  SlidersIcon,
+} from "../../components/shop/ShopIcons";
 import { useCatalogue } from "../../hooks/useCatalogue";
 import { useBatchSize } from "../../hooks/useBatchSize";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import {
   approvedOccasionPlaceholders,
-  buildOccasionDiscovery,
+  buildShopDiscovery,
   fetchDiscoveryModule,
 } from "../../services/content";
+import { FILTER_DIMENSIONS } from "../../services/productModel";
 import { SAMPLE_PIECES, SAMPLE_PIECES_ENABLED } from "../../services/samplePieces";
 import {
   SORT_OPTIONS,
@@ -25,6 +32,11 @@ import {
   parseShopState,
 } from "../../utils/shopState";
 import "./Shop.css";
+
+const SHOP_LEDE = "Premium Aso Oke fabrics for life\u2019s most meaningful moments.";
+const SHOP_TAGLINE = "Authentic heritage. Timeless beauty. Endless possibilities.";
+
+const DIMENSION_KEYS = FILTER_DIMENSIONS.map((dimension) => dimension.key);
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -43,12 +55,19 @@ export default function Shop() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [discovery, setDiscovery] = useState(null);
 
-  const refined = hasActiveRefinements(state) || state.sort !== "newest";
+  // The header's Search icon lands here with ?focus=search. Search is
+  // otherwise tucked away (the header already carries it), so the field
+  // appears when asked for, or whenever a search is active.
+  const searchRequested = searchParams.get("focus") === "search";
+  const [searchOpen, setSearchOpen] = useState(searchRequested);
+  const searchInputRef = useRef(null);
+  const showSearch = searchOpen || Boolean(state.query);
+
+  const refined = hasActiveRefinements(state) || state.sort !== "newest" || state.view !== "grid";
 
   useDocumentMeta({
     title: "Shop — Universal Dicta Couture",
-    description:
-      "Timeless styles for every occasion. Tradition, elegance and modern sophistication.",
+    description: SHOP_LEDE,
     // Refinements share the Shop's canonical and are not indexed
     // separately, so no duplicate SEO pages are created.
     canonicalPath: "/shop",
@@ -64,6 +83,14 @@ export default function Shop() {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (searchRequested) setSearchOpen(true);
+  }, [searchRequested]);
+
+  useEffect(() => {
+    if (searchOpen && searchRequested) searchInputRef.current?.focus();
+  }, [searchOpen, searchRequested]);
 
   // Keep the search box in step with the URL (Back/Forward, chips).
   useEffect(() => {
@@ -118,12 +145,38 @@ export default function Shop() {
   const facets = useMemo(() => buildFacets(catalogue, state), [catalogue, state]);
   const chips = useMemo(() => buildChips(state), [state]);
 
-  // Same fallback chain as Home: admin-managed module, then whatever
-  // occasions genuinely exist in the published catalogue, then the
-  // approved occasions with stand-in photography — so Shop By never
-  // sits empty before real products or real photos exist.
-  const discoveryModule =
-    discovery ?? buildOccasionDiscovery(products, "Shop By") ?? approvedOccasionPlaceholders("Shop By");
+  // Same fallback chain as Home: admin-managed module, then tabs built
+  // from what genuinely exists on the pieces being shown (Occasion,
+  // Style, Fabric & Pattern), then the approved occasions with
+  // stand-in photography — so Shop By never sits empty before real
+  // products or real photos exist.
+  const discoveryModule = useMemo(
+    () =>
+      discovery ?? buildShopDiscovery(catalogue, "Shop By") ?? approvedOccasionPlaceholders("Shop By"),
+    [discovery, catalogue]
+  );
+
+  // A tile adds its filter to what is already applied (a Colour and an
+  // Occasion can be combined) rather than starting the search over.
+  const resolveTileDestination = useCallback(
+    (item) => {
+      const [path, queryString = ""] = item.destination.split("?");
+      if (path !== "/shop") return item.destination;
+
+      const next = new URLSearchParams(searchParams);
+      next.delete("focus");
+      new URLSearchParams(queryString).forEach((value, key) => {
+        if (DIMENSION_KEYS.includes(key)) {
+          if (!next.getAll(key).includes(value)) next.append(key, value);
+        } else {
+          next.set(key, value);
+        }
+      });
+      const query = next.toString();
+      return query ? `${path}?${query}` : path;
+    },
+    [searchParams]
+  );
   const visible = results.slice(0, visibleCount);
   const remaining = results.length - visible.length;
 
@@ -152,20 +205,18 @@ export default function Shop() {
         </nav>
 
         <h1 className="shop__title">Shop</h1>
-        <p className="shop__lede">
-          Timeless styles for every occasion. Tradition, elegance and modern sophistication.
-        </p>
-        <p className="shop__help">
-          Need help choosing?{" "}
-          <Link className="link" to="/chats">
-            Chat with Dicta Couturier
-          </Link>
-        </p>
+        <p className="shop__lede">{SHOP_LEDE}</p>
+        <p className="shop__tagline">{SHOP_TAGLINE}</p>
       </div>
 
       {discoveryModule ? (
         <div className="container shop__discovery">
-          <DiscoveryModule module={discoveryModule} />
+          <DiscoveryModule
+            module={discoveryModule}
+            className="discovery--shop"
+            hideTitleWithTabs
+            resolveDestination={resolveTileDestination}
+          />
         </div>
       ) : null}
 
@@ -176,47 +227,61 @@ export default function Shop() {
 
         <section className="shop__results" aria-label="Products">
           <div className="shop__toolbar">
-            <form
-              className="shop__search"
-              role="search"
-              onSubmit={(event) => {
-                event.preventDefault();
-                updateState({ ...state, query: searchDraft.trim() });
-              }}
-            >
-              <label className="visually-hidden" htmlFor="shop-search">
-                Product Search
-              </label>
-              <input
-                id="shop-search"
-                className="form-control"
-                type="search"
-                value={searchDraft}
-                placeholder="Search pieces, fabrics, occasions"
-                onChange={(event) => setSearchDraft(event.target.value)}
-              />
-              <button type="submit" className="btn btn--secondary shop__search-submit">
-                Search
-              </button>
-            </form>
+            {showSearch ? (
+              <form
+                className="shop__search"
+                role="search"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  updateState({ ...state, query: searchDraft.trim() });
+                }}
+              >
+                <label className="visually-hidden" htmlFor="shop-search">
+                  Product Search
+                </label>
+                <input
+                  id="shop-search"
+                  ref={searchInputRef}
+                  className="form-control"
+                  type="search"
+                  value={searchDraft}
+                  placeholder="Search pieces, fabrics, occasions"
+                  onChange={(event) => setSearchDraft(event.target.value)}
+                />
+                <button type="submit" className="btn btn--secondary shop__search-submit">
+                  Search
+                </button>
+              </form>
+            ) : null}
 
             <div className="shop__controls">
               <button
                 type="button"
-                className="btn btn--secondary shop__filter-button"
+                className="shop__filter-button"
                 onClick={() => setIsDrawerOpen(true)}
                 aria-haspopup="dialog"
               >
-                Filter{chips.length ? ` (${chips.length})` : ""}
+                <SlidersIcon size={20} />
+                <span>Filters{chips.length ? ` (${chips.length})` : ""}</span>
               </button>
 
               <div className="shop__sort">
                 <label className="visually-hidden" htmlFor="shop-sort">
                   Sort by
                 </label>
+                {/* The visible text is drawn here; the native select sits
+                    invisibly over it so the OS picker (and 16px text, which
+                    stops iOS zooming in) still does the choosing. */}
+                <span className="shop__sort-face" aria-hidden="true">
+                  <span className="shop__sort-prefix">Sort:</span>
+                  <span className="shop__sort-value">
+                    {SORT_OPTIONS.find((option) => option.value === state.sort)?.label}
+                  </span>
+                  <ChevronDownIcon size={18} />
+                </span>
                 <select
                   id="shop-sort"
-                  className="form-control"
+                  className="shop__sort-select"
                   value={state.sort}
                   onChange={(event) => updateState({ ...state, sort: event.target.value })}
                 >
@@ -227,12 +292,39 @@ export default function Shop() {
                   ))}
                 </select>
               </div>
+
+              <div className="shop__view" role="group" aria-label="Layout">
+                <button
+                  type="button"
+                  className={`shop__view-button${state.view === "grid" ? " is-active" : ""}`}
+                  aria-pressed={state.view === "grid"}
+                  aria-label="Grid view"
+                  onClick={() => updateState({ ...state, view: "grid" })}
+                >
+                  <GridViewIcon size={20} />
+                </button>
+                <button
+                  type="button"
+                  className={`shop__view-button${state.view === "list" ? " is-active" : ""}`}
+                  aria-pressed={state.view === "list"}
+                  aria-label="List view"
+                  onClick={() => updateState({ ...state, view: "list" })}
+                >
+                  <ListViewIcon size={20} />
+                </button>
+              </div>
             </div>
           </div>
 
           <FilterChips chips={chips} onRemove={removeChip} onClearAll={clearAll} />
 
-          <p className="shop__count" role="status" aria-live="polite">
+          {/* Read out to assistive tech as results change; shown on screen
+              only when there is a message to give (loading, none found). */}
+          <p
+            className={`shop__count${isLoading || results.length === 0 ? "" : " visually-hidden"}`}
+            role="status"
+            aria-live="polite"
+          >
             {isLoading
               ? "Loading pieces…"
               : !showSamples && error
@@ -272,7 +364,7 @@ export default function Shop() {
 
           {visible.length > 0 ? (
             <>
-              <ProductGrid products={visible} label="Shop results" />
+              <ProductGrid products={visible} view={state.view} label="Shop results" />
               {showSamples ? (
                 <p className="shop__count shop__preview-note">
                   Preview pieces. Your real pieces replace these as soon as they are published.
@@ -282,10 +374,11 @@ export default function Shop() {
                 <div className="shop__load-more">
                   <button
                     type="button"
-                    className="btn btn--secondary"
+                    className="shop__load-more-button"
                     onClick={() => setVisibleCount((count) => count + batchSize)}
                   >
-                    Load More Pieces
+                    <span>Load More Pieces</span>
+                    <ChevronDownIcon size={18} />
                   </button>
                   <p className="shop__count">
                     Showing {visible.length} of {results.length}

@@ -29,6 +29,7 @@ export const EMPTY_STATE = {
   sort: "newest",
   newIn: false,
   discovery: "",
+  view: "grid",
 };
 
 function toPrice(value) {
@@ -61,6 +62,8 @@ export function parseShopState(searchParams) {
     sort: SORT_VALUES.includes(sort) ? sort : "newest",
     newIn: searchParams.get("newin") === "1",
     discovery: (searchParams.get("discovery") ?? "").trim(),
+    // Grid is the default; only the list view is written to the URL.
+    view: searchParams.get("view") === "list" ? "list" : "grid",
   };
 }
 
@@ -77,6 +80,7 @@ export function buildSearchParams(state) {
   if (state.sort && state.sort !== "newest") params.set("sort", state.sort);
   if (state.newIn) params.set("newin", "1");
   if (state.discovery) params.set("discovery", state.discovery);
+  if (state.view === "list") params.set("view", "list");
 
   return params;
 }
@@ -174,18 +178,22 @@ export function buildChips(state) {
   const chips = [];
 
   if (state.query) {
-    chips.push({ id: "q", label: `Search: ${state.query}`, type: "query" });
+    chips.push({ id: "q", label: `Search: ${state.query}`, text: `“${state.query}”`, type: "query" });
   }
 
   if (state.newIn) {
-    chips.push({ id: "newin", label: "New In", type: "newIn" });
+    chips.push({ id: "newin", label: "New In", text: "New In", type: "newIn" });
   }
 
   FILTER_DIMENSIONS.forEach((dimension) => {
     (state.filters?.[dimension.key] ?? []).forEach((value) => {
       chips.push({
         id: `${dimension.key}:${value}`,
+        // `label` is the full name (used for assistive tech); `text` is
+        // what the chip shows, since the row is already headed
+        // "Active Filters:".
         label: `${dimension.label}: ${value}`,
+        text: value,
         type: "dimension",
         dimension: dimension.key,
         value,
@@ -194,7 +202,7 @@ export function buildChips(state) {
   });
 
   if (state.min !== null || state.max !== null) {
-    chips.push({ id: "price", label: "Price range", type: "price" });
+    chips.push({ id: "price", label: "Price range", text: "Price range", type: "price" });
   }
 
   return chips;

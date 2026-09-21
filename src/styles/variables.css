@@ -31,6 +31,8 @@
   /* ---------- Derived states ---------- */
   --color-brand-hover: #4d0d0f;               /* Wine darkened ~20% — hover/pressed only */
   --color-brand-tint: rgba(96, 16, 19, 0.06); /* Wine at 6% — subtle hover wash */
+  --color-brand-tint-strong: rgba(96, 16, 19, 0.1); /* Wine at 10% — selected chips, active toggle */
+  --color-neutral-tint: rgba(31, 31, 31, 0.06);     /* Ink at 6% — inactive segmented tabs */
 
   /* Contrast notes (WCAG 2.x, measured):
      ink on ivory 15.6:1 · gray on ivory 5.0:1 · wine on ivory 12.5:1
@@ -75,7 +77,7 @@
   --tracking-tight: -0.01em;
   --tracking-normal: 0;
   --tracking-wide: 0.03em;
-  --tracking-caps: 0.14em; /* only for the approved all-caps brand declaration */
+  --tracking-caps: 0.14em; /* only for all-caps brand lines: the approved declaration and the Shop tagline */
 
   /* ---------- Spacing scale ---------- */
   --space-3xs: 0.25rem;

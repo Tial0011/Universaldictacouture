@@ -137,3 +137,109 @@
     text-underline-offset: 0.25em;
   }
 }
+
+/* ---------- Shop variant ----------
+   A segmented tab bar (the tabs stand in for the heading) over a
+   scrolling row of small photo tiles. Scoped to .discovery--shop so
+   Home's circular row and any other use of the module are untouched. */
+.discovery--shop .discovery__groups {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--space-3xs);
+  margin-bottom: var(--space-xs);
+  padding: var(--space-3xs);
+  background: var(--color-neutral-tint);
+  border-radius: var(--radius-pill);
+}
+
+/* Sized by their labels, then sharing the spare room, so a longer
+   label ("Fabric & Pattern") is never the one that gets clipped. */
+.discovery--shop .discovery__group {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-inline: var(--space-2xs);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-color: transparent;
+}
+
+@media (hover: hover) {
+  .discovery--shop .discovery__group:not(.is-active):hover {
+    color: var(--color-brand);
+    border-color: transparent;
+    background: var(--color-brand-tint);
+  }
+}
+
+.discovery--shop .discovery__list {
+  display: flex;
+  gap: var(--space-2xs);
+  overflow-x: auto;
+  padding-bottom: var(--space-3xs);
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.discovery--shop .discovery__list::-webkit-scrollbar {
+  display: none;
+}
+
+/* Each tile is a small card: photo on top, name beneath. Six across
+   is too tight to read on a phone, so the row scrolls and the next
+   tile peeks in to show there is more. */
+.discovery--shop .discovery__list > li {
+  flex: 0 0 5.75rem;
+  scroll-snap-align: start;
+}
+
+.discovery--shop .discovery__item {
+  gap: 0;
+  height: 100%;
+  padding: var(--space-3xs);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.discovery--shop .discovery__media {
+  aspect-ratio: 6 / 5;
+  border: 0;
+  border-radius: var(--radius-md);
+}
+
+.discovery--shop .discovery__name {
+  padding: var(--space-3xs) 0.1rem 0.1rem;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+@media (min-width: 640px) {
+  .discovery--shop .discovery__list > li {
+    flex-basis: 7rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .discovery--shop .discovery__groups {
+    max-width: 30rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Room for the whole set: wrap into a grid rather than scroll. */
+  .discovery--shop .discovery__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+    overflow: visible;
+  }
+
+  .discovery--shop .discovery__list > li {
+    flex: initial;
+  }
+}
