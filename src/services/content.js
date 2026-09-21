@@ -13,6 +13,23 @@ import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { isFirebaseConfigured } from "../firebase/config";
 import heroReadyToWear from "../assets/images/hero/hero-ready-to-wear.jpg";
+import collectionPlaceholder1 from "../assets/images/collection/collection-placeholder-1.jpg";
+import collectionPlaceholder2 from "../assets/images/collection/collection-placeholder-2.jpg";
+import collectionPlaceholder3 from "../assets/images/collection/collection-placeholder-3.jpg";
+
+/**
+ * Stand-in photography for the Shop by Occasion / Shop By tiles on
+ * both Home and Shop, used only while no real occasion photos have
+ * been published (see approvedOccasionPlaceholders below). Three
+ * copies of the same approved hero photograph, cycled per tile, so
+ * each tile can later be swapped for its own real photo independently
+ * without touching the others.
+ */
+const COLLECTION_PLACEHOLDER_IMAGES = [
+  collectionPlaceholder1,
+  collectionPlaceholder2,
+  collectionPlaceholder3,
+];
 
 /** The only hero concepts the specification approves. */
 export const APPROVED_HERO_CONCEPTS = [
@@ -206,7 +223,11 @@ export function approvedOccasionPlaceholders(title = "Shop by Occasion") {
   const items = APPROVED_OCCASION_EXAMPLES.map((occasion, index) => ({
     id: `occasion-${index}`,
     name: occasion,
-    image: null,
+    image: {
+      url: COLLECTION_PLACEHOLDER_IMAGES[index % COLLECTION_PLACEHOLDER_IMAGES.length],
+      publicId: "",
+      alt: "",
+    },
     destination: `/shop?occasion=${encodeURIComponent(occasion)}`,
     group: "",
     order: index,

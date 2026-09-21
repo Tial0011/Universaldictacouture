@@ -119,6 +119,11 @@
   margin-bottom: 0;
 }
 
+.shop__preview-note {
+  margin-top: var(--space-sm);
+  font-style: italic;
+}
+
 /* ---------- Filter panel ---------- */
 .shop-filters__head {
   display: flex;

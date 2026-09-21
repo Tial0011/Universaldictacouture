@@ -9,7 +9,12 @@ import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { useCatalogue } from "../../hooks/useCatalogue";
 import { useBatchSize } from "../../hooks/useBatchSize";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
-import { buildOccasionDiscovery, fetchDiscoveryModule } from "../../services/content";
+import {
+  approvedOccasionPlaceholders,
+  buildOccasionDiscovery,
+  fetchDiscoveryModule,
+} from "../../services/content";
+import { SAMPLE_PIECES, SAMPLE_PIECES_ENABLED } from "../../services/samplePieces";
 import {
   SORT_OPTIONS,
   applyShopState,
@@ -24,6 +29,12 @@ import "./Shop.css";
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { products, isLoading, error, retry } = useCatalogue();
+  // Same preview fallback as Home: while there is no real, published
+  // catalogue yet, the grid shows the same stand-in pieces (see
+  // samplePieces.js) rather than sitting empty — never on a live
+  // storefront unless VITE_SHOW_SAMPLE_PIECES is explicitly set.
+  const showSamples = SAMPLE_PIECES_ENABLED && !isLoading && (Boolean(error) || products.length === 0);
+  const catalogue = showSamples ? SAMPLE_PIECES : products;
   const batchSize = useBatchSize();
 
   const state = useMemo(() => parseShopState(searchParams), [searchParams]);
@@ -103,11 +114,16 @@ export default function Shop() {
     });
   }, [state, updateState]);
 
-  const results = useMemo(() => applyShopState(products, state), [products, state]);
-  const facets = useMemo(() => buildFacets(products, state), [products, state]);
+  const results = useMemo(() => applyShopState(catalogue, state), [catalogue, state]);
+  const facets = useMemo(() => buildFacets(catalogue, state), [catalogue, state]);
   const chips = useMemo(() => buildChips(state), [state]);
 
-  const discoveryModule = discovery ?? buildOccasionDiscovery(products, "Shop By");
+  // Same fallback chain as Home: admin-managed module, then whatever
+  // occasions genuinely exist in the published catalogue, then the
+  // approved occasions with stand-in photography — so Shop By never
+  // sits empty before real products or real photos exist.
+  const discoveryModule =
+    discovery ?? buildOccasionDiscovery(products, "Shop By") ?? approvedOccasionPlaceholders("Shop By");
   const visible = results.slice(0, visibleCount);
   const remaining = results.length - visible.length;
 
@@ -219,14 +235,14 @@ export default function Shop() {
           <p className="shop__count" role="status" aria-live="polite">
             {isLoading
               ? "Loading pieces…"
-              : error
+              : !showSamples && error
                 ? ""
                 : `${results.length} ${results.length === 1 ? "piece" : "pieces"}`}
           </p>
 
           {isLoading ? <LoadingSpinner label="Loading the collection" /> : null}
 
-          {!isLoading && error ? (
+          {!isLoading && !showSamples && error ? (
             <div className="shop__state">
               <p>{error}</p>
               <button type="button" className="btn btn--primary" onClick={retry}>
@@ -235,13 +251,13 @@ export default function Shop() {
             </div>
           ) : null}
 
-          {!isLoading && !error && products.length === 0 ? (
+          {!isLoading && !showSamples && !error && products.length === 0 ? (
             <div className="shop__state">
               <p>No pieces have been published yet. Please check back soon.</p>
             </div>
           ) : null}
 
-          {!isLoading && !error && products.length > 0 && results.length === 0 ? (
+          {!isLoading && catalogue.length > 0 && results.length === 0 ? (
             <div className="shop__state">
               <p>
                 {state.query
@@ -257,6 +273,11 @@ export default function Shop() {
           {visible.length > 0 ? (
             <>
               <ProductGrid products={visible} label="Shop results" />
+              {showSamples ? (
+                <p className="shop__count shop__preview-note">
+                  Preview pieces. Your real pieces replace these as soon as they are published.
+                </p>
+              ) : null}
               {remaining > 0 ? (
                 <div className="shop__load-more">
                   <button

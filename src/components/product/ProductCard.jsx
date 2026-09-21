@@ -59,6 +59,7 @@ export default function ProductCard({ product, imageLoading = "lazy" }) {
 
   const saved = isSaved(product.id);
   const { isComplete } = resolveSelections(product);
+  const isSample = Boolean(product.isSample);
 
   const handleSave = () => {
     const nowSaved = toggleSaved(product.id);
@@ -107,15 +108,17 @@ export default function ProductCard({ product, imageLoading = "lazy" }) {
             sizes="(min-width: 1280px) 20vw, (min-width: 768px) 30vw, 45vw"
           />
         </Link>
-        <button
-          type="button"
-          className={`product-card__save${saved ? " is-saved" : ""}`}
-          onClick={handleSave}
-          aria-pressed={saved}
-          aria-label={saved ? `Remove ${product.name} from Saved Pieces` : `Save ${product.name} to Saved Pieces`}
-        >
-          <HeartIcon filled={saved} />
-        </button>
+        {isSample ? null : (
+          <button
+            type="button"
+            className={`product-card__save${saved ? " is-saved" : ""}`}
+            onClick={handleSave}
+            aria-pressed={saved}
+            aria-label={saved ? `Remove ${product.name} from Saved Pieces` : `Save ${product.name} to Saved Pieces`}
+          >
+            <HeartIcon filled={saved} />
+          </button>
+        )}
       </div>
 
       <div className="product-card__body">
@@ -123,15 +126,17 @@ export default function ProductCard({ product, imageLoading = "lazy" }) {
           <Link to={product.href}>{product.name}</Link>
         </h3>
         <ProductPrice product={product} />
-        <button
-          type="button"
-          className="product-card__closet"
-          onClick={handleAddToCloset}
-          disabled={isAdding}
-          aria-busy={isAdding || undefined}
-        >
-          Add to Closet
-        </button>
+        {isSample ? null : (
+          <button
+            type="button"
+            className="product-card__closet"
+            onClick={handleAddToCloset}
+            disabled={isAdding}
+            aria-busy={isAdding || undefined}
+          >
+            Add to Closet
+          </button>
+        )}
       </div>
     </article>
   );
