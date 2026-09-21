@@ -86,8 +86,16 @@ export default function Home() {
   // exist in the published catalogue; otherwise the approved
   // occasions still show, illustrated rather than photographed,
   // until real photos are published for them.
-  const discoveryModule =
+  // Section 3 spec: "Shop by Occasion" shows at most 9 items on the
+  // Homepage (unlike the Shop page's full catalogue browsing). This
+  // caps whichever source wins — admin-managed, catalogue-derived, or
+  // the approved placeholders — without touching DiscoveryModule
+  // itself, since Shop reuses that component without this limit.
+  const rawDiscoveryModule =
     discovery ?? buildOccasionDiscovery(products) ?? approvedOccasionPlaceholders();
+  const discoveryModule = rawDiscoveryModule
+    ? { ...rawDiscoveryModule, items: rawDiscoveryModule.items.slice(0, 9) }
+    : null;
   const realNewIn = selectNewIn(products, 6);
   // In preview mode, an unreachable or still-empty catalogue is covered
   // by sample pieces so the section is never blank (see samplePieces.js).
