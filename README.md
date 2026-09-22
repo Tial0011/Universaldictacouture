@@ -13,14 +13,14 @@ can be added cleanly.
 - React Router
 - Plain CSS (design tokens in `src/styles/variables.css`)
 - Firebase (Auth + Firestore)
-- Cloudinary (image storage — not Firebase Storage)
+- Netlify Blobs (image storage — not Firebase Storage)
 - Netlify (hosting + optional serverless functions)
 
 ## Getting started
 
 ```bash
 npm install
-cp .env.example .env   # fill in real Firebase/Cloudinary values
+cp .env.example .env   # fill in real Firebase values
 npm run dev
 ```
 
@@ -44,10 +44,10 @@ src/
                     Domain-specific components, added as each area is built
   pages/            One folder per route (public site + admin/)
   firebase/         Firebase app/auth/firestore setup
-  cloudinary/       Cloudinary upload + URL helpers
+  cloudinary/       Legacy Cloudinary URL compatibility
   hooks/            Shared React hooks
   context/          React context providers (auth, etc.)
-  services/         Data-access layer (Firestore/Cloudinary calls), added per domain
+  services/         Data-access layer (Firestore/image storage calls), added per domain
   utils/            Generic helpers
   styles/           Design tokens, global reset, responsive helpers
 netlify/
@@ -123,7 +123,7 @@ future About/editorial experience.
 
 ## Environment variables
 
-See `.env.example` for the full list (Firebase config + Cloudinary
+See `.env.example` for the full list (Firebase config + Netlify Functions
 cloud name/upload preset). All client-side variables are prefixed
 `VITE_` per Vite's convention.
 
@@ -137,3 +137,6 @@ cloud name/upload preset). All client-side variables are prefixed
   `netlify/functions/README.md`.
 - No fake products, reviews, statistics, or testimonials are included
   anywhere in this codebase.
+
+## Admin workspace
+The admin at `/admin` now includes protected access, product management, a catalogue label guide, homepage banners, discovery tiles and reviews. See [Admin setup](docs/admin-setup.md) for Firebase Spark access rules, Netlify image storage configuration and launch verification. This supersedes the earlier admin-placeholder note above.

@@ -1,21 +1,12 @@
-# netlify/functions/
+# Netlify Functions
 
-No functions exist yet — none are needed for Sections 1–4 of the
-specification. Add a function here only when server-side logic is
-genuinely required (a signed Cloudinary operation, a payment
-webhook, anything that needs a secret the client must never see).
+images.js handles POST uploads and GET/HEAD image delivery at /.netlify/functions/images.
 
-Each function is a single file exporting a handler, e.g.:
+- Auth: verify the Firebase ID token through accounts:lookup, then require admins/{uid}.active using Firestore rules.
+- Input: JPEG, PNG or WebP up to 4 MB, decoded and re-encoded with sharp. SVG and animated images are rejected.
+- Storage: site-wide catalogue-images Netlify Blobs store; new UUID per upload.
+- Delivery: public WebP URL, with caching and nosniff headers. Draft image files are also public.
+- Secrets: none beyond credentials Netlify supplies for Blobs. FIREBASE_WEB_API_KEY and FIREBASE_PROJECT_ID must be available to Functions (the VITE_* equivalents are accepted as a fallback).
+- Local development: npx netlify dev, then use port 8888. Vite alone does not run functions.
 
-```js
-// netlify/functions/example.js
-export async function handler(event) {
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ ok: true }),
-  };
-}
-```
-
-It becomes available at `/.netlify/functions/example` in production
-and via `netlify dev` locally.
+See ../../docs/admin-setup.md for full setup and deployment checks.

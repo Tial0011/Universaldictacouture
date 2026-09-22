@@ -1,43 +1,75 @@
 rules_version = '2';
-
-// Starting point for the Phase 3/4 public catalogue. Review before
-// deploying, and extend as later phases add orders and chats.
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Public catalogue: published documents only, never writable from
-    // the client.
+    // Admin memberships are provisioned by the owner in the Firebase Console.
+    // Browser clients, including admins, cannot grant or change memberships.
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true;
+    }
+    match /admins/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list, write: if false;
+    }
     match /products/{productId} {
-      allow read: if resource.data.status == 'published';
-      allow write: if false;
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.status in ['draft', 'published', 'archived']
+        && (request.resource.data.status != 'published'
+          || (request.resource.data.price is number
+            && request.resource.data.price >= 0
+            && request.resource.data.category is list
+            && request.resource.data.category.size() > 0));
+      allow delete: if false;
     }
-
     match /heroSlides/{slideId} {
-      allow read: if resource.data.published == true;
-      allow write: if false;
+      allow read: if resource.data.published == true || isAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.published is bool
+        && request.resource.data.headline is string
+        && request.resource.data.headline.size() > 0
+        && request.resource.data.concept in ['ready-to-wear', 'aso-oke-fabric', 'custom-style', 'shop-by-occasion', 'bridal-event-dressing'];
+      allow delete: if false;
     }
-
     match /discoveryModules/{moduleId} {
-      allow read: if resource.data.active == true;
-      allow write: if false;
+      allow read: if resource.data.active == true || isAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.active is bool
+        && request.resource.data.placement in ['home', 'shop']
+        && request.resource.data.items is list
+        && request.resource.data.items.size() <= 12;
+      allow delete: if false;
     }
-
     match /reviews/{reviewId} {
-      allow read: if resource.data.published == true;
+      allow read: if resource.data.published == true || isAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.published is bool
+        && request.resource.data.author is string
+        && request.resource.data.body is string
+        && request.resource.data.body.size() > 0;
+      allow delete: if false;
+    }
+    match /taxonomy/{labelId} {
+      allow read: if isAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.dimension in ['category', 'occasion', 'style', 'fabric', 'colour', 'size'];
+      allow delete: if false;
+    }
+    match /homeSections/{sectionId} {
+      allow read: if resource.data.section == 'customStyle';
       allow write: if false;
     }
-
-    // Style Circle: write-only. Reads are denied, so subscriber
-    // addresses never leave the backend; a repeat signup is rejected
-    // here, which is what the UI reports as a duplicate.
     match /styleCircleSubscribers/{key} {
       allow create: if request.resource.data.keys().hasOnly(['email', 'source', 'createdAt'])
-                    && request.resource.data.email is string
-                    && request.resource.data.email.size() < 320;
+        && request.resource.data.email is string
+        && request.resource.data.email.size() < 320;
       allow read, update, delete: if false;
     }
-
-    // Saved Pieces belong to the signed-in visitor alone.
     match /savedPieces/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }

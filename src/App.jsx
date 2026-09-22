@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import SiteLayout from "./components/navigation/SiteLayout";
 import AdminLayout from "./components/navigation/AdminLayout";
-import ProtectedRoute from "./components/common/ProtectedRoute";
+import AdminAccess from "./components/admin/AdminAccess";
 
 import Home from "./pages/Home/Home";
 import Shop from "./pages/Shop/Shop";
@@ -17,6 +17,7 @@ import SavedPieces from "./pages/SavedPieces/SavedPieces";
 import MyCloset from "./pages/MyCloset/MyCloset";
 import NotFound from "./pages/NotFound";
 
+import AdminSettings from "./pages/admin/Settings/Settings";
 import Dashboard from "./pages/admin/Dashboard/Dashboard";
 import AdminProducts from "./pages/admin/Products/Products";
 import AdminTaxonomy from "./pages/admin/Taxonomy/Taxonomy";
@@ -46,9 +47,9 @@ export default function App() {
       <Route
         path="/admin"
         element={
-          <ProtectedRoute>
+          <AdminAccess>
             <AdminLayout />
-          </ProtectedRoute>
+          </AdminAccess>
         }
       >
         <Route index element={<Dashboard />} />
@@ -57,6 +58,8 @@ export default function App() {
         <Route path="discovery" element={<AdminDiscovery />} />
         <Route path="homepage" element={<AdminHomepage />} />
         <Route path="reviews" element={<AdminReviews />} />
+        <Route path="settings" element={<AdminSettings />} />
+        <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
   );
