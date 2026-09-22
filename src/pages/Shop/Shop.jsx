@@ -16,12 +16,10 @@ import { useCatalogue } from "../../hooks/useCatalogue";
 import { useBatchSize } from "../../hooks/useBatchSize";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import {
-  approvedOccasionPlaceholders,
   buildShopDiscovery,
   fetchDiscoveryModule,
 } from "../../services/content";
 import { FILTER_DIMENSIONS } from "../../services/productModel";
-import { SAMPLE_PIECES, SAMPLE_PIECES_ENABLED } from "../../services/samplePieces";
 import {
   SORT_OPTIONS,
   applyShopState,
@@ -41,12 +39,7 @@ const DIMENSION_KEYS = FILTER_DIMENSIONS.map((dimension) => dimension.key);
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { products, isLoading, error, retry } = useCatalogue();
-  // Same preview fallback as Home: while there is no real, published
-  // catalogue yet, the grid shows the same stand-in pieces (see
-  // samplePieces.js) rather than sitting empty — never on a live
-  // storefront unless VITE_SHOW_SAMPLE_PIECES is explicitly set.
-  const showSamples = SAMPLE_PIECES_ENABLED && !isLoading && (Boolean(error) || products.length === 0);
-  const catalogue = showSamples ? SAMPLE_PIECES : products;
+  const catalogue = products;
   const batchSize = useBatchSize();
 
   const state = useMemo(() => parseShopState(searchParams), [searchParams]);
@@ -145,14 +138,10 @@ export default function Shop() {
   const facets = useMemo(() => buildFacets(catalogue, state), [catalogue, state]);
   const chips = useMemo(() => buildChips(state), [state]);
 
-  // Same fallback chain as Home: admin-managed module, then tabs built
-  // from what genuinely exists on the pieces being shown (Occasion,
-  // Style, Fabric & Pattern), then the approved occasions with
-  // stand-in photography — so Shop By never sits empty before real
-  // products or real photos exist.
+  // Discovery comes from published content or real product attributes.
   const discoveryModule = useMemo(
     () =>
-      discovery ?? buildShopDiscovery(catalogue, "Shop By") ?? approvedOccasionPlaceholders("Shop By"),
+      discovery ?? buildShopDiscovery(catalogue, "Shop By"),
     [discovery, catalogue]
   );
 
@@ -327,14 +316,14 @@ export default function Shop() {
           >
             {isLoading
               ? "Loading pieces…"
-              : !showSamples && error
+              : error
                 ? ""
                 : `${results.length} ${results.length === 1 ? "piece" : "pieces"}`}
           </p>
 
           {isLoading ? <LoadingSpinner label="Loading the collection" /> : null}
 
-          {!isLoading && !showSamples && error ? (
+          {!isLoading && error ? (
             <div className="shop__state">
               <p>{error}</p>
               <button type="button" className="btn btn--primary" onClick={retry}>
@@ -343,7 +332,7 @@ export default function Shop() {
             </div>
           ) : null}
 
-          {!isLoading && !showSamples && !error && products.length === 0 ? (
+          {!isLoading && !error && products.length === 0 ? (
             <div className="shop__state">
               <p>No pieces have been published yet. Please check back soon.</p>
             </div>
@@ -365,11 +354,6 @@ export default function Shop() {
           {visible.length > 0 ? (
             <>
               <ProductGrid products={visible} view={state.view} label="Shop results" />
-              {showSamples ? (
-                <p className="shop__count shop__preview-note">
-                  Preview pieces. Your real pieces replace these as soon as they are published.
-                </p>
-              ) : null}
               {remaining > 0 ? (
                 <div className="shop__load-more">
                   <button

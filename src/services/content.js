@@ -13,37 +13,9 @@ import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { isFirebaseConfigured } from "../firebase/config";
 import heroReadyToWear from "../assets/images/hero/hero-ready-to-wear.jpg";
-import collectionPlaceholder1 from "../assets/images/collection/collection-placeholder-1.jpg";
-import collectionPlaceholder2 from "../assets/images/collection/collection-placeholder-2.jpg";
-import collectionPlaceholder3 from "../assets/images/collection/collection-placeholder-3.jpg";
-import occasionWeddingGuest from "../assets/images/occasions/wedding-guest.jpg";
-import occasionBridal from "../assets/images/occasions/bridal.jpg";
-import occasionEngagement from "../assets/images/occasions/traditional-engagement.jpg";
-import occasionCelebration from "../assets/images/occasions/celebration.jpg";
-import occasionChurchEvent from "../assets/images/occasions/church-event.jpg";
 
-/**
- * Stand-in photography for the Shop by Occasion / Shop By tiles on
- * both Home and Shop, used only while no real occasion photos have
- * been published (see approvedOccasionPlaceholders below). Each
- * approved occasion has its own fabric photograph (cut from the Shop
- * mockup — low resolution, stand-ins only), so each tile can later be
- * swapped for a real photo independently. Any occasion without one
- * falls back to cycling the three generic placeholders.
- */
-const OCCASION_STAND_IN_IMAGES = {
-  "Wedding Guest": occasionWeddingGuest,
-  Bridal: occasionBridal,
-  "Traditional Engagement": occasionEngagement,
-  Celebration: occasionCelebration,
-  "Church/Event": occasionChurchEvent,
-};
 
-const COLLECTION_PLACEHOLDER_IMAGES = [
-  collectionPlaceholder1,
-  collectionPlaceholder2,
-  collectionPlaceholder3,
-];
+
 
 /** The only hero concepts the specification approves. */
 export const APPROVED_HERO_CONCEPTS = [
@@ -225,32 +197,7 @@ export function buildOccasionDiscovery(products, title = "Shop by Occasion") {
   return { id: "occasion-fallback", title, groups: [], items };
 }
 
-/**
- * The five approved occasions with no photography yet — used only
- * when neither an admin discovery module nor the published catalogue
- * has anything to show, so the section still appears (with an
- * illustration standing in per item; see OccasionIllustration) rather
- * than being invisible until photos exist. These are the approved
- * taxonomy, not invented categories.
- */
-export function approvedOccasionPlaceholders(title = "Shop by Occasion") {
-  const items = APPROVED_OCCASION_EXAMPLES.map((occasion, index) => ({
-    id: `occasion-${index}`,
-    name: occasion,
-    image: {
-      url:
-        OCCASION_STAND_IN_IMAGES[occasion] ??
-        COLLECTION_PLACEHOLDER_IMAGES[index % COLLECTION_PLACEHOLDER_IMAGES.length],
-      publicId: "",
-      alt: "",
-    },
-    destination: `/shop?occasion=${encodeURIComponent(occasion)}`,
-    group: "",
-    order: index,
-    published: true,
-  }));
-  return { id: "occasion-approved", title, groups: [], items };
-}
+
 
 /**
  * Shop discovery: three tabs — Occasion, Style, Fabric & Pattern — each
@@ -363,8 +310,8 @@ export async function fetchCustomStylePromo() {
 }
 
 /** Published review / feed entries for the homepage preview. */
-export async function fetchPublishedReviews(max = 3) {
-  if (!isFirebaseConfigured) return [];
+export async function fetchPublishedReviews(max = 3, strict = false) {
+  if (!isFirebaseConfigured) { if (strict) throw new Error("Reviews are not connected."); return []; }
 
   try {
     const snapshot = await getDocs(
@@ -386,6 +333,7 @@ export async function fetchPublishedReviews(max = 3) {
       .filter(Boolean);
   } catch (error) {
     if (import.meta.env.DEV) console.error(error);
+    if (strict) throw new Error("Reviews could not be loaded.");
     return [];
   }
 }

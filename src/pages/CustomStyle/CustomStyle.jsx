@@ -1,10 +1,3 @@
 import PageIntro from "../../components/common/PageIntro";
-
-export default function CustomStyle() {
-  return (
-    <PageIntro
-      title="Custom style"
-      description="Bespoke styling requests will be gathered here in a later phase."
-    />
-  );
-}
+import Button from "../../components/common/Button";
+export default function CustomStyle() { return <><PageIntro title="Custom Style" description="Discuss your preferred style, fabric and measurements with Dicta Couturier." /><div className="container section"><Button to="/chats">Contact Dicta Couturier</Button><Button to="/shop" variant="ghost">Browse the shop</Button></div></>; }

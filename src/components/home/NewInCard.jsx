@@ -26,18 +26,8 @@ function HeartIcon({ filled }) {
   );
 }
 
-/**
- * New In "menu card".
- *
- * Laid out like a line on a restaurant menu: the piece's name, then a
- * price line that runs on a dotted leader to a small category mark,
- * then one clear action — View Piece. Choosing sizes / options happens
- * on Product Details, so this card only ever leads there.
- *
- * A piece with no uploaded photo yet borrows `fallbackImage` (the
- * hero photograph) so the section never looks empty.
- */
-export default function NewInCard({ product, fallbackImage = null, imageLoading = "lazy" }) {
+/** A published piece using its own uploaded image. */
+export default function NewInCard({ product, imageLoading = "lazy" }) {
   const { isSaved, toggleSaved, isPersistent } = useSavedPieces();
   const { showToast } = useToast();
 
@@ -63,14 +53,14 @@ export default function NewInCard({ product, fallbackImage = null, imageLoading 
       <div className="menu-card__media">
         <Link to={product.href} className="menu-card__media-link" tabIndex={-1} aria-hidden="true">
           <ProductImage
-            image={product.image || fallbackImage}
+            image={product.image}
             alt={product.image ? product.name : ""}
             transformation="w_720,ar_3:1,c_fill,g_auto,q_auto,f_auto"
             loading={imageLoading}
             sizes="(min-width: 1280px) 16vw, (min-width: 640px) 30vw, 45vw"
           />
         </Link>
-        {product.isSample ? null : (
+
           <button
             type="button"
             className={`menu-card__save${saved ? " is-saved" : ""}`}
@@ -84,7 +74,6 @@ export default function NewInCard({ product, fallbackImage = null, imageLoading 
           >
             <HeartIcon filled={saved} />
           </button>
-        )}
       </div>
 
       <div className="menu-card__body">

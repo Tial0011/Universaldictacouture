@@ -13,7 +13,6 @@ import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import heroReadyToWear from "../../assets/images/hero/hero-ready-to-wear.jpg";
 import {
   APPROVED_HERO_COPY,
-  approvedOccasionPlaceholders,
   buildOccasionDiscovery,
   fetchCustomStylePromo,
   fetchDiscoveryModule,
@@ -21,7 +20,6 @@ import {
   fetchPublishedReviews,
 } from "../../services/content";
 import { selectNewIn } from "../../services/products";
-import { SAMPLE_PIECES, SAMPLE_PIECES_ENABLED } from "../../services/samplePieces";
 import "./Home.css";
 import "../../components/home/home-sections.css";
 
@@ -83,30 +81,17 @@ export default function Home() {
   }, []);
 
   // Admin-managed discovery wins; then whatever occasions genuinely
-  // exist in the published catalogue; otherwise the approved
-  // occasions still show, illustrated rather than photographed,
-  // until real photos are published for them.
-  // Section 3 spec: "Shop by Occasion" shows at most 9 items on the
-  // Homepage (unlike the Shop page's full catalogue browsing). This
-  // caps whichever source wins — admin-managed, catalogue-derived, or
-  // the approved placeholders — without touching DiscoveryModule
-  // itself, since Shop reuses that component without this limit.
+  // Use only published discovery content or real catalogue attributes.
   const rawDiscoveryModule =
-    discovery ?? buildOccasionDiscovery(products) ?? approvedOccasionPlaceholders();
+    discovery ?? buildOccasionDiscovery(products);
   const discoveryModule = rawDiscoveryModule
     ? { ...rawDiscoveryModule, items: rawDiscoveryModule.items.slice(0, 9) }
     : null;
   const realNewIn = selectNewIn(products, 6);
-  // In preview mode, an unreachable or still-empty catalogue is covered
-  // by sample pieces so the section is never blank (see samplePieces.js).
-  const showSamples =
-    SAMPLE_PIECES_ENABLED && !isLoading && (Boolean(error) || realNewIn.length === 0);
-  const newInProducts = showSamples ? SAMPLE_PIECES : realNewIn;
+  const newInProducts = realNewIn;
   // "View all" goes to the New In filter only when pieces are actually
   // flagged New In; otherwise the section is showing the newest pieces
   // and the whole collection is the honest destination.
-  // Pieces without an uploaded photo borrow the hero photograph.
-  const heroImage = slides.find((slide) => slide.image)?.image ?? FALLBACK_SLIDE[0].image;
   const hasFlaggedNewIn = products.some((product) => product.isNewIn);
 
   return (
@@ -137,9 +122,7 @@ export default function Home() {
       <NewIn
         products={newInProducts}
         isLoading={isLoading}
-        error={showSamples ? null : error}
-        isSample={showSamples}
-        fallbackImage={heroImage}
+        error={error}
         viewAllTo={hasFlaggedNewIn ? "/shop?newin=1" : "/shop"}
       />
 

@@ -17,8 +17,6 @@ export default function NewIn({
   products,
   isLoading,
   error,
-  fallbackImage = null,
-  isSample = false,
   viewAllTo = "/shop?newin=1",
 }) {
   const [activeCategory, setActiveCategory] = useState("all");
@@ -76,18 +74,11 @@ export default function NewIn({
             <li key={product.id}>
               <NewInCard
                 product={product}
-                fallbackImage={fallbackImage}
                 imageLoading={index < 4 ? "eager" : "lazy"}
               />
             </li>
           ))}
         </ul>
-      ) : null}
-
-      {!isLoading && !error && isSample ? (
-        <p className="home-section__note home-section__note--preview">
-          Preview pieces. Your real pieces replace these as soon as they are published.
-        </p>
       ) : null}
     </section>
   );

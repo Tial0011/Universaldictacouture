@@ -39,6 +39,8 @@ export default function App() {
         <Route path="/our-story" element={<OurStory />} />
         <Route path="/policies" element={<Policies />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/signin" element={<Profile />} />
+        <Route path="/signup" element={<Profile />} />
         <Route path="/saved-pieces" element={<SavedPieces />} />
         <Route path="/my-closet" element={<MyCloset />} />
         <Route path="*" element={<NotFound />} />

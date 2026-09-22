@@ -74,7 +74,6 @@ export default function ProductCard({ product, view = "grid", imageLoading = "la
   const { showToast } = useToast();
 
   const saved = isSaved(product.id);
-  const isSample = Boolean(product.isSample);
   const subtitle = buildSubtitle(product);
 
   const handleSave = () => {
@@ -104,7 +103,7 @@ export default function ProductCard({ product, view = "grid", imageLoading = "la
             }
           />
         </Link>
-        {isSample ? null : (
+
           <button
             type="button"
             className={`product-card__save${saved ? " is-saved" : ""}`}
@@ -114,7 +113,6 @@ export default function ProductCard({ product, view = "grid", imageLoading = "la
           >
             <HeartIcon filled={saved} />
           </button>
-        )}
       </div>
 
       <div className="product-card__body">

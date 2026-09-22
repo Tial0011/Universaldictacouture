@@ -59,3 +59,13 @@ With a configured development Firebase project, verify:
 7. Check mobile navigation, keyboard focus, unsaved-change prompts and error handling offline.
 
 Rules and service integration need to be verified against your project before production. No remote project settings or rules are deployed automatically by this change.
+
+## Customer accounts and real catalogue
+
+Customers can register at /signup and sign in at /signin. Enable Email/Password in Firebase Authentication and ensure the deployed domain is authorized. Registration creates a customer account only; it never creates an admins membership.
+
+Saved pieces use each signed-in customer's own Firestore document. Guest saved pieces and My Closet are browser-session data; closet storage is separated by account. Guest selections are not automatically merged into a new account.
+
+Mock products, orders, payments and conversations have been removed. The shop stays empty until real products are published. Chats opens the configured WhatsApp contact; no in-app chat or payment processing is claimed. Product details and the reviews page now read published data.
+
+Verify registration with your own email, sign out and sign back in, save a real product, and confirm a different account cannot see those saved pieces or access admin. These live account checks require a configured Firebase project.

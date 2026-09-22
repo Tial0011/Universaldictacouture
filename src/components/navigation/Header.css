@@ -389,17 +389,7 @@
   .site-header__chat-launcher { forced-color-adjust: auto; }
 }
 
-.site-header__admin-login {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: var(--touch-target);
-  padding: var(--space-2xs) var(--space-sm);
-  color: var(--color-text-on-brand);
-  border: 1px solid currentColor;
-  border-radius: var(--radius-control);
-  text-decoration: none;
-  font-weight: var(--weight-semibold);
-}
-.site-header__admin-login:hover { background: var(--color-brand-hover); }
-.site-header__admin-login:focus-visible { outline-color: var(--color-focus-ring-inverse); }
+
+.site-header__account-link { display: inline-flex; align-items: center; min-height: var(--touch-target); padding-inline: var(--space-xs); color: var(--color-brand); font-size: var(--text-sm); white-space: nowrap; }
+.site-header__primary ul { flex-wrap: wrap; column-gap: var(--space-xs); row-gap: 0; }
+.site-header__drawer.is-open { max-height: min(70dvh, 32rem); overflow-y: auto; }

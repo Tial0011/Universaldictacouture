@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { closetLineKey, priceForSelections, resolveSelections } from "../services/productModel";
+import { useAuth } from "./AuthContext";
 import { revalidateProduct } from "../services/products";
 
 /**
@@ -31,9 +32,9 @@ const ClosetContext = createContext({
   addToCloset: async () => ({ status: ADD_RESULT.ERROR }),
 });
 
-function readSession() {
+function readSession(storageKey) {
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
+    const raw = sessionStorage.getItem(storageKey);
     const parsed = raw ? JSON.parse(raw) : [];
     return Array.isArray(parsed) ? parsed : [];
   } catch {
@@ -42,15 +43,20 @@ function readSession() {
 }
 
 export function ClosetProvider({ children }) {
-  const [lines, setLines] = useState(() => readSession());
+  const { user } = useAuth();
+  return <ClosetSession key={user?.uid || "guest"} storageKey={STORAGE_KEY + ":" + (user?.uid || "guest")} >{children}</ClosetSession>;
+}
+
+function ClosetSession({ children, storageKey }) {
+  const [lines, setLines] = useState(() => readSession(storageKey));
 
   useEffect(() => {
     try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
+      sessionStorage.setItem(storageKey, JSON.stringify(lines));
     } catch {
       // Closet then lives in memory only for this page.
     }
-  }, [lines]);
+  }, [lines, storageKey]);
 
   const addToCloset = useCallback(async (product, selections = {}) => {
     if (!product?.id) return { status: ADD_RESULT.ERROR };
@@ -109,6 +115,7 @@ export function ClosetProvider({ children }) {
       lines,
       itemCount: lines.reduce((total, line) => total + line.quantity, 0),
       addToCloset,
+      removeFromCloset: key => setLines(previous => previous.filter(line => line.key !== key)),
     }),
     [lines, addToCloset]
   );

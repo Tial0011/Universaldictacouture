@@ -128,7 +128,6 @@ export default function Header() {
           <Link to="/custom-style" className="site-header__utility-item site-header__utility-link">
             Custom Styles Available
           </Link>
-          <Link to="/admin" className="site-header__admin-login">{adminLabel}</Link>
         </div>
       </div>
 
@@ -141,7 +140,7 @@ export default function Header() {
 
             <nav className="site-header__primary" aria-label="Primary navigation">
               <ul>
-                {PRIMARY_LINKS.map((link) => (
+                {[...PRIMARY_LINKS, { to: "/admin", label: adminLabel }].map((link) => (
                   <li key={link.to}><HeaderLink {...link} /></li>
                 ))}
               </ul>
@@ -160,7 +159,7 @@ export default function Header() {
                   autoComplete="off"
                 />
               </form>
-              <NavLink className="site-header__tool" to="/profile" aria-label="Profile" title="Profile"><Icon name="user" /></NavLink>
+              <NavLink className="site-header__account-link" to={user ? "/profile" : "/signin"}>{user ? "Account" : "Sign in"}</NavLink>
               <NavLink className="site-header__tool" to="/my-closet" aria-label="My Closet" title="My Closet"><Icon name="closet" /></NavLink>
             </div>
           </div>
@@ -214,7 +213,7 @@ export default function Header() {
           >
             <nav aria-label="Mobile menu">
               <ul>
-                {[...MOBILE_DRAWER_LINKS, { to: "/admin", label: adminLabel }].map((link) => (
+                {[...MOBILE_DRAWER_LINKS, ...(!user ? [{ to: "/signin", label: "Sign in" }, { to: "/signup", label: "Sign up" }] : []), { to: "/admin", label: adminLabel }].map((link) => (
                   <li key={link.to}>
                     <HeaderLink {...link} onNavigate={closeMenu} />
                   </li>

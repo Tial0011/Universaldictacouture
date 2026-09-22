@@ -1,0 +1,10 @@
+.account-page { padding-block: var(--space-xl); }
+.account-card { max-width: var(--content-narrow-width); margin-inline: auto; padding: var(--space-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-top: 2px solid var(--color-accent); border-radius: var(--radius-surface); display: grid; gap: var(--space-md); }
+.account-card h1 { font-size: var(--text-xl); }
+.account-form { display: grid; gap: var(--space-md); }
+.account-actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+.customer-list { display: grid; gap: var(--space-md); margin: 0; padding: 0; list-style: none; }
+.customer-piece { display: grid; grid-template-columns: 100px 1fr; gap: var(--space-sm); border-bottom: 1px solid var(--color-border); padding-block: var(--space-sm); }
+.customer-piece img { width: 100px; height: 125px; object-fit: cover; }
+.customer-piece h2 { font-size: var(--text-lg); }
+@media (max-width: 599px) { .account-card { padding: var(--space-md); } }
