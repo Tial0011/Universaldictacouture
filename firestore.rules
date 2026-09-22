@@ -70,6 +70,58 @@ service cloud.firestore {
         && request.resource.data.email.size() < 320;
       allow read, update, delete: if false;
     }
+    // One private conversation per customer. Messages and summaries commit together.
+    match /conversations/{customerId} {
+      function owner() {
+        return request.auth != null && request.auth.uid == customerId;
+      }
+      function participant() {
+        return owner() || isAdmin();
+      }
+      function validSummary() {
+        let data = request.resource.data;
+        let messagePath = /databases/$(database)/documents/conversations/$(customerId)/messages/$(data.lastMessageId);
+        let message = getAfter(messagePath).data;
+        return data.keys().hasOnly(['customerId', 'customerName', 'customerEmail', 'createdAt', 'lastMessageId', 'lastMessage', 'lastSenderRole', 'updatedAt'])
+          && data.customerId == customerId
+          && data.lastMessageId is string
+          && !exists(messagePath)
+          && data.updatedAt == request.time
+          && message.createdAt == request.time
+          && message.senderId == request.auth.uid
+          && data.lastMessage == message.body
+          && data.lastSenderRole == message.senderRole;
+      }
+      allow get: if participant();
+      allow list: if isAdmin() && request.query.limit <= 20;
+      allow create: if owner()
+        && request.resource.data.customerName is string
+        && request.resource.data.customerName.size() > 0
+        && request.resource.data.customerName.size() <= 120
+        && request.resource.data.customerEmail == request.auth.token.email
+        && request.resource.data.createdAt == request.time
+        && validSummary();
+      allow update: if participant()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastMessageId', 'lastMessage', 'lastSenderRole', 'updatedAt'])
+        && validSummary();
+      allow delete: if false;
+      match /messages/{messageId} {
+        allow get: if participant();
+        allow list: if participant() && request.query.limit <= 30;
+        allow create: if request.auth != null
+          && request.resource.data.keys().hasOnly(['body', 'senderId', 'senderRole', 'createdAt'])
+          && request.resource.data.body is string
+          && request.resource.data.body.size() > 0
+          && request.resource.data.body.size() <= 2000
+          && request.resource.data.senderId == request.auth.uid
+          && ((request.resource.data.senderRole == 'customer' && owner())
+            || (request.resource.data.senderRole == 'admin' && isAdmin()))
+          && request.resource.data.createdAt == request.time
+          && getAfter(/databases/$(database)/documents/conversations/$(customerId)).data.lastMessageId == messageId
+          && getAfter(/databases/$(database)/documents/conversations/$(customerId)).data.updatedAt == request.time;
+        allow update, delete: if false;
+      }
+    }
     match /savedPieces/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }

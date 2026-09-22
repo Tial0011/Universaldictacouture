@@ -78,3 +78,6 @@
   .admin-panel { padding: var(--space-sm); }
   .admin-access__card { padding: var(--space-md); }
 }
+
+.admin-nav__utilities { display: grid; gap: var(--space-xs); border-top: 1px solid var(--color-border); padding-top: var(--space-md); }
+.admin-nav__utilities .btn { justify-content: flex-start; width: 100%; }

@@ -32,10 +32,14 @@ export default function AdminLayout() {
       </div>
       <nav id="admin-navigation" className={menuOpen ? "admin-nav is-open" : "admin-nav"}>
         {navLink("/admin", "Overview")}
-        {["Catalogue", "Website content"].map(group => <div className="admin-nav__group" key={group}>
+        {["Catalogue", "Website content", "Customers"].map(group => <div className="admin-nav__group" key={group}>
           <p>{group}</p><ul>{ADMIN_SECTIONS.filter(section => section.group === group).map(section => <li key={section.path}>{navLink(section.path, section.label)}</li>)}</ul>
         </div>)}
         <div className="admin-nav__group">{navLink("/admin/settings", "Setup & access")}</div>
+        <div className="admin-nav__group admin-nav__utilities">
+          <Button to="/" variant="ghost" onClick={() => setMenuOpen(false)}>View website</Button>
+          <Button variant="secondary" isLoading={busy} onClick={logout}>{busy ? "Signing out..." : "Sign out"}</Button>
+        </div>
       </nav>
       <p className="admin-sidebar-note">Universal Dicta Couture<br />Website administration</p>
     </aside>

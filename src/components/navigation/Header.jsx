@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import Logo from "../brand/Logo";
 import { useAuth } from "../../context/AuthContext";
 import { BRAND } from "../brand/brandLanguage";
@@ -74,6 +74,7 @@ export default function Header() {
   const drawerRef = useRef(null);
   const menuButtonRef = useRef(null);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     if (!isMenuOpen) return undefined;
@@ -230,10 +231,10 @@ export default function Header() {
           <HeaderLink to="/my-closet" label="My Closet" icon="closet" />
         </nav>
 
-        <NavLink className="site-header__chat-launcher" to="/chats" aria-label="Chat with Dicta Couturier">
+        {pathname !== "/chats" && <NavLink className="site-header__chat-launcher" to="/chats" aria-label="Chat with Dicta Couturier">
           <Icon name="chat" size={19} />
           <span>CHAT WITH DICTA COUTURIER</span>
-        </NavLink>
+        </NavLink>}
       </header>
     </>
   );

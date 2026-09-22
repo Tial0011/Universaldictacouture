@@ -23,6 +23,7 @@ import AdminProducts from "./pages/admin/Products/Products";
 import AdminTaxonomy from "./pages/admin/Taxonomy/Taxonomy";
 import AdminDiscovery from "./pages/admin/Discovery/Discovery";
 import AdminHomepage from "./pages/admin/Homepage/Homepage";
+import AdminChats from "./pages/admin/Chats/Chats";
 import AdminReviews from "./pages/admin/Reviews/Reviews";
 
 export default function App() {
@@ -60,6 +61,7 @@ export default function App() {
         <Route path="discovery" element={<AdminDiscovery />} />
         <Route path="homepage" element={<AdminHomepage />} />
         <Route path="reviews" element={<AdminReviews />} />
+        <Route path="chats" element={<AdminChats />} />
         <Route path="settings" element={<AdminSettings />} />
         <Route path="*" element={<NotFound />} />
       </Route>
