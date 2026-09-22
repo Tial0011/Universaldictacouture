@@ -29,7 +29,7 @@ export const APPROVED_HERO_CONCEPTS = [
 /** The approved hero copy. Admin slides may override the imagery and concept. */
 export const APPROVED_HERO_COPY = {
   eyebrow: "PREMIUM ASO OKE",
-  headline: "Timeless Tradition",
+  headline: "Modern Tradition",
   secondary: "Modern You",
   body: "Beautifully crafted Aso Oke for every occasion. Classic, elegant and proudly Nigerian.",
   primaryCta: { label: "Shop the Collection", to: "/shop" },

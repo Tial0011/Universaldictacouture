@@ -22,7 +22,7 @@ export const SCHEMAS = {
   },
   heroSlides: {
     title: "Homepage", singular: "slide", description: "Manage the main homepage banners. Lower display-order numbers appear first. The website displays up to 12 published slides.",
-    initial: { headline: "Timeless Tradition", secondary: "Modern You", eyebrow: "PREMIUM ASO OKE", body: "Beautifully crafted Aso Oke for every occasion. Classic, elegant and proudly Nigerian.", concept: "ready-to-wear", order: 0, published: false },
+    initial: { headline: "Modern Tradition", secondary: "Modern You", eyebrow: "PREMIUM ASO OKE", body: "Beautifully crafted Aso Oke for every occasion. Classic, elegant and proudly Nigerian.", concept: "ready-to-wear", order: 0, published: false },
     fields: [
       text("concept", "Banner theme", { type: "select", options: HERO_CONCEPTS }),
       text("headline", "Headline", { required: true }), text("secondary", "Second headline line"), text("eyebrow", "Small heading"), text("body", "Supporting text", { type: "textarea" }),
