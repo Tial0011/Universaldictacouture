@@ -37,14 +37,14 @@ export default function AdminLayout() {
         </div>)}
         <div className="admin-nav__group">{navLink("/admin/settings", "Setup & access")}</div>
         <div className="admin-nav__group admin-nav__utilities">
-          <Button to="/" variant="ghost" onClick={() => setMenuOpen(false)}>View website</Button>
+          <Button to="/" variant="ghost" onClick={() => setMenuOpen(false)}>Visit website</Button>
           <Button variant="secondary" isLoading={busy} onClick={logout}>{busy ? "Signing out..." : "Sign out"}</Button>
         </div>
       </nav>
       <p className="admin-sidebar-note">Universal Dicta Couture<br />Website administration</p>
     </aside>
     <div className="admin-workspace">
-      <header className="admin-topbar"><p>Admin <span aria-hidden="true">/</span> <strong>{title}</strong></p><div className="admin-actions"><Button to="/" variant="ghost">View website ↗</Button><Button variant="secondary" isLoading={busy} onClick={logout}>Sign out</Button></div></header>
+      <header className="admin-topbar"><p>Admin <span aria-hidden="true">/</span> <strong>{title}</strong></p></header>
       {error && <p className="field__error" role="alert">{error}</p>}
       <main id="admin-main" tabIndex={-1} ref={main} className="admin-layout__content"><Outlet /></main>
       <footer className="admin-footer">Signed in as {user?.email || "administrator"}</footer>
