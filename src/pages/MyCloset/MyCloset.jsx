@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { formatNaira } from "../../utils/formatters";
 import {
   MOCK_CLOSET_PIECES,
@@ -211,6 +211,7 @@ function MyPieces({ onOpenReview }) {
 }
 
 function OrderDetail({ order }) {
+  const chatThread = `order-${order.id}`;
   const [section, setSection] = useState("editions");
 
   return (
@@ -222,7 +223,7 @@ function OrderDetail({ order }) {
           <strong>{formatNaira(order.total)}</strong>
           <small>{order.summary}</small>
         </div>
-        <Link to="/chats" className="closet-inline-link">Open in Chat <Icon name="chat" size={16} /></Link>
+        <Link to={`/chats?thread=${encodeURIComponent(chatThread)}`} className="closet-inline-link">Open in Chat <Icon name="chat" size={16} /></Link>
       </div>
 
       <div className="closet-order-detail__switch" role="tablist" aria-label={`${order.title} history`}>
@@ -240,7 +241,7 @@ function OrderDetail({ order }) {
                 <span>{edition.state}</span>
                 <small>{edition.actor} · {edition.time}</small>
               </div>
-              <Link to="/chats">See in Chat <Icon name="arrow" size={15} /></Link>
+              <Link to={`/chats?thread=${encodeURIComponent(chatThread)}&focus=${encodeURIComponent(edition.id)}`}>See in Chat <Icon name="arrow" size={15} /></Link>
             </div>
           ))}
         </div>
@@ -258,8 +259,12 @@ function OrderDetail({ order }) {
   );
 }
 
-function OrdersTab() {
-  const [openId, setOpenId] = useState(MOCK_ORDERS[0].id);
+function OrdersTab({ requestedOrder }) {
+  const [openId, setOpenId] = useState(requestedOrder || MOCK_ORDERS[0].id);
+
+  useEffect(() => {
+    if (requestedOrder && MOCK_ORDERS.some((order) => order.id === requestedOrder)) setOpenId(requestedOrder);
+  }, [requestedOrder]);
 
   return (
     <div className="closet-records">
@@ -346,7 +351,7 @@ function PaymentsTab() {
                         <small>{record.time}</small>
                       </div>
                       <span className={`closet-payment-state closet-payment-state--${record.state.toLowerCase().replaceAll(" ", "-")}`}>{record.state}</span>
-                      <Link to="/chats">See in Chat <Icon name="arrow" size={15} /></Link>
+                      <Link to={`/chats?thread=${encodeURIComponent(`order-${payment.orderId}`)}&focus=${encodeURIComponent(record.id)}`}>See in Chat <Icon name="arrow" size={15} /></Link>
                     </div>
                   ))}
                 </div>
@@ -383,7 +388,7 @@ function ReviewSelectedModal({ pieces, onClose }) {
         </div>
         <div className="closet-modal__actions">
           <button type="button" className="closet-button closet-button--secondary" onClick={onClose}>Back to My Closet</button>
-          <Link className="closet-button closet-button--primary" to="/chats">Continue with a Couturier <Icon name="arrow" size={17} /></Link>
+          <Link className="closet-button closet-button--primary" to="/chats?thread=closet-review">Continue with a Couturier <Icon name="arrow" size={17} /></Link>
         </div>
       </section>
     </div>
@@ -391,8 +396,26 @@ function ReviewSelectedModal({ pieces, onClose }) {
 }
 
 export default function MyCloset() {
-  const [activeTab, setActiveTab] = useState("pieces");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedTab = searchParams.get("tab");
+  const requestedOrder = searchParams.get("order");
+  const safeTab = TABS.some((tab) => tab.id === requestedTab) ? requestedTab : "pieces";
+  const [activeTab, setActiveTab] = useState(safeTab);
   const [reviewPieces, setReviewPieces] = useState([]);
+
+  useEffect(() => {
+    setActiveTab(safeTab);
+  }, [safeTab]);
+
+  const selectTab = (tabId) => {
+    setActiveTab(tabId);
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.set("tab", tabId);
+      if (tabId !== "orders") next.delete("order");
+      return next;
+    }, { replace: true });
+  };
 
   return (
     <div className="my-closet-page">
@@ -417,7 +440,7 @@ export default function MyCloset() {
               role="tab"
               aria-selected={activeTab === tab.id}
               aria-controls={`closet-panel-${tab.id}`}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => selectTab(tab.id)}
             >
               {tab.label}
             </button>
@@ -426,7 +449,7 @@ export default function MyCloset() {
 
         <section id={`closet-panel-${activeTab}`} role="tabpanel" aria-labelledby={`closet-tab-${activeTab}`} className="closet-panel">
           {activeTab === "pieces" ? <MyPieces onOpenReview={setReviewPieces} /> : null}
-          {activeTab === "orders" ? <OrdersTab /> : null}
+          {activeTab === "orders" ? <OrdersTab requestedOrder={requestedOrder} /> : null}
           {activeTab === "payments" ? <PaymentsTab /> : null}
         </section>
       </div>

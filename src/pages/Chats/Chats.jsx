@@ -1,13 +1,24 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import ConversationList from "../../components/chat/ConversationList";
 import ChatWindow from "../../components/chat/ChatWindow";
 import { MOCK_THREADS } from "../../components/chat/mockChatData";
 import "./Chats.css";
 
 export default function Chats() {
-  const [activeId, setActiveId] = useState(MOCK_THREADS[0].id);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedThread = searchParams.get("thread");
+  const initialId = MOCK_THREADS.some((thread) => thread.id === requestedThread) ? requestedThread : MOCK_THREADS[0].id;
+  const [activeId, setActiveId] = useState(initialId);
   const [search, setSearch] = useState("");
-  const [mobileView, setMobileView] = useState("chat");
+  const [mobileView, setMobileView] = useState(requestedThread ? "chat" : "list");
+
+  useEffect(() => {
+    if (requestedThread && MOCK_THREADS.some((thread) => thread.id === requestedThread)) {
+      setActiveId(requestedThread);
+      setMobileView("chat");
+    }
+  }, [requestedThread]);
 
   const filteredThreads = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -26,6 +37,11 @@ export default function Chats() {
   const selectThread = (threadId) => {
     setActiveId(threadId);
     setMobileView("chat");
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.set("thread", threadId);
+      return next;
+    }, { replace: true });
   };
 
   return (

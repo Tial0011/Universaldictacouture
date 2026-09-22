@@ -18,7 +18,6 @@ const PRIMARY_LINKS = [
 const MOBILE_DRAWER_LINKS = [
   { to: "/custom-style", label: "Custom Style" },
   { to: "/reviews-feeds", label: "Reviews & Feeds" },
-  { to: "/saved-pieces", label: "Saved Pieces" },
   { to: "/about", label: "About" },
   { to: "/profile", label: "Profile" },
 ];
@@ -158,7 +157,6 @@ export default function Header() {
                 />
               </form>
               <NavLink className="site-header__tool" to="/profile" aria-label="Profile" title="Profile"><Icon name="user" /></NavLink>
-              <NavLink className="site-header__tool" to="/saved-pieces" aria-label="Saved Pieces" title="Saved Pieces"><Icon name="heart" /></NavLink>
               <NavLink className="site-header__tool" to="/my-closet" aria-label="My Closet" title="My Closet"><Icon name="closet" /></NavLink>
             </div>
           </div>
