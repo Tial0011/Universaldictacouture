@@ -16,15 +16,29 @@ import heroReadyToWear from "../assets/images/hero/hero-ready-to-wear.jpg";
 import collectionPlaceholder1 from "../assets/images/collection/collection-placeholder-1.jpg";
 import collectionPlaceholder2 from "../assets/images/collection/collection-placeholder-2.jpg";
 import collectionPlaceholder3 from "../assets/images/collection/collection-placeholder-3.jpg";
+import occasionWeddingGuest from "../assets/images/occasions/wedding-guest.jpg";
+import occasionBridal from "../assets/images/occasions/bridal.jpg";
+import occasionEngagement from "../assets/images/occasions/traditional-engagement.jpg";
+import occasionCelebration from "../assets/images/occasions/celebration.jpg";
+import occasionChurchEvent from "../assets/images/occasions/church-event.jpg";
 
 /**
  * Stand-in photography for the Shop by Occasion / Shop By tiles on
  * both Home and Shop, used only while no real occasion photos have
- * been published (see approvedOccasionPlaceholders below). Three
- * copies of the same approved hero photograph, cycled per tile, so
- * each tile can later be swapped for its own real photo independently
- * without touching the others.
+ * been published (see approvedOccasionPlaceholders below). Each
+ * approved occasion has its own fabric photograph (cut from the Shop
+ * mockup — low resolution, stand-ins only), so each tile can later be
+ * swapped for a real photo independently. Any occasion without one
+ * falls back to cycling the three generic placeholders.
  */
+const OCCASION_STAND_IN_IMAGES = {
+  "Wedding Guest": occasionWeddingGuest,
+  Bridal: occasionBridal,
+  "Traditional Engagement": occasionEngagement,
+  Celebration: occasionCelebration,
+  "Church/Event": occasionChurchEvent,
+};
+
 const COLLECTION_PLACEHOLDER_IMAGES = [
   collectionPlaceholder1,
   collectionPlaceholder2,
@@ -224,7 +238,9 @@ export function approvedOccasionPlaceholders(title = "Shop by Occasion") {
     id: `occasion-${index}`,
     name: occasion,
     image: {
-      url: COLLECTION_PLACEHOLDER_IMAGES[index % COLLECTION_PLACEHOLDER_IMAGES.length],
+      url:
+        OCCASION_STAND_IN_IMAGES[occasion] ??
+        COLLECTION_PLACEHOLDER_IMAGES[index % COLLECTION_PLACEHOLDER_IMAGES.length],
       publicId: "",
       alt: "",
     },
@@ -242,7 +258,7 @@ export function approvedOccasionPlaceholders(title = "Shop by Occasion") {
  * tile never leads to an empty result. Occasion keeps to the approved
  * occasions (in their approved order); Style and Fabric & Pattern list
  * whatever the pieces carry, most-used first. Each tile borrows the
- * photograph of the first piece that has that value.
+ * photograph of a piece that has that value.
  *
  * Tabs with nothing behind them are left out, and null is returned
  * when no tab has anything (callers then fall back to the approved
@@ -276,9 +292,12 @@ export function buildShopDiscovery(products, title = "Shop By") {
         if (group.approved && !approvedName) return;
 
         const name = approvedName ?? trimmed;
-        const entry = found.get(name.toLowerCase()) ?? { name, count: 0, image: null };
+        const entry = found.get(name.toLowerCase()) ?? { name, count: 0, images: [] };
         entry.count += 1;
-        if (!entry.image && product.image) entry.image = product.image;
+        const imageKey = product.image?.publicId || product.image?.url;
+        if (imageKey && !entry.images.some((known) => (known.publicId || known.url) === imageKey)) {
+          entry.images.push(product.image);
+        }
         found.set(name.toLowerCase(), entry);
       });
     });
@@ -292,11 +311,22 @@ export function buildShopDiscovery(products, title = "Shop By") {
       : [...found.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 
     groups.push({ id: group.id, label: group.label, order: groups.length });
+
+    // Each tile borrows a photo of a piece that has its value, preferring
+    // one no earlier tile in this tab already shows, so neighbouring
+    // tiles do not repeat the same picture when there is a choice.
+    const usedImages = new Set();
     ordered.slice(0, SHOP_DISCOVERY_MAX_PER_GROUP).forEach((entry, index) => {
+      const image =
+        entry.images.find((candidate) => !usedImages.has(candidate.publicId || candidate.url)) ??
+        entry.images[0] ??
+        null;
+      if (image) usedImages.add(image.publicId || image.url);
+
       items.push({
         id: `${group.id}-${index}`,
         name: entry.name,
-        image: entry.image,
+        image,
         destination: `/shop?${group.param}=${encodeURIComponent(entry.name)}`,
         group: group.id,
         order: index,

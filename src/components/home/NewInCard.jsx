@@ -65,7 +65,7 @@ export default function NewInCard({ product, fallbackImage = null, imageLoading 
           <ProductImage
             image={product.image || fallbackImage}
             alt={product.image ? product.name : ""}
-            transformation="w_640,h_640,c_fill,g_auto,q_auto,f_auto"
+            transformation="w_720,ar_3:1,c_fill,g_auto,q_auto,f_auto"
             loading={imageLoading}
             sizes="(min-width: 1280px) 16vw, (min-width: 640px) 30vw, 45vw"
           />
