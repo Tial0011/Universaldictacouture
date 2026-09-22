@@ -160,7 +160,7 @@ export default function Header() {
                   autoComplete="off"
                 />
               </form>
-              <NavLink className="site-header__account-link" to={user ? "/profile" : "/signin"}>{user ? "Account" : "Sign in"}</NavLink>
+              <NavLink className="site-header__account-link" to={user ? "/profile" : "/signin"}>{user ? "Account" : "Client login"}</NavLink>
               <NavLink className="site-header__tool" to="/my-closet" aria-label="My Closet" title="My Closet"><Icon name="closet" /></NavLink>
             </div>
           </div>
@@ -214,7 +214,7 @@ export default function Header() {
           >
             <nav aria-label="Mobile menu">
               <ul>
-                {[...MOBILE_DRAWER_LINKS, ...(!user ? [{ to: "/signin", label: "Sign in" }, { to: "/signup", label: "Sign up" }] : []), { to: "/admin", label: adminLabel }].map((link) => (
+                {[...MOBILE_DRAWER_LINKS, ...(!user ? [{ to: "/signin", label: "Client login" }, { to: "/signup", label: "Sign up" }] : []), { to: "/admin", label: adminLabel }].map((link) => (
                   <li key={link.to}>
                     <HeaderLink {...link} onNavigate={closeMenu} />
                   </li>
@@ -229,6 +229,7 @@ export default function Header() {
           <HeaderLink to="/shop" label="Shop" icon="bag" />
           <HeaderLink to="/chats" label="Chats" icon="chat" />
           <HeaderLink to="/my-closet" label="My Closet" icon="closet" />
+          <HeaderLink to={user ? "/profile" : "/signin"} label={user ? "Account" : "Client login"} icon="user" />
         </nav>
 
         {pathname !== "/chats" && <NavLink className="site-header__chat-launcher" to="/chats" aria-label="Chat with Dicta Couturier">

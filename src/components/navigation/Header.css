@@ -351,7 +351,7 @@
     min-height: calc(60px + env(safe-area-inset-bottom));
     padding: .25rem .5rem env(safe-area-inset-bottom);
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     align-items: center;
     background: var(--color-white);
     border-top: 1px solid var(--color-border);
@@ -393,3 +393,6 @@
 .site-header__account-link { display: inline-flex; align-items: center; min-height: var(--touch-target); padding-inline: var(--space-xs); color: var(--color-brand); font-size: var(--text-sm); white-space: nowrap; }
 .site-header__primary ul { flex-wrap: wrap; column-gap: var(--space-xs); row-gap: 0; }
 .site-header__drawer.is-open { max-height: min(70dvh, 32rem); overflow-y: auto; }
+
+.site-header__account-link { border: 1px solid var(--color-brand); border-radius: var(--radius-control); text-decoration: none; }
+.site-header__account-link:hover { background: var(--color-brand-tint); }

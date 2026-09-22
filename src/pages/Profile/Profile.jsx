@@ -53,10 +53,10 @@ export default function Profile() {
       <h1>{user ? "Your account" : creating ? "Create your account" : "Welcome back"}</h1>
       {user ? <>
         <p>Signed in as <strong>{user.email}</strong>.</p>
-        <div className="account-actions"><Button to="/shop">Browse the shop</Button><Button to="/saved-pieces" variant="secondary">Saved pieces</Button><Button to="/my-closet" variant="secondary">My Closet</Button></div>
+        <div className="account-actions"><Button to="/shop">Browse the shop</Button><Button to="/saved-pieces" variant="secondary">Saved pieces</Button><Button to="/chats" variant="secondary">My messages</Button><Button to="/my-closet" variant="secondary">My Closet</Button></div>
         <Button variant="ghost" isLoading={busy} onClick={logout}>Sign out</Button>
       </> : <>
-        <p>{creating ? "Create an account to keep your saved pieces across visits." : "Sign in to access your saved pieces."}</p>
+        <p>{creating ? "Create an account to save your favourite pieces and message the studio." : "Sign in to access your saved pieces and conversations."}</p>
         {!isFirebaseConfigured && <p role="alert">Account access is temporarily unavailable. Please try again later.</p>}
         <form onSubmit={submit} key={pathname} className="account-form">
           <fieldset disabled={busy || !isFirebaseConfigured} className="account-form">
