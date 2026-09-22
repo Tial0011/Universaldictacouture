@@ -11,6 +11,7 @@
 /* Slides stack so the section keeps the height of the tallest one and
    nothing jumps as the carousel advances. */
 .hero__slide {
+  position: relative;
   grid-area: 1 / 1;
   display: grid;
   opacity: 0;
@@ -26,6 +27,8 @@
 }
 
 .hero__media {
+  position: absolute;
+  inset: 0;
   grid-area: 1 / 1;
   overflow: hidden;
 }
@@ -41,6 +44,7 @@
 }
 
 .hero__content {
+  position: relative;
   grid-area: 1 / 1;
   align-self: end;
   display: flex;
@@ -193,6 +197,7 @@
   }
 
   .hero__image--desktop {
+    object-position: center 30%;
     display: block;
   }
 

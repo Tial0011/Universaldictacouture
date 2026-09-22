@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import Logo from "../brand/Logo";
+import { useAuth } from "../../context/AuthContext";
 import { BRAND } from "../brand/brandLanguage";
 import CustomStyleIcon from "./icons/CustomStyleIcon";
 import ReviewsIcon from "./icons/ReviewsIcon";
@@ -65,6 +66,8 @@ function HeaderLink({ to, label, end = false, onNavigate, icon }) {
 }
 
 export default function Header() {
+  const { user } = useAuth();
+  const adminLabel = user ? "Admin area" : "Admin login";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
   const drawerId = useId();
@@ -125,6 +128,7 @@ export default function Header() {
           <Link to="/custom-style" className="site-header__utility-item site-header__utility-link">
             Custom Styles Available
           </Link>
+          <Link to="/admin" className="site-header__admin-login">{adminLabel}</Link>
         </div>
       </div>
 
@@ -210,7 +214,7 @@ export default function Header() {
           >
             <nav aria-label="Mobile menu">
               <ul>
-                {MOBILE_DRAWER_LINKS.map((link) => (
+                {[...MOBILE_DRAWER_LINKS, { to: "/admin", label: adminLabel }].map((link) => (
                   <li key={link.to}>
                     <HeaderLink {...link} onNavigate={closeMenu} />
                   </li>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { signOutUser } from "../../firebase/auth";
 import { ADMIN_SECTIONS } from "../admin/adminSections";
@@ -9,6 +9,7 @@ import "./AdminLayout.css";
 
 export default function AdminLayout() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [error, setError] = useState("");
@@ -18,7 +19,7 @@ export default function AdminLayout() {
   useEffect(() => { main.current?.focus(); }, [pathname]);
   async function logout() {
     setBusy(true); setError("");
-    try { await signOutUser(); } catch { setError("Unable to sign out. Please try again."); }
+    try { await signOutUser(); navigate("/", { replace: true }); } catch { setError("Unable to sign out. Please try again."); }
     finally { setBusy(false); }
   }
   const navLink = (path, label) => <NavLink to={path} end onClick={() => setMenuOpen(false)} className={({ isActive }) => isActive ? "is-active" : ""}>{label}</NavLink>;

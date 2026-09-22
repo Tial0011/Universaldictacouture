@@ -388,3 +388,18 @@
 @media (forced-colors: active) {
   .site-header__chat-launcher { forced-color-adjust: auto; }
 }
+
+.site-header__admin-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target);
+  padding: var(--space-2xs) var(--space-sm);
+  color: var(--color-text-on-brand);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-control);
+  text-decoration: none;
+  font-weight: var(--weight-semibold);
+}
+.site-header__admin-login:hover { background: var(--color-brand-hover); }
+.site-header__admin-login:focus-visible { outline-color: var(--color-focus-ring-inverse); }

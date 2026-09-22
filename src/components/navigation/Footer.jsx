@@ -40,6 +40,7 @@ const DIRECT_LINKS = [
   { to: "/about", label: "About Us" },
   { to: "/our-story", label: "Our Story" },
   { to: "/policies", label: "Policies" },
+  { to: "/admin", label: "Admin login" },
 ];
 
 const SOCIAL_ICONS = {

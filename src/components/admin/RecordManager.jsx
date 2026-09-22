@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { loadAdminPage, saveAdminRecord, adminError } from "../../services/admin";
 import { SCHEMAS } from "./recordSchemas";
+import { invalidateCatalogue } from "../../hooks/useCatalogue";
 import ImageField from "./ImageField";
 import Button from "../common/Button";
 export default function RecordManager({ kind }) {
@@ -69,6 +70,7 @@ export default function RecordManager({ kind }) {
       const raw = { ...editor };
       if (kind === "products" && Object.hasOwn(raw, "images")) raw.primaryImage = raw.images?.[0] || null;
       await saveAdminRecord(kind, raw);
+      if (kind === "products") invalidateCatalogue();
       setNotice("Saved successfully."); setEditor(null); setDirty(false);
       setParams({}, { replace: true }); setLoading(true); setPendingPage(undefined); setRevision(v => v + 1);
       addButtonArea.current?.querySelector("button")?.focus();
