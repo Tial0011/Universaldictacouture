@@ -219,11 +219,12 @@
 
   .site-header__mobile-top {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-template-areas: "brand brand brand brand" "menu actions actions actions";
+    grid-template-columns: 3rem minmax(0, 1fr) 9rem;
+    grid-template-areas: "menu brand actions";
     align-items: center;
-    gap: .25rem;
-    padding-block: .25rem .375rem;
+    gap: .375rem;
+    min-height: 76px;
+    padding: .375rem clamp(.5rem, 2.5vw, 1.25rem);
   }
 
   .site-header__mobile-brand {
@@ -234,11 +235,11 @@
   }
   .site-header__mobile-brand .logo {
     height: auto;
-    width: 116px;
+    width: clamp(96px, 28vw, 116px);
     max-width: 100%;
   }
 
-  /* Four clearly framed controls share the same compact touch row. */
+  /* Small woven icon frames sit inside comfortable touch targets. */
   .site-header__icon-button,
   .site-header__action {
     display: flex;
@@ -249,12 +250,11 @@
     align-items: center;
     justify-content: center;
     gap: .15rem;
-    padding: .2rem .15rem;
+    padding: .125rem 0;
     color: var(--color-brand);
-    background: var(--color-white);
-    border: 1px solid color-mix(in srgb, var(--color-brand) 26%, transparent);
+    background: transparent;
+    border: 0;
     border-radius: var(--radius-md);
-    box-shadow: 0 2px 7px rgba(31, 17, 18, .06);
     font-family: var(--font-body);
     text-align: center;
     text-decoration: none;
@@ -266,10 +266,12 @@
 
   .site-header__icon-button span,
   .site-header__action span {
-    font-size: .6875rem;
+    font-size: .5625rem;
     font-weight: var(--weight-medium);
     line-height: 1.15;
   }
+
+  .site-header__icon-button span { font-size: .625rem; }
 
   .site-header__mobile-actions {
     grid-area: actions;
@@ -283,15 +285,37 @@
   .site-header__action svg,
   .site-header__icon-button svg {
     flex: 0 0 auto;
+    box-sizing: content-box;
+    width: 17px;
+    height: 17px;
+    padding: 5px;
+    border: 1px solid color-mix(in srgb, var(--color-brand) 32%, transparent);
+    border-radius: var(--radius-md);
+    background-color: var(--color-ivory);
+    background-image: linear-gradient(rgba(251, 248, 242, .72), rgba(251, 248, 242, .72)), url("../../assets/brand/menu-weave.svg");
+    background-size: auto, 60px 72px;
+    background-position: center;
+    box-shadow: inset 0 0 0 2px var(--color-white), 0 2px 5px rgba(31, 17, 18, .08);
+  }
+
+  .site-header__icon-button svg {
+    width: 21px;
+    height: 21px;
+    padding: 7px;
   }
 
   .site-header__action span {
     overflow-wrap: normal;
+    max-width: 100%;
+    min-height: 2.3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .site-header__action.is-active {
-    background: var(--color-brand-tint);
+  .site-header__action.is-active svg {
     border-color: var(--color-brand);
+    background-color: var(--color-brand-tint);
   }
 
   .site-header__icon-button:focus-visible,
@@ -302,9 +326,8 @@
   }
 
   @media (hover: hover) {
-    .site-header__icon-button:hover,
-    .site-header__action:hover {
-      background: var(--color-brand-tint);
+    .site-header__icon-button:hover svg,
+    .site-header__action:hover svg {
       border-color: var(--color-brand);
     }
   }
