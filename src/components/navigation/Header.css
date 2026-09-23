@@ -5,13 +5,8 @@
   background: var(--color-ivory);
 }
 
-/* ---------- Announcement bar ----------
-   Delivery + Custom Styles. Phones stack the two items; once the bar is
-   wide enough they sit on one line with a hairline divider, and on
-   large screens the brand tagline leads. Sized by its own width
-   (container query), not the viewport. */
+/* ---------- Desktop utility bar ---------- */
 .site-header__utility {
-  container: utility / inline-size;
   background: var(--color-brand);
   color: var(--color-text-on-brand);
 }
@@ -19,10 +14,10 @@
 .site-header__utility-inner {
   min-height: 30px;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  column-gap: var(--space-sm);
+  justify-content: space-evenly;
+  column-gap: var(--space-xs);
+  padding-inline: var(--space-sm);
   padding-block: 0.3rem;
   font-family: var(--font-body);
   font-size: var(--text-xs);
@@ -32,50 +27,16 @@
   text-align: center;
 }
 
-.site-header__utility-tagline {
-  display: none;
-}
-
 .site-header__utility-item {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   color: inherit;
-  white-space: nowrap;
+  justify-content: center;
 }
 
-.site-header__utility-link {
-  text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0.55);
-  text-underline-offset: 0.25em;
-}
-
-.site-header__utility-link:focus-visible {
-  outline-color: var(--color-focus-ring-inverse);
-}
-
-@media (hover: hover) {
-  .site-header__utility-link:hover {
-    text-decoration-color: currentColor;
-  }
-}
-
-@container utility (min-width: 28rem) {
-  .site-header__utility-item + .site-header__utility-item {
-    padding-left: var(--space-sm);
-    border-left: 1px solid rgba(255, 255, 255, 0.45);
-  }
-}
-
-@container utility (min-width: 68rem) {
-  .site-header__utility-tagline {
-    display: inline;
-  }
-
-  .site-header__utility-tagline + .site-header__utility-item {
-    padding-left: var(--space-sm);
-    border-left: 1px solid rgba(255, 255, 255, 0.45);
-  }
+.site-header__utility-item svg {
+  flex-shrink: 0;
 }
 
 .site-header__main {
@@ -234,6 +195,7 @@
 }
 
 @media (max-width: 767px) {
+  .site-header__utility { display: none; }
   .site-header { position: sticky; top: 0; }
   .site-header__desktop { display: none; }
 
