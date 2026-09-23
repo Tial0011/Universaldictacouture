@@ -194,6 +194,21 @@
   .site-header__primary a { font-size: var(--text-xs); }
 }
 
+@media (min-width: 768px) and (max-width: 1079px) {
+  .site-header__main {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "brand tools" "nav nav";
+    row-gap: 0;
+  }
+
+  .site-header__brand { grid-area: brand; }
+  .site-header__tools { grid-area: tools; }
+  .site-header__primary { grid-area: nav; }
+  .site-header__primary ul { justify-content: space-between; flex-wrap: nowrap; }
+
+  html { scroll-padding-top: calc(var(--logo-height-header) + var(--touch-target) + var(--space-xs)); }
+}
+
 @media (max-width: 767px) {
   .site-header__utility { display: none; }
   .site-header { position: sticky; top: 0; }

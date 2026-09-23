@@ -1,5 +1,9 @@
 /* The hero is the page's one large moment; everything below it keeps
    the quiet, evenly spaced editorial rhythm of the design system. */
+body:has(#main-content > .trust-strip-wrap) {
+  --content-max-width: clamp(77.5rem, 85vw, 92.5rem);
+}
+
 .home-hero-placeholder {
   display: flex;
   align-items: center;
