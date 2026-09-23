@@ -1,8 +1,50 @@
+/* ---------- Cultural flow: Authentic Aso Oke Textile System ----------
+   A subtle, ultra-luxurious woven pattern language that flows from the
+   benefits strip downward toward the footer. It features fine warp and
+   weft thread lines, authentic Aso-Oke motif elements, and rich warm ivory
+   tonality that honors Nigerian native craftsmanship without competing with
+   product imagery. */
+.home-cultural-flow {
+  position: relative;
+  background-color: var(--color-ivory);
+  background-image:
+    /* Layer 1: Soft ambient lighting and vignette */
+    radial-gradient(ellipse 95% 45% at 50% 0%, rgba(255, 255, 255, 0.88) 0%, transparent 80%),
+    radial-gradient(circle at 92% 35%, rgba(176, 141, 87, 0.035) 0%, transparent 45%),
+    radial-gradient(circle at 8% 65%, rgba(96, 16, 19, 0.025) 0%, transparent 45%),
+    /* Layer 2: Micro warp & weft weave grid */
+    repeating-linear-gradient(
+      0deg,
+      rgba(96, 16, 19, 0.014) 0px,
+      rgba(96, 16, 19, 0.014) 1px,
+      transparent 1px,
+      transparent 16px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(176, 141, 87, 0.018) 0px,
+      rgba(176, 141, 87, 0.018) 1px,
+      transparent 1px,
+      transparent 16px
+    ),
+    /* Layer 3: Authentic Aso Oke textile motif, softened with an ivory wash */
+    linear-gradient(rgba(251, 248, 242, 0.94), rgba(251, 248, 242, 0.94)),
+    url("../../assets/brand/menu-weave.svg");
+  background-size: auto, auto, auto, auto, auto, auto, 140px 168px;
+  background-position: center top;
+}
+
 /* ---------- Trust / service strip ---------- */
 .trust-strip-wrap {
+  position: relative;
+  z-index: 1;
   padding-block: clamp(.875rem, 2vw, 1.25rem);
-  background-color: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(176, 141, 87, 0.25);
+  border-bottom: 1px solid rgba(176, 141, 87, 0.25);
+  box-shadow: 0 4px 16px rgba(31, 17, 18, 0.03);
 }
 
 .trust-strip-wrap > .container {
@@ -26,7 +68,7 @@
 }
 
 .trust-strip__item + .trust-strip__item {
-  border-inline-start: 1px solid var(--color-border);
+  border-inline-start: 1px solid rgba(176, 141, 87, 0.22);
 }
 
 .trust-strip__link,
@@ -40,6 +82,7 @@
   text-align: center;
   text-decoration: none;
   color: var(--color-text-primary);
+  transition: transform var(--duration-fast) var(--ease-standard);
 }
 
 .trust-strip__icon {
@@ -50,6 +93,8 @@
   width: clamp(1.5rem, 5cqi, 2rem);
   height: clamp(1.5rem, 5cqi, 2rem);
   color: var(--color-brand);
+  filter: drop-shadow(0 1px 2px rgba(96, 16, 19, 0.08));
+  transition: transform var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard);
 }
 
 .trust-strip__icon svg {
@@ -73,6 +118,7 @@
   color: var(--color-text-primary);
   overflow-wrap: anywhere;
   text-wrap: balance;
+  transition: color var(--duration-fast) var(--ease-standard);
 }
 
 .trust-strip__caption {
@@ -89,6 +135,7 @@
 @media (hover: hover) {
   .trust-strip__link:hover .trust-strip__icon {
     color: var(--color-brand-hover);
+    transform: translateY(-1px);
   }
   .trust-strip__link:hover .trust-strip__label {
     color: var(--color-brand);
@@ -150,6 +197,7 @@
 
 /* ---------- Generic homepage section ---------- */
 .home-section {
+  position: relative;
   padding-block: var(--section-space);
 }
 
@@ -189,10 +237,7 @@
 /* ---------- Custom Style promotion ----------
    A warm banner: photograph on the left melting into a brown
    gradient, copy on the right. The browns are mixed from the locked
-   wine + gold tokens rather than introducing new colours. The two
-   halves stay side by side on phones (as in the reference) and the
-   image column simply grows on larger screens. Text sits on the
-   darker end of the gradient so it stays readable. */
+   wine + gold tokens rather than introducing new colours. */
 .custom-promo {
   --promo-brown-light: color-mix(in srgb, var(--color-wine) 52%, var(--color-gold));
   --promo-brown-deep: color-mix(in srgb, var(--color-wine) 74%, var(--color-gold));
@@ -204,6 +249,8 @@
   overflow: hidden;
   color: var(--color-ivory);
   background: linear-gradient(100deg, var(--promo-brown-light) 0%, var(--promo-brown-deep) 100%);
+  border-block: 1px solid rgba(176, 141, 87, 0.35);
+  box-shadow: 0 8px 24px rgba(31, 17, 18, 0.12);
 }
 
 .custom-promo__inner {
@@ -353,7 +400,21 @@
 .reviews-preview__item {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xs);
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(176, 141, 87, 0.25);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 14px rgba(31, 17, 18, 0.04);
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+@media (hover: hover) {
+  .reviews-preview__item:hover {
+    border-color: var(--color-brand);
+    box-shadow: 0 10px 24px rgba(96, 16, 19, 0.08);
+    transform: translateY(-2px);
+  }
 }
 
 .reviews-preview__media {
@@ -361,6 +422,7 @@
   aspect-ratio: 1 / 1;
   overflow: hidden;
   border-radius: var(--radius-surface);
+  border: 1px solid rgba(176, 141, 87, 0.16);
 }
 
 .reviews-preview__body {
@@ -368,6 +430,7 @@
   font-size: var(--text-md);
   font-style: italic;
   line-height: var(--leading-snug);
+  color: var(--color-ink);
 }
 
 .reviews-preview__author {
@@ -376,12 +439,6 @@
 }
 
 /* ---------- Style Circle ---------- */
-/* Wine surface (see .surface--brand in surfaces.css) so the page
-   flows Review & Feeds (white) → Style Circle (wine) → Footer
-   (wine) instead of jumping straight from white into the footer.
-   The form's label/status text needs the light-on-wine overrides
-   below since .form-control's own light background keeps the input
-   itself readable without any change. */
 .style-circle .field__label {
   color: inherit;
 }

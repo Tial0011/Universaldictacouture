@@ -142,34 +142,37 @@ export default function Home() {
         </div>
       )}
 
-      <TrustStrip />
+      {/* Cultural flow: Aso Oke woven design system flowing from benefits strip downward */}
+      <div className="home-cultural-flow">
+        <TrustStrip />
 
-      {!isLoading || discovery ? (
-        <div className="home-section home-section--shop-by container">
-          <DiscoveryModule
-            module={shopByModule}
-            className="discovery--home"
-            groupNavigation="arrows"
-            viewAllTo="/shop"
-            renderMedia={(item) =>
-              item.group === "occasion" && !item.image ? <OccasionIllustration name={item.name} /> : null
-            }
-          />
-        </div>
-      ) : null}
+        {!isLoading || discovery ? (
+          <div className="home-section home-section--shop-by container">
+            <DiscoveryModule
+              module={shopByModule}
+              className="discovery--home"
+              groupNavigation="arrows"
+              viewAllTo="/shop"
+              renderMedia={(item) =>
+                item.group === "occasion" && !item.image ? <OccasionIllustration name={item.name} /> : null
+              }
+            />
+          </div>
+        ) : null}
 
-      <NewIn
-        products={newInProducts}
-        isLoading={isLoading}
-        error={error}
-        viewAllTo={hasFlaggedNewIn ? "/shop?newin=1" : "/shop"}
-      />
+        <NewIn
+          products={newInProducts}
+          isLoading={isLoading}
+          error={error}
+          viewAllTo={hasFlaggedNewIn ? "/shop?newin=1" : "/shop"}
+        />
 
-      <CustomStylePromo image={customStyleImage} />
+        <CustomStylePromo image={customStyleImage} />
 
-      <ReviewsPreview entries={reviews} />
+        <ReviewsPreview entries={reviews} />
 
-      <StyleCircle />
+        <StyleCircle />
+      </div>
     </>
   );
 }
