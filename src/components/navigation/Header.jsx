@@ -259,7 +259,8 @@ export default function Header() {
                 <p>Modern fashion. A heritage you wear.</p>
               </div>
               <button type="button" className="site-header__drawer-close" aria-label="Close menu" onClick={closeMenuAndFocus}>
-                <Icon name="close" size={22} />
+                <Icon name="close" size={18} />
+                <span>Close</span>
               </button>
             </div>
             <nav aria-label="Mobile menu">

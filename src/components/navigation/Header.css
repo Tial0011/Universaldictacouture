@@ -341,16 +341,44 @@
 
   .site-header__drawer-top {
     position: relative;
+    isolation: isolate;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-sm);
-    min-height: 9rem;
+    min-height: 9.5rem;
     padding: max(var(--space-md), env(safe-area-inset-top)) var(--space-md);
     color: var(--color-white);
     background: var(--color-brand);
-    border-bottom: 2px solid var(--color-accent);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 50%, transparent);
     text-align: center;
+  }
+
+  .site-header__drawer-top::before {
+    content: "";
+    position: absolute;
+    inset: 42% 0 0;
+    z-index: 0;
+    background-image:
+      repeating-linear-gradient(45deg, transparent 0 8px, rgba(176, 141, 87, 0.2) 8px 9px, transparent 9px 17px),
+      repeating-linear-gradient(-45deg, transparent 0 8px, rgba(251, 248, 242, 0.11) 8px 9px, transparent 9px 17px);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 38%);
+    mask-image: linear-gradient(to bottom, transparent, #000 38%);
+    pointer-events: none;
+  }
+
+  .site-header__drawer-top::after {
+    content: "";
+    position: absolute;
+    inset: 68% 0 0;
+    z-index: 0;
+    background: linear-gradient(180deg, transparent, var(--color-ivory));
+    pointer-events: none;
+  }
+
+  .site-header__drawer-top > * {
+    position: relative;
+    z-index: 1;
   }
 
   .site-header__drawer-brand {
@@ -361,8 +389,10 @@
   }
 
   .site-header__drawer-logo {
-    height: 3.5rem;
-    max-height: 3.5rem;
+    width: min(42vw, 11rem);
+    height: auto;
+    max-height: none;
+    max-width: calc(100% - 3rem);
     margin-inline: auto;
   }
 
@@ -387,15 +417,28 @@
     top: max(var(--space-sm), env(safe-area-inset-top));
     right: var(--space-md);
     flex: 0 0 auto;
-    width: var(--touch-target);
+    gap: var(--space-3xs);
+    min-width: var(--touch-target);
     height: var(--touch-target);
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    padding-inline: var(--space-2xs);
     color: var(--color-white);
     background: transparent;
-    border: 1px solid currentColor;
-    border-radius: var(--radius-pill);
+    border: 0;
+    border-bottom: 1px solid var(--color-accent);
+    border-radius: 0;
+    font-family: var(--font-body);
+    font-size: 0.625rem;
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+  }
+
+  .site-header__drawer-close svg {
+    flex: 0 0 auto;
+    stroke-width: 1.4;
   }
 
   .site-header__drawer nav {
