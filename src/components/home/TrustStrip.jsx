@@ -5,25 +5,30 @@ const ITEMS = [
   {
     id: "delivery",
     label: "Nationwide & International Delivery",
+    compactLabel: "Nationwide Delivery",
     caption: "Customer-Paid Delivery",
+    compactCaption: "Overseas too · Customer-paid",
     icon: "truck",
   },
   {
     id: "transfer",
     label: "Bank Transfer Only",
     caption: "Simple & Secure Payments",
+    compactCaption: "Secure payments",
     icon: "shield",
   },
   {
     id: "authentic",
     label: "Authentic Aso Oke",
     caption: "Authentic. Refined. Timeless.",
+    compactCaption: "Premium quality",
     icon: "diamond",
   },
   {
     id: "custom",
     label: "Custom Style",
     caption: "Create What You Want",
+    compactCaption: "Made for you",
     icon: "hanger",
     to: "/custom-style",
   },
@@ -31,6 +36,7 @@ const ITEMS = [
     id: "chat",
     label: "Dicta Couturier",
     caption: "Personal Guidance, Just for You",
+    compactCaption: "Personal guidance",
     icon: "headset",
     to: "/chats",
   },
@@ -103,8 +109,14 @@ export default function TrustStrip() {
                   <TrustIcon name={item.icon} />
                 </span>
                 <span className="trust-strip__copy">
-                  <span className="trust-strip__label">{item.label}</span>
-                  <span className="trust-strip__caption">{item.caption}</span>
+                  <span className="trust-strip__label">
+                    <span className="trust-strip__wide-copy">{item.label}</span>
+                    <span className="trust-strip__compact-copy">{item.compactLabel || item.label}</span>
+                  </span>
+                  <span className="trust-strip__caption">
+                    <span className="trust-strip__wide-copy">{item.caption}</span>
+                    <span className="trust-strip__compact-copy">{item.compactCaption || item.caption}</span>
+                  </span>
                 </span>
               </>
             );
