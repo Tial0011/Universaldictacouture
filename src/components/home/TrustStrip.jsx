@@ -1,41 +1,36 @@
 import { Link } from "react-router-dom";
 
-/**
- * The approved service/trust items. Titles are the approved copy
- * unchanged; captions are short, generic supporting phrases only —
- * no percentages, timelines or service-tier claims that aren't
- * already stated elsewhere in the approved brand copy.
- */
+/** Homepage service highlights and their supporting copy. */
 const ITEMS = [
   {
     id: "delivery",
     label: "Nationwide & International Delivery",
-    caption: "Delivered to your door",
+    caption: "Customer-Paid Delivery",
     icon: "truck",
   },
   {
     id: "transfer",
     label: "Bank Transfer Only",
-    caption: "Simple & secure",
+    caption: "Simple & Secure Payments",
     icon: "shield",
   },
   {
     id: "authentic",
     label: "Authentic Aso Oke",
-    caption: "Genuine heritage fabric",
+    caption: "Authentic. Refined. Timeless.",
     icon: "diamond",
   },
   {
     id: "custom",
     label: "Custom Style",
-    caption: "Made for you",
+    caption: "Create What You Want",
     icon: "hanger",
     to: "/custom-style",
   },
   {
     id: "chat",
     label: "Dicta Couturier",
-    caption: "Here to help",
+    caption: "Personal Guidance, Just for You",
     icon: "headset",
     to: "/chats",
   },
