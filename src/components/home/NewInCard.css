@@ -30,9 +30,8 @@
 
 /* ---------- Card ---------- */
 .menu-card {
-  /* Wide "swatch" crop, the same shape as the Shop card image. Keep in
-     step with the transformation in NewInCard.jsx. */
-  --menu-card-media-ratio: 3 / 1;
+  /* Product previews show the complete upload with details underneath. */
+  --menu-card-media-ratio: 1 / 1;
 
   display: flex;
   flex-direction: column;
@@ -67,9 +66,10 @@
 }
 
 .menu-card__media .product-image {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .menu-card__media .product-image--empty {

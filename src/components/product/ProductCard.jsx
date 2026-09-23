@@ -6,11 +6,10 @@ import { useToast } from "../../context/ToastContext";
 import { formatNaira } from "../../utils/formatters";
 import "./ProductCard.css";
 
-// Wide "swatch" crop in the grid (matches --product-card-media-ratio in
-// ProductCard.css — change the two together), square beside the text
-// in the list view.
-const GRID_IMAGE = "w_720,ar_3:1,c_fill,g_auto,q_auto,f_auto";
-const LIST_IMAGE = "w_480,ar_1:1,c_fill,g_auto,q_auto,f_auto";
+// Product previews must show the complete upload. Resize without cropping;
+// the card contains the image proportionally inside its media frame.
+const GRID_IMAGE = "w_720,h_720,c_limit,q_auto,f_auto";
+const LIST_IMAGE = "w_480,h_480,c_limit,q_auto,f_auto";
 
 function HeartIcon({ filled }) {
   return (

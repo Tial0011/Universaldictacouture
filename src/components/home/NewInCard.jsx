@@ -55,7 +55,7 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
           <ProductImage
             image={product.image}
             alt={product.image ? product.name : ""}
-            transformation="w_720,ar_3:1,c_fill,g_auto,q_auto,f_auto"
+            transformation="w_720,h_720,c_limit,q_auto,f_auto"
             loading={imageLoading}
             sizes="(min-width: 1280px) 16vw, (min-width: 640px) 30vw, 45vw"
           />
