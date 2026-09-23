@@ -224,13 +224,13 @@ export default function Header() {
                 <Icon name="search" size={20} />
                 <span>Search</span>
               </NavLink>
-              <NavLink className="site-header__action" to="/custom-style" aria-label="Custom Style">
+              <NavLink className={({ isActive }) => `site-header__action${isActive ? " is-active" : ""}`} to="/custom-style" aria-label="Custom Style" title="Custom Style">
                 <CustomStyleIcon size={21} />
-                <span>Custom Style</span>
+                <span>Custom</span>
               </NavLink>
-              <NavLink className="site-header__action" to="/reviews-feeds" aria-label="Reviews & Feeds">
+              <NavLink className={({ isActive }) => `site-header__action${isActive ? " is-active" : ""}`} to="/reviews-feeds" aria-label="Reviews & Feeds" title="Reviews & Feeds">
                 <ReviewsIcon size={19} />
-                <span>Reviews &amp; Feeds</span>
+                <span>Reviews</span>
               </NavLink>
             </div>
           </div>
