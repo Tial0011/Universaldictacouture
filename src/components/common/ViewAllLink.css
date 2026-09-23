@@ -2,9 +2,10 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  min-height: var(--touch-target);
+  min-height: 2rem;
+  padding: 0.2rem 0.1rem;
   font-family: var(--font-body);
-  font-size: var(--text-sm);
+  font-size: 0.72rem;
   font-weight: var(--weight-medium);
   color: var(--color-brand);
   white-space: nowrap;

@@ -71,6 +71,31 @@
   white-space: nowrap;
 }
 
+@media (max-width: 480px) {
+  .discovery--home .discovery__head {
+    gap: 0.5rem;
+  }
+
+  .discovery--home .discovery__head-actions {
+    gap: 0.3rem;
+  }
+
+  .discovery--home .discovery__group-arrows {
+    gap: 0.25rem;
+  }
+
+  .discovery--home .discovery__group-arrow {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.75rem;
+  }
+
+  .discovery--home .discovery__view-all {
+    font-size: 0.7rem;
+    padding: 0.22rem 0.15rem;
+  }
+}
+
 /* ---------- Couture "Front & Back" Navigation Buttons ----------
    Inspired by the mobile menu bar: ivory background with authentic Aso-Oke
    weave texture, double-stitched tailored framing, and tactile micro-interactions. */

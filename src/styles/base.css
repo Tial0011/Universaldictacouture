@@ -87,6 +87,41 @@ hr {
   display: none !important;
 }
 
+/* ---------- Luxury textile utilities ---------- */
+.luxury-pattern,
+.luxury-pattern--whisper,
+.luxury-pattern--presence,
+.luxury-pattern--signature {
+  position: relative;
+  isolation: isolate;
+}
+
+.luxury-pattern::before,
+.luxury-pattern--whisper::before,
+.luxury-pattern--presence::before,
+.luxury-pattern--signature::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.luxury-pattern--whisper::before {
+  background: var(--pattern-weave);
+  opacity: 0.38;
+}
+
+.luxury-pattern--presence::before {
+  background: var(--pattern-loom);
+  opacity: 0.58;
+}
+
+.luxury-pattern--signature::before {
+  background: var(--pattern-emboss);
+  opacity: 0.8;
+}
+
 /* ---------- Base ---------- */
 body {
   background-color: var(--color-bg);
