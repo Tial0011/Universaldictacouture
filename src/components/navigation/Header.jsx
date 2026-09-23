@@ -253,9 +253,10 @@ export default function Header() {
             inert={!isMenuOpen}
           >
             <div className="site-header__drawer-top">
-              <div>
-                <p>UNIVERSAL DICTA COUTURE</p>
-                <h2 id={`${drawerId}-title`}>Explore</h2>
+              <div className="site-header__drawer-brand">
+                <Logo size="header" variant="white" className="site-header__drawer-logo" />
+                <h2 id={`${drawerId}-title`} className="visually-hidden">Universal Dicta Couture menu</h2>
+                <p>Modern fashion <span aria-hidden="true">·</span> Nigerian heritage <span aria-hidden="true">·</span> Aso Oke</p>
               </div>
               <button type="button" className="site-header__drawer-close" aria-label="Close menu" onClick={closeMenuAndFocus}>
                 <Icon name="close" size={22} />
