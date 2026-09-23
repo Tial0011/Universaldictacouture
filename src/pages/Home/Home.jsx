@@ -109,14 +109,18 @@ export default function Home() {
         ? adminItems
         : catalogue?.items.filter((item) => item.group === group.id) ?? [];
 
-      return categoryItems.map((item) => ({
-        ...item,
-        id: `${group.id}-${item.id}`,
-        group: group.id,
-        image: item.image ?? (OCCASION_IMAGES[item.name]
+      return categoryItems.map((item) => {
+        const occasionImage = group.id === "occasion" && OCCASION_IMAGES[item.name]
           ? { url: OCCASION_IMAGES[item.name], alt: "" }
-          : null),
-      }));
+          : null;
+
+        return {
+          ...item,
+          id: `${group.id}-${item.id}`,
+          group: group.id,
+          image: adminItems.length ? item.image ?? occasionImage : occasionImage ?? item.image,
+        };
+      });
     });
 
     return { id: "home-shop-by", title: "Shop By", groups: SHOP_DISCOVERY_GROUPS, items };

@@ -63,7 +63,7 @@
 
 .discovery--home .discovery__list {
   display: flex;
-  gap: var(--space-xs);
+  gap: var(--space-2xs);
   overflow-x: auto;
   padding-bottom: var(--space-3xs);
   scroll-snap-type: x proximity;
@@ -72,13 +72,13 @@
 
 .discovery--home .discovery__list > li {
   flex: 0 0 auto;
-  width: 8.5rem;
+  width: 6rem;
   scroll-snap-align: start;
 }
 
 .discovery--home .discovery__media {
   position: relative;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 1 / 1;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
 }
@@ -121,6 +121,10 @@
 @media (min-width: 640px) {
   .discovery--home .discovery__list > li {
     width: clamp(9rem, 12vw, 10.5rem);
+  }
+
+  .discovery--home .discovery__media {
+    aspect-ratio: 3 / 2;
   }
 }
 
