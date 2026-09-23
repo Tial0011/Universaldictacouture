@@ -224,8 +224,8 @@
     grid-template-areas: "menu brand actions";
     align-items: center;
     gap: .25rem;
-    min-height: 76px;
-    padding: .375rem clamp(.5rem, 2.5vw, 1.25rem);
+    min-height: 64px;
+    padding: .25rem clamp(.375rem, 2vw, .75rem);
   }
 
   .site-header__mobile-brand {
@@ -238,6 +238,7 @@
     height: auto;
     width: 100%;
     max-width: 100%;
+    max-height: 48px;
   }
 
   /* Bare icons and quiet labels; the entire control remains tappable. */
@@ -250,8 +251,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: .1875rem;
-    padding: .25rem 0;
+    gap: .125rem;
+    padding: .125rem 0;
     color: var(--color-brand);
     background: transparent;
     border: 0;
@@ -280,7 +281,7 @@
   .site-header__mobile-actions {
     grid-area: actions;
     justify-self: end;
-    width: min(100%, 8.25rem);
+    width: min(100%, 7.75rem);
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: stretch;
@@ -296,8 +297,8 @@
   }
 
   .site-header__icon-button svg {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     stroke-width: 1.4;
   }
 
