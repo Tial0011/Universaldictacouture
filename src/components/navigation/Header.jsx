@@ -16,10 +16,9 @@ const PRIMARY_LINKS = [
 ];
 
 const MOBILE_DRAWER_LINKS = [
-  { to: "/custom-style", label: "Custom Style" },
-  { to: "/reviews-feeds", label: "Reviews & Feeds" },
-  { to: "/about", label: "About" },
-  { to: "/profile", label: "Profile" },
+  { to: "/custom-style", label: "Custom Style", icon: "custom-style", description: "Create something personal" },
+  { to: "/reviews-feeds", label: "Reviews & Feeds", icon: "reviews", description: "Stories from our clients" },
+  { to: "/about", label: "About", icon: "weave", description: "Our house and heritage" },
 ];
 
 function Icon({ name, size = 20 }) {
@@ -53,7 +52,7 @@ function Icon({ name, size = 20 }) {
   return <svg {...common}>{paths[name]}</svg>;
 }
 
-function HeaderLink({ to, label, end = false, onNavigate, icon }) {
+function HeaderLink({ to, label, end = false, onNavigate, icon, description }) {
   return (
     <NavLink
       to={to}
@@ -61,8 +60,16 @@ function HeaderLink({ to, label, end = false, onNavigate, icon }) {
       onClick={onNavigate}
       className={({ isActive }) => (isActive ? "is-active" : undefined)}
     >
-      {icon ? <Icon name={icon} size={22} /> : null}
-      <span>{label}</span>
+      {icon === "custom-style" ? <CustomStyleIcon size={22} /> :
+        icon === "reviews" ? <ReviewsIcon size={22} /> :
+          icon ? <Icon name={icon} size={22} /> : null}
+      {description ? (
+        <span className="site-header__drawer-copy">
+          <span className="site-header__drawer-link-label">{label}</span>
+          <span className="site-header__drawer-link-description">{description}</span>
+        </span>
+      ) : <span>{label}</span>}
+      {description ? <span className="site-header__drawer-chevron" aria-hidden="true">›</span> : null}
     </NavLink>
   );
 }
@@ -80,6 +87,12 @@ export default function Header() {
 
   useEffect(() => {
     if (!isMenuOpen) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const mobileViewport = window.matchMedia("(max-width: 767px)");
+    const onViewportChange = () => {
+      if (!mobileViewport.matches) setIsMenuOpen(false);
+    };
     const onKeyDown = (event) => {
       if (event.key === "Escape") {
         setIsMenuOpen(false);
@@ -102,12 +115,21 @@ export default function Header() {
       }
     };
     document.addEventListener("keydown", onKeyDown);
+    mobileViewport.addEventListener("change", onViewportChange);
     const firstFocusable = drawerRef.current?.querySelector("a[href], button:not([disabled])");
     firstFocusable?.focus();
-    return () => document.removeEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+      mobileViewport.removeEventListener("change", onViewportChange);
+    };
   }, [isMenuOpen]);
 
   const closeMenu = () => setIsMenuOpen(false);
+  const closeMenuAndFocus = () => {
+    closeMenu();
+    menuButtonRef.current?.focus();
+  };
 
   const submitSearch = (event) => {
     event.preventDefault();
@@ -213,15 +235,51 @@ export default function Header() {
             </div>
           </div>
 
+          <button
+            type="button"
+            className={`site-header__drawer-backdrop${isMenuOpen ? " is-open" : ""}`}
+            aria-label="Close menu"
+            tabIndex={-1}
+            onClick={closeMenuAndFocus}
+          />
           <div
             ref={drawerRef}
             id={drawerId}
             className={`site-header__drawer${isMenuOpen ? " is-open" : ""}`}
+            role="dialog"
+            aria-modal={isMenuOpen ? "true" : undefined}
+            aria-labelledby={`${drawerId}-title`}
             aria-hidden={!isMenuOpen}
+            inert={!isMenuOpen}
           >
+            <div className="site-header__drawer-top">
+              <div>
+                <p>UNIVERSAL DICTA COUTURE</p>
+                <h2 id={`${drawerId}-title`}>Explore</h2>
+              </div>
+              <button type="button" className="site-header__drawer-close" aria-label="Close menu" onClick={closeMenuAndFocus}>
+                <Icon name="close" size={22} />
+              </button>
+            </div>
             <nav aria-label="Mobile menu">
+              <p className="site-header__drawer-group-label">The House</p>
               <ul>
-                {[...MOBILE_DRAWER_LINKS, ...(!user ? [{ to: "/signin", label: "Client login" }, { to: "/signup", label: "Sign up" }] : []), { to: "/admin", label: adminLabel }].map((link) => (
+                {MOBILE_DRAWER_LINKS.map((link) => (
+                  <li key={link.to}>
+                    <HeaderLink {...link} onNavigate={closeMenu} />
+                  </li>
+                ))}
+              </ul>
+              <p className="site-header__drawer-group-label">Your Account</p>
+              <ul>
+                {[
+                  { to: "/profile", label: "Profile", icon: "user", description: "Your personal space" },
+                  ...(!user ? [
+                    { to: "/signin", label: "Client login", icon: "user", description: "Welcome back" },
+                    { to: "/signup", label: "Sign up", icon: "heart", description: "Join our style circle" },
+                  ] : []),
+                  { to: "/admin", label: adminLabel, icon: "shield", description: "Couture administration" },
+                ].map((link) => (
                   <li key={link.to}>
                     <HeaderLink {...link} onNavigate={closeMenu} />
                   </li>
