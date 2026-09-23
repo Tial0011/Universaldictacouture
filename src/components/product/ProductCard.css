@@ -92,24 +92,11 @@
   aspect-ratio: var(--product-card-media-ratio);
 }
 
-.product-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 /* Keep the complete uploaded product visible, including portrait and
    landscape photos. Editorial imagery keeps its own presentation. */
 .product-card__media .product-image {
   display: block;
   object-fit: contain;
-}
-
-.product-image--empty {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background-color: var(--color-bg);
 }
 
 .product-card__save {

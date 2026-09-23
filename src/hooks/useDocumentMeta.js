@@ -7,7 +7,12 @@ import { useEffect } from "react";
  * clean /shop URL and are marked noindex, so refinements never become
  * duplicate indexable pages.
  */
-export function useDocumentMeta({ title, description, canonicalPath, noindex = false }) {
+export function useDocumentMeta({
+  title = "Universal Dicta Couture",
+  description = "Modern fashion. A heritage you wear. Explore Aso Oke with Universal Dicta Couture.",
+  canonicalPath = window.location.pathname,
+  noindex = false,
+}) {
   useEffect(() => {
     if (title) document.title = title;
 

@@ -1,6 +1,5 @@
 import { useId, useState } from "react";
 import {
-  DuplicateSubscriptionError,
   subscribeToStyleCircle,
   validateEmail,
 } from "../../services/styleCircle";
@@ -15,7 +14,7 @@ import {
 export default function StyleCircle() {
   const fieldId = useId();
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState("idle"); // idle | loading | success | duplicate | error
+  const [status, setStatus] = useState("idle"); // idle | loading | success | error
   const [message, setMessage] = useState("");
 
   const isInvalid = status === "error";
@@ -39,11 +38,6 @@ export default function StyleCircle() {
       setMessage("You are in. Welcome to the Style Circle.");
       setEmail("");
     } catch (error) {
-      if (error instanceof DuplicateSubscriptionError) {
-        setStatus("duplicate");
-        setMessage(error.message);
-        return;
-      }
       setStatus("error");
       setMessage(error?.message || "Style Circle could not be reached. Please try again.");
     }

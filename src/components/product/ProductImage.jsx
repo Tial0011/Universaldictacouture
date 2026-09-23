@@ -1,4 +1,5 @@
 import { getImageUrl } from "../../cloudinary/cloudinary";
+import "./ProductImage.css";
 
 /**
  * Product / editorial imagery.
@@ -11,7 +12,7 @@ import { getImageUrl } from "../../cloudinary/cloudinary";
 export default function ProductImage({
   image,
   alt,
-  transformation = "w_600,h_750,c_fill,g_auto,q_auto,f_auto",
+  transformation = "w_1200,h_1500,c_limit,q_auto,f_auto",
   className = "",
   loading = "lazy",
   sizes,

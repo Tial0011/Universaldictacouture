@@ -8,7 +8,7 @@ function sentAt(timestamp) {
   return timestamp?.toDate?.().toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) || "Sending...";
 }
 
-export default function Conversation({ user, customerId, admin = false, title = "Dicta Couturier" }) {
+export default function Conversation({ user, customerId, admin = false, title = "Dicta Couturier", initialDraft = "" }) {
   const [messages, setMessages] = useState([]);
   const [cursor, setCursor] = useState(null);
   const [hasMore, setHasMore] = useState(false);
@@ -17,7 +17,7 @@ export default function Conversation({ user, customerId, admin = false, title = 
   const [readError, setReadError] = useState("");
   const [actionError, setActionError] = useState("");
   const [attempt, setAttempt] = useState(0);
-  const [text, setText] = useState("");
+  const [text, setText] = useState(() => initialDraft.slice(0, MESSAGE_LIMIT));
   const [sending, setSending] = useState(false);
   const [cached, setCached] = useState(false);
   const mounted = useRef(false);

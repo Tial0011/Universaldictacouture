@@ -3,7 +3,9 @@ import { useSavedPieces } from "../../context/SavedPiecesContext";
 import ProductGrid from "../../components/product/ProductGrid";
 import Button from "../../components/common/Button";
 import PageIntro from "../../components/common/PageIntro";
+import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 export default function SavedPieces() {
+  useDocumentMeta({ title: "Saved pieces | Universal Dicta Couture", noindex: true });
   const { products, isLoading, error, retry } = useCatalogue();
   const { savedIds, isPersistent, error: saveError } = useSavedPieces();
   const saved = products.filter(product => savedIds.includes(product.id));

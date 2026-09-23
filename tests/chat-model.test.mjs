@@ -1,6 +1,22 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { prepareMessage, mergeMessages } from "../src/services/chatModel.js";
+import { prepareMessage, mergeMessages, closetEnquiry, MESSAGE_LIMIT } from "../src/services/chatModel.js";
+
+test("closet enquiry preserves selected options and product references without asserting an order", () => {
+  const draft = closetEnquiry([{ name: "Aso Oke set", slug: "aso-oke", quantity: 2, selections: { Size: "M", Colour: "Wine" } }]);
+  assert.match(draft, /Aso Oke set \(quantity: 2\)/);
+  assert.match(draft, /Size: M, Colour: Wine/);
+  assert.match(draft, /\/shop\/aso-oke/);
+  assert.equal(prepareMessage(draft), draft);
+});
+
+test("a large closet produces a valid message with a clear note about remaining selections", () => {
+  const lines = Array.from({ length: 100 }, (_, index) => ({ name: `Piece ${index}`, productId: `piece-${index}`, quantity: 1, selections: { Fabric: "Aso Oke" } }));
+  const draft = closetEnquiry(lines);
+  assert.ok(draft.length <= MESSAGE_LIMIT);
+  assert.match(draft, /more selection\(s\) to discuss/);
+  assert.equal(prepareMessage(draft), draft);
+});
 test("empty and oversized messages are rejected, meaningful whitespace preserved", () => {
   for (const value of [null, "  ", "\n\t", "x".repeat(2001)]) assert.throws(() => prepareMessage(value));
   assert.equal(prepareMessage("  Hello\nPlease help  "), "Hello\nPlease help");

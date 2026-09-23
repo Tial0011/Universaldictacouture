@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { fetchPublishedReviews } from "../../services/content";
 import ProductImage from "../../components/product/ProductImage";
 import Button from "../../components/common/Button";
+import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import "../Profile/Profile.css";
 export default function ReviewsFeeds() {
+  useDocumentMeta({ title: "Customer reviews | Universal Dicta Couture", description: "Read published customer reviews from Universal Dicta Couture.", canonicalPath: "/reviews-feeds" });
   const [state,setState] = useState({entries:[],loading:true,error:""});
   const [attempt,setAttempt] = useState(0);
   useEffect(()=>{ let active=true; fetchPublishedReviews(50,true).then(entries=>{if(active)setState({entries,loading:false,error:""});}).catch(()=>{if(active)setState({entries:[],loading:false,error:"Reviews could not be loaded. Please try again."});});return()=>{active=false;};},[attempt]);

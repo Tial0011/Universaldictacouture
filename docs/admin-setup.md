@@ -18,16 +18,19 @@ The implementation uses email/password Auth and standard Firestore document oper
 
 Spark has quotas; this architecture reduces reads but cannot guarantee a site stays within them. Monitor actual usage in Firebase. See [Firebase plans](https://firebase.google.com/docs/projects/billing/firebase-pricing-plans) and [Firestore billing](https://firebase.google.com/docs/firestore/pricing).
 
-## Cloudinary images
+## Photo storage
 
-1. Create a Cloudinary image upload preset with unsigned signing mode.
-2. Restrict allowed formats to jpg, jpeg, png and webp, and maximum file size to 5 MB in the preset. Enable unique filenames and keep overwrite disabled. Set the asset folder to universal-dicta/admin.
-3. Set VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET in the build environment and rebuild.
-4. Upload a photo in a draft product and save. Firestore stores image URLs, public IDs, dimensions and descriptions; image bytes go only to Cloudinary.
+Uploads use the authenticated Netlify image function and Netlify Blobs. No Cloudinary upload preset is required.
 
-Unsigned presets are public and uploads do not inherit Firebase admin authorization. Anyone who learns a preset can use it subject to its restrictions. Monitor Cloudinary usage. If admin-authenticated uploads or API deletion become necessary, add a signed upload endpoint on the existing Netlify hosting layer that verifies Firebase ID tokens and membership; keep the API secret server-side. Do not put API secrets in VITE\_\* variables. See [Cloudinary upload presets](https://cloudinary.com/documentation/upload_presets).
+1. Deploy with the repository's `netlify.toml`, including `netlify/functions`.
+2. Set `FIREBASE_WEB_API_KEY` and `FIREBASE_PROJECT_ID` in the Netlify Functions environment, using the same Firebase project as the frontend. Set the `VITE_FIREBASE_*` variables in the build environment and rebuild.
+3. Create the active admin membership described above and publish `firestore.rules`. The upload endpoint checks both the signed-in account and its membership.
+4. Upload a JPEG, PNG or WebP of at most 4 MiB in a draft product and save. The server validates the photo, removes metadata and converts it to WebP without cropping, limiting its largest dimension to 2400 pixels.
+5. Reload the draft, then publish it and confirm its photo is visible on the storefront.
 
-Removing a photo from a record does not delete its Cloudinary asset. A failed save can also leave uploaded assets unattached. Clean up confirmed unused assets in the Cloudinary Console.
+Netlify supplies the deployed Blobs credentials. Do not place service-account keys or private tokens in `VITE_*` variables. For local uploads, run `npx netlify dev` and use port 8888; Vite alone does not provide the function. Local Blobs data is separate from production.
+
+Photo files are public, including photos belonging to drafts. Removing a photo from a record does not delete the file, and a failed save can leave an unattached upload. Clean up only confirmed unused files in the `catalogue-images` Blobs store. Legacy Cloudinary images still render when `VITE_CLOUDINARY_CLOUD_NAME` is configured.
 
 ## Content workflow
 
@@ -50,3 +53,15 @@ With a configured development Firebase project, verify:
 6. Check mobile navigation, keyboard focus, unsaved-change prompts and error handling offline.
 
 Rules and service integration need to be verified against your project before production. No remote project settings or rules are deployed automatically by this change.
+
+## Customer and admin chat
+
+Publish the current `firestore.rules` before enabling chat. A signed-in customer owns one private conversation; active administrators can read and reply through `/admin/chats`.
+
+1. Send a message as a customer and open that conversation in the admin inbox.
+2. Reply as an admin and confirm that the reply appears for the customer without reloading.
+3. Verify that a second customer cannot read or write the first customer's conversation.
+4. Check message history beyond 30 messages and inbox pagination beyond 20 conversations.
+5. Disable an admin membership and confirm that protected requests are denied.
+
+The automated rules tests require the local Firestore emulator and Java 21+. They never run against production data. Use the emulator command in the root README.

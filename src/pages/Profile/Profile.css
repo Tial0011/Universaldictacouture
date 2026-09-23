@@ -5,6 +5,7 @@
 .account-actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
 .customer-list { display: grid; gap: var(--space-md); margin: 0; padding: 0; list-style: none; }
 .customer-piece { display: grid; grid-template-columns: 100px 1fr; gap: var(--space-sm); border-bottom: 1px solid var(--color-border); padding-block: var(--space-sm); }
-.customer-piece img { width: 100px; height: 125px; object-fit: cover; }
+.customer-piece img { width: 100px; height: 125px; object-fit: contain; }
+.customer-piece > div { min-width: 0; overflow-wrap: anywhere; }
 .customer-piece h2 { font-size: var(--text-lg); }
 @media (max-width: 599px) { .account-card { padding: var(--space-md); } }

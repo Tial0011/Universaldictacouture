@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { signOutUser } from "../../firebase/auth";
 import { ADMIN_SECTIONS } from "../admin/adminSections";
 import Logo from "../brand/Logo";
 import Button from "../common/Button";
+import LoadingSpinner from "../common/LoadingSpinner";
+import PageBoundary from "../common/PageBoundary";
 import "./AdminLayout.css";
 
 export default function AdminLayout() {
@@ -46,7 +48,7 @@ export default function AdminLayout() {
     <div className="admin-workspace">
       <header className="admin-topbar"><p>Admin <span aria-hidden="true">/</span> <strong>{title}</strong></p></header>
       {error && <p className="field__error" role="alert">{error}</p>}
-      <main id="admin-main" tabIndex={-1} ref={main} className="admin-layout__content"><Outlet /></main>
+      <main id="admin-main" tabIndex={-1} ref={main} className="admin-layout__content"><PageBoundary key={pathname}><Suspense fallback={<LoadingSpinner label="Loading admin page" />}><Outlet /></Suspense></PageBoundary></main>
       <footer className="admin-footer">Signed in as {user?.email || "administrator"}</footer>
     </div>
   </div>;

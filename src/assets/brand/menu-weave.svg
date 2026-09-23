@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="144" viewBox="0 0 120 144" fill="none">
+  <!-- Original textile motif: fine warp threads, stepped diamonds and woven bands. -->
+  <g stroke="#b08d57">
+    <path d="M4 0v144M9 0v144M111 0v144M116 0v144" stroke-width=".6" opacity=".8"/>
+    <path d="M0 3h120M0 9h120M0 69h120M0 75h120M0 135h120M0 141h120" stroke-width=".5" opacity=".55"/>
+    <path d="m0 36 6-6 6 6-6 6Zm0 72 6-6 6 6-6 6Zm0 108 6-6 6 6-6 6Zm108-72 6-6 6 6-6 6Zm0 36 6-6 6 6-6 6Zm0 36 6-6 6 6-6 6Z" stroke-width=".8"/>
+    <path d="M60 18v6h-6v6h-6v6h-6v6h6v6h6v6h6v6h6v-6h6v-6h6v-6h6v-6h-6v-6h-6v-6h-6v-6Z" stroke-width=".8"/>
+    <path d="m63 30 12 12-12 12-12-12Z" stroke-width=".6"/>
+    <path d="M60 90v6h-6v6h-6v6h-6v6h6v6h6v6h6v6h6v-6h6v-6h6v-6h6v-6h-6v-6h-6v-6h-6v-6Z" stroke-width=".8"/>
+    <path d="m63 102 12 12-12 12-12-12Z" stroke-width=".6"/>
+    <path d="M26 0v144M96 0v144" stroke-width=".4" stroke-dasharray="2 4" opacity=".6"/>
+  </g>
+</svg>

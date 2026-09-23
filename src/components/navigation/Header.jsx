@@ -211,8 +211,8 @@ export default function Header() {
               aria-controls={drawerId}
               onClick={() => setIsMenuOpen((open) => !open)}
             >
-              <Icon name={isMenuOpen ? "close" : "menu"} />
-              <span aria-hidden="true">{isMenuOpen ? "Close" : "Menu"}</span>
+              <Icon name="menu" />
+              <span aria-hidden="true">Menu</span>
             </button>
 
             <NavLink to="/" className="site-header__mobile-brand" aria-label="Universal Dicta Couture home" onClick={closeMenu}>
@@ -258,9 +258,11 @@ export default function Header() {
                 <h2 id={`${drawerId}-title`} className="visually-hidden">Universal Dicta Couture menu</h2>
                 <p>Modern fashion. A heritage you wear.</p>
               </div>
-              <button type="button" className="site-header__drawer-close" aria-label="Close menu" onClick={closeMenuAndFocus}>
-                <Icon name="close" size={18} />
-                <span>Close</span>
+              <button type="button" className="site-header__drawer-close" aria-label="Close menu" title="Close menu" onClick={closeMenuAndFocus}>
+                <svg className="site-header__clasp" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+                  <path d="m7 7 9 9-9 9M25 7l-9 9 9 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  <path className="site-header__clasp-thread" d="m16 11 5 5-5 5-5-5Z" strokeWidth="1.2" strokeLinejoin="round" />
+                </svg>
               </button>
             </div>
             <nav aria-label="Mobile menu">

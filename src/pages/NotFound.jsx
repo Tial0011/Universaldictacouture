@@ -1,7 +1,9 @@
 import PageIntro from "../components/common/PageIntro";
 import Button from "../components/common/Button";
+import { useDocumentMeta } from "../hooks/useDocumentMeta";
 
 export default function NotFound() {
+  useDocumentMeta({ title: "Page not found | Universal Dicta Couture", noindex: true });
   return (
     <>
       <PageIntro

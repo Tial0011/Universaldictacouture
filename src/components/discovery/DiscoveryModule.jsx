@@ -158,7 +158,7 @@ export default function DiscoveryModule({
                     <ProductImage
                       image={item.image}
                       alt=""
-                      transformation="w_420,h_420,c_fill,g_auto,q_auto,f_auto"
+                      transformation="w_420,h_420,c_limit,q_auto,f_auto"
                     />
                   )}
                 </span>

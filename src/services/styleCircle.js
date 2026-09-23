@@ -41,11 +41,10 @@ async function emailKey(email) {
 }
 
 export class SubscriptionError extends Error {}
-export class DuplicateSubscriptionError extends Error {}
 
 /**
  * @returns {Promise<{ status: "subscribed" }>}
- * @throws {DuplicateSubscriptionError|SubscriptionError}
+ * @throws {SubscriptionError}
  */
 export async function subscribeToStyleCircle(rawEmail) {
   const { isValid, email, message } = validateEmail(rawEmail);
@@ -69,9 +68,9 @@ export async function subscribeToStyleCircle(rawEmail) {
   } catch (error) {
     if (import.meta.env.DEV) console.error(error);
     if (error?.code === "permission-denied") {
-      // Rules reject a write to an existing document, which is how a
-      // duplicate presents itself when reads are not permitted.
-      throw new DuplicateSubscriptionError("You are already part of the Style Circle.");
+      // Duplicate writes and a configuration failure have the same code.
+      // A public client cannot read subscriber records to distinguish them.
+      throw new SubscriptionError("We could not confirm your subscription. If you have subscribed before, you do not need to sign up again. Otherwise, please try again later.");
     }
     throw new SubscriptionError("Style Circle could not be reached. Please try again.");
   }
