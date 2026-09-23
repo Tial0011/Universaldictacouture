@@ -228,9 +228,9 @@ export default function Header() {
                 <CustomStyleIcon size={21} />
                 <span>Custom Style</span>
               </NavLink>
-              <NavLink className="site-header__action" to="/reviews-feeds" aria-label="Reviews">
+              <NavLink className="site-header__action" to="/reviews-feeds" aria-label="Reviews & Feeds">
                 <ReviewsIcon size={19} />
-                <span>Reviews</span>
+                <span>Reviews &amp; Feeds</span>
               </NavLink>
             </div>
           </div>

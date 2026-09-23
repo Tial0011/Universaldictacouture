@@ -218,78 +218,95 @@
   .site-header__mobile { display: block; background: var(--color-white); border-bottom: 1px solid var(--color-border); }
 
   .site-header__mobile-top {
-    min-height: 64px;
     display: grid;
-    grid-template-columns: var(--touch-target) minmax(0, 1fr) auto;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-areas: "brand brand brand brand" "menu actions actions actions";
     align-items: center;
     gap: .25rem;
+    padding-block: .25rem .375rem;
   }
 
   .site-header__mobile-brand {
-    flex-direction: column;
+    grid-area: brand;
     justify-self: center;
     min-width: 0;
     max-width: 100%;
-    padding-block: 0.25rem;
   }
   .site-header__mobile-brand .logo {
     height: auto;
-    width: 110px;
+    width: 116px;
     max-width: 100%;
-    max-height: var(--logo-height-header);
   }
 
-  /* Hamburger — wine/red, thin strokes, no fill. */
-  .site-header__icon-button {
-    flex-direction: column;
-    gap: .2rem;
-    color: var(--color-brand);
-    background: transparent;
-    border: 0;
-    padding: 0 .2rem;
-    font-family: var(--font-body);
-  }
-
-  .site-header__icon-button span {
-    font-size: 0.6rem;
-    font-weight: var(--weight-medium);
-    line-height: 1;
-  }
-
-  /* Search / Custom Style / Reviews, right-aligned as one group so the
-     three sit together the way the reference shows them. */
-  .site-header__mobile-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: clamp(.35rem, 2.5vw, .75rem);
-    min-width: 0;
-  }
-
+  /* Four clearly framed controls share the same compact touch row. */
+  .site-header__icon-button,
   .site-header__action {
     display: flex;
+    min-width: 0;
+    width: 100%;
+    min-height: 3.5rem;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: .2rem;
-    min-height: var(--touch-target);
-    padding: 0 .15rem;
+    gap: .15rem;
+    padding: .2rem .15rem;
     color: var(--color-brand);
-    background: transparent;
-    border: 0;
+    background: var(--color-white);
+    border: 1px solid color-mix(in srgb, var(--color-brand) 26%, transparent);
+    border-radius: var(--radius-md);
+    box-shadow: 0 2px 7px rgba(31, 17, 18, .06);
     font-family: var(--font-body);
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .site-header__icon-button {
+    grid-area: menu;
+  }
+
+  .site-header__icon-button span,
+  .site-header__action span {
+    font-size: .6875rem;
+    font-weight: var(--weight-medium);
+    line-height: 1.15;
+  }
+
+  .site-header__mobile-actions {
+    grid-area: actions;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: .25rem;
+    min-width: 0;
+  }
+
+  .site-header__action svg,
+  .site-header__icon-button svg {
+    flex: 0 0 auto;
   }
 
   .site-header__action span {
-    font-size: 0.6rem;
-    font-weight: var(--weight-medium);
-    line-height: 1;
-    white-space: nowrap;
+    overflow-wrap: normal;
   }
 
-  @media (max-width: 360px) {
-    .site-header__mobile-actions { gap: .3rem; }
-    .site-header__action span { font-size: 0.56rem; }
+  .site-header__action.is-active {
+    background: var(--color-brand-tint);
+    border-color: var(--color-brand);
+  }
+
+  .site-header__icon-button:focus-visible,
+  .site-header__action:focus-visible,
+  .site-header__mobile-brand:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) {
+    .site-header__icon-button:hover,
+    .site-header__action:hover {
+      background: var(--color-brand-tint);
+      border-color: var(--color-brand);
+    }
   }
 
   .site-header__drawer-backdrop {
