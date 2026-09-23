@@ -252,6 +252,7 @@
 }
 
 .discovery--home .discovery__caption > svg {
+  display: none;
   flex: 0 0 auto;
   width: 12px;
   color: var(--color-brand);
@@ -301,6 +302,18 @@
   }
   .discovery--home .discovery__caption {
     padding: .75rem .4rem .4rem;
+  }
+  .discovery--home .discovery__caption > svg {
+    display: block;
+  }
+}
+
+@media (pointer: coarse) {
+  .discovery--home .discovery__list {
+    scrollbar-width: none;
+  }
+  .discovery--home .discovery__list::-webkit-scrollbar {
+    display: none;
   }
 }
 

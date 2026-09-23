@@ -107,7 +107,7 @@
 /* ---------- Shop variant ----------
    A segmented tab bar (the tabs stand in for the heading) over a
    scrolling row of small photo tiles. Scoped to .discovery--shop so
-   Home's circular row and any other use of the module are untouched. */
+   the homepage and any other use of the module are untouched. */
 .discovery--shop .discovery__groups {
   display: flex;
   flex-wrap: nowrap;
