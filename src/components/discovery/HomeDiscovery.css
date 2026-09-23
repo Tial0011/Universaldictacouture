@@ -1,0 +1,327 @@
+/* Homepage discovery: fine woven edges, clear controls, quiet photo frames. */
+.discovery--home {
+  position: relative;
+  padding-block: clamp(1rem, 2vw, 1.5rem);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.discovery--home::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--color-brand) url("../../assets/brand/menu-weave.svg") center / 30px 36px repeat;
+  pointer-events: none;
+}
+
+.discovery--home .discovery__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(.375rem, 1.5vw, 1rem);
+  margin-bottom: .65rem;
+}
+
+.discovery--home .discovery__title {
+  min-width: 0;
+  font-size: clamp(1.25rem, 3.5vw, 2.5rem);
+  font-weight: var(--weight-medium);
+  line-height: 1.08;
+}
+
+.discovery--home .discovery__title-prefix {
+  display: block;
+  margin-bottom: .25rem;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: .625rem;
+  font-weight: var(--weight-medium);
+  line-height: 1.2;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.discovery--home .discovery__head-actions {
+  display: flex;
+  align-items: center;
+  gap: clamp(.375rem, 1.5vw, 1rem);
+  white-space: nowrap;
+}
+
+/* Like two ends of a weaving shuttle: open sides and a fine central clasp. */
+.discovery--home .discovery__group-arrows {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-block: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  background: linear-gradient(rgba(251, 248, 242, .9), rgba(251, 248, 242, .9)),
+    url("../../assets/brand/menu-weave.svg") center / 60px 72px;
+}
+
+.discovery--home .discovery__group-arrows::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border: 1px solid var(--color-accent);
+  transform: translate(-50%, -50%) rotate(45deg);
+  pointer-events: none;
+}
+
+.discovery--home .discovery__group-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  color: var(--color-brand);
+  background: transparent;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.discovery--home .discovery__group-arrow svg {
+  width: 30px;
+  height: 24px;
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.discovery--home .discovery__arrow-thread {
+  stroke: var(--color-accent);
+}
+
+.discovery--home .discovery__group-arrow:disabled {
+  color: var(--color-text-secondary);
+  opacity: .35;
+  cursor: default;
+}
+
+.discovery--home .discovery__group-arrow:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* An ivory label on wine, with the same woven edge as the navigation. */
+.discovery--home .discovery__view-all {
+  position: relative;
+  isolation: isolate;
+  min-height: var(--touch-target);
+  padding: .5rem .5rem;
+  gap: .25rem;
+  border: 1px solid var(--color-brand);
+  border-radius: var(--radius-control);
+  background: var(--color-brand);
+  color: var(--color-ivory);
+  font-size: .6875rem;
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.discovery--home .discovery__view-all::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 3px;
+  border-inline: 1px solid var(--color-accent);
+  background: url("../../assets/brand/menu-weave.svg") center / 60px 72px;
+  opacity: .22;
+  pointer-events: none;
+}
+
+.discovery--home .discovery__view-all svg {
+  width: 13px;
+  height: 13px;
+}
+
+.discovery--home .discovery__chapter {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: .875rem;
+}
+
+.discovery--home .discovery__chapter-track {
+  flex: 1;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 4px;
+}
+
+.discovery--home .discovery__chapter-track > span {
+  height: 2px;
+  background: var(--color-border);
+}
+
+.discovery--home .discovery__chapter-track > .is-current {
+  background: var(--color-brand);
+}
+
+.discovery--home .discovery__position {
+  color: var(--color-brand);
+  font-family: var(--font-body);
+  font-size: .625rem;
+  font-weight: var(--weight-medium);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .06em;
+}
+
+.discovery--home .discovery__position > span {
+  color: var(--color-text-secondary);
+}
+
+.discovery--home .discovery__list {
+  display: flex;
+  gap: clamp(.5rem, 1.5vw, 1rem);
+  overflow-x: auto;
+  margin: -4px;
+  padding: 4px 4px .625rem;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.discovery--home .discovery__list > li {
+  flex: 0 0 clamp(6.25rem, 26vw, 9rem);
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.discovery--home .discovery__item {
+  height: 100%;
+  padding: 4px;
+  gap: 0;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+
+.discovery--home .discovery__media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border: 0;
+  border-radius: 1px;
+}
+
+.discovery--home .discovery__media::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(251, 248, 242, .65);
+  pointer-events: none;
+}
+
+.discovery--home .discovery__media .product-image,
+.discovery--home .occasion-illustration {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.discovery--home .discovery__caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .25rem;
+  flex: 1;
+  min-height: 3.125rem;
+  padding: .5rem .2rem .25rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+.discovery--home .discovery__name {
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: clamp(.9375rem, 1.5vw, 1.1875rem);
+  font-weight: var(--weight-semibold);
+  line-height: 1.15;
+  text-align: left;
+  text-wrap: balance;
+}
+
+.discovery--home .discovery__caption > svg {
+  flex: 0 0 auto;
+  width: 12px;
+  color: var(--color-brand);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.discovery--home .discovery__empty {
+  padding: var(--space-md);
+  color: var(--color-text-secondary);
+  border: 1px dashed var(--color-border-strong);
+}
+
+.discovery--home .discovery__group-arrow:not(:disabled):active {
+  background: var(--color-brand-tint-strong);
+}
+
+.discovery--home .discovery__view-all:active {
+  background-color: var(--color-brand-hover);
+}
+
+@media (hover: hover) {
+  .discovery--home .discovery__group-arrow:not(:disabled):hover {
+    background: var(--color-brand-tint);
+  }
+  .discovery--home .discovery__group-arrow--previous:not(:disabled):hover svg {
+    transform: translateX(-2px);
+  }
+  .discovery--home .discovery__group-arrow--next:not(:disabled):hover svg,
+  .discovery--home .discovery__item:hover .discovery__caption > svg {
+    transform: translateX(2px);
+  }
+  .discovery--home .discovery__view-all:hover {
+    background-color: var(--color-brand-hover);
+  }
+  .discovery--home .discovery__item:hover {
+    border-color: var(--color-brand);
+  }
+}
+
+@media (min-width: 640px) {
+  .discovery--home .discovery__list > li {
+    flex-basis: clamp(9rem, 14vw, 12rem);
+  }
+  .discovery--home .discovery__view-all {
+    padding-inline: .875rem;
+    font-size: var(--text-xs);
+  }
+  .discovery--home .discovery__caption {
+    padding: .75rem .4rem .4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .discovery--home *,
+  .discovery--home *::before {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .discovery--home::before,
+  .discovery--home .discovery__group-arrows::after,
+  .discovery--home .discovery__view-all::before {
+    display: none;
+  }
+  .discovery--home .discovery__group-arrow,
+  .discovery--home .discovery__view-all {
+    border: 1px solid ButtonText;
+  }
+  .discovery--home .discovery__chapter-track > .is-current {
+    background: Highlight;
+  }
+}

@@ -2,12 +2,17 @@ import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import ProductImage from "../product/ProductImage";
 import ViewAllLink from "../common/ViewAllLink";
+import StitchArrowIcon from "../common/icons/StitchArrowIcon";
 import "./DiscoveryModule.css";
+import "./HomeDiscovery.css";
 
 function GroupArrow({ direction }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d={direction === "previous" ? "M19 12H5m0 0 5-5m-5 5 5 5" : "M5 12h14m0 0-5-5m5 5-5 5"} />
+    <svg width="32" height="24" viewBox="0 0 32 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <g transform={direction === "previous" ? "translate(32 0) scale(-1 1)" : undefined}>
+        <path className="discovery__arrow-thread" d="M3 8v8M6 7v10m3-8 3 3-3 3-3-3Z" strokeWidth=".8" />
+        <path d="M12 12h16m-7-6 7 6-7 6" />
+      </g>
     </svg>
   );
 }
@@ -100,17 +105,28 @@ export default function DiscoveryModule({
         {arrowNavigation ? (
           <div className="discovery__head-actions">
             <div className="discovery__group-arrows" role="group" aria-label="Shop By groups">
-              <button type="button" className="discovery__group-arrow" aria-label="Previous Shop By group" aria-controls={`discovery-panel-${module.id}`} disabled={currentIndex === 0} onClick={() => selectGroup(groups[currentIndex - 1].id)}>
+              <button type="button" className="discovery__group-arrow discovery__group-arrow--previous" aria-label={currentIndex > 0 ? `Previous group: ${groups[currentIndex - 1].label}` : "Previous Shop by group"} aria-controls={`discovery-panel-${module.id}`} disabled={currentIndex === 0} onClick={() => selectGroup(groups[currentIndex - 1].id)}>
                 <GroupArrow direction="previous" />
               </button>
-              <button type="button" className="discovery__group-arrow" aria-label="Next Shop By group" aria-controls={`discovery-panel-${module.id}`} disabled={currentIndex === groups.length - 1} onClick={() => selectGroup(groups[currentIndex + 1].id)}>
+              <button type="button" className="discovery__group-arrow discovery__group-arrow--next" aria-label={currentIndex < groups.length - 1 ? `Next group: ${groups[currentIndex + 1].label}` : "Next Shop by group"} aria-controls={`discovery-panel-${module.id}`} disabled={currentIndex === groups.length - 1} onClick={() => selectGroup(groups[currentIndex + 1].id)}>
                 <GroupArrow direction="next" />
               </button>
             </div>
-            {viewAllTo ? <ViewAllLink to={viewAllTo} /> : null}
+            {viewAllTo ? <ViewAllLink to={viewAllTo} className="discovery__view-all" /> : null}
           </div>
         ) : viewAllTo ? <ViewAllLink to={viewAllTo} /> : null}
       </div>
+
+      {arrowNavigation ? (
+        <div className="discovery__chapter" aria-hidden="true">
+          <div className="discovery__chapter-track">
+            {groups.map((group) => <span key={group.id} className={group.id === currentGroup ? "is-current" : undefined} />)}
+          </div>
+          <span className="discovery__position">
+            {String(currentIndex + 1).padStart(2, "0")}<span> / {String(groups.length).padStart(2, "0")}</span>
+          </span>
+        </div>
+      ) : null}
 
       {hasTabs ? (
         <div className="discovery__groups" role="tablist" aria-label={`${module.title} groups`}>
@@ -145,7 +161,7 @@ export default function DiscoveryModule({
           className="discovery__list"
           id={`discovery-panel-${module.id}`}
           role={hasTabs ? "tabpanel" : undefined}
-          aria-labelledby={hasTabs ? `discovery-tab-${currentGroup}` : undefined}
+          aria-labelledby={hasTabs ? `discovery-tab-${currentGroup}` : arrowNavigation ? `discovery-${module.id}` : undefined}
         >
           {items.map((item) => (
             <li key={item.id}>
@@ -164,7 +180,12 @@ export default function DiscoveryModule({
                     />
                   )}
                 </span>
-                <span className="discovery__name">{item.name}</span>
+                {arrowNavigation ? (
+                  <span className="discovery__caption">
+                    <span className="discovery__name">{item.name}</span>
+                    <StitchArrowIcon size={14} />
+                  </span>
+                ) : <span className="discovery__name">{item.name}</span>}
               </Link>
             </li>
           ))}
