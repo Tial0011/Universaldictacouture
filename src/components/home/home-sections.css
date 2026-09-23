@@ -117,6 +117,37 @@
   .trust-strip__compact-copy { display: none; }
 }
 
+/* A lighter mobile strip, with the same five benefits and touch targets. */
+@media (max-width: 767px) {
+  .trust-strip-wrap {
+    padding-block: .625rem;
+  }
+
+  .trust-strip__link,
+  .trust-strip__static {
+    gap: .375rem;
+  }
+
+  .trust-strip__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .trust-strip__copy {
+    gap: .25rem;
+  }
+
+  .trust-strip__label {
+    font-size: clamp(.625rem, 2.35cqi, .75rem);
+    line-height: 1.2;
+  }
+
+  .trust-strip__caption {
+    font-size: clamp(.5625rem, 2.1cqi, .625rem);
+    line-height: 1.25;
+  }
+}
+
 /* ---------- Generic homepage section ---------- */
 .home-section {
   padding-block: var(--section-space);
