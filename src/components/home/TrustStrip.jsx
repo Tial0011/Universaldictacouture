@@ -99,11 +99,13 @@ export default function TrustStrip() {
           {ITEMS.map((item) => {
             const content = (
               <>
-                <span className="trust-strip__badge">
+                <span className="trust-strip__icon">
                   <TrustIcon name={item.icon} />
                 </span>
-                <span className="trust-strip__label">{item.label}</span>
-                <span className="trust-strip__caption">{item.caption}</span>
+                <span className="trust-strip__copy">
+                  <span className="trust-strip__label">{item.label}</span>
+                  <span className="trust-strip__caption">{item.caption}</span>
+                </span>
               </>
             );
             return (
