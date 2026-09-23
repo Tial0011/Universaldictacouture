@@ -212,7 +212,6 @@ export default function Header() {
               onClick={() => setIsMenuOpen((open) => !open)}
             >
               <Icon name="menu" />
-              <span aria-hidden="true">Menu</span>
             </button>
 
             <NavLink to="/" className="site-header__mobile-brand" aria-label="Universal Dicta Couture home" onClick={closeMenu}>
@@ -220,7 +219,7 @@ export default function Header() {
             </NavLink>
 
             <div className="site-header__mobile-actions">
-              <NavLink className="site-header__action" to="/shop?focus=search" aria-label="Search">
+              <NavLink className="site-header__action" to="/shop?focus=search" aria-label="Search" title="Search">
                 <Icon name="search" size={20} />
                 <span>Search</span>
               </NavLink>
