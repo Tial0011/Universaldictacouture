@@ -5,15 +5,17 @@ A React storefront and protected admin workspace for Universal Dicta Couture. Cu
 ## What is implemented
 
 - Public catalogue, product details, filtering, homepage content and published reviews backed by Firestore. The shop stays empty until real products are published; there is no mock catalogue fallback.
-- Customer email/password registration at `/signup`, sign-in at `/signin`, and account details at `/profile`.
+- Customer email/password registration at `/signup`, sign-in and password reset at `/signin`, and account details with email-verification controls at `/profile`.
 - Saved pieces stored per signed-in customer in Firestore. Guest saved pieces use browser session storage.
 - My Closet with selected products and quantities, stored for the browser session and separated by account. Guest selections are not automatically merged after sign-in.
 - An Admin login link in desktop navigation and the mobile menu. `/admin` requires an active admin membership, not just a customer account.
 - Admin screens for products, categories and attributes, homepage banners, discovery tiles, reviews and setup information.
 - Private customer messages at `/chats` and an admin inbox at `/admin/chats`, with live replies while a conversation is open.
 - Authenticated photo uploads to Netlify Blobs, with server-side validation and image optimisation.
+- Custom Style enquiry preparation and My Closet enquiries that carry selected pieces into an editable chat draft, including through sign-in. Messages are sent only when the customer chooses Send.
+- About, Our Story and delivery/order information pages, plus product photo galleries with uncropped imagery.
 
-**Current scope:** My Closet is not a checkout or order system. Payments, order tracking and customer review submission are not implemented. Chat supports text messages; attachments, email notifications, read receipts and typing indicators are not implemented. Password reset and email-verification flows are not implemented. See [admin setup and launch checks](docs/admin-setup.md).
+**Current scope:** Orders are discussed with the couturier; My Closet is not a checkout or order system. Automated payments, order tracking and customer review submission are not implemented. Chat supports text messages; attachments, email notifications, read receipts and typing indicators are not implemented. Password reset and email verification use Firebase's hosted email-action pages. See [admin setup and launch checks](docs/admin-setup.md).
 
 ## Stack
 
@@ -158,7 +160,7 @@ For a sense of photo traffic, 1,000 visits downloading 20 photos averaging 250 K
 ```powershell
 npm run lint
 npm run build
-node --test tests/admin-model.test.mjs tests/image-storage.test.mjs tests/chat-model.test.mjs
+node --test tests/admin-model.test.mjs tests/image-storage.test.mjs tests/chat-model.test.mjs tests/product-model.test.mjs
 ```
 
 `npm run preview` serves the built frontend locally; it does not replace Netlify Dev for function testing. The automated tests cover admin models and image handling, not a complete live Firebase/Netlify integration.

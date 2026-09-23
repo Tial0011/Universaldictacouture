@@ -8,7 +8,7 @@
  * invented data.
  */
 
-import { normaliseText } from "../utils/search";
+import { normaliseText } from "../utils/search.js";
 
 /** Taxonomy dimensions the Shop filters on. */
 export const FILTER_DIMENSIONS = [
@@ -103,9 +103,8 @@ export function normaliseProduct(id, raw) {
 
   const imageSource = Array.isArray(raw.images) ? raw.images : raw.images ? [raw.images] : [];
   const images = imageSource.map(normaliseImage).filter(Boolean);
-  // A piece with no uploaded photo yet is still publishable: the
-  // storefront supplies a stand-in image (see NewInCard) rather than
-  // hiding the piece.
+  // A piece with no uploaded photo stays publishable with an empty
+  // media frame; never substitute a photograph of another product.
   const primaryImage = normaliseImage(raw.primaryImage) || images[0] || null;
 
   const options = normaliseOptions(raw.options);
@@ -183,17 +182,17 @@ export function resolveSelections(product, selections = {}) {
   const missing = [];
   const resolved = {};
 
-  requiredOptions(product).forEach((option) => {
+  (product?.options ?? []).forEach((option) => {
     const supplied = selections?.[option.name];
     if (supplied && option.values.includes(supplied)) {
       resolved[option.name] = supplied;
       return;
     }
-    if (option.values.length === 1) {
+    if (option.required && option.values.length === 1) {
       resolved[option.name] = option.values[0];
       return;
     }
-    missing.push(option.name);
+    if (option.required) missing.push(option.name);
   });
 
   return { resolved, missing, isComplete: missing.length === 0 };

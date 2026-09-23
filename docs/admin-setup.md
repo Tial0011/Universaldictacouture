@@ -63,5 +63,17 @@ Publish the current `firestore.rules` before enabling chat. A signed-in customer
 3. Verify that a second customer cannot read or write the first customer's conversation.
 4. Check message history beyond 30 messages and inbox pagination beyond 20 conversations.
 5. Disable an admin membership and confirm that protected requests are denied.
+6. Prepare a Custom Style enquiry or select My Closet's “Ask about these pieces”. If signed out, sign in and confirm the draft is preserved. Review it and send explicitly; it must never be sent automatically.
 
 The automated rules tests require the local Firestore emulator and Java 21+. They never run against production data. Use the emulator command in the root README.
+
+## Account email actions
+
+Password reset is available from “Forgot your password?” on `/signin`. Signed-in customers can send a verification email and refresh its status from `/profile`. These actions use Firebase Authentication's hosted action pages; the website does not collect email action codes itself.
+
+1. Configure the Authentication email templates for the brand and check the authorized domains for the deployed site.
+2. Request a reset for a test account, open its email, set a new password and sign in with it. The reset form deliberately does not reveal whether an address is registered.
+3. Send a verification email, open its link, then select “Check verification” on the account page.
+4. Test a failed network request and excessive attempts. A failed request must show an error rather than claim an email was sent.
+
+These checks require the actual Firebase project and a test inbox. A local production build cannot prove email delivery.

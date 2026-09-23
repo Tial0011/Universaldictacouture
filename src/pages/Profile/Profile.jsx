@@ -26,6 +26,10 @@ function accountError(error) {
       return "The email or password is incorrect. Please try again.";
     case "auth/weak-password":
       return "Choose a password with at least six characters.";
+    case "auth/password-does-not-meet-requirements":
+      return "Use a longer password with upper and lowercase letters, a number and a symbol.";
+    case "auth/operation-not-allowed":
+      return "Email sign-in is not available yet. Please contact us.";
     case "auth/too-many-requests":
       return "There have been too many attempts. Please wait a little and try again.";
     case "auth/network-request-failed":
@@ -132,7 +136,7 @@ export default function Profile() {
   return (
     <section className="account-page container">
       <div className="account-card">
-        <p className="brand-text">Universal Dicta Couture</p>
+        <p className="text-secondary">Universal Dicta Couture</p>
         <h1>{user ? "Your account" : resetting ? "Reset your password" : creating ? "Create your account" : "Welcome back"}</h1>
 
         {user ? (

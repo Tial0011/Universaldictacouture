@@ -70,11 +70,21 @@ export default function ProductDetails() {
 function Piece({ product }) {
   const { addToCloset } = useCloset();
   const { isSaved, toggleSaved, error: savedError } = useSavedPieces();
-  const [selections, setSelections] = useState({});
+  const [selections, setSelections] = useState(() => Object.fromEntries(
+    product.options.filter(option => option.required && option.values.length === 1)
+      .map(option => [option.name, option.values[0]])
+  ));
+  const images = [product.image, ...product.images].filter((image, index, entries) =>
+    image && entries.findIndex(entry => entry && (entry.publicId || entry.url) === (image.publicId || image.url)) === index
+  );
+  const [imageIndex, setImageIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [actionError, setActionError] = useState("");
   const saved = isSaved(product.id);
+  const estimatedPrice = product.hasVariablePricing && !product.variants.some(variant =>
+    Object.entries(variant.options).every(([name, value]) => String(selections[name] || "") === String(value))
+  );
   const details = [
     ["Category", product.category],
     ["Fabric", product.fabric],
@@ -121,14 +131,22 @@ function Piece({ product }) {
           <Button to="/shop" variant="ghost">Back to shop</Button>
         </div>
         <div className="product-details__layout">
-          <div className="product-details__media">
-            <ProductImage image={product.image} alt={product.name} loading="eager" />
+          <div className="product-details__gallery">
+            <div className="product-details__media">
+              <ProductImage image={images[imageIndex]} alt={product.name} loading="eager" />
+            </div>
+            {images.length > 1 && <div className="product-details__thumbnails" role="group" aria-label="Product photographs">
+              {images.map((image, index) => <button type="button" key={image.publicId || image.url} aria-label={`View photograph ${index + 1} of ${product.name}`} aria-pressed={imageIndex === index} onClick={() => setImageIndex(index)}>
+                <ProductImage image={image} alt="" transformation="w_160,h_160,c_limit,q_auto,f_auto" />
+              </button>)}
+            </div>}
           </div>
           <div className="product-details__information">
             <div className="product-details__heading">
               <p className="product-details__eyebrow">Universal Dicta Couture</p>
               <h1 id="piece-title">{product.name}</h1>
               <p className="product-details__price" aria-live="polite" aria-atomic="true">
+                {estimatedPrice && <span>From</span>}
                 {formatNaira(priceForSelections(product, selections))}
                 {product.unitLabel && <span>{product.unitLabel}</span>}
               </p>
@@ -161,7 +179,7 @@ function Piece({ product }) {
                           id={fieldId}
                           name={option.name}
                           required={option.required}
-                          value={selections[option.name] || (option.values.length === 1 ? option.values[0] : "")}
+                          value={selections[option.name] || ""}
                           onChange={(event) => {
                             setSelections((current) => ({ ...current, [option.name]: event.target.value }));
                             setMessage("");

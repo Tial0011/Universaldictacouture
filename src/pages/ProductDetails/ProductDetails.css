@@ -2,6 +2,12 @@
   margin-bottom: var(--space-md);
 }
 
+.product-details__gallery { min-width: 0; }
+.product-details__thumbnails { display: flex; gap: var(--space-2xs); overflow-x: auto; padding: var(--space-xs) 2px; }
+.product-details__thumbnails button { flex: 0 0 4.5rem; height: 5rem; padding: var(--space-3xs); border: 1px solid var(--color-border-control); border-radius: var(--radius-md); background: var(--color-surface); }
+.product-details__thumbnails button[aria-pressed="true"] { border: 2px solid var(--color-brand); }
+.product-details__thumbnails .product-image { object-fit: contain; }
+
 .product-details__layout {
   display: grid;
   gap: clamp(1.5rem, 4vw, 4rem);
