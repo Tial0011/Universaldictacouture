@@ -2,7 +2,6 @@ import { useEffect, useId, useRef, useState } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import Logo from "../brand/Logo";
 import { useAuth } from "../../context/AuthContext";
-import { BRAND } from "../brand/brandLanguage";
 import CustomStyleIcon from "./icons/CustomStyleIcon";
 import ReviewsIcon from "./icons/ReviewsIcon";
 import "./Header.css";
@@ -196,11 +195,6 @@ export default function Header() {
 
             <NavLink to="/" className="site-header__mobile-brand" aria-label="Universal Dicta Couture home" onClick={closeMenu}>
               <Logo size="header" />
-              <span className="site-header__mobile-tagline" aria-hidden="true">
-                {BRAND.footerHeadline.split("\n").map((line) => (
-                  <span key={line}>{line}</span>
-                ))}
-              </span>
             </NavLink>
 
             <div className="site-header__mobile-actions">

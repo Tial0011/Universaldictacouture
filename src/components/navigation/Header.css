@@ -212,24 +212,15 @@
   .site-header__mobile-brand {
     flex-direction: column;
     justify-self: center;
+    min-width: 0;
     max-width: 100%;
     padding-block: 0.25rem;
   }
-  .site-header__mobile-brand .logo { height: 48px; width: auto; max-width: 150px; }
-
-  /* "More Than Fashion. / A Heritage You Wear." beneath the logo. */
-  .site-header__mobile-tagline {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 0.1rem;
-    font-family: var(--font-body);
-    font-size: 0.625rem;
-    font-weight: var(--weight-medium);
-    line-height: 1.2;
-    color: var(--color-text-primary);
-    text-align: center;
-    white-space: nowrap;
+  .site-header__mobile-brand .logo {
+    height: auto;
+    width: 110px;
+    max-width: 100%;
+    max-height: var(--logo-height-header);
   }
 
   /* Hamburger — wine/red, thin strokes, no fill. */
