@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import SiteLayout from "./components/navigation/SiteLayout";
 import AdminLayout from "./components/navigation/AdminLayout";
 import AdminAccess from "./components/admin/AdminAccess";
@@ -43,8 +43,9 @@ export default function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/signin" element={<Profile />} />
         <Route path="/signup" element={<Profile />} />
-        <Route path="/saved-pieces" element={<SavedPieces />} />
+        <Route path="/saved-pieces" element={<Navigate to="/my-closet/my-pieces" replace />} />
         <Route path="/my-closet" element={<MyCloset />} />
+        <Route path="/my-closet/my-pieces" element={<SavedPieces />} />
         <Route path="*" element={<NotFound />} />
       </Route>
 

@@ -197,8 +197,8 @@
   --promo-brown-light: color-mix(in srgb, var(--color-wine) 52%, var(--color-gold));
   --promo-brown-deep: color-mix(in srgb, var(--color-wine) 74%, var(--color-gold));
   --promo-gold-text: color-mix(in srgb, var(--color-gold) 66%, var(--color-white));
-  --promo-cta-red: #94081a; /* same vivid CTA red the Style Circle uses on wine */
-  --promo-cta-red-active: #7a0615;
+  --promo-cta-fill: var(--color-brand);
+  --promo-cta-fill-active: var(--color-brand-hover);
 
   position: relative;
   overflow: hidden;
@@ -284,7 +284,7 @@
   letter-spacing: var(--tracking-normal);
   text-align: center;
   color: var(--color-white);
-  background-color: var(--promo-cta-red);
+  background-color: var(--promo-cta-fill);
   border: 1px solid rgba(251, 248, 242, 0.65);
   border-radius: var(--radius-md);
   box-shadow: 0 6px 16px rgba(31, 17, 18, 0.25);
@@ -298,7 +298,7 @@
 }
 
 .custom-promo__cta:active {
-  background-color: var(--promo-cta-red-active);
+  background-color: var(--promo-cta-fill-active);
 }
 
 .custom-promo :focus-visible {
@@ -307,7 +307,7 @@
 
 @media (hover: hover) {
   .custom-promo__cta:hover {
-    background-color: var(--promo-cta-red-active);
+    background-color: var(--promo-cta-fill-active);
     border-color: var(--color-ivory);
   }
 
@@ -340,7 +340,7 @@
   }
 }
 
-/* ---------- Reviews & Feeds preview ---------- */
+/* ---------- Review & Feeds preview ---------- */
 .reviews-preview {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
@@ -377,7 +377,7 @@
 
 /* ---------- Style Circle ---------- */
 /* Wine surface (see .surface--brand in surfaces.css) so the page
-   flows Reviews & Feeds (white) → Style Circle (wine) → Footer
+   flows Review & Feeds (white) → Style Circle (wine) → Footer
    (wine) instead of jumping straight from white into the footer.
    The form's label/status text needs the light-on-wine overrides
    below since .form-control's own light background keeps the input
@@ -427,27 +427,22 @@
   flex: 0 0 auto;
 }
 
-/* The button's default fill is the same wine as this section's
-   background, so it needs a brighter, more saturated red to read as
-   a distinct call to action against the wine surface (see the
-   reference: a vivid red pill, not a white button). */
+/* An ivory call to action stays distinct on the wine surface. */
 .style-circle .btn--primary {
-  --style-circle-cta-red: #94081a;
-  --style-circle-cta-red-active: #7a0615;
-  background-color: var(--style-circle-cta-red);
-  border-color: var(--style-circle-cta-red);
-  color: var(--color-white);
+  background-color: var(--color-ivory);
+  border-color: var(--color-ivory);
+  color: var(--color-brand);
 }
 
 .style-circle .btn--primary:active:not(:disabled) {
-  background-color: var(--style-circle-cta-red-active);
-  border-color: var(--style-circle-cta-red-active);
+  background-color: var(--color-white);
+  border-color: var(--color-white);
 }
 
 @media (hover: hover) {
   .style-circle .btn--primary:hover:not(:disabled) {
-    background-color: var(--style-circle-cta-red-active);
-    border-color: var(--style-circle-cta-red-active);
+    background-color: var(--color-white);
+    border-color: var(--color-white);
   }
 }
 

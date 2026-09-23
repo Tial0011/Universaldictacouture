@@ -6,9 +6,9 @@ A React storefront and protected admin workspace for Universal Dicta Couture. Cu
 
 - Public catalogue, product details, filtering, homepage content and published reviews backed by Firestore. The shop stays empty until real products are published; there is no mock catalogue fallback.
 - Customer email/password registration at `/signup`, sign-in and password reset at `/signin`, and account details with email-verification controls at `/profile`.
-- Saved pieces stored per signed-in customer in Firestore. Guest saved pieces use browser session storage.
+- My Closet → My Pieces stores saved products per signed-in customer in Firestore. Guest saves use browser session storage.
 - My Closet with selected products and quantities, stored for the browser session and separated by account. Guest selections are not automatically merged after sign-in.
-- An Admin login link in desktop navigation and the mobile menu. `/admin` requires an active admin membership, not just a customer account.
+- The studio workspace is available at `/admin` to users with an active admin membership, not just a customer account. It is not linked from customer navigation.
 - Admin screens for products, categories and attributes, homepage banners, discovery tiles, reviews and setup information.
 - Private customer messages at `/chats` and an admin inbox at `/admin/chats`, with live replies while a conversation is open.
 - Authenticated photo uploads to Netlify Blobs, with server-side validation and image optimisation.

@@ -9,7 +9,7 @@ import { useEffect } from "react";
  */
 export function useDocumentMeta({
   title = "Universal Dicta Couture",
-  description = "Modern fashion. A heritage you wear. Explore Aso Oke with Universal Dicta Couture.",
+  description = "Honouring the future through our everyday wear of Aso Oke!",
   canonicalPath = window.location.pathname,
   noindex = false,
 }) {

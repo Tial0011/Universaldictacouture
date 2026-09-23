@@ -14,6 +14,14 @@ export default function Policies() {
         { title: "Sizing and custom requests", body: "Discuss measurements, fabric, style and any specific requirements before confirming a custom request. Ask about any details you are unsure of before payment." },
         { title: "Confirm your order’s terms", body: "Before paying, ask the couturier to confirm availability, timing and the terms that apply to your order, including changes, cancellations and returns." },
       ]} />
+      <section className="editorial-contact" aria-labelledby="contact-details-heading">
+        <h2 id="contact-details-heading">Contact Universal Dicta Couture</h2>
+        <address>
+          <span>Ogun State, Nigeria</span>
+          <a href="mailto:universaldictacouture@gmail.com">universaldictacouture@gmail.com</a>
+          <a href="tel:+2349061959388">09061959388</a>
+        </address>
+      </section>
       <div className="editorial-actions"><Button to="/chats">Contact Dicta Couturier</Button><Button to="/shop" variant="secondary">Browse the shop</Button></div>
     </div>
   </>;

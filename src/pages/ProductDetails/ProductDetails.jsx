@@ -120,7 +120,7 @@ function Piece({ product }) {
     try {
       toggleSaved(product.id);
     } catch {
-      setActionError("We couldn't update your saved pieces. Please try again.");
+      setActionError("We couldn't update My Pieces. Please try again.");
     }
   }
 

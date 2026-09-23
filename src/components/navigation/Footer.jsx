@@ -19,7 +19,7 @@ const NAV_GROUPS = [
     links: [
       { to: "/shop", label: "Shop" },
       { to: "/custom-style", label: "Custom Style" },
-      { to: "/reviews-feeds", label: "Reviews & Feeds" },
+      { to: "/reviews-feeds", label: "Review & Feeds" },
     ],
   },
   {
@@ -28,7 +28,7 @@ const NAV_GROUPS = [
     links: [
       { to: "/chats", label: "Chat with Dicta Couturier" },
       { to: "/profile", label: "Profile" },
-      { to: "/saved-pieces", label: "Saved Pieces" },
+      { to: "/my-closet/my-pieces", label: "My Pieces" },
       { to: "/my-closet", label: "My Closet" },
     ],
   },
@@ -40,7 +40,6 @@ const DIRECT_LINKS = [
   { to: "/about", label: "About Us" },
   { to: "/our-story", label: "Our Story" },
   { to: "/policies", label: "Policies" },
-  { to: "/admin", label: "Admin login" },
 ];
 
 const SOCIAL_ICONS = {
@@ -110,9 +109,9 @@ export default function Footer() {
               needed since this variant is already legible on wine. */}
           <Logo size="footer" variant="white" className="site-footer__logo" />
           <p className="site-footer__headline">
-            {BRAND.footerHeadline.split("\n").map((line, i) => (
+            {BRAND.tagline.split(", ").map((line, i) => (
               <span key={i} className="site-footer__headline-line">
-                {line}
+                {i === 0 ? `${line},` : line}
               </span>
             ))}
           </p>

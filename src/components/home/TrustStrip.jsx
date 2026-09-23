@@ -13,8 +13,8 @@ const ITEMS = [
   {
     id: "transfer",
     label: "Bank Transfer Only",
-    caption: "Simple & Secure Payments",
-    compactCaption: "Secure payments",
+    caption: "Confirm details before transfer",
+    compactCaption: "Confirm before transfer",
     icon: "shield",
   },
   {

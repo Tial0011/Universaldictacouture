@@ -2,11 +2,12 @@ import PageIntro from "../../components/common/PageIntro";
 import Button from "../../components/common/Button";
 import EditorialSections from "../../components/common/EditorialSections";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
+import { BRAND } from "../../components/brand/brandLanguage";
 
 export default function OurStory() {
-  useDocumentMeta({ title: "Our Story | Universal Dicta Couture", description: "More Than Fashion. A Heritage You Wear. Discover the ideas behind Universal Dicta Couture.", canonicalPath: "/our-story" });
+  useDocumentMeta({ title: "Our Story | Universal Dicta Couture", description: BRAND.supportingLine, canonicalPath: "/our-story" });
   return <>
-    <PageIntro title="Our Story" description="More Than Fashion. A Heritage You Wear." />
+    <PageIntro title="Our Story" description={BRAND.supportingLine} />
     <div className="container editorial-content">
       <EditorialSections sections={[
         { title: "The cloth", body: "Aso Oke brings texture, pattern and character to the way we dress. Our collection invites you to explore those details and find your own expression of heritage." },

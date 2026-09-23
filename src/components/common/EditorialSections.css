@@ -5,6 +5,10 @@
 .editorial-section h2 { margin-bottom: var(--space-xs); font-size: var(--text-lg); color: var(--color-brand); }
 .editorial-section p { color: var(--color-text-secondary); }
 .editorial-actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+.editorial-contact { margin-bottom: var(--space-lg); padding-top: var(--space-md); border-top: 1px solid var(--color-border); }
+.editorial-contact h2 { margin-bottom: var(--space-xs); font-size: var(--text-lg); }
+.editorial-contact address { display: grid; gap: var(--space-3xs); font-style: normal; }
+.editorial-contact a { width: fit-content; min-width: 0; color: var(--color-brand); text-decoration: underline; text-underline-offset: .2em; overflow-wrap: anywhere; }
 .custom-enquiry { max-width: var(--content-narrow-width); padding: clamp(var(--space-sm), 3vw, var(--space-lg)); border: 1px solid var(--color-border); border-top: 2px solid var(--color-accent); background: var(--color-surface); }
 .custom-enquiry h2 { font-size: var(--text-xl); }
 .custom-enquiry form { display: grid; gap: var(--space-md); margin-top: var(--space-md); }

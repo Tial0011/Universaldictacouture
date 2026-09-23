@@ -42,9 +42,9 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
     showToast(
       nowSaved
         ? isPersistent
-          ? "Saved to your Saved Pieces."
-          : "Saved for this visit. Create a Profile to keep your Saved Pieces."
-        : "Removed from your Saved Pieces."
+          ? "Saved to My Closet → My Pieces."
+          : "Saved for this visit. Create a Profile to keep your pieces."
+        : "Removed from My Pieces."
     );
   };
 
@@ -68,8 +68,8 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
             aria-pressed={saved}
             aria-label={
               saved
-                ? `Remove ${product.name} from Saved Pieces`
-                : `Save ${product.name} to Saved Pieces`
+                ? `Remove ${product.name} from My Pieces`
+                : `Save ${product.name} to My Pieces`
             }
           >
             <HeartIcon filled={saved} />

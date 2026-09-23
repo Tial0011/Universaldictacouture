@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import Logo from "../brand/Logo";
+import { BRAND } from "../brand/brandLanguage";
 import { useAuth } from "../../context/AuthContext";
 import CustomStyleIcon from "./icons/CustomStyleIcon";
 import ReviewsIcon from "./icons/ReviewsIcon";
@@ -10,14 +11,14 @@ const PRIMARY_LINKS = [
   { to: "/", label: "Home", end: true },
   { to: "/shop", label: "Shop" },
   { to: "/custom-style", label: "Custom Style" },
-  { to: "/reviews-feeds", label: "Reviews & Feeds" },
+  { to: "/reviews-feeds", label: "Review & Feeds" },
   { to: "/chats", label: "Chats" },
   { to: "/about", label: "About" },
 ];
 
 const MOBILE_DRAWER_LINKS = [
   { to: "/custom-style", label: "Custom Style", icon: "custom-style", description: "Create something personal" },
-  { to: "/reviews-feeds", label: "Reviews & Feeds", icon: "reviews", description: "Stories from our clients" },
+  { to: "/reviews-feeds", label: "Review & Feeds", icon: "reviews", description: "Stories from our clients" },
   { to: "/about", label: "About", icon: "weave", description: "Our house and heritage" },
 ];
 
@@ -76,7 +77,6 @@ function HeaderLink({ to, label, end = false, onNavigate, icon, description }) {
 
 export default function Header() {
   const { user } = useAuth();
-  const adminLabel = user ? "Admin area" : "Admin login";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
   const drawerId = useId();
@@ -153,7 +153,7 @@ export default function Header() {
           </span>
           <span className="site-header__utility-item">
             <Icon name="shield" size={17} />
-            <span>Secure Ordering</span>
+            <span>Bank Transfer Only</span>
           </span>
           <span className="site-header__utility-item">
             <Icon name="quality" size={17} />
@@ -161,7 +161,7 @@ export default function Header() {
           </span>
           <span className="site-header__utility-item">
             <Icon name="weave" size={17} />
-            <span>A Heritage You Wear</span>
+            <span>{BRAND.tagline}</span>
           </span>
         </div>
       </div>
@@ -175,7 +175,7 @@ export default function Header() {
 
             <nav className="site-header__primary" aria-label="Primary navigation">
               <ul>
-                {[...PRIMARY_LINKS, { to: "/admin", label: adminLabel }].map((link) => (
+                {PRIMARY_LINKS.map((link) => (
                   <li key={link.to}><HeaderLink {...link} /></li>
                 ))}
               </ul>
@@ -227,7 +227,7 @@ export default function Header() {
                 <CustomStyleIcon size={21} />
                 <span>Custom</span>
               </NavLink>
-              <NavLink className={({ isActive }) => `site-header__action${isActive ? " is-active" : ""}`} to="/reviews-feeds" aria-label="Reviews & Feeds" title="Reviews & Feeds">
+              <NavLink className={({ isActive }) => `site-header__action${isActive ? " is-active" : ""}`} to="/reviews-feeds" aria-label="Review & Feeds" title="Review & Feeds">
                 <ReviewsIcon size={19} />
                 <span>Reviews</span>
               </NavLink>
@@ -255,7 +255,7 @@ export default function Header() {
               <div className="site-header__drawer-brand">
                 <Logo size="header" variant="white" className="site-header__drawer-logo" />
                 <h2 id={`${drawerId}-title`} className="visually-hidden">Universal Dicta Couture menu</h2>
-                <p>Modern fashion. A heritage you wear.</p>
+                <p>{BRAND.tagline}</p>
               </div>
               <button type="button" className="site-header__drawer-close" aria-label="Close menu" title="Close menu" onClick={closeMenuAndFocus}>
                 <svg className="site-header__clasp" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
@@ -281,7 +281,6 @@ export default function Header() {
                     { to: "/signin", label: "Client login", icon: "user", description: "Welcome back" },
                     { to: "/signup", label: "Sign up", icon: "heart", description: "Join our style circle" },
                   ] : []),
-                  { to: "/admin", label: adminLabel, icon: "shield", description: "Couture administration" },
                 ].map((link) => (
                   <li key={link.to}>
                     <HeaderLink {...link} onNavigate={closeMenu} />

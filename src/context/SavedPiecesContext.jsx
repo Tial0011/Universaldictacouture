@@ -25,11 +25,11 @@ function SavedSession({ uid, children }) {
       const ids = snapshot.data()?.productIds;
       latest.current = Array.isArray(ids) ? ids.filter(id => typeof id === "string") : [];
       setSavedIds(latest.current); ready.current = true;
-    }).catch(() => { if (active) setError("Your saved pieces could not be loaded. Refresh to try again."); });
+    }).catch(() => { if (active) setError("Your pieces could not be loaded. Refresh to try again."); });
     return () => { active = false; };
   }, [uid]);
   function toggleSaved(id) {
-    if (!ready.current) { setError("Your saved pieces are not ready yet. Please wait or refresh to retry."); return false; }
+    if (!ready.current) { setError("Your pieces are not ready yet. Please wait or refresh to retry."); return false; }
     const adding = !latest.current.includes(id);
     const next = adding ? [...latest.current, id] : latest.current.filter(value => value !== id);
     latest.current = next; setSavedIds(next); setError("");

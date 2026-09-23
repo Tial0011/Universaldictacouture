@@ -80,9 +80,9 @@ export default function ProductCard({ product, view = "grid", imageLoading = "la
     showToast(
       nowSaved
         ? isPersistent
-          ? "Saved to your Saved Pieces."
-          : "Saved for this visit. Create a Profile to keep your Saved Pieces."
-        : "Removed from your Saved Pieces."
+          ? "Saved to My Closet → My Pieces."
+          : "Saved for this visit. Create a Profile to keep your pieces."
+        : "Removed from My Pieces."
     );
   };
 
@@ -108,7 +108,7 @@ export default function ProductCard({ product, view = "grid", imageLoading = "la
             className={`product-card__save${saved ? " is-saved" : ""}`}
             onClick={handleSave}
             aria-pressed={saved}
-            aria-label={saved ? `Remove ${product.name} from Saved Pieces` : `Save ${product.name} to Saved Pieces`}
+            aria-label={saved ? `Remove ${product.name} from My Pieces` : `Save ${product.name} to My Pieces`}
           >
             <HeartIcon filled={saved} />
           </button>

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import ProductImage from "../product/ProductImage";
 
 /**
- * Reviews & Feeds preview.
+ * Review & Feeds preview.
  *
  * Only genuine published entries are shown. Nothing is rated,
  * counted, verified or attributed beyond what the shop itself
@@ -12,15 +12,15 @@ export default function ReviewsPreview({ entries }) {
   return (
     <section className="home-section container" aria-labelledby="home-reviews">
       <div className="home-section__head">
-        <h2 id="home-reviews">Reviews &amp; Feeds</h2>
+        <h2 id="home-reviews">Review &amp; Feeds</h2>
         <Link className="home-section__more" to="/reviews-feeds">
-          Visit Reviews &amp; Feeds
+          Visit Review &amp; Feeds
         </Link>
       </div>
 
       {entries.length === 0 ? (
         <p className="home-section__note">
-          Nothing has been published to Reviews &amp; Feeds yet.
+          Nothing has been published to Review &amp; Feeds yet.
         </p>
       ) : (
         <ul className="reviews-preview">

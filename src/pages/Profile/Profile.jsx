@@ -144,7 +144,7 @@ export default function Profile() {
             <p>Signed in as <strong>{user.email}</strong></p>
             <div className="account-actions">
               <Button to="/shop">Browse Shop</Button>
-              <Button to="/saved-pieces" variant="secondary">Saved pieces</Button>
+              <Button to="/my-closet/my-pieces" variant="secondary">My Pieces</Button>
               <Button to="/chats" variant="secondary">My messages</Button>
               <Button to="/my-closet" variant="secondary">My Closet</Button>
             </div>
