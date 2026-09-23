@@ -100,6 +100,16 @@
   padding-block: var(--section-space);
 }
 
+/* Keep discovery close to the benefits strip and avoid doubled section
+   padding between its cards and New In. */
+.home-section--shop-by {
+  padding-block: clamp(var(--space-sm), 2vw, var(--space-md)) 0;
+}
+
+.home-section--shop-by + .home-section {
+  padding-top: clamp(var(--space-md), 3vw, var(--space-lg));
+}
+
 .home-section__head {
   display: flex;
   flex-wrap: wrap;

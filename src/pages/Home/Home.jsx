@@ -145,7 +145,7 @@ export default function Home() {
       <TrustStrip />
 
       {!isLoading || discovery ? (
-        <div className="home-section container">
+        <div className="home-section home-section--shop-by container">
           <DiscoveryModule
             module={shopByModule}
             className="discovery--home"
