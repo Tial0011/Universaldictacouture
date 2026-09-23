@@ -17,36 +17,61 @@
 
 /* ---------- Homepage Shop By: group arrows and a separate card scroller. ---------- */
 .discovery--home .discovery__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  flex-wrap: wrap;
-  row-gap: var(--space-2xs);
+  column-gap: var(--space-sm);
+}
+
+.discovery--home .discovery__title {
+  min-width: 0;
 }
 
 .discovery--home .discovery__head-actions,
 .discovery--home .discovery__group-arrows {
   display: flex;
   align-items: center;
-  gap: var(--space-2xs);
 }
 
 .discovery--home .discovery__head-actions {
-  margin-left: auto;
+  gap: var(--space-sm);
+  white-space: nowrap;
+}
+
+/* A slim paired control reads like one editorial detail, not two badges. */
+.discovery--home .discovery__group-arrows {
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-control);
+  background: var(--color-white);
+  box-shadow: 0 3px 12px rgba(31, 17, 18, .05);
 }
 
 .discovery--home .discovery__group-arrow {
-  width: var(--touch-target);
+  width: 2.5rem;
   height: var(--touch-target);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: var(--color-brand);
-  background: var(--color-white);
-  border: 1px solid var(--color-border-control);
-  border-radius: var(--radius-pill);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  transition: color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard);
+}
+
+.discovery--home .discovery__group-arrow + .discovery__group-arrow {
+  border-left: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+.discovery--home .discovery__group-arrow svg {
+  width: 17px;
+  height: 17px;
 }
 
 .discovery--home .discovery__group-arrow:disabled {
-  opacity: 0.4;
+  color: var(--color-text-secondary);
+  opacity: .5;
   cursor: default;
 }
 
@@ -57,7 +82,68 @@
 
 @media (hover: hover) {
   .discovery--home .discovery__group-arrow:not(:disabled):hover {
-    background: var(--color-brand-tint);
+    color: var(--color-text-on-brand);
+    background: var(--color-brand);
+  }
+}
+
+.discovery--home .discovery__group-arrow:not(:disabled):active {
+  color: var(--color-text-on-brand);
+  background: var(--color-brand-hover);
+}
+
+.discovery--home .view-all-link {
+  font-weight: var(--weight-semibold);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: .32em;
+}
+
+@media (max-width: 639px) {
+  .discovery--home .discovery__head {
+    column-gap: .375rem;
+  }
+
+  .discovery--home .discovery__title {
+    font-size: clamp(1.375rem, 6vw, 1.625rem);
+    line-height: 1.08;
+  }
+
+  .discovery--home .discovery__title-prefix {
+    display: block;
+    margin-bottom: .15rem;
+    color: var(--color-text-secondary);
+    font-family: var(--font-body);
+    font-size: .625rem;
+    font-weight: var(--weight-medium);
+    line-height: 1.2;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .discovery--home .discovery__head-actions {
+    gap: .375rem;
+  }
+
+  .discovery--home .discovery__group-arrow {
+    width: 2rem;
+  }
+
+  .discovery--home .view-all-link {
+    gap: .125rem;
+    font-size: .6875rem;
+  }
+
+  .discovery--home .view-all-link svg {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+@media (max-width: 359px) {
+  .discovery--home .discovery__title {
+    font-size: 1.25rem;
   }
 }
 
@@ -88,7 +174,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .occasion-illustration {

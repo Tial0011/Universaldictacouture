@@ -6,8 +6,8 @@ import "./DiscoveryModule.css";
 
 function GroupArrow({ direction }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d={direction === "previous" ? "m14.5 5-7 7 7 7" : "m9.5 5 7 7-7 7"} />
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={direction === "previous" ? "M19 12H5m0 0 5-5m-5 5 5 5" : "M5 12h14m0 0-5-5m5 5-5 5"} />
     </svg>
   );
 }
@@ -94,7 +94,7 @@ export default function DiscoveryModule({
     <section className={`discovery ${className}`.trim()} aria-labelledby={`discovery-${module.id}`}>
       <div className={`discovery__head${hasTabs && hideTitleWithTabs ? " visually-hidden" : ""}`}>
         <Heading id={`discovery-${module.id}`} className="discovery__title" aria-live={arrowNavigation ? "polite" : undefined}>
-          {arrowNavigation ? "Shop by " : titleLead ? `${titleLead} ` : ""}
+          {arrowNavigation ? <span className="discovery__title-prefix">Shop by </span> : titleLead ? `${titleLead} ` : ""}
           <span className="discovery__title-accent">{arrowNavigation ? groups[currentIndex].label : titleAccent}</span>
         </Heading>
         {arrowNavigation ? (
@@ -158,7 +158,9 @@ export default function DiscoveryModule({
                     <ProductImage
                       image={item.image}
                       alt=""
-                      transformation="w_420,h_420,c_limit,q_auto,f_auto"
+                      transformation={arrowNavigation
+                        ? "w_420,h_420,c_fill,g_auto,q_auto,f_auto"
+                        : "w_420,h_420,c_limit,q_auto,f_auto"}
                     />
                   )}
                 </span>
