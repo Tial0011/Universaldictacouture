@@ -211,7 +211,7 @@ export function buildOccasionDiscovery(products, title = "Shop by Occasion") {
  * when no tab has anything (callers then fall back to the approved
  * occasion placeholders).
  */
-const SHOP_DISCOVERY_GROUPS = [
+export const SHOP_DISCOVERY_GROUPS = [
   { id: "occasion", label: "Occasion", key: "occasion", param: "occasion", approved: APPROVED_OCCASION_EXAMPLES },
   { id: "style", label: "Style", key: "style", param: "style" },
   { id: "fabric", label: "Fabric & Pattern", key: "fabric", param: "fabric" },

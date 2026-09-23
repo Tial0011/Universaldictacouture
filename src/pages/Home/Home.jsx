@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import HeroCarousel from "../../components/home/HeroCarousel";
 import TrustStrip from "../../components/home/TrustStrip";
 import DiscoveryModule from "../../components/discovery/DiscoveryModule";
@@ -11,9 +11,15 @@ import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { useCatalogue } from "../../hooks/useCatalogue";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import heroReadyToWear from "../../assets/images/hero/hero-ready-to-wear.jpg";
+import weddingGuestImage from "../../assets/images/occasions/wedding-guest.jpg";
+import bridalImage from "../../assets/images/occasions/bridal.jpg";
+import traditionalEngagementImage from "../../assets/images/occasions/traditional-engagement.jpg";
+import celebrationImage from "../../assets/images/occasions/celebration.jpg";
+import churchEventImage from "../../assets/images/occasions/church-event.jpg";
 import {
   APPROVED_HERO_COPY,
-  buildOccasionDiscovery,
+  SHOP_DISCOVERY_GROUPS,
+  buildShopDiscovery,
   fetchCustomStylePromo,
   fetchDiscoveryModule,
   fetchHeroSlides,
@@ -32,6 +38,14 @@ const FALLBACK_SLIDE = [
     order: 0,
   },
 ];
+
+const OCCASION_IMAGES = {
+  "Wedding Guest": weddingGuestImage,
+  Bridal: bridalImage,
+  "Traditional Engagement": traditionalEngagementImage,
+  Celebration: celebrationImage,
+  "Church/Event": churchEventImage,
+};
 
 export default function Home() {
   const { products, isLoading, error } = useCatalogue();
@@ -80,13 +94,33 @@ export default function Home() {
     };
   }, []);
 
-  // Admin-managed discovery wins; then whatever occasions genuinely
-  // Use only published discovery content or real catalogue attributes.
-  const rawDiscoveryModule =
-    discovery ?? buildOccasionDiscovery(products);
-  const discoveryModule = rawDiscoveryModule
-    ? { ...rawDiscoveryModule, items: rawDiscoveryModule.items.slice(0, 9) }
-    : null;
+  const shopByModule = useMemo(() => {
+    const catalogue = buildShopDiscovery(products);
+    const items = SHOP_DISCOVERY_GROUPS.flatMap((group) => {
+      const adminGroup = discovery?.groups?.find(
+        (entry) => entry.label.trim().replace(/^Shop by\s+/i, "").toLowerCase() === group.label.toLowerCase()
+      );
+      const adminItems = discovery?.items.filter((item) =>
+        adminGroup
+          ? item.group === adminGroup.id || (group.id === "occasion" && !item.group)
+          : group.id === "occasion" && !item.group
+      ) ?? [];
+      const categoryItems = adminItems.length
+        ? adminItems
+        : catalogue?.items.filter((item) => item.group === group.id) ?? [];
+
+      return categoryItems.map((item) => ({
+        ...item,
+        id: `${group.id}-${item.id}`,
+        group: group.id,
+        image: item.image ?? (OCCASION_IMAGES[item.name]
+          ? { url: OCCASION_IMAGES[item.name], alt: "" }
+          : null),
+      }));
+    });
+
+    return { id: "home-shop-by", title: "Shop By", groups: SHOP_DISCOVERY_GROUPS, items };
+  }, [discovery, products]);
   const realNewIn = selectNewIn(products, 6);
   const newInProducts = realNewIn;
   // "View all" goes to the New In filter only when pieces are actually
@@ -106,14 +140,15 @@ export default function Home() {
 
       <TrustStrip />
 
-      {discoveryModule ? (
+      {!isLoading || discovery ? (
         <div className="home-section container">
           <DiscoveryModule
-            module={discoveryModule}
+            module={shopByModule}
             className="discovery--home"
+            groupNavigation="arrows"
             viewAllTo="/shop"
             renderMedia={(item) =>
-              item.image ? null : <OccasionIllustration name={item.name} />
+              item.group === "occasion" && !item.image ? <OccasionIllustration name={item.name} /> : null
             }
           />
         </div>
