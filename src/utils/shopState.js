@@ -145,23 +145,57 @@ export function applyShopState(products, state) {
 /**
  * Values available per dimension, counted against every other active
  * refinement, so a filter never offers a choice that leads nowhere.
+ * Admin taxonomy labels (taxonomyByDimension) are merged in so an
+ * allocation appears even with zero published products behind it.
+ * Matching is case-insensitive; product casing wins when both exist.
  */
-export function buildFacets(products, state) {
+export function buildFacets(products, state, taxonomyByDimension = null) {
   return FILTER_DIMENSIONS.map((dimension) => {
     const pool = filterProducts(products, state, { skipDimension: dimension.key });
     const counts = new Map();
+    const lowerToLabel = new Map();
+
+    const remember = (label, count) => {
+      const lower = label.toLowerCase();
+      if (lowerToLabel.has(lower)) {
+        const existing = lowerToLabel.get(lower);
+        counts.set(existing, (counts.get(existing) ?? 0) + count);
+        return;
+      }
+      lowerToLabel.set(lower, label);
+      counts.set(label, (counts.get(label) ?? 0) + count);
+    };
 
     pool.forEach((product) => {
       (product[dimension.key] ?? []).forEach((value) => {
-        const label = value.trim();
+        const label = String(value).trim();
         if (!label) return;
-        counts.set(label, (counts.get(label) ?? 0) + 1);
+        remember(label, 1);
       });
+    });
+
+    // Admin allocations: ensure every taxonomy label for this dimension
+    // is offered, even when no product in the current pool carries it.
+    const taxonomyLabels = Array.isArray(taxonomyByDimension?.[dimension.key])
+      ? taxonomyByDimension[dimension.key]
+      : [];
+    taxonomyLabels.forEach((raw) => {
+      const label = String(raw ?? "").trim();
+      if (!label) return;
+      const lower = label.toLowerCase();
+      if (lowerToLabel.has(lower)) return;
+      lowerToLabel.set(lower, label);
+      if (!counts.has(label)) counts.set(label, 0);
     });
 
     const selected = state.filters?.[dimension.key] ?? [];
     selected.forEach((value) => {
-      if (!counts.has(value)) counts.set(value, 0);
+      const trimmed = String(value ?? "").trim();
+      if (!trimmed) return;
+      const lower = trimmed.toLowerCase();
+      if (lowerToLabel.has(lower)) return;
+      lowerToLabel.set(lower, trimmed);
+      if (!counts.has(trimmed)) counts.set(trimmed, 0);
     });
 
     return {

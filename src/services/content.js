@@ -309,6 +309,34 @@ export async function fetchCustomStylePromo() {
   }
 }
 
+/**
+ * Admin taxonomy labels, grouped by dimension.
+ * Public read is allowed (see firestore.rules) so Shop filters can show
+ * admin allocations even before a published product uses them.
+ * Returns { category: [], occasion: [], ... } with trimmed, deduped labels.
+ */
+export async function fetchTaxonomyLabels() {
+  const empty = { category: [], occasion: [], style: [], fabric: [], colour: [], size: [] };
+  if (!isFirebaseConfigured) return empty;
+  try {
+    const snapshot = await getDocs(query(collection(db, "taxonomy"), limit(500)));
+    const grouped = { ...empty };
+    snapshot.docs.forEach((entry) => {
+      const data = entry.data() ?? {};
+      const dimension = String(data.dimension ?? "").trim();
+      const name = String(data.name ?? "").trim();
+      if (!grouped[dimension] || !name) return;
+      const exists = grouped[dimension].some((label) => label.toLowerCase() === name.toLowerCase());
+      if (!exists) grouped[dimension].push(name);
+    });
+    Object.keys(grouped).forEach((key) => grouped[key].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })));
+    return grouped;
+  } catch (error) {
+    if (import.meta.env.DEV) console.error(error);
+    return empty;
+  }
+}
+
 /** Published review / feed entries for the homepage preview. */
 export async function fetchPublishedReviews(max = 3, strict = false) {
   if (!isFirebaseConfigured) { if (strict) throw new Error("Reviews are not connected."); return []; }

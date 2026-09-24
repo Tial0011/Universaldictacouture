@@ -16,7 +16,7 @@ export const SCHEMAS = {
     ],
   },
   taxonomy: {
-    title: "Categories & attributes", singular: "label", description: "Keep a shared label guide for your catalogue. Use these spellings when adding products. Shop filters reflect labels on published products.",
+    title: "Categories & attributes", singular: "label", description: "Allocate shop labels for your catalogue. Labels appear in Shop filters immediately (with zero count until a published product uses the exact spelling). Use these spellings when adding products.",
     initial: { name: "", dimension: "category" },
     fields: [text("name", "Label", { required: true }), text("dimension", "Type", { type: "select", options: DIMENSIONS })],
   },

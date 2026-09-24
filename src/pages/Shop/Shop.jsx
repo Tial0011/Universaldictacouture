@@ -18,6 +18,7 @@ import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import {
   buildShopDiscovery,
   fetchDiscoveryModule,
+  fetchTaxonomyLabels,
 } from "../../services/content";
 import { FILTER_DIMENSIONS } from "../../services/productModel";
 import {
@@ -47,6 +48,7 @@ export default function Shop() {
   const [visibleCount, setVisibleCount] = useState(batchSize);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [discovery, setDiscovery] = useState(null);
+  const [taxonomy, setTaxonomy] = useState(null);
 
   // The header's Search icon lands here with ?focus=search. Search is
   // otherwise tucked away (the header already carries it), so the field
@@ -71,6 +73,9 @@ export default function Shop() {
     let active = true;
     fetchDiscoveryModule("shop").then((module) => {
       if (active && module) setDiscovery(module);
+    });
+    fetchTaxonomyLabels().then((labels) => {
+      if (active) setTaxonomy(labels);
     });
     return () => {
       active = false;
@@ -135,7 +140,7 @@ export default function Shop() {
   }, [state, updateState]);
 
   const results = useMemo(() => applyShopState(catalogue, state), [catalogue, state]);
-  const facets = useMemo(() => buildFacets(catalogue, state), [catalogue, state]);
+  const facets = useMemo(() => buildFacets(catalogue, state, taxonomy), [catalogue, state, taxonomy]);
   const chips = useMemo(() => buildChips(state), [state]);
 
   // Discovery comes from published content or real product attributes.
