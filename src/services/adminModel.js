@@ -22,6 +22,18 @@ export function prepareRecord(kind, raw) {
   if (kind === "products") {
     required("name", "Product name");
     DIMENSIONS.forEach(key => { data[key] = splitValues(data[key]); });
+    const rawShopBy = data.shopBy && typeof data.shopBy === "object" && !Array.isArray(data.shopBy) ? data.shopBy : {};
+    data.shopBy = Object.fromEntries(
+      Object.entries(rawShopBy)
+        .map(([key, values]) => [String(key).trim(), splitValues(values)])
+        .filter(([key, values]) => key && values.length)
+    );
+    ["occasion", "style", "fabric"].forEach((key) => {
+      const selected = data.shopBy[key]?.length ? data.shopBy[key] : data[key];
+      data[key] = splitValues(selected);
+      if (data[key].length) data.shopBy[key] = data[key];
+      else delete data.shopBy[key];
+    });
     data.aliases = splitValues(data.aliases);
     data.keywords = splitValues(data.keywords);
     if (!["draft", "published", "archived"].includes(data.status)) throw new Error("Choose a product status.");

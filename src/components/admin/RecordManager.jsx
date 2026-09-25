@@ -5,6 +5,7 @@ import { SCHEMAS } from "./recordSchemas";
 import { invalidateCatalogue } from "../../hooks/useCatalogue";
 import ImageField from "./ImageField";
 import Button from "../common/Button";
+import { DEFAULT_SHOP_BY_GROUPS, fetchShopByGroups } from "../../services/shopBy";
 export default function RecordManager({ kind }) {
   const schema = SCHEMAS[kind];
   const [params, setParams] = useSearchParams();
@@ -21,6 +22,7 @@ export default function RecordManager({ kind }) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [revision, setRevision] = useState(0);
+  const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
   const [pendingPage, setPendingPage] = useState(undefined);
   const editorHeading = useRef(null);
   const addButtonArea = useRef(null);
@@ -35,6 +37,14 @@ export default function RecordManager({ kind }) {
       .finally(() => { if (current) setLoading(false); });
     return () => { current = false; };
   }, [kind, pendingPage, revision]);
+  useEffect(() => {
+    if (kind !== "products") return;
+    let current = true;
+    fetchShopByGroups().then((groups) => {
+      if (current && groups.length) setShopByGroups(groups);
+    });
+    return () => { current = false; };
+  }, [kind, revision]);
   useEffect(() => {
     if (!dirty && !uploading) return;
     const prevent = event => { event.preventDefault(); event.returnValue = ""; };
@@ -64,6 +74,16 @@ export default function RecordManager({ kind }) {
     addButtonArea.current?.querySelector("button")?.focus();
   }
   function update(key, value) { setEditor(previous => ({ ...previous, [key]: value })); setDirty(true); }
+  function updateShopBy(group, nextValues) {
+    setEditor((previous) => {
+      const shopBy = { ...(previous.shopBy || {}), [group.key]: nextValues };
+      if (!nextValues.length) delete shopBy[group.key];
+      const next = { ...previous, shopBy };
+      if (["occasion", "style", "fabric"].includes(group.key)) next[group.key] = nextValues;
+      return next;
+    });
+    setDirty(true);
+  }
   async function save(event) {
     event.preventDefault(); setSaving(true); setError(""); setNotice("");
     try {
@@ -89,9 +109,27 @@ export default function RecordManager({ kind }) {
     const value = editor[key];
     const props = { id, required, "aria-describedby": hint ? id + "-hint" : undefined };
     return <div className="field" key={key}>
-      {type !== "checkbox" && <label className="field__label" htmlFor={type === "tiles" ? undefined : id}>{label}</label>}
+      {type !== "checkbox" && <label className="field__label" htmlFor={type === "tiles" || type === "shopBy" ? undefined : id}>{label}</label>}
       {type === "checkbox" ? <label className="choice" htmlFor={id}><input id={id} type="checkbox" checked={!!value} onChange={event => update(key, event.target.checked)} />{label}</label>
         : type === "select" ? <select {...props} value={value || options[0]} onChange={event => update(key, event.target.value)}>{options.map(option => <option key={option} value={option}>{option.replaceAll("-", " ")}</option>)}</select>
+        : type === "shopBy" ? <div className="admin-shop-by-field admin-stack">
+          <div className="admin-shop-by-field__intro"><p>Choose where this product should appear in the homepage Shop By flow.</p><Button to="/admin/discovery" variant="secondary">Manage Shop By groups & choices</Button></div>
+          {shopByGroups.map((group) => {
+            const rawSelected = editor.shopBy?.[group.key] ?? editor[group.key] ?? [];
+            const selected = Array.isArray(rawSelected) ? rawSelected.map(String) : String(rawSelected || "").split(",").map(entry => entry.trim()).filter(Boolean);
+            const choices = [...new Set([...(group.values || []), ...selected])];
+            return <fieldset className="admin-shop-by-group" key={group.id}>
+              <legend><span>Shop by</span> {group.label}</legend>
+              {choices.length ? <div className="admin-shop-by-choices">{choices.map((choice) => {
+                const checked = selected.some((entry) => entry.toLowerCase() === choice.toLowerCase());
+                return <label className="choice admin-shop-by-choice" key={choice}><input type="checkbox" checked={checked} onChange={() => {
+                  const next = checked ? selected.filter((entry) => entry.toLowerCase() !== choice.toLowerCase()) : [...selected, choice];
+                  updateShopBy(group, next);
+                }} /><span>{choice}</span></label>;
+              })}</div> : <p className="field__hint">No saved choices yet. Use “Manage Shop By groups & choices” to add one.</p>}
+            </fieldset>;
+          })}
+        </div>
         : type === "textarea" ? <textarea {...props} value={value || ""} maxLength={4000} onChange={event => update(key, event.target.value)} />
         : type === "image" || type === "images" ? <ImageField id={id} value={value} multiple={type === "images"} onChange={value => update(key, value)} setUploading={setUploading} />
         : type === "tiles" ? <div className="admin-stack">{(value || []).map((tile, index) => <fieldset className="admin-panel admin-stack" key={index}>

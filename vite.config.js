@@ -5,8 +5,8 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react()],
   server: {
-  watch: {
-    ignored: ['**/.tools.local/**'],
+    watch: {
+      ignored: ['**/.tools.local/**'],
+    },
   },
-},
 })

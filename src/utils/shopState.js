@@ -24,6 +24,7 @@ const DIMENSION_KEYS = FILTER_DIMENSIONS.map((dimension) => dimension.key);
 export const EMPTY_STATE = {
   query: "",
   filters: Object.fromEntries(DIMENSION_KEYS.map((key) => [key, []])),
+  shopBy: {},
   min: null,
   max: null,
   sort: "newest",
@@ -53,10 +54,21 @@ export function parseShopState(searchParams) {
   }
 
   const sort = searchParams.get("sort");
+  const shopBy = {};
+  searchParams.getAll("shopby").forEach((entry) => {
+    const separator = entry.indexOf(":");
+    if (separator <= 0) return;
+    const group = entry.slice(0, separator).trim();
+    const value = entry.slice(separator + 1).trim();
+    if (!group || !value) return;
+    shopBy[group] = shopBy[group] || [];
+    if (!shopBy[group].includes(value)) shopBy[group].push(value);
+  });
 
   return {
     query: (searchParams.get("q") ?? "").trim(),
     filters,
+    shopBy,
     min,
     max,
     sort: SORT_VALUES.includes(sort) ? sort : "newest",
@@ -75,6 +87,10 @@ export function buildSearchParams(state) {
     (state.filters?.[key] ?? []).forEach((value) => params.append(key, value));
   });
 
+  Object.entries(state.shopBy ?? {}).forEach(([group, values]) => {
+    values.forEach((value) => params.append("shopby", `${group}:${value}`));
+  });
+
   if (state.min !== null && state.min !== undefined) params.set("min", String(state.min));
   if (state.max !== null && state.max !== undefined) params.set("max", String(state.max));
   if (state.sort && state.sort !== "newest") params.set("sort", state.sort);
@@ -91,7 +107,8 @@ export function hasActiveRefinements(state) {
       state.newIn ||
       state.min !== null ||
       state.max !== null ||
-      DIMENSION_KEYS.some((key) => (state.filters?.[key] ?? []).length > 0)
+      DIMENSION_KEYS.some((key) => (state.filters?.[key] ?? []).length > 0) ||
+      Object.values(state.shopBy ?? {}).some((values) => values.length > 0)
   );
 }
 
@@ -101,6 +118,16 @@ function matchesDimension(product, key, selected) {
   return selected.some((value) =>
     (product[key] ?? []).some((candidate) => candidate.toLowerCase() === value.toLowerCase())
   );
+}
+
+function matchesShopBy(product, selectedByGroup = {}) {
+  return Object.entries(selectedByGroup).every(([group, selected]) => {
+    if (!selected?.length) return true;
+    const values = product.shopBy?.[group] ?? [];
+    return selected.some((value) =>
+      values.some((candidate) => candidate.toLowerCase() === value.toLowerCase())
+    );
+  });
 }
 
 function matchesPrice(product, min, max) {
@@ -116,6 +143,7 @@ export function filterProducts(products, state, { skipDimension } = {}) {
     if (state.newIn && !product.isNewIn) return false;
     if (!matchesPrice(product, state.min, state.max)) return false;
     if (!matchesQuery(product.searchText, state.query)) return false;
+    if (!matchesShopBy(product, state.shopBy)) return false;
     return DIMENSION_KEYS.every((key) =>
       key === skipDimension ? true : matchesDimension(product, key, state.filters?.[key] ?? [])
     );
@@ -230,6 +258,19 @@ export function buildChips(state) {
         text: value,
         type: "dimension",
         dimension: dimension.key,
+        value,
+      });
+    });
+  });
+
+  Object.entries(state.shopBy ?? {}).forEach(([group, values]) => {
+    values.forEach((value) => {
+      chips.push({
+        id: `shopby:${group}:${value}`,
+        label: `Shop By ${group}: ${value}`,
+        text: value,
+        type: "shopBy",
+        group,
         value,
       });
     });

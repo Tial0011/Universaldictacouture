@@ -4,12 +4,15 @@ const visibility = text("published", "Published on website", { type: "checkbox" 
 export const SCHEMAS = {
   products: {
     title: "Products", singular: "product", description: "Manage your collection, from first draft to published piece.",
-    initial: { name: "", price: "", status: "draft", category: "", images: [], isNewIn: false },
+    initial: { name: "", price: "", status: "draft", category: "", shopBy: {}, occasion: [], style: [], fabric: [], images: [], isNewIn: false },
     fields: [
       text("name", "Product name", { required: true }), text("price", "Price (NGN)", { type: "number", hint: "Required before publishing. Enter the base price in naira." }),
       text("status", "Visibility", { type: "select", options: ["draft", "published", "archived"] }),
       text("unitLabel", "Price unit", { hint: "Optional, for example: per yard." }),
-      ...DIMENSIONS.map(key => text(key, key === "category" ? "Categories" : key[0].toUpperCase() + key.slice(1), { type: "values", hint: "Separate multiple labels with commas." })),
+      text("category", "Categories", { type: "values", hint: "Separate multiple labels with commas." }),
+      text("shopBy", "Shop By", { type: "shopBy", hint: "Choose the reusable Shop By values that describe this product. Manage the available groups and choices from the Shop By admin page." }),
+      text("colour", "Colour", { type: "values", hint: "Separate multiple labels with commas." }),
+      text("size", "Size", { type: "values", hint: "Separate multiple labels with commas." }),
       text("isNewIn", "Feature in New In", { type: "checkbox" }),
       text("keywords", "Search keywords", { type: "values" }), text("aliases", "Alternative names", { type: "values" }),
       text("images", "Product photos", { type: "images", hint: "The first photo is the cover. JPEG, PNG or WebP, up to 4 MB each." }),

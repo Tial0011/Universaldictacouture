@@ -17,9 +17,9 @@ import { useBatchSize } from "../../hooks/useBatchSize";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import {
   buildShopDiscovery,
-  fetchDiscoveryModule,
   fetchTaxonomyLabels,
 } from "../../services/content";
+import { DEFAULT_SHOP_BY_GROUPS, fetchShopByGroups } from "../../services/shopBy";
 import { FILTER_DIMENSIONS } from "../../services/productModel";
 import {
   SORT_OPTIONS,
@@ -47,7 +47,7 @@ export default function Shop() {
   const [searchDraft, setSearchDraft] = useState(state.query);
   const [visibleCount, setVisibleCount] = useState(batchSize);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [discovery, setDiscovery] = useState(null);
+  const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
   const [taxonomy, setTaxonomy] = useState(null);
 
   // The header's Search icon lands here with ?focus=search. Search is
@@ -71,8 +71,8 @@ export default function Shop() {
 
   useEffect(() => {
     let active = true;
-    fetchDiscoveryModule("shop").then((module) => {
-      if (active && module) setDiscovery(module);
+    fetchShopByGroups().then((groups) => {
+      if (active && groups.length) setShopByGroups(groups);
     });
     fetchTaxonomyLabels().then((labels) => {
       if (active) setTaxonomy(labels);
@@ -118,14 +118,26 @@ export default function Shop() {
     [state, updateState]
   );
 
+  const toggleShopBy = useCallback(
+    (group, value) => {
+      const current = state.shopBy?.[group] ?? [];
+      const nextValues = current.includes(value)
+        ? current.filter((entry) => entry !== value)
+        : [...current, value];
+      updateState({ ...state, shopBy: { ...(state.shopBy || {}), [group]: nextValues } });
+    },
+    [state, updateState]
+  );
+
   const removeChip = useCallback(
     (chip) => {
       if (chip.type === "query") updateState({ ...state, query: "" });
       else if (chip.type === "newIn") updateState({ ...state, newIn: false });
       else if (chip.type === "price") updateState({ ...state, min: null, max: null });
+      else if (chip.type === "shopBy") toggleShopBy(chip.group, chip.value);
       else toggleValue(chip.dimension, chip.value);
     },
-    [state, updateState, toggleValue]
+    [state, updateState, toggleShopBy, toggleValue]
   );
 
   const clearAll = useCallback(() => {
@@ -133,6 +145,7 @@ export default function Shop() {
       ...state,
       query: "",
       filters: Object.fromEntries(Object.keys(state.filters).map((key) => [key, []])),
+      shopBy: {},
       min: null,
       max: null,
       newIn: false,
@@ -145,9 +158,8 @@ export default function Shop() {
 
   // Discovery comes from published content or real product attributes.
   const discoveryModule = useMemo(
-    () =>
-      discovery ?? buildShopDiscovery(catalogue, "Shop By"),
-    [discovery, catalogue]
+    () => buildShopDiscovery(catalogue, "Shop By", shopByGroups),
+    [catalogue, shopByGroups]
   );
 
   // A tile adds its filter to what is already applied (a Colour and an
@@ -160,7 +172,7 @@ export default function Shop() {
       const next = new URLSearchParams(searchParams);
       next.delete("focus");
       new URLSearchParams(queryString).forEach((value, key) => {
-        if (DIMENSION_KEYS.includes(key)) {
+        if (DIMENSION_KEYS.includes(key) || key === "shopby") {
           if (!next.getAll(key).includes(value)) next.append(key, value);
         } else {
           next.set(key, value);
