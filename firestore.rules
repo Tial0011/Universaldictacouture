@@ -50,7 +50,7 @@ service cloud.firestore {
         && request.resource.data.author is string
         && request.resource.data.body is string
         && request.resource.data.body.size() > 0;
-      allow delete: if false;
+      allow delete: if isAdmin();
     }
     match /taxonomy/{labelId} {
       // Labels drive the public Shop filters, so every visitor can read

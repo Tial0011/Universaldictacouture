@@ -34,9 +34,25 @@ export const SCHEMAS = {
     ],
   },
   reviews: {
-    title: "Customer reviews", singular: "review", description: "Add genuine customer feedback and choose which reviews appear on the website.",
-    initial: { author: "", body: "", published: false },
-    fields: [text("author", "Customer name", { required: true }), text("body", "Customer review", { required: true, type: "textarea" }), text("image", "Customer photo (optional)", { type: "image" }), visibility],
+    title: "Customer reviews", singular: "review", description: "Create and publish customer stories for the homepage Review & Feeds showcase.",
+    initial: {
+      author: "",
+      body: "",
+      images: [],
+      customerServiceRating: 0,
+      productQualityRating: 0,
+      productId: "",
+      published: false,
+    },
+    fields: [
+      text("author", "Customer / reviewer name", { required: true }),
+      text("body", "Customer review", { required: true, type: "textarea", hint: "Long reviews are automatically shortened on the homepage with a Read more link." }),
+      text("images", "Review photos", { type: "images", maxImages: 7, hint: "Upload up to 7 JPEG, PNG or WebP images. The first photo is the homepage image; use Make cover to choose another primary image." }),
+      text("customerServiceRating", "Customer Service rating", { type: "rating", required: true }),
+      text("productQualityRating", "Product Quality rating", { type: "rating", required: true }),
+      text("productId", "Tagged product", { type: "product", required: true, hint: "Search and select an existing published product. The review stores its product ID and resolves the live product name, image and price on the website." }),
+      visibility,
+    ],
   },
   discoveryModules: {
     title: "Shop discovery", singular: "section", description: "Create image tiles that guide customers to an occasion or collection. Keep one active section per placement; lower display order takes priority.",

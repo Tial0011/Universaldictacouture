@@ -36,7 +36,8 @@ export default function Home() {
   const { products, isLoading, error } = useCatalogue();
   const [slides, setSlides] = useState(FALLBACK_SLIDE);
   const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
-  const [reviews, setReviews] = useState([]);
+  const [reviewState, setReviewState] = useState({ entries: [], loading: true, error: "" });
+  const [reviewAttempt, setReviewAttempt] = useState(0);
   const [customStyleImage, setCustomStyleImage] = useState({
     url: heroReadyToWear,
     publicId: "",
@@ -66,10 +67,6 @@ export default function Home() {
       if (active && groups.length) setShopByGroups(groups);
     });
 
-    fetchPublishedReviews(3).then((entries) => {
-      if (active) setReviews(entries);
-    });
-
     fetchCustomStylePromo().then((result) => {
       if (active && result.image) setCustomStyleImage(result.image);
     });
@@ -78,6 +75,16 @@ export default function Home() {
       active = false;
     };
   }, []);
+
+
+  useEffect(() => {
+    let active = true;
+    setReviewState((previous) => ({ ...previous, loading: true, error: "" }));
+    fetchPublishedReviews(20, true)
+      .then((entries) => { if (active) setReviewState({ entries, loading: false, error: "" }); })
+      .catch(() => { if (active) setReviewState({ entries: [], loading: false, error: "Reviews could not be loaded. Please try again." }); });
+    return () => { active = false; };
+  }, [reviewAttempt]);
 
   const shopByModule = useMemo(
     () => buildShopDiscovery(products, "Shop By", shopByGroups),
@@ -124,7 +131,13 @@ export default function Home() {
 
         <CustomStylePromo image={customStyleImage} />
 
-        <ReviewsPreview entries={reviews} />
+        <ReviewsPreview
+          entries={reviewState.entries}
+          products={products}
+          isLoading={reviewState.loading}
+          error={reviewState.error}
+          onRetry={() => setReviewAttempt((value) => value + 1)}
+        />
 
         <StyleCircle />
       </div>

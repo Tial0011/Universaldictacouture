@@ -30,3 +30,19 @@ test("only approved hero concepts and valid reviews can be saved", () => {
   assert.throws(() => prepareRecord("heroSlides", { headline: "Headline", concept: "other" }));
   assert.throws(() => prepareRecord("reviews", { author: "Customer", body: " " }));
 });
+
+test("published reviews require independent ratings and a tagged product", () => {
+  const draft = prepareRecord("reviews", { author: "Amara", body: "Lovely", published: false });
+  assert.equal(draft.customerServiceRating, 0);
+  assert.throws(() => prepareRecord("reviews", { author: "Amara", body: "Lovely", published: true, productId: "piece", customerServiceRating: 5 }));
+  assert.throws(() => prepareRecord("reviews", { author: "Amara", body: "Lovely", published: true, customerServiceRating: 5, productQualityRating: 5 }));
+  const published = prepareRecord("reviews", { author: "Amara", body: "Lovely", published: true, productId: "piece", customerServiceRating: 5, productQualityRating: 4, image: "https://example.test/review.jpg" });
+  assert.equal(published.productId, "piece");
+  assert.equal(published.images.length, 1);
+  assert.equal(published.image.url, "https://example.test/review.jpg");
+});
+
+test("review image count is limited to seven", () => {
+  const images = Array.from({ length: 8 }, (_, index) => `https://example.test/${index}.jpg`);
+  assert.throws(() => prepareRecord("reviews", { author: "Amara", body: "Lovely", images }));
+});

@@ -55,6 +55,34 @@ export function prepareRecord(kind, raw) {
   if (kind === "reviews") {
     required("author", "Customer name");
     required("body", "Review");
+
+    const sourceImages = Array.isArray(data.images)
+      ? data.images
+      : data.image
+        ? [data.image]
+        : [];
+    if (sourceImages.length > 7) throw new Error("Use up to 7 review photos.");
+    data.images = sourceImages.map(imageValue).filter(Boolean);
+    data.image = data.images[0] || null;
+
+    const normaliseRating = (value, label) => {
+      if (value === "" || value == null || Number(value) === 0) return 0;
+      const rating = Number(value);
+      if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+        throw new Error(label + " must be between 1 and 5 stars.");
+      }
+      return rating;
+    };
+    data.customerServiceRating = normaliseRating(data.customerServiceRating, "Customer Service rating");
+    data.productQualityRating = normaliseRating(data.productQualityRating, "Product Quality rating");
+    data.productId = String(data.productId || "").trim();
+
+    if (data.published) {
+      if (!data.customerServiceRating || !data.productQualityRating) {
+        throw new Error("Choose both Customer Service and Product Quality ratings before publishing.");
+      }
+      if (!data.productId) throw new Error("Choose the product this review is about before publishing.");
+    }
   }
   if (kind === "discoveryModules") {
     required("title", "Section title");

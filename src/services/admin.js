@@ -1,4 +1,4 @@
-import { collection, doc, getDocFromServer, getDocsFromServer, query, orderBy, documentId, limit, startAfter, setDoc, serverTimestamp } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocFromServer, getDocsFromServer, query, orderBy, documentId, limit, startAfter, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { prepareRecord } from "./adminModel";
 const COLLECTIONS = new Set(["products", "heroSlides", "reviews", "discoveryModules", "taxonomy"]);
@@ -23,8 +23,17 @@ export async function saveAdminRecord(kind, raw) {
   const reference = raw.id ? doc(target(kind), raw.id) : doc(target(kind));
   if (!raw.id) data.createdAt = serverTimestamp();
   if (kind === "products" && data.status === "published" && !data.publishedAt) data.publishedAt = serverTimestamp();
+  if (kind === "reviews") {
+    data.publishedAt = data.published ? (data.publishedAt || serverTimestamp()) : null;
+  }
   await setDoc(reference, { ...data, updatedAt: serverTimestamp() }, { merge: true });
   return reference.id;
+}
+
+export async function deleteAdminRecord(kind, id) {
+  if (kind !== "reviews") throw new Error("Only review deletion is available here.");
+  if (!id) throw new Error("Choose a review to delete.");
+  await deleteDoc(doc(target(kind), id));
 }
 export function adminError(error) {
   if (error?.code === "permission-denied") return "Access was denied. Check your admin access and the published Firestore rules.";

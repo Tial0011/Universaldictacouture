@@ -14,6 +14,7 @@ import { db } from "../firebase/firestore";
 import { isFirebaseConfigured } from "../firebase/config";
 import heroReadyToWear from "../assets/images/hero/hero-ready-to-wear.jpg";
 import { DEFAULT_SHOP_BY_GROUPS } from "./shopBy";
+import { normaliseReviewRecord, selectLatestPublishedReviews } from "./reviewModel";
 
 
 
@@ -321,28 +322,22 @@ export async function fetchTaxonomyLabels() {
   }
 }
 
-/** Published review / feed entries for the homepage preview. */
-export async function fetchPublishedReviews(max = 3, strict = false) {
+/** Published review / feed entries, newest first after chronology is resolved. */
+export async function fetchPublishedReviews(max = 20, strict = false) {
   if (!isFirebaseConfigured) { if (strict) throw new Error("Reviews are not connected."); return []; }
 
   try {
+    // Sort client-side after fetching the published set so legacy documents that
+    // predate publishedAt can safely fall back to createdAt/updatedAt without
+    // requiring a brittle Firestore composite index. The public homepage is then
+    // capped to the requested latest window (20 by default).
     const snapshot = await getDocs(
-      query(collection(db, "reviews"), where("published", "==", true), limit(max))
+      query(collection(db, "reviews"), where("published", "==", true))
     );
-
-    return snapshot.docs
-      .map((entry) => {
-        const data = entry.data() ?? {};
-        const body = data.body ? String(data.body).trim() : "";
-        if (!body) return null;
-        return {
-          id: entry.id,
-          body,
-          author: data.author ? String(data.author).trim() : "",
-          image: normaliseImage(data.image),
-        };
-      })
+    const reviews = snapshot.docs
+      .map((entry) => normaliseReviewRecord(entry.id, entry.data() ?? {}))
       .filter(Boolean);
+    return selectLatestPublishedReviews(reviews, max);
   } catch (error) {
     if (import.meta.env.DEV) console.error(error);
     if (strict) throw new Error("Reviews could not be loaded.");
