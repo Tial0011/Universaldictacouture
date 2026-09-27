@@ -3,7 +3,7 @@ import { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import "../src/styles/global.css";
-import ReviewGrid from "../src/components/reviews/ReviewGrid";
+import ReviewCarousel from "../src/components/reviews/ReviewCarousel";
 import ReviewCard from "../src/components/reviews/ReviewCard";
 import ChatProductTag from "../src/components/chat/ChatProductTag";
 import { productChatContext } from "../src/services/chatModel";
@@ -26,7 +26,7 @@ export default function Fixture() {
   return <main className="reviews-page"><div className="container reviews-page__content">
     <p>Responsive test fixtures — sample stories, not customer reviews.</p>
     <div className="reviews-page__filters">{["all", "photos", "written"].map(value => <button key={value} onClick={() => setFilter(value)}>{value}</button>)}</div>
-    <ReviewGrid>{entries.filter(entry => filter === "all" || (filter === "photos" ? entry.image : !entry.image)).map(entry => <ReviewCard key={entry.id} entry={entry} product={entry.productId === piece.id ? piece : null} saved={saved.includes(entry.id)} onSave={() => setSaved(ids => ids.includes(entry.id) ? ids.filter(id => id !== entry.id) : [...ids, entry.id])} showDate />)}</ReviewGrid>
+    <ReviewCarousel title="Review & Feeds" description="Latest 6 reviews from our amazing customers" viewAll>{entries.filter(entry => filter === "all" || (filter === "photos" ? entry.image : !entry.image)).map(entry => <ReviewCard key={entry.id} entry={entry} product={entry.productId === piece.id ? piece : null} saved={saved.includes(entry.id)} onSave={() => setSaved(ids => ids.includes(entry.id) ? ids.filter(id => id !== entry.id) : [...ids, entry.id])} showDate />)}</ReviewCarousel>
     <section><h2>Product tag preview</h2><ChatProductTag context={productChatContext(piece, entries[0])} /><p>The customer’s message belongs below this card.</p></section>
   </div></main>;
 }

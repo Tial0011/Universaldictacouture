@@ -22,7 +22,7 @@ function Icon({ name, filled = false }) {
 
 function Stars({ value, label }) {
   return <div className="udc-review-rating" aria-label={value ? `${label}: ${value} out of 5 stars` : `${label}: not rated`}>
-    <span>{label === "Customer Service" ? "Service" : "Quality"}</span>
+    <span>{label}</span>
     {value ? <span className="udc-review-rating__stars" aria-hidden="true">{[1, 2, 3, 4, 5].map((star) => <i key={star} className={star <= value ? "is-filled" : ""}>★</i>)}</span>
       : <small>Not rated</small>}
   </div>;
@@ -86,8 +86,8 @@ export default function ReviewCard({
   return <article className={`udc-review-card udc-review-card--${variant} udc-review-card--${entry.image ? "photo" : "written"}`} data-review-id={entry.id} tabIndex={-1}>
     {entry.image ? <div className="udc-review-card__media">
       <ProductImage image={entry.image} alt={entry.image.alt || `${entry.author || "Customer"} review photo`} transformation="w_800,h_1200,c_limit,q_auto,f_auto" />
-      <span className="udc-review-card__edition">Worn by you</span>
-    </div> : <div className="udc-review-card__note"><span>In their words</span><span aria-hidden="true">UDC</span></div>}
+      <button className="udc-review-card__photo-like" type="button" aria-label={liked ? "Unlike reviewed piece" : "Like reviewed piece"} aria-pressed={liked} disabled={!likeReady} onClick={() => onLike?.(entry)}><Icon name="heart" filled={liked} /></button>
+    </div> : null}
 
     <div className="udc-review-card__body">
       <div className="udc-review-card__identity">
@@ -95,7 +95,6 @@ export default function ReviewCard({
           <h3>{entry.author || "Universal Dicta customer"}</h3>
           {reviewDate && <time dateTime={timestampDate(entry.publishedAt || entry.submittedAt || entry.createdAt)?.toISOString()}>{reviewDate}</time>}
         </div>
-        <span className="udc-review-card__quote" aria-hidden="true">“</span>
       </div>
 
       <p className="udc-review-card__copy">{reviewText}</p>
@@ -112,14 +111,13 @@ export default function ReviewCard({
         {presentation ? <>
           <div className="udc-review-product__thumb">{presentation.image
             ? <ProductImage image={presentation.image} alt={presentation.name} transformation="w_180,h_180,c_fill,g_auto,q_auto,f_auto" />
-            : <span aria-hidden="true">UDC</span>}</div>
+            : null}</div>
           <div className="udc-review-product__copy">
-            <span>Reviewed piece</span>
             <strong>{presentation.name}</strong>
             {presentation.price != null && <small>{formatNaira(presentation.price)}{presentation.variable ? " +" : ""}</small>}
           </div>
           {presentation.available
-            ? <Link className="udc-review-product__cta" to={presentation.href} aria-label={`View ${presentation.name}`}>View piece <Icon name="arrow" /></Link>
+            ? <Link className="udc-review-product__cta" to={presentation.href} aria-label={`Shop ${presentation.name}`}>Shop This Piece <Icon name="arrow" /></Link>
             : <span className="udc-review-product__unavailable">Currently unavailable</span>}
         </> : <div className="udc-review-product__missing"><strong>Reviewed piece unavailable</strong><span>The customer story remains published, but this product is no longer in the live catalogue.</span></div>}
       </div>

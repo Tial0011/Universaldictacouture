@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import ReviewCard from "../../components/reviews/ReviewCard";
-import ReviewGrid from "../../components/reviews/ReviewGrid";
+import ReviewCarousel from "../../components/reviews/ReviewCarousel";
 import { useReviewInteractions } from "../../components/reviews/useReviewInteractions";
 import Button from "../../components/common/Button";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
@@ -39,7 +39,7 @@ export default function ReviewsFeeds() {
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("newest");
-  const { isLiked, toggleLike, isReviewSaved, toggleSavedReview, shareReview, piecesReady, reviewsReady, piecesError, reviewsError, retryReviewSync } = useReviewInteractions();
+  const { isLiked, toggleLike, isReviewSaved, toggleSavedReview, shareReview, piecesReady, reviewsReady } = useReviewInteractions();
 
   useEffect(() => {
     let active = true;
@@ -82,25 +82,22 @@ export default function ReviewsFeeds() {
     const target = Array.from(document.querySelectorAll("[data-review-id]")).find((node) => node.dataset.reviewId === focusId);
     if (!target) return;
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-    target.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
+    target.scrollIntoView({ block: "center", inline: "start", behavior: reduced ? "auto" : "smooth" });
     target.focus({ preventScroll: true });
   }, [focusId, state.loading, visible.length]);
 
   return <main className="reviews-page">
     <section className="reviews-page__hero" aria-labelledby="reviews-page-title">
-      <div className="reviews-page__hero-pattern" aria-hidden="true" />
       <div className="container reviews-page__hero-inner">
-        <span className="reviews-page__eyebrow">Universal Dicta Couture · The customer edit</span>
         <div className="reviews-page__hero-copy">
-          <h1 id="reviews-page-title">Reviews <em>&amp; Feeds</em></h1>
-          <div><p>Woven with meaning.<br />Worn your way.</p><span className="reviews-page__lede">Real moments, personal style, and the pieces that become part of your story.</span></div>
+          <h1 id="reviews-page-title">Review &amp; Feeds</h1>
+          <Link to="/my-closet/saved-reviews">Saved reviews →</Link>
         </div>
-        <div className="reviews-page__hero-footer"><span>Tradition in every thread. You in every story.</span><Link to="/my-closet/saved-reviews">Your saved stories <span aria-hidden="true">↗</span></Link></div>
       </div>
     </section>
 
     <section className="container reviews-page__content" aria-label="Published customer reviews">
-      <div className="reviews-page__toolbar">
+      <details className="reviews-page__filter-panel"><summary>Filter &amp; search reviews</summary><div className="reviews-page__toolbar">
         <div className="reviews-page__filters" aria-label="Review filters">
           {FILTERS.map((item) => <button key={item.id} type="button" className={filter === item.id ? "is-active" : ""} aria-pressed={filter === item.id} onClick={() => {
             setFilter(item.id);
@@ -123,18 +120,16 @@ export default function ReviewsFeeds() {
             </select>
           </label>
         </div>
-      </div>
+      </div></details>
 
       <div className="reviews-page__summary">
         <p>{state.loading ? "Loading customer stories…" : `${visible.length} ${visible.length === 1 ? "story" : "stories"} shown`}</p>
         <span aria-hidden="true" />
       </div>
-      {piecesError && <p role="alert">{piecesError}</p>}
-      {reviewsError && <div role="status"><p>{reviewsError}</p>{retryReviewSync && <Button variant="secondary" onClick={retryReviewSync}>Retry account sync</Button>}</div>}
 
       {state.loading ? <div className="reviews-page__loading" role="status">Loading Review &amp; Feeds…</div>
       : state.error ? <div className="reviews-page__state" role="alert"><h2>Review &amp; Feeds is taking a moment.</h2><p>{state.error}</p><Button onClick={() => setAttempt((value) => value + 1)}>Try again</Button></div>
-      : visible.length ? <ReviewGrid>
+      : visible.length ? <ReviewCarousel>
           {visible.map((entry) => <ReviewCard
             key={entry.id}
             entry={entry}
@@ -150,10 +145,9 @@ export default function ReviewsFeeds() {
             onSave={() => toggleSavedReview(entry.id)}
             onShare={shareReview}
           />)}
-        </ReviewGrid>
+        </ReviewCarousel>
       : <div className="reviews-page__state"><h2>No matching stories</h2><p>Try another filter or search phrase.</p><button type="button" onClick={() => { setFilter("all"); setQuery(""); setSort("newest"); }}>Clear filters</button></div>}
 
-      <div className="reviews-page__signature"><span aria-hidden="true">UDC</span><p>Stories worth keeping.<br /><em>Style that stays with you.</em></p><Link to="/shop">Discover the collection <span aria-hidden="true">→</span></Link></div>
     </section>
   </main>;
 }

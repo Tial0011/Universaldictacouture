@@ -10,3 +10,4 @@
 .review-grid[data-masonry="true"] { grid-auto-rows: 4px; }
 .review-grid__item { min-width: 0; }
 /* No dense placement: visual order must match keyboard/reading order. */
+@media (max-width:540px) { .review-grid { grid-template-columns:minmax(0,1fr); } }
