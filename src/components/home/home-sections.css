@@ -55,7 +55,7 @@
 /* Always one row; only the arrangement within each benefit changes. */
 .trust-strip-wrap .trust-strip {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
   margin: 0;
   padding: 0;
@@ -145,7 +145,7 @@
 /* Respond to available space, including a resized desktop window. */
 @container benefits (min-width: 60rem) {
   .trust-strip-wrap .trust-strip {
-    grid-template-columns: 1.3fr 1.05fr 1fr .85fr 1.1fr;
+    grid-template-columns: 1.3fr 1fr .85fr 1.1fr;
   }
   .trust-strip__link,
   .trust-strip__static {
@@ -164,7 +164,7 @@
   .trust-strip__compact-copy { display: none; }
 }
 
-/* A lighter mobile strip, with the same five benefits and touch targets. */
+/* A lighter mobile strip, with the same four benefits and touch targets. */
 @media (max-width: 767px) {
   .trust-strip-wrap {
     padding-block: .625rem;

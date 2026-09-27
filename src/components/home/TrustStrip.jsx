@@ -11,13 +11,6 @@ const ITEMS = [
     icon: "truck",
   },
   {
-    id: "transfer",
-    label: "Bank Transfer Only",
-    caption: "Confirm details before transfer",
-    compactCaption: "Confirm before transfer",
-    icon: "shield",
-  },
-  {
     id: "authentic",
     label: "Authentic Aso Oke",
     caption: "Authentic. Refined. Timeless.",
@@ -64,12 +57,6 @@ function TrustIcon({ name }) {
         <path d="M13.5 10h3.5l3 3v2.5h-6.5z" />
         <circle cx="6" cy="18" r="1.6" />
         <circle cx="16.5" cy="18" r="1.6" />
-      </>
-    ),
-    shield: (
-      <>
-        <path d="M12 3.5 5 6v5.5c0 4.2 3 6.9 7 9 4-2.1 7-4.8 7-9V6Z" />
-        <path d="m9.2 12 1.9 1.9 3.7-3.9" />
       </>
     ),
     diamond: (

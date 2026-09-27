@@ -45,7 +45,6 @@ function Icon({ name, size = 20 }) {
     chat: <><path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 8.8 8.8 0 0 1-3.3-.7L4 20l1.5-4.1A7.2 7.2 0 0 1 4.5 12 7.5 7.5 0 0 1 12 4.5a7.5 7.5 0 0 1 8 7Z" /><path d="M8 11.5h.01M12 11.5h.01M16 11.5h.01" /></>,
     home: <><path d="M4 11.5 12 4l8 7.5" /><path d="M6 10v9.5h12V10" /><path d="M9.75 19.5V14h4.5v5.5" /></>,
     truck: <><path d="M3 6.5h11v9H3z" /><path d="M14 9.5h3.6l3.4 3.1v2.9h-7" /><circle cx="7" cy="17.5" r="1.8" /><circle cx="17" cy="17.5" r="1.8" /></>,
-    shield: <><path d="m12 3 8 3v5c0 5-8 10-8 10S4 16 4 11V6Z" /><path d="m8.5 11.5 2.5 2.5 4.5-5" /></>,
     quality: <><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9Z" /></>,
     weave: <><path d="m12 3 9 9-9 9-9-9Z" /><path d="m7.5 7.5 9 9m-9 0 9-9M3 12h18M12 3v18" /></>,
     bag: <><path d="M7 8.5V7a5 5 0 0 1 10 0v1.5" /><path d="M5.5 8.5h13l.9 12.2a1.5 1.5 0 0 1-1.5 1.6H6.1a1.5 1.5 0 0 1-1.5-1.6Z" /></>,
@@ -150,10 +149,6 @@ export default function Header() {
           <span className="site-header__utility-item">
             <Icon name="truck" size={17} />
             <span>Nationwide &amp; International Delivery</span>
-          </span>
-          <span className="site-header__utility-item">
-            <Icon name="shield" size={17} />
-            <span>Bank Transfer Only</span>
           </span>
           <span className="site-header__utility-item">
             <Icon name="quality" size={17} />
