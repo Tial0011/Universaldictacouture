@@ -30,7 +30,7 @@ export default function SiteLayout() {
           </Suspense>
         </PageBoundary>
       </main>
-      <Footer />
+      <Footer followsStyleCircle={pathname === "/"} />
     </>
   );
 }

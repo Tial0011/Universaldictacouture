@@ -1,4 +1,7 @@
 import { useId, useState } from "react";
+import { Link } from "react-router-dom";
+import StitchArrowIcon from "../common/icons/StitchArrowIcon";
+import "./StyleCircle.css";
 import {
   subscribeToStyleCircle,
   validateEmail,
@@ -21,6 +24,7 @@ export default function StyleCircle() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (status === "loading") return;
 
     const check = validateEmail(email);
     if (!check.isValid) {
@@ -46,14 +50,20 @@ export default function StyleCircle() {
   return (
     <section className="style-circle surface--brand" aria-labelledby="home-style-circle">
       <div className="container style-circle__inner">
-        <h2 id="home-style-circle">Join Our Style Circle</h2>
+        <div className="style-circle__copy">
+        <p className="style-circle__eyebrow">Universal Dicta Couture</p>
+        <h2 id="home-style-circle">Join Our <em>Style Circle</em></h2>
         <p className="style-circle__intro">
           Be the first to see our new arrivals, exclusive offers and style inspiration.
         </p>
+        <div className="style-circle__threads" aria-hidden="true"><span /><span /><span /></div>
+        </div>
 
+        <div className="style-circle__invitation">
+        <p className="style-circle__invitation-title">A little inspiration, in your inbox.</p>
         <form className="style-circle__form" onSubmit={handleSubmit} noValidate>
           <div className="field style-circle__field">
-            <label className="field__label visually-hidden" htmlFor={fieldId}>
+            <label className="field__label" htmlFor={fieldId}>
               Email address
             </label>
             <input
@@ -62,6 +72,10 @@ export default function StyleCircle() {
               type="email"
               name="email"
               autoComplete="email"
+              inputMode="email"
+              autoCapitalize="none"
+              spellCheck={false}
+              disabled={status === "loading"}
               placeholder="Enter your email address"
               value={email}
               onChange={(event) => {
@@ -83,6 +97,7 @@ export default function StyleCircle() {
             aria-busy={status === "loading" || undefined}
           >
             {status === "loading" ? "Subscribing…" : "Subscribe"}
+            <StitchArrowIcon size={20} />
           </button>
         </form>
 
@@ -94,6 +109,8 @@ export default function StyleCircle() {
         >
           {message}
         </p>
+        <Link className="style-circle__policy" to="/policies">Read our policies <StitchArrowIcon size={14} /></Link>
+        </div>
       </div>
     </section>
   );

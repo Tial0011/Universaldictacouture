@@ -1,22 +1,28 @@
 /*
-  Footer — premium wine surface, two-column mobile arrangement
-  (brand + social + copyright on the left, collapsible nav rows +
-  signature on the right), matching the approved reference layout.
-
-  `.surface--brand` (see surfaces.css) supplies the wine background,
-  the on-brand text colour, the inverse focus ring, and the `.link`
-  colour override. Most of what follows layers spacing, hierarchy and
-  the restrained gold accent on top of that using only existing
-  tokens (wine / ivory / white / gold at varying opacity). The one
-  exception is --footer-cta-red below — see its comment.
+  A quieter echo of Style Circle: deep wine / charcoal, the same weave
+  at reduced opacity, and a separate ivory stitched seam on the home page.
+  Brand and navigation stay side by side on phones; copyright sits below.
+  Existing brand tokens and inverse focus states are preserved.
 */
 .site-footer {
   margin-top: var(--section-space);
+  position:relative;
+  isolation:isolate;
+  background:linear-gradient(125deg,var(--color-wine-deep),var(--color-ink));
+  border-top:1px solid #d3bc8a4d;
 }
+.site-footer--after-circle { margin-top:0; }
+.site-footer::before { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; background:url("../../assets/brand/menu-weave.svg") center/120px 144px; opacity:.12; }
+
+/* An intentional ivory pause: the menu's stitched seam, given room to breathe. */
+.couture-separator { background:var(--color-ivory); padding-block:clamp(1.5rem,3vw,2.25rem); }
+.couture-separator__inner { display:flex; align-items:center; justify-content:center; gap:1rem; }
+.couture-separator__inner > span { flex:1; height:3px; border-block:1px solid #b08d5740; }
+.couture-separator__inner > i { width:72px; height:12px; background-color:var(--color-ivory); background-image:repeating-linear-gradient(45deg,transparent 0 5px,#b08d5780 5px 6px,transparent 6px 11px),repeating-linear-gradient(-45deg,transparent 0 5px,#b08d5780 5px 6px,transparent 6px 11px); border-block:1px solid #b08d5766; }
 
 .site-footer {
   --on-brand-muted: rgba(251, 248, 242, 0.72);
-  --on-brand-faint: rgba(251, 248, 242, 0.45);
+  --on-brand-faint: rgba(251, 248, 242, 0.68);
   --on-brand-border: rgba(251, 248, 242, 0.18);
   --on-brand-border-strong: rgba(251, 248, 242, 0.32);
 }
@@ -26,31 +32,30 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--space-sm);
-  padding-block: var(--space-lg) var(--space-md);
+  gap: clamp(1.25rem,5vw,4rem);
+  padding-block: clamp(2rem,4vw,3.5rem) var(--space-lg);
 }
 
 .site-footer__brand-block {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-xs);
-  /* Even 50/50 split with the nav column — an invisible centre line
-     down the footer, matched below at tablet/desktop. */
+  gap: var(--space-sm);
+  /* Balanced base; responsive rules give the navigation more room. */
   flex: 1 1 50%;
   min-width: 0;
 }
 
 .site-footer__logo {
   margin: 0;
-  --logo-height: 38px;
+  --logo-height: 48px;
 }
 
 .site-footer__headline {
   margin: 0;
   font-family: var(--font-display);
   font-style: italic;
-  font-size: var(--text-sm);
+  font-size: clamp(.9rem,1.4vw,1.25rem);
   line-height: var(--leading-snug);
   color: var(--color-white);
 }
@@ -61,9 +66,7 @@
 
 .site-footer__legal {
   margin: 0;
-  /* Smaller than the --text-xs token (which has a 0.8125rem ceiling)
-     so the copyright line stays on one line in its half of the
-     footer instead of wrapping or crowding the social row. */
+  /* Secondary legal copy in its own full-width closing row. */
   font-size: 0.6875rem;
   color: var(--on-brand-faint);
 }
@@ -96,7 +99,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2xs);
-  min-height: 2.25rem;
+  min-height: 2.75rem;
   font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
@@ -138,7 +141,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  min-height: 2rem;
+  min-height: 2.75rem;
   font-size: var(--text-sm);
   color: var(--on-brand-muted);
 }
@@ -151,7 +154,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2xs);
-  min-height: 2.25rem;
+  min-height: 2.75rem;
   padding-block: var(--space-3xs);
   border-top: 1px solid var(--on-brand-border);
   font-family: var(--font-body);
@@ -174,13 +177,15 @@
 
 @media (hover: hover) {
   .footer-direct__link:hover {
-    color: var(--color-accent);
+    color: var(--color-white);
+    text-decoration: underline;
+    text-underline-offset: .25em;
   }
 }
 
 @media (hover: hover) {
   .footer-group a:hover {
-    color: var(--color-accent);
+    color: var(--color-white);
     text-decoration: underline;
     text-underline-offset: 0.25em;
   }
@@ -193,7 +198,8 @@
   width: 9rem;
   max-width: 100%;
   height: auto;
-  opacity: 0.9;
+  opacity: 0.65;
+  margin-top:var(--space-sm);
 }
 
 /* ---------- Social row ---------- */
@@ -210,11 +216,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
   color: var(--color-white);
   border: 1px solid var(--on-brand-border-strong);
-  border-radius: var(--radius-pill);
+  border-radius: 10px;
+  background:#fbf8f208;
+  box-shadow:inset 0 1px 0 #ffffff0d;
+  transition:background-color 180ms ease,border-color 180ms ease;
 }
 
 .footer-social__link--pending {
@@ -225,8 +234,8 @@
 @media (hover: hover) {
   a.footer-social__link:hover {
     color: var(--color-brand);
-    background-color: var(--color-accent);
-    border-color: var(--color-accent);
+    background-color: var(--color-ivory);
+    border-color: var(--color-ivory);
   }
 }
 
@@ -236,14 +245,17 @@
     align-items: flex-start;
     padding-block: var(--space-xl) var(--space-lg);
   }
+  .site-footer__brand-block { flex:0 1 34%; }
+  .site-footer__links { flex:1 1 66%; }
 
   .site-footer__logo {
     --logo-height: var(--logo-height-footer);
   }
 
   .site-footer__nav-groups {
-    display: flex;
-    gap: var(--space-lg);
+    display: grid;
+    grid-template-columns:.8fr 1.4fr .8fr;
+    gap:clamp(1rem,2vw,2.5rem);
   }
 
   /* From tablet up the three direct pages read as a third column. */
@@ -254,7 +266,7 @@
   }
 
   .footer-direct__link {
-    min-height: 0;
+    min-height: 2.75rem;
     padding-block: 0;
     border-top: 0;
     justify-content: flex-start;
@@ -286,15 +298,19 @@
     padding-bottom: 0;
   }
 
-  /* The nav rows stay collapsed as <details> elements (no `open`
-     attribute) so mobile defaults to closed dropdowns, but from
-     tablet width up the full footer nav should read as always-open
-     columns — so their content is shown regardless of the element's
-     open state, without altering that state. */
-  .footer-group > ul {
-    display: block !important;
-  }
 }
+
+.site-footer__bottom { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding-block:1.2rem 4.75rem; position:relative; }
+.site-footer__bottom::before { content:""; position:absolute; inset:0 var(--content-padding-inline) auto; height:1px; background:#fbf8f224; }
+.site-footer__declaration { font-size:.6rem; letter-spacing:.13em; color:var(--on-brand-muted); }
+@media(max-width:767px) {
+  .site-footer__bottom { flex-direction:column; align-items:flex-start; gap:.5rem; }
+  .site-footer__links { flex-basis:55%; }
+  .site-footer__brand-block { flex-basis:45%; }
+  .footer-group__heading,.footer-direct__link,.footer-group a { font-size:.78rem; }
+  .footer-social { gap:.4rem; }
+}
+@media(forced-colors:active) { .site-footer::before,.couture-separator { display:none; } .footer-social__link { border:1px solid ButtonText; } }
 
 @media (prefers-reduced-motion: reduce) {
   .footer-group__heading::after {
