@@ -45,11 +45,24 @@ service cloud.firestore {
     }
     match /reviews/{reviewId} {
       allow read: if resource.data.published == true || isAdmin();
+      // Customer submission is intentionally not opened here yet: this codebase
+      // has no authoritative order/purchase collection against which Firestore
+      // can securely prove review eligibility. Admin remains the only writer.
       allow create, update: if isAdmin()
         && request.resource.data.published is bool
+        && request.resource.data.status in ['pending', 'published', 'hidden']
         && request.resource.data.author is string
+        && request.resource.data.author.size() > 0
         && request.resource.data.body is string
-        && request.resource.data.body.size() > 0;
+        && request.resource.data.body.size() > 0
+        && request.resource.data.customerServiceRating is int
+        && request.resource.data.customerServiceRating >= 1
+        && request.resource.data.customerServiceRating <= 5
+        && request.resource.data.productQualityRating is int
+        && request.resource.data.productQualityRating >= 1
+        && request.resource.data.productQualityRating <= 5
+        && request.resource.data.productId is string
+        && request.resource.data.productId.size() > 0;
       allow delete: if isAdmin();
     }
     match /taxonomy/{labelId} {
@@ -127,6 +140,9 @@ service cloud.firestore {
       }
     }
     match /savedPieces/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+    match /savedReviews/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
   }

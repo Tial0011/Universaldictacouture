@@ -24,7 +24,10 @@ export async function saveAdminRecord(kind, raw) {
   if (!raw.id) data.createdAt = serverTimestamp();
   if (kind === "products" && data.status === "published" && !data.publishedAt) data.publishedAt = serverTimestamp();
   if (kind === "reviews") {
-    data.publishedAt = data.published ? (data.publishedAt || serverTimestamp()) : null;
+    // First-publication time is immutable. Hiding or editing a review never
+    // resets it, so an old review cannot become the newest homepage story.
+    if (data.published && !raw.publishedAt) data.publishedAt = serverTimestamp();
+    else if (!raw.publishedAt) delete data.publishedAt;
   }
   await setDoc(reference, { ...data, updatedAt: serverTimestamp() }, { merge: true });
   return reference.id;

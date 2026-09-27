@@ -14,7 +14,7 @@ import { db } from "../firebase/firestore";
 import { isFirebaseConfigured } from "../firebase/config";
 import heroReadyToWear from "../assets/images/hero/hero-ready-to-wear.jpg";
 import { DEFAULT_SHOP_BY_GROUPS } from "./shopBy";
-import { normaliseReviewRecord, selectLatestPublishedReviews } from "./reviewModel";
+import { normaliseReviewRecord, selectLatestPublishedReviews, sortPublishedReviews } from "./reviewModel";
 
 
 
@@ -322,22 +322,22 @@ export async function fetchTaxonomyLabels() {
   }
 }
 
-/** Published review / feed entries, newest first after chronology is resolved. */
+/** Published review / feed entries, newest first by first publication time. */
 export async function fetchPublishedReviews(max = 20, strict = false) {
   if (!isFirebaseConfigured) { if (strict) throw new Error("Reviews are not connected."); return []; }
 
   try {
-    // Sort client-side after fetching the published set so legacy documents that
-    // predate publishedAt can safely fall back to createdAt/updatedAt without
-    // requiring a brittle Firestore composite index. The public homepage is then
-    // capped to the requested latest window (20 by default).
+    // The homepage rule is intentionally based on publishedAt, not updatedAt:
+    // editing an older story must never make it "new" again. We sort the entire
+    // published set before applying the homepage cap. A null max returns the
+    // complete published feed for /reviews-feeds.
     const snapshot = await getDocs(
       query(collection(db, "reviews"), where("published", "==", true))
     );
     const reviews = snapshot.docs
       .map((entry) => normaliseReviewRecord(entry.id, entry.data() ?? {}))
       .filter(Boolean);
-    return selectLatestPublishedReviews(reviews, max);
+    return max == null ? sortPublishedReviews(reviews) : selectLatestPublishedReviews(reviews, max);
   } catch (error) {
     if (import.meta.env.DEV) console.error(error);
     if (strict) throw new Error("Reviews could not be loaded.");

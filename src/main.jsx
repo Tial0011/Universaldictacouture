@@ -9,6 +9,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
 import { SavedPiecesProvider } from "./context/SavedPiecesContext";
 import { ClosetProvider } from "./context/ClosetContext";
+import { SavedReviewsProvider } from "./context/SavedReviewsContext";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -16,9 +17,11 @@ createRoot(document.getElementById("root")).render(
       <AuthProvider>
         <ToastProvider>
           <SavedPiecesProvider>
-            <ClosetProvider>
+            <SavedReviewsProvider>
+              <ClosetProvider>
               <App />
             </ClosetProvider>
+            </SavedReviewsProvider>
           </SavedPiecesProvider>
         </ToastProvider>
       </AuthProvider>

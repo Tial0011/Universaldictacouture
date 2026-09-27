@@ -1,0 +1,63 @@
+import { useState } from "react";
+import { useSavedReviews } from "../../context/SavedReviewsContext";
+import { truncateText } from "../../utils/formatters";
+
+const LIKED_KEY = "udc:review-likes:session";
+
+function readLikedIds() {
+  try {
+    const ids = JSON.parse(sessionStorage.getItem(LIKED_KEY) || "[]");
+    return Array.isArray(ids) ? ids.filter((id) => typeof id === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLikedIds(ids) {
+  try { sessionStorage.setItem(LIKED_KEY, JSON.stringify(ids)); } catch { /* memory-only fallback */ }
+}
+
+export function useReviewInteractions() {
+  const [likedIds, setLikedIds] = useState(readLikedIds);
+  const { isReviewSaved, toggleSavedReview } = useSavedReviews();
+
+  function toggleLike(reviewId) {
+    setLikedIds((current) => {
+      const next = current.includes(reviewId)
+        ? current.filter((id) => id !== reviewId)
+        : [...current, reviewId];
+      writeLikedIds(next);
+      return next;
+    });
+  }
+
+  async function shareReview(entry, product) {
+    const target = product?.href || `/reviews-feeds?review=${encodeURIComponent(entry.id)}`;
+    const url = new URL(target, window.location.origin).toString();
+    const text = `${truncateText(entry.body, 180)}${product?.name ? ` — ${product.name}` : ""}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: `Review & Feeds — ${product?.name || "Universal Dicta Couture"}`, text, url });
+        return "shared";
+      }
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(`${text}\n${url}`);
+        return "copied";
+      }
+      window.prompt("Copy this review and link", `${text}\n${url}`);
+      return "prompt";
+    } catch (error) {
+      if (error?.name === "AbortError") return "cancelled";
+      window.prompt("Copy this review and link", `${text}\n${url}`);
+      return "prompt";
+    }
+  }
+
+  return {
+    isLiked: (id) => likedIds.includes(id),
+    toggleLike,
+    isReviewSaved,
+    toggleSavedReview,
+    shareReview,
+  };
+}

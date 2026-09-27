@@ -61,12 +61,11 @@ export function prepareRecord(kind, raw) {
       : data.image
         ? [data.image]
         : [];
-    if (sourceImages.length > 7) throw new Error("Use up to 7 review photos.");
-    data.images = sourceImages.map(imageValue).filter(Boolean);
-    data.image = data.images[0] || null;
+    if (sourceImages.length > 1) throw new Error("Use zero or one customer review photo.");
+    data.image = sourceImages.map(imageValue).filter(Boolean)[0] || null;
+    delete data.images;
 
     const normaliseRating = (value, label) => {
-      if (value === "" || value == null || Number(value) === 0) return 0;
       const rating = Number(value);
       if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
         throw new Error(label + " must be between 1 and 5 stars.");
@@ -76,12 +75,26 @@ export function prepareRecord(kind, raw) {
     data.customerServiceRating = normaliseRating(data.customerServiceRating, "Customer Service rating");
     data.productQualityRating = normaliseRating(data.productQualityRating, "Product Quality rating");
     data.productId = String(data.productId || "").trim();
+    if (!data.productId) throw new Error("Choose the product this review is about.");
 
-    if (data.published) {
-      if (!data.customerServiceRating || !data.productQualityRating) {
-        throw new Error("Choose both Customer Service and Product Quality ratings before publishing.");
-      }
-      if (!data.productId) throw new Error("Choose the product this review is about before publishing.");
+    data.status = String(data.status || (data.published ? "published" : "pending")).trim().toLowerCase();
+    if (!["pending", "published", "hidden"].includes(data.status)) throw new Error("Choose a valid review status.");
+    data.published = data.status === "published";
+
+    data.customerId = String(data.customerId || "").trim();
+    data.orderId = String(data.orderId || "").trim();
+    data.orderItemId = String(data.orderItemId || "").trim();
+
+    if (data.productSnapshot && typeof data.productSnapshot === "object") {
+      const price = Number(data.productSnapshot.price);
+      data.productSnapshot = {
+        name: String(data.productSnapshot.name || "").trim(),
+        image: imageValue(data.productSnapshot.image),
+        price: Number.isFinite(price) && price >= 0 ? price : null,
+        slug: String(data.productSnapshot.slug || "").trim(),
+      };
+    } else {
+      data.productSnapshot = null;
     }
   }
   if (kind === "discoveryModules") {
