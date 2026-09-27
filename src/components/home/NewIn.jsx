@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import NewInCard from "./NewInCard";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ViewAllLink from "../common/ViewAllLink";
-import "./NewIn.css";
+// Use the exact Shop By styling so the two headers cannot drift apart.
+import "../discovery/DiscoveryModule.css";
+import "../discovery/HomeDiscovery.css";
 
 /**
  * Small chevron for the New In carousel controls — drawn to the same
@@ -44,8 +46,6 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
     index: 0,
     canPrev: false,
     canNext: false,
-    thumbLeft: 0,
-    thumbWidth: 100,
   });
 
   useEffect(() => {
@@ -53,13 +53,6 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
     if (!track) return undefined;
 
     const update = () => {
-      const maxScroll = track.scrollWidth - track.clientWidth;
-      const ratio = maxScroll > 0 ? track.scrollLeft / maxScroll : 0;
-      const thumbWidth = track.scrollWidth > 0
-        ? Math.min(100, (track.clientWidth / track.scrollWidth) * 100)
-        : 100;
-      const thumbLeft = Math.min(100 - thumbWidth, Math.max(0, ratio * (100 - thumbWidth)));
-
       // Nearest-card index, purely for the "01 / 20" readout — mirrors
       // the same approach already used by the Review & Feeds carousel.
       const cards = Array.from(track.querySelectorAll("[data-new-in-item]"));
@@ -77,8 +70,6 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
         index,
         canPrev: track.scrollLeft > 8,
         canNext: track.scrollLeft + track.clientWidth < track.scrollWidth - 8,
-        thumbLeft,
-        thumbWidth,
       });
     };
 
@@ -90,7 +81,7 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
       track.removeEventListener("scroll", update);
       observer?.disconnect();
     };
-  }, [products.length]);
+  }, [products, isLoading, error]);
 
   function scroll(direction) {
     const track = trackRef.current;
@@ -105,15 +96,16 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
   const showControls = !isLoading && !error && products.length > 1;
 
   return (
-    <section className="home-section container" aria-labelledby="home-new-in">
-      <div className="home-section__head new-in__head">
-        <h2 id="home-new-in">New In</h2>
-        <div className="new-in__controls">
+    <section className="home-section container discovery--home" aria-labelledby="home-new-in">
+      <div className="discovery__head">
+        <h2 id="home-new-in" className="discovery__title"><span className="discovery__title-prefix">New </span><span className="discovery__title-accent">In</span></h2>
+        <div className="discovery__head-actions">
           {showControls ? (
-            <div className="new-in__arrows" role="group" aria-label="New In navigation">
+            <div className="discovery__group-arrows" role="group" aria-label="New In navigation">
               <button
                 type="button"
                 aria-label="Previous new pieces"
+                className="discovery__group-arrow discovery__group-arrow--previous"
                 aria-controls="new-in-track"
                 disabled={!scrollState.canPrev}
                 onClick={() => scroll(-1)}
@@ -123,6 +115,7 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
               <button
                 type="button"
                 aria-label="Next new pieces"
+                className="discovery__group-arrow discovery__group-arrow--next"
                 aria-controls="new-in-track"
                 disabled={!scrollState.canNext}
                 onClick={() => scroll(1)}
@@ -131,19 +124,16 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
               </button>
             </div>
           ) : null}
-          <ViewAllLink to={viewAllTo} />
+          <ViewAllLink to={viewAllTo} className="discovery__view-all" />
         </div>
       </div>
 
       {showControls ? (
-        <div className="new-in__progress" aria-hidden="true">
-          <div className="new-in__progress-track">
-            <span
-              className="new-in__progress-thumb"
-              style={{ left: `${scrollState.thumbLeft}%`, width: `${scrollState.thumbWidth}%` }}
-            />
+        <div className="discovery__chapter" aria-hidden="true">
+          <div className="discovery__chapter-track">
+            {products.map((product, index) => <span key={product.id} className={index === scrollState.index ? "is-current" : undefined} />)}
           </div>
-          <span className="new-in__position">
+          <span className="discovery__position">
             {String(scrollState.index + 1).padStart(2, "0")}
             <span> / {String(products.length).padStart(2, "0")}</span>
           </span>
