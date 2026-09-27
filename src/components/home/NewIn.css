@@ -1,0 +1,133 @@
+/* ---------- New In: header, controls and scroll progress ----------
+   Coordinates the New In carousel with Shop By above it: a title row
+   with circular previous/next controls and "View all", then a slim
+   wine/gold progress line with a numeric position readout. Shop By's
+   progress reflects a fixed number of groups (Occasion/Style/Fabric);
+   New In's reflects the visitor's actual scroll position through a
+   continuous product carousel, so it uses a moving thumb rather than
+   fixed segments — related in language, not identical in kind, since
+   New In stays a product showcase rather than a category one. */
+
+.new-in__head {
+  align-items: center;
+}
+
+.new-in__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 0 0 auto;
+}
+
+.new-in__arrows {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+.new-in__arrows button {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(96, 16, 19, 0.28);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-white);
+  color: var(--color-brand);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.new-in__arrows button svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+@media (hover: hover) {
+  .new-in__arrows button:not(:disabled):hover {
+    background-color: var(--color-brand);
+    color: var(--color-white);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(96, 16, 19, 0.18);
+  }
+}
+
+.new-in__arrows button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.new-in__arrows button:disabled {
+  opacity: 0.35;
+  cursor: default;
+  box-shadow: none;
+}
+
+.new-in__arrows button:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ---------- Progress: continuous scroll position, not fixed dots ---------- */
+.new-in__progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: -0.25rem 0 var(--space-sm);
+}
+
+.new-in__progress-track {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(176, 141, 87, 0.22);
+  overflow: hidden;
+}
+
+.new-in__progress-thumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-brand), var(--color-accent));
+  transition: left var(--duration-fast) var(--ease-standard),
+    width var(--duration-fast) var(--ease-standard);
+}
+
+.new-in__position {
+  flex: 0 0 auto;
+  color: var(--color-brand);
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.new-in__position > span {
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 480px) {
+  .new-in__arrows button {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+
+  .new-in__arrows button svg {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .new-in__arrows button,
+  .new-in__progress-thumb {
+    transition: none;
+  }
+}

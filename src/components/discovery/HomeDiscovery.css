@@ -251,6 +251,10 @@
   padding: 0.5rem 0.25rem 1rem;
   scroll-snap-type: x proximity;
   scroll-padding-inline: 0.25rem;
+  /* Deliberate, controlled motion on this axis rather than an instant
+     jump — the item list itself has no button-driven steps, but this
+     keeps momentum/snap settling smooth and consistent with New In. */
+  scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: rgba(176, 141, 87, 0.3) transparent;
   -webkit-overflow-scrolling: touch;
@@ -407,6 +411,10 @@
   .discovery--home *,
   .discovery--home *::before {
     transition: none;
+  }
+
+  .discovery--home .discovery__list {
+    scroll-behavior: auto;
   }
 }
 

@@ -1,29 +1,62 @@
-/* ---------- New In menu-card grid ----------
-   Two across on phones (as in the reference), three on tablets, and
-   six in one row on wide screens. */
+/* ---------- New In: single horizontal product carousel ----------
+   One scrolling row instead of a grid, so New In reads as a carousel
+   alongside Shop By rather than a multi-row product listing. Card
+   width scales fluidly with the viewport (clamp) instead of jumping
+   between a few fixed column counts, so tablet widths interpolate
+   smoothly between the phone and desktop sizes, and the next card
+   always peeks in at the edge as an affordance to keep scrolling. */
 .menu-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: nowrap;
   gap: var(--space-sm);
   margin: 0;
-  padding: 0;
+  padding: 0.25rem 0.25rem 1rem;
   list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 0.25rem;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(96, 16, 19, 0.3) transparent;
+  -webkit-overflow-scrolling: touch;
 }
 
 .menu-grid > li {
+  flex: 0 0 clamp(9.5rem, 30vw, 13.5rem);
   min-width: 0;
+  scroll-snap-align: start;
 }
 
 @media (min-width: 640px) {
   .menu-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-md);
+  }
+
+  .menu-grid > li {
+    flex-basis: clamp(11rem, 22vw, 14.5rem);
   }
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 1024px) {
+  .menu-grid > li {
+    flex-basis: clamp(12rem, 17vw, 15rem);
+  }
+}
+
+@media (pointer: coarse) {
   .menu-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    scrollbar-width: none;
+  }
+
+  .menu-grid::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-grid {
+    scroll-behavior: auto;
   }
 }
 

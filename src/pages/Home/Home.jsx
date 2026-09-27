@@ -90,12 +90,10 @@ export default function Home() {
     () => buildShopDiscovery(products, "Shop By", shopByGroups),
     [products, shopByGroups]
   );
-  const realNewIn = selectNewIn(products, 6);
-  const newInProducts = realNewIn;
-  // "View all" goes to the New In filter only when pieces are actually
-  // flagged New In; otherwise the section is showing the newest pieces
-  // and the whole collection is the honest destination.
-  const hasFlaggedNewIn = products.some((product) => product.isNewIn);
+  // New In is always the newest published pieces (see selectNewIn),
+  // capped at 20 — never a manually curated set — so "View all" can
+  // simply point at the shop's default, newest-first view.
+  const newInProducts = selectNewIn(products, 20);
 
   return (
     <>
@@ -126,7 +124,7 @@ export default function Home() {
           products={newInProducts}
           isLoading={isLoading}
           error={error}
-          viewAllTo={hasFlaggedNewIn ? "/shop?newin=1" : "/shop"}
+          viewAllTo="/shop"
         />
 
         <CustomStylePromo image={customStyleImage} />

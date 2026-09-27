@@ -74,14 +74,20 @@ export async function fetchPublishedProducts() {
 }
 
 /**
- * Published products flagged New In, newest first. When nothing has
- * been flagged yet, the most recently published pieces stand in, so
- * the homepage section is never empty while the catalogue is not —
- * "New In" is, honestly, the newest pieces.
+ * Homepage New In: the newest published pieces, and nothing else.
+ *
+ * The complete published catalogue is sorted newest-first by
+ * publishedAt FIRST (see sortByNewest), and only THEN capped at `max`
+ * — never the other way around — so publishing a new piece always
+ * promotes it to position #1 and the oldest piece in the previous set
+ * falls out automatically once more than `max` pieces are published.
+ * publishedAt is set once, at first publish, and never touched again
+ * on later edits (see productModel / admin.js), so editing an older
+ * piece never makes it look new. This never reads isNewIn and never
+ * depends on any manual admin selection.
  */
-export function selectNewIn(products, max = 8) {
-  const flagged = products.filter((product) => product.isNewIn);
-  return sortByNewest(flagged.length ? flagged : products).slice(0, max);
+export function selectNewIn(products, max = 20) {
+  return sortByNewest(products).slice(0, max);
 }
 
 export function sortByNewest(products) {
