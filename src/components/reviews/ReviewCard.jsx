@@ -117,7 +117,7 @@ export default function ReviewCard({
             {presentation.price != null && <small>{formatNaira(presentation.price)}{presentation.variable ? " +" : ""}</small>}
           </div>
           {presentation.available
-            ? <Link className="udc-review-product__cta" to={presentation.href} aria-label={`Shop ${presentation.name}`}>Shop This Piece <Icon name="arrow" /></Link>
+            ? <Link className="udc-review-product__cta" to={presentation.href} aria-label={`Shop ${presentation.name}`}>Shop Piece <Icon name="arrow" /></Link>
             : <span className="udc-review-product__unavailable">Currently unavailable</span>}
         </> : <div className="udc-review-product__missing"><strong>Reviewed piece unavailable</strong><span>The customer story remains published, but this product is no longer in the live catalogue.</span></div>}
       </div>

@@ -16,13 +16,19 @@
 .udc-review-rating__stars { display:flex; gap:2px; line-height:1; }
 .udc-review-rating__stars i { color:#d8d0c9; font-style:normal; font-size:1.1rem; }
 .udc-review-rating__stars .is-filled { color:#995500; }
-.udc-review-product { display:grid; grid-template-columns:56px minmax(0,1fr); gap:4px 10px; padding:4px; border:1px solid #f2ede7; border-radius:5px; }
-.udc-review-product__thumb { grid-row:span 2; min-height:68px; overflow:hidden; border-radius:3px; background:#f5f0e8; }
+.udc-review-product { display:grid; grid-template-columns:36px minmax(0,1fr) auto; align-items:center; gap:7px; padding:5px; border:1px solid #eae1d6; border-radius:7px; background:#fbf8f280; }
+.udc-review-product__thumb { height:40px; overflow:hidden; border-radius:4px; background:#f5f0e8; }
 .udc-review-product__thumb .product-image,.udc-review-product__thumb img { width:100%; height:100%; object-fit:cover; }
 .udc-review-product__copy { display:flex; flex-direction:column; justify-content:center; min-width:0; gap:2px; }
-.udc-review-product__copy strong { font-size:.75rem; font-weight:500; line-height:1.25; overflow-wrap:anywhere; }
-.udc-review-product__copy small { color:#80121b; font-size:.75rem; font-weight:700; }
-.udc-review-product__cta { grid-column:2; display:flex; justify-content:center; align-items:center; gap:.4rem; min-height:44px; border-radius:3px; color:#fff; background:#790d19; font-size:.75rem; text-decoration:none; }
+.udc-review-product__copy strong { font-size:.68rem; font-weight:500; line-height:1.25; overflow-wrap:anywhere; }
+.udc-review-product__copy small { color:#80121b; font-size:.65rem; font-weight:600; }
+.udc-review-product__cta { display:flex; justify-content:center; align-items:center; gap:.25rem; min-height:44px; padding-inline:4px; border-radius:4px; color:#790d19; font-size:.65rem; font-weight:600; white-space:nowrap; text-decoration:none; }
+.udc-review-product__cta svg { width:13px; height:13px; }
+.udc-review-product__cta:hover { background:#6010130a; }
+.udc-review-card { border-color:#b08d5733; box-shadow:inset 0 1px 0 #fff,0 4px 18px #43090d06; transition:border-color 180ms ease,box-shadow 180ms ease; }
+.udc-review-card:focus-within { border-color:#60101366; }
+@media(hover:hover) { .udc-review-card:hover { border-color:#b08d5780; box-shadow:inset 0 1px 0 #fff,0 5px 20px #43090d0d; } }
+@media(prefers-reduced-motion:reduce) { .udc-review-card { transition:none; } }
 .udc-review-product__unavailable { font-size:.7rem; color:#69615d; }
 .udc-review-product__missing { grid-column:1/-1; font-size:.75rem; }
 .udc-review-product__missing span { display:none; }
