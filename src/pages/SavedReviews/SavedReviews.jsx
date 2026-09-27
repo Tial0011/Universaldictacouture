@@ -36,10 +36,10 @@ export default function SavedReviews() {
   const unavailableCount = state.loading ? 0 : savedReviewIds.length - saved.length;
 
   return <>
-    <PageIntro eyebrow="My Closet" title="Saved Reviews" description={isPersistent ? "Customer stories you bookmarked, ready to revisit." : "Customer stories you bookmark are kept for this browser session."} />
+    <PageIntro eyebrow="My Closet" title="Saved Reviews" description={isPersistent ? "Customer stories you bookmarked, ready to revisit." : "Customer stories you bookmark are kept in this browser."} />
     <section className="container section saved-reviews" aria-label="Bookmarked customer reviews">
       {(saveError || piecesError) && <p role="alert">{saveError || piecesError}</p>}
-      {!isReady || (hasSavedReviews && state.loading)
+      {!isReady && saveError ? null : !isReady || (hasSavedReviews && state.loading)
         ? <p role="status">Loading your saved reviews…</p>
         : !hasSavedReviews
           ? <p>No reviews saved yet. Bookmark a customer story to see it here.</p>

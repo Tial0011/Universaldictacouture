@@ -44,11 +44,15 @@ export function useReviewInteractions() {
     showToast(likedIds.includes(reviewId) ? "Review unliked." : "Review liked for this visit.");
   }
 
-  function saveReview(reviewId) {
+  async function saveReview(reviewId) {
     if (!reviewsReady) return;
-    const added = toggleSavedReview(reviewId);
+    const added = await toggleSavedReview(reviewId);
+    if (added === null) {
+      showToast("Bookmark change could not be stored. Check your connection and try again.", "error");
+      return;
+    }
     showToast(added
-      ? reviewsPersistent ? "Review saved in My Closet → Saved Reviews." : "Review saved for this visit in My Closet → Saved Reviews."
+      ? reviewsPersistent ? "Review saved in My Closet → Saved Reviews." : "Review saved in this browser under My Closet → Saved Reviews."
       : "Review removed from Saved Reviews.");
   }
 
