@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useCatalogue } from "../../hooks/useCatalogue";
 import { useCloset } from "../../context/ClosetContext";
 import { useSavedPieces } from "../../context/SavedPiecesContext";
+import { useAuth } from "../../context/AuthContext";
+import { useAuthGate } from "../../context/AuthGateContext";
 import ProductImage from "../../components/product/ProductImage";
 import Button from "../../components/common/Button";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
@@ -71,6 +73,9 @@ export default function ProductDetails() {
 
 function Piece({ product }) {
   const { addToCloset } = useCloset();
+  const { user } = useAuth();
+  const { requestAuth } = useAuthGate();
+  const location = useLocation();
   const { isSaved, toggleSaved, error: savedError } = useSavedPieces();
   const [selections, setSelections] = useState(() => Object.fromEntries(
     product.options.filter(option => option.required && option.values.length === 1)
@@ -127,6 +132,10 @@ function Piece({ product }) {
   }
 
   async function handleShare() {
+    if (!user) {
+      requestAuth({ returnTo: `${location.pathname}${location.search}` });
+      return;
+    }
     const result = await shareContent(buildProductShare(product, window.location.origin));
     if (result === "copied") setMessage("Product name, description and link copied, ready to share.");
   }

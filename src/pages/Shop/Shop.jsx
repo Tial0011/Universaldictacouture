@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import ProductGrid from "../../components/product/ProductGrid";
 import DiscoveryModule from "../../components/discovery/DiscoveryModule";
 import ShopFilters from "../../components/shop/ShopFilters";
@@ -14,6 +14,8 @@ import {
 } from "../../components/shop/ShopIcons";
 import { useCatalogue } from "../../hooks/useCatalogue";
 import { useBatchSize } from "../../hooks/useBatchSize";
+import { useAuth } from "../../context/AuthContext";
+import { useAuthGate } from "../../context/AuthGateContext";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import {
   buildShopDiscovery,
@@ -39,12 +41,15 @@ const DIMENSION_KEYS = FILTER_DIMENSIONS.map((dimension) => dimension.key);
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const { user } = useAuth();
+  const { requestAuth } = useAuthGate();
   const { products, isLoading, error, retry } = useCatalogue();
   const catalogue = products;
   const batchSize = useBatchSize();
 
   const state = useMemo(() => parseShopState(searchParams), [searchParams]);
-  const [searchDraft, setSearchDraft] = useState(state.query);
+  const [searchDraft, setSearchDraft] = useState(() => String(location.state?.shopSearchDraft || state.query || ""));
   const [visibleCount, setVisibleCount] = useState(batchSize);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
@@ -85,6 +90,15 @@ export default function Shop() {
   useEffect(() => {
     if (searchRequested) setSearchOpen(true);
   }, [searchRequested]);
+
+  useEffect(() => {
+    if (user || !state.query) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete("q");
+    next.set("focus", "search");
+    setSearchParams(next, { replace: true });
+    requestAuth({ returnTo: "/shop?focus=search", returnState: { shopSearchDraft: state.query } });
+  }, [user, state.query]);
 
   useEffect(() => {
     if (searchOpen && searchRequested) searchInputRef.current?.focus();
@@ -239,6 +253,7 @@ export default function Shop() {
                 role="search"
                 onSubmit={(event) => {
                   event.preventDefault();
+                  if (!user) { requestAuth({ returnTo: "/shop?focus=search", returnState: { shopSearchDraft: searchDraft.trim() } }); return; }
                   updateState({ ...state, query: searchDraft.trim() });
                 }}
               >

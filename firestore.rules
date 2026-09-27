@@ -32,7 +32,22 @@ service cloud.firestore {
         && request.resource.data.headline is string
         && request.resource.data.headline.size() > 0
         && request.resource.data.concept in ['ready-to-wear', 'aso-oke-fabric', 'custom-style', 'shop-by-occasion', 'bridal-event-dressing'];
-      allow delete: if false;
+      allow delete: if isAdmin();
+    }
+    match /siteAppearance/{slotId} {
+      allow read: if slotId == 'auth' || isAdmin();
+      allow create, update: if isAdmin()
+        && slotId == 'auth'
+        && request.resource.data.eyebrow is string
+        && request.resource.data.eyebrow.size() > 0
+        && request.resource.data.eyebrow.size() <= 80
+        && request.resource.data.headline is string
+        && request.resource.data.headline.size() > 0
+        && request.resource.data.headline.size() <= 120
+        && request.resource.data.supportingText is string
+        && request.resource.data.supportingText.size() > 0
+        && request.resource.data.supportingText.size() <= 260;
+      allow delete: if isAdmin();
     }
     match /discoveryModules/{moduleId} {
       allow read: if resource.data.active == true || isAdmin();
@@ -82,10 +97,27 @@ service cloud.firestore {
       allow write: if false;
     }
     match /styleCircleSubscribers/{key} {
-      allow create: if request.resource.data.keys().hasOnly(['email', 'source', 'createdAt'])
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['email', 'customerId', 'source', 'createdAt'])
+        && request.resource.data.customerId == request.auth.uid
         && request.resource.data.email is string
-        && request.resource.data.email.size() < 320;
+        && request.resource.data.email.size() < 320
+        && request.resource.data.source == 'style-circle'
+        && request.resource.data.createdAt == request.time;
       allow read, update, delete: if false;
+    }
+    match /customerProfiles/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['fullName', 'phoneNumber', 'email', 'createdAt', 'updatedAt'])
+        && request.resource.data.fullName is string
+        && request.resource.data.fullName.size() > 0
+        && request.resource.data.fullName.size() <= 120
+        && request.resource.data.phoneNumber is string
+        && request.resource.data.phoneNumber.size() <= 40
+        && request.resource.data.email == request.auth.token.email;
+      allow delete: if false;
     }
     // One private conversation per customer. Messages and summaries commit together.
     match /conversations/{customerId} {

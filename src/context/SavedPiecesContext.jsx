@@ -6,24 +6,31 @@ import { useAuth } from "./AuthContext";
 
 const SavedPiecesContext = createContext({ savedIds: [], isSaved: () => false, toggleSaved: () => false, retrySync: () => {}, isPersistent: false, isReady: true, storage: "memory", error: "" });
 const GUEST_KEY = "udc:saved-pieces:guest";
-function readRecord(key) {
-  let raw;
-  try { raw = localStorage.getItem(key); } catch { /* blocked storage */ }
-  if (raw == null) try { raw = sessionStorage.getItem(key); } catch { /* blocked storage */ }
+function parseRecord(raw) {
   try {
     const record = JSON.parse(raw || "{}");
     return { productIds: itemIds(Array.isArray(record) ? record : record?.productIds), pending: Array.isArray(record?.pending) ? record.pending : [] };
   } catch { return { productIds: [], pending: [] }; }
 }
-function writeRecord(key, record) {
+function readAccountRecord(key) {
+  let raw;
+  try { raw = localStorage.getItem(key); } catch { /* blocked storage */ }
+  if (raw == null) try { raw = sessionStorage.getItem(key); } catch { /* blocked storage */ }
+  return parseRecord(raw);
+}
+function readGuestRecord() {
+  let raw;
+  try { raw = sessionStorage.getItem(GUEST_KEY); } catch { /* blocked storage */ }
+  return parseRecord(raw);
+}
+function writeAccountRecord(key, record) {
   const value = JSON.stringify(record);
-  try {
-    localStorage.setItem(key, value);
-    try { sessionStorage.removeItem(key); } catch { /* optional legacy cleanup */ }
-    return "browser";
-  } catch {
-    try { sessionStorage.setItem(key, value); return "session"; } catch { return "memory"; }
-  }
+  try { localStorage.setItem(key, value); return "browser"; }
+  catch { try { sessionStorage.setItem(key, value); return "session"; } catch { return "memory"; } }
+}
+function writeGuestRecord(record) {
+  try { sessionStorage.setItem(GUEST_KEY, JSON.stringify(record)); return "session"; }
+  catch { return "memory"; }
 }
 export function SavedPiecesProvider({ children }) {
   const { user } = useAuth();
@@ -32,8 +39,8 @@ export function SavedPiecesProvider({ children }) {
 function SavedSession({ uid, children }) {
   const [store] = useState(() => {
     const key = uid ? `udc:saved-pieces:account:${uid}` : GUEST_KEY;
-    const initial = readRecord(key);
-    const guestIds = uid ? readRecord(GUEST_KEY).productIds : [];
+    const initial = uid ? readAccountRecord(key) : readGuestRecord();
+    const guestIds = uid ? readGuestRecord().productIds : [];
     if (guestIds.length) {
       initial.productIds = itemIds([...initial.productIds, ...guestIds]);
       initial.pending = [...initial.pending, ...guestIds.map(id => ({ id, saved: true }))];
@@ -42,9 +49,9 @@ function SavedSession({ uid, children }) {
     return createSavedItemsStore({
       initial, idsField: "productIds", snapshotField: "savedIds", itemLabel: "saved pieces",
       persist(record) {
-        const storage = writeRecord(key, record);
-        if (guestIds.length && !guestCopied && storage !== "memory") {
-          writeRecord(GUEST_KEY, { productIds: readRecord(GUEST_KEY).productIds.filter(id => !guestIds.includes(id)), pending: [] });
+        const storage = uid ? writeAccountRecord(key, record) : writeGuestRecord(record);
+        if (uid && guestIds.length && !guestCopied && storage !== "memory") {
+          writeGuestRecord({ productIds: readGuestRecord().productIds.filter(id => !guestIds.includes(id)), pending: [] });
           guestCopied = true;
         }
         return storage;
@@ -62,7 +69,7 @@ function SavedSession({ uid, children }) {
     store.start();
     const retry = () => { void store.retry(); };
     const onStorage = event => {
-      if (!uid && (event.key === GUEST_KEY || event.key === null)) store.replaceGuestIds(readRecord(GUEST_KEY).productIds);
+      if (!uid && (event.key === GUEST_KEY || event.key === null)) store.replaceGuestIds(readGuestRecord().productIds);
     };
     window.addEventListener("online", retry);
     window.addEventListener("storage", onStorage);

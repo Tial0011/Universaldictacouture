@@ -46,12 +46,15 @@ export class SubscriptionError extends Error {}
  * @returns {Promise<{ status: "subscribed" }>}
  * @throws {SubscriptionError}
  */
-export async function subscribeToStyleCircle(rawEmail) {
+export async function subscribeToStyleCircle(rawEmail, user) {
   const { isValid, email, message } = validateEmail(rawEmail);
   if (!isValid) throw new SubscriptionError(message);
 
   if (!isFirebaseConfigured) {
     throw new SubscriptionError("Style Circle is not available right now. Please try again later.");
+  }
+  if (!user?.uid) {
+    throw new SubscriptionError("Sign in to join the Style Circle.");
   }
 
   const key = await emailKey(email);
@@ -61,7 +64,7 @@ export async function subscribeToStyleCircle(rawEmail) {
     // Firestore rather than silently overwritten.
     await setDoc(
       doc(db, COLLECTION, key),
-      { email, source: "style-circle", createdAt: serverTimestamp() },
+      { email, customerId: user.uid, source: "style-circle", createdAt: serverTimestamp() },
       { merge: false }
     );
     return { status: "subscribed" };

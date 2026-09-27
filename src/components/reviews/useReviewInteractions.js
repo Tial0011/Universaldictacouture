@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useAuthGate } from "../../context/AuthGateContext";
 import { useSavedReviews } from "../../context/SavedReviewsContext";
 import { useSavedPieces } from "../../context/SavedPiecesContext";
 import { useToast } from "../../context/ToastContext";
@@ -21,11 +24,20 @@ function writeLikedIds(ids) {
 
 export function useReviewInteractions() {
   const [likedIds, setLikedIds] = useState(readLikedIds);
+  const { user } = useAuth();
+  const { requestAuth } = useAuthGate();
+  const location = useLocation();
+  const requireAccount = () => {
+    if (user) return false;
+    requestAuth({ returnTo: `${location.pathname}${location.search}${location.hash}` });
+    return true;
+  };
   const { isSaved, toggleSaved, storage: piecesStorage, error: piecesError, isReady: piecesReady } = useSavedPieces();
   const { isReviewSaved, toggleSavedReview, retrySync, isPersistent: reviewsPersistent, error: reviewsError, isReady: reviewsReady } = useSavedReviews();
   const { showToast } = useToast();
 
   function toggleLike(reviewId, product) {
+    if (requireAccount()) return;
     if (product?.id) {
       if (!piecesReady) return;
       const added = toggleSaved(product.id);
@@ -45,6 +57,7 @@ export function useReviewInteractions() {
   }
 
   function saveReview(reviewId) {
+    if (requireAccount()) return;
     const result = toggleSavedReview(reviewId);
     if (!result) {
       showToast("This review could not be bookmarked. Please refresh and try again.", "error");
@@ -60,6 +73,7 @@ export function useReviewInteractions() {
   }
 
   async function shareReview(entry, product) {
+    if (requireAccount()) return "gated";
     const result = await shareContent(buildReviewShare(entry, product, window.location.origin));
     if (result === "copied") showToast("Product details, review and links copied, ready to share.");
     return result;

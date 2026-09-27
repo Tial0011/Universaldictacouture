@@ -45,7 +45,18 @@ function writeRecord(key, record) {
 
 export function SavedReviewsProvider({ children }) {
   const { user } = useAuth();
-  return <SavedReviewsSession key={user?.uid || "guest"} uid={user?.uid}>{children}</SavedReviewsSession>;
+  if (!user?.uid) {
+    return <SavedReviewsContext.Provider value={{
+      savedReviewIds: [],
+      isReviewSaved: () => false,
+      toggleSavedReview: () => null,
+      retrySync: () => {},
+      isPersistent: false,
+      isReady: true,
+      error: "",
+    }}>{children}</SavedReviewsContext.Provider>;
+  }
+  return <SavedReviewsSession key={user.uid} uid={user.uid}>{children}</SavedReviewsSession>;
 }
 
 function SavedReviewsSession({ uid, children }) {

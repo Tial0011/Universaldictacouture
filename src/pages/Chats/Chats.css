@@ -1058,3 +1058,4 @@ body:has(.chats-page) #main-content {
   .chat-voice-bubble,
   .chat-file-bubble { min-width: min(300px, 80vw); }
 }
+.chat-guest-compose form { display:grid; gap:var(--space-sm); }

@@ -34,8 +34,8 @@ export async function saveAdminRecord(kind, raw) {
 }
 
 export async function deleteAdminRecord(kind, id) {
-  if (kind !== "reviews") throw new Error("Only review deletion is available here.");
-  if (!id) throw new Error("Choose a review to delete.");
+  if (!["reviews", "heroSlides"].includes(kind)) throw new Error("Deletion is not available for this content section.");
+  if (!id) throw new Error("Choose a record to delete.");
   await deleteDoc(doc(target(kind), id));
 }
 export function adminError(error) {

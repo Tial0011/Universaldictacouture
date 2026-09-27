@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useCloset } from "../../context/ClosetContext";
 import { useSavedPieces } from "../../context/SavedPiecesContext";
 import { useSavedReviews } from "../../context/SavedReviewsContext";
+import { useAuth } from "../../context/AuthContext";
 import ProductImage from "../../components/product/ProductImage";
 import Button from "../../components/common/Button";
 import { formatNaira, truncateText } from "../../utils/formatters";
@@ -14,6 +15,7 @@ import "./SavedReviewPreview.css";
 
 export default function MyCloset() {
   useDocumentMeta({ title: "My Closet | Universal Dicta Couture", noindex: true });
+  const { user } = useAuth();
   const { lines, removeFromCloset } = useCloset();
   const { savedIds } = useSavedPieces();
   const { savedReviewIds, toggleSavedReview, isReady, isPersistent, error: saveError, retrySync } = useSavedReviews();
@@ -22,7 +24,7 @@ export default function MyCloset() {
   const hasSavedReviews = savedReviewIds.length > 0;
 
   useEffect(() => {
-    if (!isReady || !hasSavedReviews) return;
+    if (!user || !isReady || !hasSavedReviews) return;
     let active = true;
     fetchPublishedReviews(null, true)
       .then((entries) => {
@@ -32,7 +34,7 @@ export default function MyCloset() {
         if (active) setReviewState({ entries: [], loading: false, error: "Saved reviews could not be loaded. Please try again." });
       });
     return () => { active = false; };
-  }, [isReady, hasSavedReviews, attempt]);
+  }, [user, isReady, hasSavedReviews, attempt]);
 
   const reviewMap = useMemo(() => new Map(reviewState.entries.map((entry) => [entry.id, entry])), [reviewState.entries]);
   const savedReviews = savedReviewIds.map((id) => reviewMap.get(id)).filter(Boolean);
@@ -51,25 +53,27 @@ export default function MyCloset() {
     </section>
 
     <section className="closet-section" aria-labelledby="closet-saved-reviews-heading">
-      <div className="closet-section__heading"><h2 id="closet-saved-reviews-heading">Saved reviews{savedReviewIds.length ? ` (${savedReviewIds.length})` : ""}</h2><Link to="/my-closet/saved-reviews">View all</Link></div>
-      {saveError && <div role="status"><p>{saveError}</p>{isPersistent && <Button variant="secondary" onClick={retrySync}>Retry account sync</Button>}</div>}
-      {!isReady && saveError ? null : !isReady || (hasSavedReviews && reviewState.loading)
-        ? <p role="status">Loading your saved reviews…</p>
-        : !hasSavedReviews
-          ? <p>No reviews saved yet. Bookmark one from Review &amp; Feeds to see it here.</p>
-          : reviewState.error
-            ? <div role="alert"><p>{reviewState.error}</p><Button variant="secondary" onClick={() => { setReviewState((previous) => ({ ...previous, loading: true, error: "" })); setAttempt((value) => value + 1); }}>Try again</Button></div>
-            : <>
-              {savedReviews.length ? <ul className="closet-saved-reviews">{savedReviews.slice(0, 3).map((entry) => <li key={entry.id}>
-                <strong>{entry.author || "Customer review"}</strong>
-                <p>{truncateText(entry.body, 130)}</p>
-                {entry.productSnapshot?.name && <small>Reviewed piece: {entry.productSnapshot.name}</small>}
-                <div className="closet-saved-reviews__actions"><Link to={`/reviews-feeds?review=${encodeURIComponent(entry.id)}`}>Read review</Link><button type="button" onClick={() => toggleSavedReview(entry.id)}>Remove bookmark</button></div>
-              </li>)}</ul> : <p>Your bookmarked reviews are no longer published.</p>}
-              {savedReviews.length < savedReviewIds.length && <p>{savedReviewIds.length - savedReviews.length} saved {savedReviewIds.length - savedReviews.length === 1 ? "review is" : "reviews are"} no longer published.</p>}
-            </>}
+      <div className="closet-section__heading"><h2 id="closet-saved-reviews-heading">Saved reviews{user && savedReviewIds.length ? ` (${savedReviewIds.length})` : ""}</h2>{user && <Link to="/my-closet/saved-reviews">View all</Link>}</div>
+      {!user ? <div className="account-private-note"><p>Saved Reviews belong to your private customer account. Sign in to view or manage them.</p><Button to="/signin" state={{ returnTo: "/my-closet" }} variant="secondary">SIGN IN TO VIEW SAVED REVIEWS</Button></div> : <>
+        {saveError && <div role="status"><p>{saveError}</p>{isPersistent && <Button variant="secondary" onClick={retrySync}>Retry account sync</Button>}</div>}
+        {!isReady && saveError ? null : !isReady || (hasSavedReviews && reviewState.loading)
+          ? <p role="status">Loading your saved reviews…</p>
+          : !hasSavedReviews
+            ? <p>No reviews saved yet. Bookmark one from Review &amp; Feeds to see it here.</p>
+            : reviewState.error
+              ? <div role="alert"><p>{reviewState.error}</p><Button variant="secondary" onClick={() => { setReviewState((previous) => ({ ...previous, loading: true, error: "" })); setAttempt((value) => value + 1); }}>Try again</Button></div>
+              : <>
+                {savedReviews.length ? <ul className="closet-saved-reviews">{savedReviews.slice(0, 3).map((entry) => <li key={entry.id}>
+                  <strong>{entry.author || "Customer review"}</strong>
+                  <p>{truncateText(entry.body, 130)}</p>
+                  {entry.productSnapshot?.name && <small>Reviewed piece: {entry.productSnapshot.name}</small>}
+                  <div className="closet-saved-reviews__actions"><Link to={`/reviews-feeds?review=${encodeURIComponent(entry.id)}`}>Read review</Link><button type="button" onClick={() => toggleSavedReview(entry.id)}>Remove bookmark</button></div>
+                </li>)}</ul> : <p>Your bookmarked reviews are no longer published.</p>}
+                {savedReviews.length < savedReviewIds.length && <p>{savedReviewIds.length - savedReviews.length} saved {savedReviewIds.length - savedReviews.length === 1 ? "review is" : "reviews are"} no longer published.</p>}
+              </>}
+      </>}
     </section>
 
-    <div className="account-actions"><Button to="/shop">Browse the shop</Button><Button to="/my-closet/my-pieces" variant="secondary">My Pieces{savedIds.length ? ` (${savedIds.length})` : ""}</Button><Button to="/my-closet/saved-reviews" variant="secondary">Saved Reviews{savedReviewIds.length ? ` (${savedReviewIds.length})` : ""}</Button></div>
+    <div className="account-actions"><Button to="/shop">Browse the shop</Button><Button to="/my-closet/my-pieces" variant="secondary">My Pieces{savedIds.length ? ` (${savedIds.length})` : ""}</Button>{user && <Button to="/my-closet/saved-reviews" variant="secondary">Saved Reviews{savedReviewIds.length ? ` (${savedReviewIds.length})` : ""}</Button>}</div>
   </div></section>;
 }

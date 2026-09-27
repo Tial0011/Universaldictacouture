@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useAuthGate } from "../../context/AuthGateContext";
 import ProductImage from "../product/ProductImage";
 import { formatNaira, truncateText } from "../../utils/formatters";
 import { timestampDate } from "../../services/reviewModel";
@@ -71,6 +73,11 @@ export default function ReviewCard({
   showDate = false,
   forceExpanded = false,
 }) {
+  const { user } = useAuth();
+  const { requestAuth } = useAuthGate();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [expanded, setExpanded] = useState(false);
   const presentation = productPresentation(entry, product);
   const previewLength = variant === "home" ? HOME_PREVIEW_LENGTH : FEED_PREVIEW_LENGTH;
@@ -126,7 +133,10 @@ export default function ReviewCard({
         <button type="button" className={liked ? "is-selected" : ""} aria-pressed={liked} aria-label={product ? `${liked ? "Unlike" : "Like"} ${product.name} ${liked ? "in" : "and add to"} My Pieces` : `${liked ? "Unlike" : "Like"} this review`} disabled={!likeReady} onClick={() => onLike?.(entry)}><Icon name="heart" filled={liked} /><span>{liked ? "Liked" : "Like"}</span></button>
         <button type="button" className={saved ? "is-selected" : ""} aria-pressed={saved} aria-label={`${saved ? "Remove" : "Save"} this review ${saved ? "from" : "to"} Saved Reviews`} disabled={!saveReady} onClick={() => onSave?.(entry)}><Icon name="bookmark" filled={saved} /><span>{saved ? "Saved" : "Save"}</span></button>
         <button type="button" onClick={() => onShare?.(entry, product)}><Icon name="share" /><span>Share</span></button>
-        <Link to="/chats" state={{ draft: chatDraft, productContext }} aria-label={`Chat with the studio about ${presentation?.name || "this review"}`}><Icon name="chat" /><span>Chat</span></Link>
+        <button type="button" aria-label={`Chat with the studio about ${presentation?.name || "this review"}`} onClick={() => {
+          if (!user) { requestAuth({ returnTo: `${location.pathname}${location.search}`, returnState: null }); return; }
+          navigate("/chats", { state: { draft: chatDraft, productContext } });
+        }}><Icon name="chat" /><span>Chat</span></button>
       </div>
     </div>
   </article>;

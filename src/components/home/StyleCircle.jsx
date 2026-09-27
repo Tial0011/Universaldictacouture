@@ -1,5 +1,7 @@
 import { useId, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useAuthGate } from "../../context/AuthGateContext";
 import StitchArrowIcon from "../common/icons/StitchArrowIcon";
 import "./StyleCircle.css";
 import {
@@ -16,7 +18,10 @@ import {
  */
 export default function StyleCircle() {
   const fieldId = useId();
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  const { user } = useAuth();
+  const { requestAuth } = useAuthGate();
+  const [email, setEmail] = useState(() => String(location.state?.styleCircleEmail || ""));
   const [status, setStatus] = useState("idle"); // idle | loading | success | error
   const [message, setMessage] = useState("");
 
@@ -33,11 +38,16 @@ export default function StyleCircle() {
       return;
     }
 
+    if (!user) {
+      requestAuth({ returnTo: location.pathname, returnState: { styleCircleEmail: check.email } });
+      return;
+    }
+
     setStatus("loading");
     setMessage("");
 
     try {
-      await subscribeToStyleCircle(email);
+      await subscribeToStyleCircle(email, user);
       setStatus("success");
       setMessage("You are in. Welcome to the Style Circle.");
       setEmail("");
