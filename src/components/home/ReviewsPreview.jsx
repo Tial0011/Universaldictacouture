@@ -16,7 +16,7 @@ function Icon({ name }) {
 export default function ReviewsPreview({ entries = [], products = [], isLoading = false, error = "", onRetry }) {
   const trackRef = useRef(null);
   const [position, setPosition] = useState({ index: 0, canPrev: false, canNext: false });
-  const { isLiked, toggleLike, isReviewSaved, toggleSavedReview, shareReview, piecesReady, reviewsReady, piecesError, reviewsError } = useReviewInteractions();
+  const { isLiked, toggleLike, isReviewSaved, toggleSavedReview, shareReview, piecesReady, reviewsReady, piecesError, reviewsError, retryReviewSync } = useReviewInteractions();
   const productMap = new Map(products.map((product) => [product.id, product]));
 
   useEffect(() => {
@@ -78,7 +78,8 @@ export default function ReviewsPreview({ entries = [], products = [], isLoading 
 
       <div className="review-showcase__woven-rule" aria-hidden="true"><span /><span /><span /></div>
 
-      {(piecesError || reviewsError) && <p role="alert">{piecesError || reviewsError}</p>}
+      {piecesError && <p role="alert">{piecesError}</p>}
+      {reviewsError && <div role="status"><p>{reviewsError}</p>{retryReviewSync && <Button variant="secondary" onClick={retryReviewSync}>Retry account sync</Button>}</div>}
 
       {isLoading ? <div className="review-showcase__loading" role="status" aria-label="Loading Review & Feeds">
         {[0, 1, 2].map((item) => <div key={item} className="review-showcase__skeleton"><div /><span /><span /></div>)}

@@ -22,7 +22,7 @@ function writeLikedIds(ids) {
 export function useReviewInteractions() {
   const [likedIds, setLikedIds] = useState(readLikedIds);
   const { isSaved, toggleSaved, isPersistent: piecesPersistent, error: piecesError, isReady: piecesReady } = useSavedPieces();
-  const { isReviewSaved, toggleSavedReview, isPersistent: reviewsPersistent, error: reviewsError, isReady: reviewsReady } = useSavedReviews();
+  const { isReviewSaved, toggleSavedReview, retrySync, isPersistent: reviewsPersistent, error: reviewsError, isReady: reviewsReady } = useSavedReviews();
   const { showToast } = useToast();
 
   function toggleLike(reviewId, product) {
@@ -44,15 +44,18 @@ export function useReviewInteractions() {
     showToast(likedIds.includes(reviewId) ? "Review unliked." : "Review liked for this visit.");
   }
 
-  async function saveReview(reviewId) {
-    if (!reviewsReady) return;
-    const added = await toggleSavedReview(reviewId);
-    if (added === null) {
-      showToast("Bookmark change could not be stored. Check your connection and try again.", "error");
+  function saveReview(reviewId) {
+    const result = toggleSavedReview(reviewId);
+    if (!result) {
+      showToast("This review could not be bookmarked. Please refresh and try again.", "error");
       return;
     }
-    showToast(added
-      ? reviewsPersistent ? "Review saved in My Closet → Saved Reviews." : "Review saved in this browser under My Closet → Saved Reviews."
+    if (result.storage === "memory") {
+      showToast("Bookmark updated for now. Browser storage is unavailable, so it may be lost on refresh.", "error");
+      return;
+    }
+    showToast(result.added
+      ? result.storage === "browser" ? "Review saved in this browser under My Closet → Saved Reviews." : "Review saved for this visit under My Closet → Saved Reviews."
       : "Review removed from Saved Reviews.");
   }
 
@@ -88,5 +91,6 @@ export function useReviewInteractions() {
     reviewsReady,
     piecesError,
     reviewsError,
+    retryReviewSync: reviewsPersistent ? retrySync : null,
   };
 }

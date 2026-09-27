@@ -16,7 +16,7 @@ export default function MyCloset() {
   useDocumentMeta({ title: "My Closet | Universal Dicta Couture", noindex: true });
   const { lines, removeFromCloset } = useCloset();
   const { savedIds } = useSavedPieces();
-  const { savedReviewIds, toggleSavedReview, isReady, error: saveError } = useSavedReviews();
+  const { savedReviewIds, toggleSavedReview, isReady, isPersistent, error: saveError, retrySync } = useSavedReviews();
   const [attempt, setAttempt] = useState(0);
   const [reviewState, setReviewState] = useState({ entries: [], loading: true, error: "" });
   const hasSavedReviews = savedReviewIds.length > 0;
@@ -52,7 +52,7 @@ export default function MyCloset() {
 
     <section className="closet-section" aria-labelledby="closet-saved-reviews-heading">
       <div className="closet-section__heading"><h2 id="closet-saved-reviews-heading">Saved reviews{savedReviewIds.length ? ` (${savedReviewIds.length})` : ""}</h2><Link to="/my-closet/saved-reviews">View all</Link></div>
-      {saveError && <p role="alert">{saveError}</p>}
+      {saveError && <div role="status"><p>{saveError}</p>{isPersistent && <Button variant="secondary" onClick={retrySync}>Retry account sync</Button>}</div>}
       {!isReady && saveError ? null : !isReady || (hasSavedReviews && reviewState.loading)
         ? <p role="status">Loading your saved reviews…</p>
         : !hasSavedReviews

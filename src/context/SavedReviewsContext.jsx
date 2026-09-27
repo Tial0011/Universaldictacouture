@@ -1,12 +1,14 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { createContext, useContext, useEffect, useState, useSyncExternalStore } from "react";
+import { arrayRemove, arrayUnion, doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase/firestore";
+import { createSavedReviewStore, reviewIds } from "../services/savedReviewStore";
 import { useAuth } from "./AuthContext";
 
 const SavedReviewsContext = createContext({
   savedReviewIds: [],
   isReviewSaved: () => false,
-  toggleSavedReview: async () => null,
+  toggleSavedReview: () => null,
+  retrySync: () => {},
   isPersistent: false,
   isReady: true,
   error: "",
@@ -15,22 +17,30 @@ const SavedReviewsContext = createContext({
 const GUEST_KEY = "udc:saved-reviews";
 const LEGACY_GUEST_KEY = "udc:saved-reviews:session";
 
-function readGuest() {
-  try {
-    const stored = localStorage.getItem(GUEST_KEY) ?? sessionStorage.getItem(LEGACY_GUEST_KEY);
-    const ids = JSON.parse(stored || "[]");
-    return Array.isArray(ids) ? ids.filter((id) => typeof id === "string") : [];
-  } catch {
-    try {
-      const ids = JSON.parse(sessionStorage.getItem(LEGACY_GUEST_KEY) || "[]");
-      return Array.isArray(ids) ? ids.filter((id) => typeof id === "string") : [];
-    } catch { return []; }
+function readRecord(key) {
+  let raw;
+  try { raw = localStorage.getItem(key); } catch { /* storage may be blocked */ }
+  if (raw == null) {
+    try { raw = sessionStorage.getItem(key) || (key === GUEST_KEY ? sessionStorage.getItem(LEGACY_GUEST_KEY) : null); } catch { /* storage may be blocked */ }
   }
+  try {
+    const record = JSON.parse(raw || "{}");
+    return {
+      reviewIds: reviewIds(Array.isArray(record) ? record : record?.reviewIds),
+      pending: Array.isArray(record?.pending) ? record.pending : [],
+    };
+  } catch { return { reviewIds: [], pending: [] }; }
 }
 
-function clearGuest() {
-  try { localStorage.removeItem(GUEST_KEY); } catch { /* storage may be blocked */ }
-  try { sessionStorage.removeItem(LEGACY_GUEST_KEY); } catch { /* storage may be blocked */ }
+function writeRecord(key, record) {
+  const value = JSON.stringify(record);
+  try {
+    localStorage.setItem(key, value);
+    try { sessionStorage.removeItem(key); } catch { /* optional old fallback cleanup */ }
+    return "browser";
+  } catch {
+    try { sessionStorage.setItem(key, value); return "session"; } catch { return "memory"; }
+  }
 }
 
 export function SavedReviewsProvider({ children }) {
@@ -39,109 +49,67 @@ export function SavedReviewsProvider({ children }) {
 }
 
 function SavedReviewsSession({ uid, children }) {
-  const [savedReviewIds, setSavedReviewIds] = useState(() => uid ? [] : readGuest());
-  const [error, setError] = useState("");
-  const [isReady, setIsReady] = useState(!uid);
-  const latest = useRef(savedReviewIds);
-  const committed = useRef(savedReviewIds);
-  const ready = useRef(!uid);
-  const writes = useRef(Promise.resolve());
-
-  useEffect(() => {
-    if (uid) return;
-    try {
-      if (localStorage.getItem(GUEST_KEY) === null && latest.current.length) {
-        localStorage.setItem(GUEST_KEY, JSON.stringify(latest.current));
-      }
-    } catch { /* browser storage may be blocked */ }
-    const onStorage = (event) => {
-      if (event.key !== GUEST_KEY) return;
-      let ids = [];
-      try {
-        const parsed = JSON.parse(event.newValue || "[]");
-        if (Array.isArray(parsed)) ids = parsed.filter((id) => typeof id === "string");
-      } catch { /* ignore malformed data from another tab */ }
-      latest.current = ids;
-      committed.current = ids;
-      setSavedReviewIds(ids);
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, [uid]);
-
-  useEffect(() => {
-    if (!uid || !db) return;
-    let active = true;
-    getDoc(doc(db, "savedReviews", uid)).then((snapshot) => {
-      if (!active) return;
-      const ids = snapshot.data()?.reviewIds;
-      const accountIds = Array.isArray(ids) ? ids.filter((id) => typeof id === "string") : [];
-      const guestIds = readGuest();
-      const merged = [...new Set([...accountIds, ...guestIds])];
-      latest.current = merged;
-      committed.current = accountIds;
-      setSavedReviewIds(latest.current);
-      ready.current = true;
-      setIsReady(true);
-      if (merged.length !== accountIds.length) {
-        writes.current = writes.current
-          .then(() => setDoc(doc(db, "savedReviews", uid), { reviewIds: merged }))
-          .then(() => { committed.current = merged; if (active) clearGuest(); })
-          .catch(() => setError("Your bookmarked reviews are visible here, but could not sync to your account. Please try again later."));
-      } else if (guestIds.length) {
-        clearGuest();
-      }
-    }).catch(() => {
-      if (active) setError("Saved reviews could not be loaded. Refresh to try again.");
+  const [store] = useState(() => {
+    const key = uid ? `udc:saved-reviews:account:${uid}` : GUEST_KEY;
+    const initial = readRecord(key);
+    const guestIds = uid ? readRecord(GUEST_KEY).reviewIds : [];
+    if (guestIds.length) {
+      initial.reviewIds = reviewIds([...initial.reviewIds, ...guestIds]);
+      initial.pending = [...initial.pending, ...guestIds.map((id) => ({ id, saved: true }))];
+    }
+    let guestCopied = false;
+    return createSavedReviewStore({
+      initial,
+      persist(record) {
+        const storage = writeRecord(key, record);
+        // Transfer only the captured guest bookmarks after the account copy is durable.
+        if (guestIds.length && !guestCopied && storage !== "memory") {
+          const remaining = readRecord(GUEST_KEY).reviewIds.filter((id) => !guestIds.includes(id));
+          writeRecord(GUEST_KEY, { reviewIds: remaining, pending: [] });
+          try { sessionStorage.removeItem(LEGACY_GUEST_KEY); } catch { /* optional cleanup */ }
+          guestCopied = true;
+        }
+        return storage;
+      },
+      loadRemote: uid && db ? async () => {
+        const snapshot = await getDoc(doc(db, "savedReviews", uid));
+        if (snapshot.metadata.fromCache) throw new Error("Account bookmarks have not been confirmed by the server.");
+        return snapshot.data()?.reviewIds || [];
+      } : undefined,
+      writeRemote: uid && db ? (id, saved) => setDoc(
+        doc(db, "savedReviews", uid),
+        { reviewIds: saved ? arrayUnion(id) : arrayRemove(id) },
+        { merge: true },
+      ) : undefined,
     });
-    return () => { active = false; };
-  }, [uid]);
+  });
+  const state = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
 
-  function toggleSavedReview(id) {
-    if (!ready.current) {
-      setError("Saved reviews are still loading. Please wait a moment.");
-      return Promise.resolve(null);
-    }
-    const adding = !latest.current.includes(id);
-    const next = adding ? [...latest.current, id] : latest.current.filter((value) => value !== id);
-    latest.current = next;
-    setSavedReviewIds(next);
-    setError("");
-
-    if (uid && db) {
-      writes.current = writes.current
-        .then(() => setDoc(doc(db, "savedReviews", uid), { reviewIds: next }))
-        .then(() => {
-          committed.current = next;
-          clearGuest();
-          if (latest.current === next) setError("");
-          return adding;
-        })
-        .catch(() => {
-          if (latest.current === next) {
-            latest.current = committed.current;
-            setSavedReviewIds(committed.current);
-          }
-          setError("That saved-review change could not be stored. Check your connection and try again.");
-          return null;
-        });
-      return writes.current;
-    } else {
-      try { localStorage.setItem(GUEST_KEY, JSON.stringify(next)); }
-      catch {
-        try { sessionStorage.setItem(LEGACY_GUEST_KEY, JSON.stringify(next)); } catch { /* memory-only fallback */ }
+  useEffect(() => {
+    store.start();
+    const retry = () => { void store.retry(); };
+    const onStorage = (event) => {
+      if (!uid && (event.key === GUEST_KEY || event.key === null)) {
+        store.replaceGuestIds(readRecord(GUEST_KEY).reviewIds);
       }
-    }
-    return Promise.resolve(adding);
-  }
+    };
+    window.addEventListener("online", retry);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener("online", retry);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, [store, uid]);
 
   return <SavedReviewsContext.Provider value={{
-    savedReviewIds,
-    isReviewSaved: (id) => savedReviewIds.includes(id),
-    toggleSavedReview,
+    savedReviewIds: state.savedReviewIds,
+    isReviewSaved: (id) => state.savedReviewIds.includes(id),
+    toggleSavedReview: store.toggle,
+    retrySync: store.retry,
     isPersistent: !!uid && !!db,
-    isReady,
-    error,
+    // Local storage is immediately ready, regardless of the account connection.
+    isReady: true,
+    error: state.error,
   }}>{children}</SavedReviewsContext.Provider>;
 }
 

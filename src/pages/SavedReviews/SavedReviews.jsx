@@ -11,7 +11,7 @@ import "./SavedReviews.css";
 
 export default function SavedReviews() {
   useDocumentMeta({ title: "Saved Reviews | Universal Dicta Couture", noindex: true });
-  const { savedReviewIds, isPersistent, isReady, error: saveError } = useSavedReviews();
+  const { savedReviewIds, isPersistent, isReady, error: saveError, retrySync } = useSavedReviews();
   const { isLiked, toggleLike, isReviewSaved, toggleSavedReview, shareReview, piecesReady, piecesError } = useReviewInteractions();
   const [attempt, setAttempt] = useState(0);
   const [state, setState] = useState({ reviews: [], products: [], loading: true, error: "" });
@@ -38,7 +38,8 @@ export default function SavedReviews() {
   return <>
     <PageIntro eyebrow="My Closet" title="Saved Reviews" description={isPersistent ? "Customer stories you bookmarked, ready to revisit." : "Customer stories you bookmark are kept in this browser."} />
     <section className="container section saved-reviews" aria-label="Bookmarked customer reviews">
-      {(saveError || piecesError) && <p role="alert">{saveError || piecesError}</p>}
+      {piecesError && <p role="alert">{piecesError}</p>}
+      {saveError && <div role="status"><p>{saveError}</p>{isPersistent && <Button variant="secondary" onClick={retrySync}>Retry account sync</Button>}</div>}
       {!isReady && saveError ? null : !isReady || (hasSavedReviews && state.loading)
         ? <p role="status">Loading your saved reviews…</p>
         : !hasSavedReviews
