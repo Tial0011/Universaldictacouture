@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useSavedReviews } from "../../context/SavedReviewsContext";
+import { useSavedPieces } from "../../context/SavedPiecesContext";
+import { useToast } from "../../context/ToastContext";
 import { truncateText } from "../../utils/formatters";
 
 const LIKED_KEY = "udc:review-likes:session";
@@ -19,9 +21,19 @@ function writeLikedIds(ids) {
 
 export function useReviewInteractions() {
   const [likedIds, setLikedIds] = useState(readLikedIds);
-  const { isReviewSaved, toggleSavedReview } = useSavedReviews();
+  const { isSaved, toggleSaved, isPersistent: piecesPersistent, error: piecesError, isReady: piecesReady } = useSavedPieces();
+  const { isReviewSaved, toggleSavedReview, isPersistent: reviewsPersistent, error: reviewsError, isReady: reviewsReady } = useSavedReviews();
+  const { showToast } = useToast();
 
-  function toggleLike(reviewId) {
+  function toggleLike(reviewId, product) {
+    if (product?.id) {
+      if (!piecesReady) return;
+      const added = toggleSaved(product.id);
+      showToast(added
+        ? piecesPersistent ? "Piece liked and saved in My Closet → My Pieces." : "Piece liked for this visit in My Closet → My Pieces."
+        : "Piece removed from My Pieces.");
+      return;
+    }
     setLikedIds((current) => {
       const next = current.includes(reviewId)
         ? current.filter((id) => id !== reviewId)
@@ -29,10 +41,19 @@ export function useReviewInteractions() {
       writeLikedIds(next);
       return next;
     });
+    showToast(likedIds.includes(reviewId) ? "Review unliked." : "Review liked for this visit.");
+  }
+
+  function saveReview(reviewId) {
+    if (!reviewsReady) return;
+    const added = toggleSavedReview(reviewId);
+    showToast(added
+      ? reviewsPersistent ? "Review saved in My Closet → Saved Reviews." : "Review saved for this visit in My Closet → Saved Reviews."
+      : "Review removed from Saved Reviews.");
   }
 
   async function shareReview(entry, product) {
-    const target = product?.href || `/reviews-feeds?review=${encodeURIComponent(entry.id)}`;
+    const target = `/reviews-feeds?review=${encodeURIComponent(entry.id)}`;
     const url = new URL(target, window.location.origin).toString();
     const text = `${truncateText(entry.body, 180)}${product?.name ? ` — ${product.name}` : ""}`;
     try {
@@ -54,10 +75,14 @@ export function useReviewInteractions() {
   }
 
   return {
-    isLiked: (id) => likedIds.includes(id),
+    isLiked: (id, product) => product?.id ? isSaved(product.id) : likedIds.includes(id),
     toggleLike,
     isReviewSaved,
-    toggleSavedReview,
+    toggleSavedReview: saveReview,
     shareReview,
+    piecesReady,
+    reviewsReady,
+    piecesError,
+    reviewsError,
   };
 }

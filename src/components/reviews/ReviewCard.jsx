@@ -8,7 +8,7 @@ import "./ReviewCard.css";
 const HOME_PREVIEW_LENGTH = 150;
 const FEED_PREVIEW_LENGTH = 300;
 
-function Icon({ name }) {
+function Icon({ name, filled = false }) {
   const paths = {
     heart: <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />,
     bookmark: <path d="M6 3h12v18l-6-4-6 4V3Z" />,
@@ -16,7 +16,7 @@ function Icon({ name }) {
     chat: <path d="M4 5h16v11H9l-5 4V5Z" />,
     arrow: <path d="M5 12h14m-5-5 5 5-5 5" />,
   };
-  return <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>;
+  return <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>;
 }
 
 function Stars({ value, label }) {
@@ -62,6 +62,8 @@ export default function ReviewCard({
   variant = "feed",
   liked = false,
   saved = false,
+  likeReady = true,
+  saveReady = true,
   onLike,
   onSave,
   onShare,
@@ -122,8 +124,8 @@ export default function ReviewCard({
       </div>
 
       <div className="udc-review-card__actions" aria-label={`Actions for ${entry.author || "customer"} review`}>
-        <button type="button" className={liked ? "is-selected" : ""} aria-pressed={liked} onClick={() => onLike?.(entry)}><Icon name="heart" /><span>Like</span></button>
-        <button type="button" className={saved ? "is-selected" : ""} aria-pressed={saved} onClick={() => onSave?.(entry)}><Icon name="bookmark" /><span>Save</span></button>
+        <button type="button" className={liked ? "is-selected" : ""} aria-pressed={liked} aria-label={product ? `${liked ? "Unlike" : "Like"} ${product.name} ${liked ? "in" : "and add to"} My Pieces` : `${liked ? "Unlike" : "Like"} this review`} disabled={!likeReady} onClick={() => onLike?.(entry)}><Icon name="heart" filled={liked} /><span>{liked ? "Liked" : "Like"}</span></button>
+        <button type="button" className={saved ? "is-selected" : ""} aria-pressed={saved} aria-label={`${saved ? "Remove" : "Save"} this review ${saved ? "from" : "to"} Saved Reviews`} disabled={!saveReady} onClick={() => onSave?.(entry)}><Icon name="bookmark" filled={saved} /><span>{saved ? "Saved" : "Save"}</span></button>
         <button type="button" onClick={() => onShare?.(entry, product)}><Icon name="share" /><span>Share</span></button>
         <Link to="/chats" state={{ draft: chatDraft }}><Icon name="chat" /><span>{variant === "feed" ? "Chat about this Review" : "Chat"}</span></Link>
       </div>

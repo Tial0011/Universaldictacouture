@@ -15,6 +15,7 @@ const OurStory = lazy(() => import("./pages/OurStory/OurStory"));
 const Policies = lazy(() => import("./pages/Policies/Policies"));
 const Profile = lazy(() => import("./pages/Profile/Profile"));
 const SavedPieces = lazy(() => import("./pages/SavedPieces/SavedPieces"));
+const SavedReviews = lazy(() => import("./pages/SavedReviews/SavedReviews"));
 const MyCloset = lazy(() => import("./pages/MyCloset/MyCloset"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -46,6 +47,7 @@ export default function App() {
         <Route path="/saved-pieces" element={<Navigate to="/my-closet/my-pieces" replace />} />
         <Route path="/my-closet" element={<MyCloset />} />
         <Route path="/my-closet/my-pieces" element={<SavedPieces />} />
+        <Route path="/my-closet/saved-reviews" element={<SavedReviews />} />
         <Route path="*" element={<NotFound />} />
       </Route>
 

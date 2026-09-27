@@ -12,6 +12,6 @@ export default function SavedPieces() {
   return <><PageIntro eyebrow="My Closet" title="My Pieces" description={isPersistent ? "Pieces you have saved, ready when you are." : "Pieces you save are kept for this browser session."} /><section className="container section">
     {saveError && <p role="alert">{saveError}</p>}
     {isLoading ? <p role="status">Loading your pieces…</p> : error ? <><p role="alert">{error}</p><Button onClick={retry}>Try again</Button></> : saved.length ? <ProductGrid products={saved} /> : <p>No published pieces are saved yet.</p>}
-    <div className="account-actions"><Button to="/my-closet" variant="secondary">My Closet</Button><Button to="/shop">Browse the shop</Button>{!isPersistent && <Button to="/signin" variant="secondary">Sign in</Button>}</div>
+    <div className="account-actions"><Button to="/my-closet" variant="secondary">My Closet</Button><Button to="/my-closet/saved-reviews" variant="secondary">Saved Reviews</Button><Button to="/shop">Browse the shop</Button>{!isPersistent && <Button to="/signin" variant="secondary">Sign in</Button>}</div>
   </section></>;
 }

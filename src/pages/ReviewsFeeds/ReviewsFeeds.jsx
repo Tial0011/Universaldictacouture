@@ -38,7 +38,7 @@ export default function ReviewsFeeds() {
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("newest");
-  const { isLiked, toggleLike, isReviewSaved, toggleSavedReview, shareReview } = useReviewInteractions();
+  const { isLiked, toggleLike, isReviewSaved, toggleSavedReview, shareReview, piecesReady, reviewsReady, piecesError, reviewsError } = useReviewInteractions();
 
   useEffect(() => {
     let active = true;
@@ -127,6 +127,7 @@ export default function ReviewsFeeds() {
         <p>{state.loading ? "Loading customer stories…" : `${visible.length} ${visible.length === 1 ? "story" : "stories"} shown`}</p>
         <span aria-hidden="true" />
       </div>
+      {(piecesError || reviewsError) && <p role="alert">{piecesError || reviewsError}</p>}
 
       {state.loading ? <div className="reviews-page__loading" role="status">Loading Review &amp; Feeds…</div>
       : state.error ? <div className="reviews-page__state" role="alert"><h2>Review &amp; Feeds is taking a moment.</h2><p>{state.error}</p><Button onClick={() => setAttempt((value) => value + 1)}>Try again</Button></div>
@@ -138,9 +139,11 @@ export default function ReviewsFeeds() {
             variant="feed"
             showDate
             forceExpanded={entry.id === focusId}
-            liked={isLiked(entry.id)}
+            liked={isLiked(entry.id, productMap.get(entry.productId))}
             saved={isReviewSaved(entry.id)}
-            onLike={() => toggleLike(entry.id)}
+            likeReady={!productMap.has(entry.productId) || piecesReady}
+            saveReady={reviewsReady}
+            onLike={() => toggleLike(entry.id, productMap.get(entry.productId))}
             onSave={() => toggleSavedReview(entry.id)}
             onShare={shareReview}
           />)}

@@ -147,6 +147,7 @@
 .udc-review-card__actions > :last-child { border-right: 0; }
 .udc-review-card__actions svg { width: 1rem; height: 1rem; flex: 0 0 auto; }
 .udc-review-card__actions .is-selected { color: var(--color-brand); background: rgba(96,16,19,.045); }
+.udc-review-card__actions button:disabled { opacity: .5; cursor: wait; }
 .udc-review-card__actions button:hover,
 .udc-review-card__actions a:hover { color: var(--color-brand); background: rgba(96,16,19,.035); }
 

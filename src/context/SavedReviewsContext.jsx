@@ -8,6 +8,7 @@ const SavedReviewsContext = createContext({
   isReviewSaved: () => false,
   toggleSavedReview: () => false,
   isPersistent: false,
+  isReady: true,
   error: "",
 });
 
@@ -30,7 +31,9 @@ export function SavedReviewsProvider({ children }) {
 function SavedReviewsSession({ uid, children }) {
   const [savedReviewIds, setSavedReviewIds] = useState(() => uid ? [] : readGuest());
   const [error, setError] = useState("");
+  const [isReady, setIsReady] = useState(!uid);
   const latest = useRef(savedReviewIds);
+  const committed = useRef(savedReviewIds);
   const ready = useRef(!uid);
   const writes = useRef(Promise.resolve());
 
@@ -41,8 +44,10 @@ function SavedReviewsSession({ uid, children }) {
       if (!active) return;
       const ids = snapshot.data()?.reviewIds;
       latest.current = Array.isArray(ids) ? ids.filter((id) => typeof id === "string") : [];
+      committed.current = latest.current;
       setSavedReviewIds(latest.current);
       ready.current = true;
+      setIsReady(true);
     }).catch(() => {
       if (active) setError("Saved reviews could not be loaded. Refresh to try again.");
     });
@@ -63,7 +68,17 @@ function SavedReviewsSession({ uid, children }) {
     if (uid && db) {
       writes.current = writes.current
         .then(() => setDoc(doc(db, "savedReviews", uid), { reviewIds: next }))
-        .catch(() => setError("That saved-review change could not be stored. Check your connection and try again."));
+        .then(() => {
+          committed.current = next;
+          if (latest.current === next) setError("");
+        })
+        .catch(() => {
+          if (latest.current === next) {
+            latest.current = committed.current;
+            setSavedReviewIds(committed.current);
+          }
+          setError("That saved-review change could not be stored. Check your connection and try again.");
+        });
     } else {
       try { sessionStorage.setItem(GUEST_KEY, JSON.stringify(next)); } catch { /* memory-only guest session */ }
     }
@@ -75,6 +90,7 @@ function SavedReviewsSession({ uid, children }) {
     isReviewSaved: (id) => savedReviewIds.includes(id),
     toggleSavedReview,
     isPersistent: !!uid && !!db,
+    isReady,
     error,
   }}>{children}</SavedReviewsContext.Provider>;
 }

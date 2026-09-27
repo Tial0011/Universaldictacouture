@@ -16,7 +16,7 @@ function Icon({ name }) {
 export default function ReviewsPreview({ entries = [], products = [], isLoading = false, error = "", onRetry }) {
   const trackRef = useRef(null);
   const [position, setPosition] = useState({ index: 0, canPrev: false, canNext: false });
-  const { isLiked, toggleLike, isReviewSaved, toggleSavedReview, shareReview } = useReviewInteractions();
+  const { isLiked, toggleLike, isReviewSaved, toggleSavedReview, shareReview, piecesReady, reviewsReady, piecesError, reviewsError } = useReviewInteractions();
   const productMap = new Map(products.map((product) => [product.id, product]));
 
   useEffect(() => {
@@ -78,6 +78,8 @@ export default function ReviewsPreview({ entries = [], products = [], isLoading 
 
       <div className="review-showcase__woven-rule" aria-hidden="true"><span /><span /><span /></div>
 
+      {(piecesError || reviewsError) && <p role="alert">{piecesError || reviewsError}</p>}
+
       {isLoading ? <div className="review-showcase__loading" role="status" aria-label="Loading Review & Feeds">
         {[0, 1, 2].map((item) => <div key={item} className="review-showcase__skeleton"><div /><span /><span /></div>)}
       </div> : error ? <div className="review-showcase__state" role="alert"><span className="review-showcase__state-motif" aria-hidden="true" /><h3>Customer stories are taking a moment.</h3><p>{error}</p>{onRetry && <Button variant="secondary" onClick={onRetry}>Try again</Button>}</div>
@@ -88,9 +90,11 @@ export default function ReviewsPreview({ entries = [], products = [], isLoading 
             entry={entry}
             product={productMap.get(entry.productId) || null}
             variant="home"
-            liked={isLiked(entry.id)}
+            liked={isLiked(entry.id, productMap.get(entry.productId))}
             saved={isReviewSaved(entry.id)}
-            onLike={() => toggleLike(entry.id)}
+            likeReady={!productMap.has(entry.productId) || piecesReady}
+            saveReady={reviewsReady}
+            onLike={() => toggleLike(entry.id, productMap.get(entry.productId))}
             onSave={() => toggleSavedReview(entry.id)}
             onShare={shareReview}
           />)}
