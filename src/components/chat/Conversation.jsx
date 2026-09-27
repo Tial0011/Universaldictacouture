@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import Button from "../common/Button";
+import ChatProductTag from "./ChatProductTag";
 import { chatError, olderMessages, sendMessage, watchMessages } from "../../services/chats";
-import { mergeMessages, MESSAGE_LIMIT } from "../../services/chatModel";
+import { mergeMessages, MESSAGE_LIMIT, normaliseProductContext } from "../../services/chatModel";
 import "./Conversation.css";
 
 function sentAt(timestamp) {
   return timestamp?.toDate?.().toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) || "Sending...";
 }
 
-export default function Conversation({ user, customerId, admin = false, title = "Dicta Couturier", initialDraft = "" }) {
+export default function Conversation({ user, customerId, admin = false, title = "Dicta Couturier", initialDraft = "", initialProductContext = null, onSent }) {
   const [messages, setMessages] = useState([]);
   const [cursor, setCursor] = useState(null);
   const [hasMore, setHasMore] = useState(false);
@@ -18,6 +19,7 @@ export default function Conversation({ user, customerId, admin = false, title = 
   const [actionError, setActionError] = useState("");
   const [attempt, setAttempt] = useState(0);
   const [text, setText] = useState(() => initialDraft.slice(0, MESSAGE_LIMIT));
+  const [productContext, setProductContext] = useState(() => normaliseProductContext(initialProductContext));
   const [sending, setSending] = useState(false);
   const [cached, setCached] = useState(false);
   const mounted = useRef(false);
@@ -60,8 +62,8 @@ export default function Conversation({ user, customerId, admin = false, title = 
     if (sendingRef.current || !text.trim()) return;
     sendingRef.current = true; setSending(true); setActionError("");
     try {
-      await sendMessage({ user, customerId, text, admin });
-      if (mounted.current) setText("");
+      await sendMessage({ user, customerId, text, admin, productContext });
+      if (mounted.current) { setText(""); setProductContext(null); onSent?.(); }
     } catch (error) { if (mounted.current) setActionError(chatError(error)); }
     finally { sendingRef.current = false; if (mounted.current) setSending(false); }
   }
@@ -73,12 +75,14 @@ export default function Conversation({ user, customerId, admin = false, title = 
         {hasMore && <Button variant="ghost" onClick={loadOlder} isLoading={loadingOlder}>Load earlier messages</Button>}
         {loading ? <p role="status">Loading messages...</p> : messages.length === 0 ? <p className="conversation__empty">{admin ? "No messages yet." : "Start a conversation about a piece, sizing or a custom style. The studio will reply here."}</p> : messages.map(message => <article key={message.id} className={"conversation__message" + (message.senderRole === (admin ? "admin" : "customer") ? " conversation__message--own" : "")}>
           <strong>{message.senderRole === "admin" ? "Dicta Couturier" : admin ? "Customer" : "You"}</strong>
+          <ChatProductTag context={message.productContext} />
           <p>{message.body}</p><small>{message.pending ? "Sending..." : sentAt(message.createdAt)}</small>
         </article>)}
         <div ref={bottom} />
       </div>
     </>}
     <form className="conversation__composer" onSubmit={submit}>
+      {productContext && <div className="conversation__attachment"><ChatProductTag context={productContext} /><button type="button" disabled={sending} onClick={() => setProductContext(null)}>Remove product tag</button></div>}
       <label htmlFor="chat-message">{admin ? "Reply to customer" : "Your message"}</label>
       <textarea id="chat-message" value={text} onChange={event => setText(event.target.value)} maxLength={MESSAGE_LIMIT} rows={3} required disabled={sending || Boolean(readError) || loading} placeholder="Write your message..." aria-describedby="chat-message-help" />
       <div className="conversation__compose-actions"><small id="chat-message-help">{text.length} / {MESSAGE_LIMIT} characters</small><Button type="submit" isLoading={sending} disabled={!text.trim() || Boolean(readError) || loading}>{sending ? "Sending..." : "Send message"}</Button></div>

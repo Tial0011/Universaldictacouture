@@ -21,6 +21,8 @@ export function prepareRecord(kind, raw) {
   };
   if (kind === "products") {
     required("name", "Product name");
+    data.description = typeof data.description === "string" ? data.description.trim() : "";
+    if (data.description.length > 4000) throw new Error("Keep the product description within 4,000 characters.");
     DIMENSIONS.forEach(key => { data[key] = splitValues(data[key]); });
     const rawShopBy = data.shopBy && typeof data.shopBy === "object" && !Array.isArray(data.shopBy) ? data.shopBy : {};
     data.shopBy = Object.fromEntries(

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import ReviewCard from "../../components/reviews/ReviewCard";
+import ReviewGrid from "../../components/reviews/ReviewGrid";
 import { useReviewInteractions } from "../../components/reviews/useReviewInteractions";
 import Button from "../../components/common/Button";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
@@ -89,11 +90,12 @@ export default function ReviewsFeeds() {
     <section className="reviews-page__hero" aria-labelledby="reviews-page-title">
       <div className="reviews-page__hero-pattern" aria-hidden="true" />
       <div className="container reviews-page__hero-inner">
-        <span className="reviews-page__eyebrow">Customer stories · Woven into the house</span>
+        <span className="reviews-page__eyebrow">Universal Dicta Couture · The customer edit</span>
         <div className="reviews-page__hero-copy">
-          <h1 id="reviews-page-title">Review <em>&amp; Feeds</em></h1>
-          <p>Real moments, honest feedback, and the pieces our customers made their own.</p>
+          <h1 id="reviews-page-title">Reviews <em>&amp; Feeds</em></h1>
+          <div><p>Woven with meaning.<br />Worn your way.</p><span className="reviews-page__lede">Real moments, personal style, and the pieces that become part of your story.</span></div>
         </div>
+        <div className="reviews-page__hero-footer"><span>Tradition in every thread. You in every story.</span><Link to="/my-closet/saved-reviews">Your saved stories <span aria-hidden="true">↗</span></Link></div>
       </div>
     </section>
 
@@ -113,7 +115,7 @@ export default function ReviewsFeeds() {
           </label>
           <label className="reviews-page__sort">
             <span>Sort</span>
-            <select value={sort} onChange={(event) => { setSort(event.target.value); if (["service", "quality"].includes(filter)) setFilter("all"); }}>
+            <select aria-label="Sort reviews" value={sort} onChange={(event) => { setSort(event.target.value); if (["service", "quality"].includes(filter)) setFilter("all"); }}>
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
               <option value="service">Customer Service</option>
@@ -132,7 +134,7 @@ export default function ReviewsFeeds() {
 
       {state.loading ? <div className="reviews-page__loading" role="status">Loading Review &amp; Feeds…</div>
       : state.error ? <div className="reviews-page__state" role="alert"><h2>Review &amp; Feeds is taking a moment.</h2><p>{state.error}</p><Button onClick={() => setAttempt((value) => value + 1)}>Try again</Button></div>
-      : visible.length ? <div className="reviews-page__grid">
+      : visible.length ? <ReviewGrid>
           {visible.map((entry) => <ReviewCard
             key={entry.id}
             entry={entry}
@@ -148,9 +150,10 @@ export default function ReviewsFeeds() {
             onSave={() => toggleSavedReview(entry.id)}
             onShare={shareReview}
           />)}
-        </div>
+        </ReviewGrid>
       : <div className="reviews-page__state"><h2>No matching stories</h2><p>Try another filter or search phrase.</p><button type="button" onClick={() => { setFilter("all"); setQuery(""); setSort("newest"); }}>Clear filters</button></div>}
 
+      <div className="reviews-page__signature"><span aria-hidden="true">UDC</span><p>Stories worth keeping.<br /><em>Style that stays with you.</em></p><Link to="/shop">Discover the collection <span aria-hidden="true">→</span></Link></div>
     </section>
   </main>;
 }

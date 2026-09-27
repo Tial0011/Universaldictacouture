@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import ReviewCard from "../../components/reviews/ReviewCard";
+import ReviewGrid from "../../components/reviews/ReviewGrid";
 import { useReviewInteractions } from "../../components/reviews/useReviewInteractions";
 import Button from "../../components/common/Button";
 import PageIntro from "../../components/common/PageIntro";
@@ -48,7 +49,7 @@ export default function SavedReviews() {
             ? <div role="alert"><p>{state.error}</p><Button onClick={() => { setState((previous) => ({ ...previous, loading: true, error: "" })); setAttempt((value) => value + 1); }}>Try again</Button></div>
             : <>
               {unavailableCount > 0 && <p>{unavailableCount} saved {unavailableCount === 1 ? "review is" : "reviews are"} no longer published.</p>}
-              {saved.length > 0 ? <div className="saved-reviews__grid">
+              {saved.length > 0 ? <ReviewGrid>
                 {saved.map((entry) => {
                   const product = productMap.get(entry.productId) || null;
                   return <ReviewCard
@@ -64,7 +65,7 @@ export default function SavedReviews() {
                     onShare={shareReview}
                   />;
                 })}
-              </div> : <p>No published reviews are available from your bookmarks right now.</p>}
+              </ReviewGrid> : <p>No published reviews are available from your bookmarks right now.</p>}
             </>}
       <div className="account-actions">
         <Button to="/reviews-feeds">Browse reviews</Button>

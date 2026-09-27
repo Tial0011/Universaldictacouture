@@ -1,0 +1,13 @@
+.chat-product-tag { min-width: 0; width: min(100%, 25rem); margin-block: .65rem; border: 1px solid var(--color-border-luxury); border-left: 3px solid var(--color-brand); background: var(--color-ivory); color: var(--color-text-primary); }
+.chat-product-tag__piece { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr); align-items: center; gap: .75rem; padding: .7rem; color: inherit; text-decoration: none; }
+.chat-product-tag__image { height: 4.5rem; background: url("../../assets/brand/menu-weave.svg") center / 60px 72px, var(--color-ivory-deep); overflow: hidden; }
+.chat-product-tag__image img { width: 100%; height: 100%; object-fit: cover; }
+.chat-product-tag__piece > div:last-child { display: grid; gap: .2rem; min-width: 0; }
+.chat-product-tag__piece span { font-size: .65rem; color: var(--color-brand); }
+.chat-product-tag .chat-product-tag__piece strong { font-size: .9rem; color: var(--color-text-primary); line-height: 1.35; overflow-wrap: anywhere; }
+.chat-product-tag .chat-product-tag__piece small { color: var(--color-text-secondary); font-size: .65rem; }
+.chat-product-tag__view { padding-top: .2rem; text-decoration: underline; }
+.chat-product-tag__review { display: flex; align-items: center; min-height: 2.75rem; padding: .4rem .7rem; border-top: 1px solid var(--color-border-luxury); font-size: .7rem; color: var(--color-brand); }
+.chat-product-tag a:focus-visible { outline: 2px solid var(--color-brand); outline-offset: -3px; }
+.conversation__attachment { display: flex; flex-wrap: wrap; align-items: start; gap: .5rem; }
+.conversation__attachment > button { min-height: 2.75rem; padding: .4rem .65rem; margin-top: .65rem; border: 1px solid var(--color-border-control); background: transparent; color: var(--color-brand); font: inherit; font-size: .75rem; cursor: pointer; }

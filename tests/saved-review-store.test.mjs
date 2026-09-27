@@ -1,6 +1,19 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createSavedReviewStore } from "../src/services/savedReviewStore.js";
+import { createSavedReviewStore, createSavedItemsStore } from "../src/services/savedReviewStore.js";
+
+test("liked pieces use the same offline-safe engine without changing productIds storage", async () => {
+  let cached;
+  const store = createSavedItemsStore({ idsField: "productIds", snapshotField: "savedIds", itemLabel: "saved pieces", initial: { productIds: ["old"] }, persist: value => { cached = value; return "browser"; }, loadRemote: async () => { throw new Error("offline"); }, writeRemote: async () => { throw new Error("offline"); } });
+  store.start();
+  assert.equal(store.toggle("new").added, true);
+  await store.retry();
+  assert.deepEqual(store.getSnapshot().savedIds, ["old", "new"]);
+  assert.match(store.getSnapshot().error, /saved pieces are kept in this browser/);
+  assert.deepEqual(cached.productIds, ["old", "new"]);
+  const reopened = createSavedItemsStore({ idsField: "productIds", snapshotField: "savedIds", initial: cached, persist: () => "browser" });
+  assert.deepEqual(reopened.getSnapshot().savedIds, ["old", "new"]);
+});
 
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 const deferred = () => {

@@ -8,6 +8,8 @@ import Button from "../../components/common/Button";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import { formatNaira } from "../../utils/formatters";
 import { priceForSelections } from "../../services/productModel";
+import { productChatContext } from "../../services/chatModel";
+import { buildProductShare, shareContent } from "../../services/shareContent";
 import "./ProductDetails.css";
 
 export default function ProductDetails() {
@@ -124,6 +126,11 @@ function Piece({ product }) {
     }
   }
 
+  async function handleShare() {
+    const result = await shareContent(buildProductShare(product, window.location.origin));
+    if (result === "copied") setMessage("Product name, description and link copied, ready to share.");
+  }
+
   return (
     <section className="section product-details" aria-labelledby="piece-title">
       <div className="container">
@@ -152,6 +159,7 @@ function Piece({ product }) {
               </p>
             </div>
 
+            {product.description && <p className="product-details__description">{product.description}</p>}
             {details.length > 0 && (
               <dl className="product-details__attributes">
                 {details.map(([label, values]) => (
@@ -201,6 +209,8 @@ function Piece({ product }) {
                   {saved ? "Saved piece" : "Save piece"}
                 </Button>
                 <Button to="/my-closet" variant="ghost">View My Closet</Button>
+                <Button variant="ghost" onClick={handleShare}>Share this piece</Button>
+                <Button to="/chats" state={{ draft: `Hello, I’m interested in ${product.name}.`, productContext: productChatContext(product) }} variant="ghost">Ask about this piece</Button>
               </div>
               <div className="product-details__feedback">
                 {message && <p role="status">{message}</p>}

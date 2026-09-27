@@ -10,6 +10,7 @@ import {
 } from "../../firebase/accountActions";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import Button from "../../components/common/Button";
+import { normaliseProductContext } from "../../services/chatModel";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import "./Profile.css";
 
@@ -55,7 +56,7 @@ export default function Profile() {
   ));
   const returnTo = location.state?.returnTo === "/chats" ? "/chats" : "/profile";
   const returnState = returnTo === "/chats" && typeof location.state?.draft === "string"
-    ? { draft: location.state.draft }
+    ? { draft: location.state.draft, productContext: normaliseProductContext(location.state.productContext) }
     : undefined;
 
   useDocumentMeta({

@@ -1,0 +1,12 @@
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  max-width: 1040px;
+  margin-inline: auto;
+  gap: clamp(.65rem, 1.8vw, 1.5rem);
+  align-items: start;
+}
+.review-grid[data-masonry="true"] { grid-auto-rows: 4px; }
+.review-grid__item { min-width: 0; }
+/* No dense placement: visual order must match keyboard/reading order. */

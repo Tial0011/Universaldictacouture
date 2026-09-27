@@ -1,53 +1,82 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { createContext, useContext, useEffect, useState, useSyncExternalStore } from "react";
+import { arrayRemove, arrayUnion, doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase/firestore";
+import { createSavedItemsStore, reviewIds as itemIds } from "../services/savedReviewStore";
 import { useAuth } from "./AuthContext";
-const SavedPiecesContext = createContext({ savedIds: [], isSaved: () => false, toggleSaved: () => false, isPersistent: false, isReady: true, error: "" });
-function readGuest() {
-  try { const ids = JSON.parse(sessionStorage.getItem("udc:saved-pieces:guest") || "[]"); return Array.isArray(ids) ? ids.filter(id => typeof id === "string") : []; }
-  catch { return []; }
+
+const SavedPiecesContext = createContext({ savedIds: [], isSaved: () => false, toggleSaved: () => false, retrySync: () => {}, isPersistent: false, isReady: true, storage: "memory", error: "" });
+const GUEST_KEY = "udc:saved-pieces:guest";
+function readRecord(key) {
+  let raw;
+  try { raw = localStorage.getItem(key); } catch { /* blocked storage */ }
+  if (raw == null) try { raw = sessionStorage.getItem(key); } catch { /* blocked storage */ }
+  try {
+    const record = JSON.parse(raw || "{}");
+    return { productIds: itemIds(Array.isArray(record) ? record : record?.productIds), pending: Array.isArray(record?.pending) ? record.pending : [] };
+  } catch { return { productIds: [], pending: [] }; }
+}
+function writeRecord(key, record) {
+  const value = JSON.stringify(record);
+  try {
+    localStorage.setItem(key, value);
+    try { sessionStorage.removeItem(key); } catch { /* optional legacy cleanup */ }
+    return "browser";
+  } catch {
+    try { sessionStorage.setItem(key, value); return "session"; } catch { return "memory"; }
+  }
 }
 export function SavedPiecesProvider({ children }) {
   const { user } = useAuth();
   return <SavedSession key={user?.uid || "guest"} uid={user?.uid}>{children}</SavedSession>;
 }
 function SavedSession({ uid, children }) {
-  const [savedIds, setSavedIds] = useState(() => uid ? [] : readGuest());
-  const [error, setError] = useState("");
-  const [isReady, setIsReady] = useState(!uid);
-  const latest = useRef(savedIds);
-  const committed = useRef(savedIds);
-  const ready = useRef(!uid);
-  const writes = useRef(Promise.resolve());
-  useEffect(() => {
-    if (!uid || !db) return;
-    let active = true;
-    getDoc(doc(db, "savedPieces", uid)).then(snapshot => {
-      if (!active) return;
-      const ids = snapshot.data()?.productIds;
-      latest.current = Array.isArray(ids) ? ids.filter(id => typeof id === "string") : [];
-      committed.current = latest.current;
-      setSavedIds(latest.current); ready.current = true; setIsReady(true);
-    }).catch(() => { if (active) setError("Your pieces could not be loaded. Refresh to try again."); });
-    return () => { active = false; };
-  }, [uid]);
-  function toggleSaved(id) {
-    if (!ready.current) { setError("Your pieces are not ready yet. Please wait or refresh to retry."); return false; }
-    const adding = !latest.current.includes(id);
-    const next = adding ? [...latest.current, id] : latest.current.filter(value => value !== id);
-    latest.current = next; setSavedIds(next); setError("");
-    if (uid && db) {
-      writes.current = writes.current.then(() => setDoc(doc(db,"savedPieces",uid),{productIds:next}))
-        .then(() => { committed.current = next; if (latest.current === next) setError(""); })
-        .catch(() => {
-          if (latest.current === next) { latest.current = committed.current; setSavedIds(committed.current); }
-          setError("Changes could not be saved to your account. Check your connection and try again.");
-        });
-    } else {
-      try { sessionStorage.setItem("udc:saved-pieces:guest",JSON.stringify(next)); } catch { /* Memory-only guest session. */ }
+  const [store] = useState(() => {
+    const key = uid ? `udc:saved-pieces:account:${uid}` : GUEST_KEY;
+    const initial = readRecord(key);
+    const guestIds = uid ? readRecord(GUEST_KEY).productIds : [];
+    if (guestIds.length) {
+      initial.productIds = itemIds([...initial.productIds, ...guestIds]);
+      initial.pending = [...initial.pending, ...guestIds.map(id => ({ id, saved: true }))];
     }
-    return adding;
-  }
-  return <SavedPiecesContext.Provider value={{ savedIds, isSaved: id => savedIds.includes(id), toggleSaved, isPersistent: !!uid && !!db, isReady, error }}>{children}</SavedPiecesContext.Provider>;
+    let guestCopied = false;
+    return createSavedItemsStore({
+      initial, idsField: "productIds", snapshotField: "savedIds", itemLabel: "saved pieces",
+      persist(record) {
+        const storage = writeRecord(key, record);
+        if (guestIds.length && !guestCopied && storage !== "memory") {
+          writeRecord(GUEST_KEY, { productIds: readRecord(GUEST_KEY).productIds.filter(id => !guestIds.includes(id)), pending: [] });
+          guestCopied = true;
+        }
+        return storage;
+      },
+      loadRemote: uid && db ? async () => {
+        const snapshot = await getDoc(doc(db, "savedPieces", uid));
+        if (snapshot.metadata.fromCache) throw new Error("Account pieces have not been confirmed by the server.");
+        return snapshot.data()?.productIds || [];
+      } : undefined,
+      writeRemote: uid && db ? (id, saved) => setDoc(doc(db, "savedPieces", uid), { productIds: saved ? arrayUnion(id) : arrayRemove(id) }, { merge: true }) : undefined,
+    });
+  });
+  const state = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
+  useEffect(() => {
+    store.start();
+    const retry = () => { void store.retry(); };
+    const onStorage = event => {
+      if (!uid && (event.key === GUEST_KEY || event.key === null)) store.replaceGuestIds(readRecord(GUEST_KEY).productIds);
+    };
+    window.addEventListener("online", retry);
+    window.addEventListener("storage", onStorage);
+    return () => { window.removeEventListener("online", retry); window.removeEventListener("storage", onStorage); };
+  }, [store, uid]);
+  return <SavedPiecesContext.Provider value={{
+    savedIds: state.savedIds,
+    isSaved: id => state.savedIds.includes(id),
+    toggleSaved: id => store.toggle(id)?.added ?? false,
+    retrySync: store.retry,
+    isPersistent: !!uid && !!db,
+    isReady: true,
+    storage: state.storage,
+    error: state.error,
+  }}>{children}</SavedPiecesContext.Provider>;
 }
 export function useSavedPieces() { return useContext(SavedPiecesContext); }

@@ -123,10 +123,26 @@ service cloud.firestore {
         && validSummary();
       allow delete: if false;
       match /messages/{messageId} {
+        function validProductContext() {
+          let tag = request.resource.data.productContext;
+          return tag is map
+            && tag.keys().hasAll(['productId', 'name', 'slug', 'imageUrl', 'imagePublicId', 'price', 'variable', 'reviewId'])
+            && tag.keys().hasOnly(['productId', 'name', 'slug', 'imageUrl', 'imagePublicId', 'price', 'variable', 'reviewId'])
+            && tag.productId is string && tag.productId.size() > 0 && tag.productId.size() <= 200
+            && tag.name is string && tag.name.size() > 0 && tag.name.size() <= 240
+            && tag.slug is string && tag.slug.size() <= 300
+            && tag.imageUrl is string && tag.imageUrl.size() <= 2048
+            && (tag.imageUrl == '' || tag.imageUrl.matches('https://.*') || tag.imageUrl.matches('/[^/].*'))
+            && tag.imagePublicId is string && tag.imagePublicId.size() <= 512
+            && (tag.price == null || (tag.price is number && tag.price >= 0))
+            && tag.variable is bool
+            && tag.reviewId is string && tag.reviewId.size() <= 200;
+        }
         allow get: if participant();
         allow list: if participant() && request.query.limit <= 30;
         allow create: if request.auth != null
-          && request.resource.data.keys().hasOnly(['body', 'senderId', 'senderRole', 'createdAt'])
+          && request.resource.data.keys().hasOnly(['body', 'senderId', 'senderRole', 'createdAt', 'productContext'])
+          && (!request.resource.data.keys().hasAny(['productContext']) || validProductContext())
           && request.resource.data.body is string
           && request.resource.data.body.size() > 0
           && request.resource.data.body.size() <= 2000

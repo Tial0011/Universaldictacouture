@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSavedReviews } from "../../context/SavedReviewsContext";
 import { useSavedPieces } from "../../context/SavedPiecesContext";
 import { useToast } from "../../context/ToastContext";
-import { truncateText } from "../../utils/formatters";
+import { buildReviewShare, shareContent } from "../../services/shareContent";
 
 const LIKED_KEY = "udc:review-likes:session";
 
@@ -21,7 +21,7 @@ function writeLikedIds(ids) {
 
 export function useReviewInteractions() {
   const [likedIds, setLikedIds] = useState(readLikedIds);
-  const { isSaved, toggleSaved, isPersistent: piecesPersistent, error: piecesError, isReady: piecesReady } = useSavedPieces();
+  const { isSaved, toggleSaved, storage: piecesStorage, error: piecesError, isReady: piecesReady } = useSavedPieces();
   const { isReviewSaved, toggleSavedReview, retrySync, isPersistent: reviewsPersistent, error: reviewsError, isReady: reviewsReady } = useSavedReviews();
   const { showToast } = useToast();
 
@@ -30,7 +30,7 @@ export function useReviewInteractions() {
       if (!piecesReady) return;
       const added = toggleSaved(product.id);
       showToast(added
-        ? piecesPersistent ? "Piece liked and saved in My Closet → My Pieces." : "Piece liked for this visit in My Closet → My Pieces."
+        ? piecesStorage === "browser" ? "Piece liked and saved in this browser under My Closet → My Pieces." : "Piece liked for this visit in My Closet → My Pieces."
         : "Piece removed from My Pieces.");
       return;
     }
@@ -60,25 +60,9 @@ export function useReviewInteractions() {
   }
 
   async function shareReview(entry, product) {
-    const target = `/reviews-feeds?review=${encodeURIComponent(entry.id)}`;
-    const url = new URL(target, window.location.origin).toString();
-    const text = `${truncateText(entry.body, 180)}${product?.name ? ` — ${product.name}` : ""}`;
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: `Review & Feeds — ${product?.name || "Universal Dicta Couture"}`, text, url });
-        return "shared";
-      }
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(`${text}\n${url}`);
-        return "copied";
-      }
-      window.prompt("Copy this review and link", `${text}\n${url}`);
-      return "prompt";
-    } catch (error) {
-      if (error?.name === "AbortError") return "cancelled";
-      window.prompt("Copy this review and link", `${text}\n${url}`);
-      return "prompt";
-    }
+    const result = await shareContent(buildReviewShare(entry, product, window.location.origin));
+    if (result === "copied") showToast("Product details, review and links copied, ready to share.");
+    return result;
   }
 
   return {

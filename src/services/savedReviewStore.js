@@ -3,8 +3,8 @@ export function reviewIds(value) {
 }
 
 /** Local bookmarks remain usable while account reads/writes are unavailable. */
-export function createSavedReviewStore({ initial = {}, persist, loadRemote, writeRemote }) {
-  let ids = reviewIds(initial.reviewIds);
+export function createSavedItemsStore({ initial = {}, persist, loadRemote, writeRemote, idsField = "reviewIds", snapshotField = "savedReviewIds", itemLabel = "bookmarks" }) {
+  let ids = reviewIds(initial[idsField]);
   let revision = 0;
   const pending = new Map();
   const overrides = new Map();
@@ -24,11 +24,11 @@ export function createSavedReviewStore({ initial = {}, persist, loadRemote, writ
   let snapshot;
 
   function publish() {
-    const localMessage = storage === "browser" ? "Your bookmarks are kept in this browser."
-      : storage === "session" ? "Your bookmarks are kept in this tab for this visit."
-        : "Browser storage is unavailable; bookmarks will last only until this page is closed or refreshed.";
+    const localMessage = storage === "browser" ? `Your ${itemLabel} are kept in this browser.`
+      : storage === "session" ? `Your ${itemLabel} are kept in this tab for this visit.`
+        : `Browser storage is unavailable; ${itemLabel} will last only until this page is closed or refreshed.`;
     snapshot = {
-      savedReviewIds: ids,
+      [snapshotField]: ids,
       storage,
       error: loadError || writeError ? `Account sync is unavailable. ${localMessage}` : storage === "memory" && started ? localMessage : "",
     };
@@ -37,7 +37,7 @@ export function createSavedReviewStore({ initial = {}, persist, loadRemote, writ
 
   function saveLocal() {
     try {
-      storage = persist({ reviewIds: ids, pending: [...pending].map(([id, operation]) => ({ id, saved: operation.saved })) });
+      storage = persist({ [idsField]: ids, pending: [...pending].map(([id, operation]) => ({ id, saved: operation.saved })) });
     } catch { storage = "memory"; }
   }
 
@@ -73,7 +73,7 @@ export function createSavedReviewStore({ initial = {}, persist, loadRemote, writ
       while (pending.size) {
         const [id, operation] = pending.entries().next().value;
         try {
-          // The adapter changes only this review, preserving other account bookmarks.
+          // The adapter changes only this item, preserving other account bookmarks.
           await writeRemote(id, operation.saved);
         } catch {
           writeError = true;
@@ -123,3 +123,6 @@ export function createSavedReviewStore({ initial = {}, persist, loadRemote, writ
     retry: () => Promise.all([refresh(), flush()]),
   };
 }
+
+// Keep the review API/cache shape compatible; pieces use the same tested engine.
+export const createSavedReviewStore = createSavedItemsStore;

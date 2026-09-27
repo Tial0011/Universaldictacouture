@@ -7,6 +7,7 @@ export const SCHEMAS = {
     initial: { name: "", price: "", status: "draft", category: "", shopBy: {}, occasion: [], style: [], fabric: [], images: [], isNewIn: false },
     fields: [
       text("name", "Product name", { required: true }), text("price", "Price (NGN)", { type: "number", hint: "Required before publishing. Enter the base price in naira." }),
+      text("description", "Product description", { type: "textarea", hint: "Describe the fabric, finish and fit. Shown on the product page and included when customers share this piece (up to 4,000 characters)." }),
       text("status", "Visibility", { type: "select", options: ["draft", "published", "archived"] }),
       text("unitLabel", "Price unit", { hint: "Optional, for example: per yard." }),
       text("category", "Categories", { type: "values", hint: "Separate multiple labels with commas." }),

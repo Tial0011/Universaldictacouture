@@ -150,6 +150,7 @@ export function normaliseProduct(id, raw) {
     id,
     slug,
     name,
+    description: typeof raw.description === "string" ? raw.description.trim() : "",
     href: `/shop/${encodeURIComponent(slug)}`,
     image: primaryImage,
     images: images.length ? images : primaryImage ? [primaryImage] : [],

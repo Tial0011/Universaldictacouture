@@ -26,3 +26,8 @@ test("missing required options block a selection; optional choices remain option
   assert.equal(resolveSelections(product, { Size: "XL", Finish: "Unknown" }).isComplete, false);
   assert.equal(resolveSelections(product, { Size: "M", Finish: "Unknown" }).resolved.Finish, undefined);
 });
+test("product descriptions reach public details and sharing without fabricated legacy copy", () => {
+  const raw = { name: "Cloth", price: 200, status: "published", category: ["Fabric"] };
+  assert.equal(normaliseProduct("p", { ...raw, description: "  Woven in wine.  " }).description, "Woven in wine.");
+  assert.equal(normaliseProduct("p", raw).description, "");
+});
