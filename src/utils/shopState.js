@@ -67,6 +67,19 @@ export function parseShopState(searchParams) {
     if (!shopBy[group].includes(value)) shopBy[group].push(value);
   });
 
+  // Promote shopby entries whose group key is a canonical filter dimension
+  // (e.g. shopby=occasion:Wedding) into the filters map instead.  This
+  // eliminates dual-representation when a URL contains both ?occasion=X and
+  // ?shopby=occasion:X, so buildSearchParams always writes the canonical form.
+  Object.keys(shopBy).forEach((group) => {
+    if (DIMENSION_KEYS.includes(group)) {
+      (shopBy[group] ?? []).forEach((value) => {
+        if (!filters[group].includes(value)) filters[group].push(value);
+      });
+      delete shopBy[group];
+    }
+  });
+
   return {
     query: (searchParams.get("q") ?? "").trim(),
     filters,

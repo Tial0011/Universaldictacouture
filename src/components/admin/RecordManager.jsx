@@ -82,6 +82,16 @@ export default function RecordManager({ kind }) {
   function open(record) {
     if (uploading || saving || (dirty && !window.confirm("Discard your unsaved changes?"))) return;
     let next = record ? { ...record } : { ...schema.initial };
+    if (kind === "products" && record) {
+      const allPrices = [
+        Number(record.price),
+        ...(Array.isArray(record.variants) ? record.variants.map((v) => Number(v.price)) : [])
+      ].filter((p) => Number.isFinite(p) && p >= 0);
+      if (allPrices.length > 0) {
+        next.price = Math.max(...allPrices);
+      }
+      next.unitLabel = record.unitLabel ?? record.priceToken ?? "";
+    }
     if (kind === "reviews") {
       next = {
         ...next,
@@ -237,7 +247,7 @@ export default function RecordManager({ kind }) {
       <p className="field__hint">{records.length} loaded · {visible.length} shown. Load more to search additional records.</p>
       {loading && <p role="status">Loading records…</p>}
       {!loading && !error && !visible.length && <div className="admin-empty"><h2>{records.length ? "No matching records" : "A fresh start"}</h2><p>{records.length ? "Try a different search or visibility filter." : "Add your first " + schema.singular + " using the button above."}</p></div>}
-      {!!visible.length && <div className="admin-table-wrap"><table className="admin-table"><caption className="visually-hidden">{schema.title}</caption><thead><tr><th scope="col">Name</th><th scope="col">{kind === "taxonomy" ? "Type" : "Visibility"}</th><th scope="col">Action</th></tr></thead><tbody>{visible.map(record => <tr key={record.id}><td><strong>{record.name || record.title || record.headline || record.author || "Untitled"}</strong>{kind === "products" && <small>{record.price == null ? "Price not set" : new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" }).format(Number(record.price))}</small>}{kind === "reviews" && record.productId && <small>Product: {reviewProducts.find(product => product.id === record.productId)?.name || record.productId}</small>}</td><td><span className={"admin-status admin-status--" + status(record)}>{status(record)}</span></td><td><div className="admin-actions"><Button variant="ghost" disabled={saving || uploading} onClick={() => open(record)} aria-label={"Edit " + (record.name || record.title || record.headline || record.author || schema.singular)}>Edit</Button>{["reviews", "heroSlides"].includes(kind) && <Button variant="ghost" disabled={saving || uploading} onClick={() => remove(record)} aria-label={`Delete ${record.author || record.headline || schema.singular}`}>Delete</Button>}</div></td></tr>)}</tbody></table></div>}
+      {!!visible.length && <div className="admin-table-wrap"><table className="admin-table"><caption className="visually-hidden">{schema.title}</caption><thead><tr><th scope="col">Name</th><th scope="col">{kind === "taxonomy" ? "Type" : "Visibility"}</th><th scope="col">Action</th></tr></thead><tbody>{visible.map(record => <tr key={record.id}><td><strong>{record.name || record.title || record.headline || record.author || "Untitled"}</strong>{kind === "products" && <small>{record.price == null ? "Main price not set" : `Main price: ${new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" }).format(Number(record.price))}${record.unitLabel || record.priceToken ? ` (${record.unitLabel || record.priceToken})` : ""}`}</small>}{kind === "reviews" && record.productId && <small>Product: {reviewProducts.find(product => product.id === record.productId)?.name || record.productId}</small>}</td><td><span className={"admin-status admin-status--" + status(record)}>{status(record)}</span></td><td><div className="admin-actions"><Button variant="ghost" disabled={saving || uploading} onClick={() => open(record)} aria-label={"Edit " + (record.name || record.title || record.headline || record.author || schema.singular)}>Edit</Button>{["reviews", "heroSlides"].includes(kind) && <Button variant="ghost" disabled={saving || uploading} onClick={() => remove(record)} aria-label={`Delete ${record.author || record.headline || schema.singular}`}>Delete</Button>}</div></td></tr>)}</tbody></table></div>}
       {more && <Button variant="secondary" disabled={loading} onClick={() => { setLoading(true); setError(""); setPendingPage(cursor); }}>Load more</Button>}
     </section>
   </div>;

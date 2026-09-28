@@ -64,20 +64,25 @@
   line-height: 1.15;
 }
 
-.product-details__price {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.4rem 0.65rem;
+.product-details__price-block {
   margin: var(--space-xs) 0 0;
-  color: var(--color-brand);
-  font-size: var(--text-lg);
-  font-weight: 600;
 }
 
-.product-details__price span {
-  font-size: var(--text-sm);
-  font-weight: 400;
+.product-details__price {
+  margin: 0;
+  color: var(--color-brand);
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.product-details__price-token {
+  margin: 0.35rem 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
 }
 
 .product-details__attributes {

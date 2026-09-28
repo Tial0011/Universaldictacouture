@@ -4,12 +4,13 @@ const visibility = text("published", "Published on website", { type: "checkbox" 
 export const SCHEMAS = {
   products: {
     title: "Products", singular: "product", description: "Manage your collection, from first draft to published piece.",
-    initial: { name: "", price: "", status: "draft", category: "", shopBy: {}, occasion: [], style: [], fabric: [], images: [], isNewIn: false },
+    initial: { name: "", price: "", unitLabel: "", status: "draft", category: "", shopBy: {}, occasion: [], style: [], fabric: [], images: [], isNewIn: false },
     fields: [
-      text("name", "Product name", { required: true }), text("price", "Price (NGN)", { type: "number", hint: "Required before publishing. Enter the base price in naira." }),
+      text("name", "Product name", { required: true }),
+      text("price", "Main price (NGN)", { type: "number", hint: "Required before publishing. Enter the single fixed main price in naira." }),
+      text("unitLabel", "Price token (What this price is for)", { hint: "Shown under the price to specify what it covers (e.g. for complete, for one bundle, for only one strand of, per keda, per yard)." }),
       text("description", "Product description", { type: "textarea", hint: "Describe the fabric, finish and fit. Shown on the product page and included when customers share this piece (up to 4,000 characters)." }),
       text("status", "Visibility", { type: "select", options: ["draft", "published", "archived"] }),
-      text("unitLabel", "Price unit", { hint: "Optional, for example: per yard." }),
       text("category", "Categories", { type: "values", hint: "Separate multiple labels with commas." }),
       text("shopBy", "Shop By", { type: "shopBy", hint: "Choose the reusable Shop By values that describe this product. Manage the available groups and choices from the Shop By admin page." }),
       text("colour", "Colour", { type: "values", hint: "Separate multiple labels with commas." }),

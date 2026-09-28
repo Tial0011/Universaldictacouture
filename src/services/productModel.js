@@ -123,8 +123,12 @@ export function normaliseProduct(id, raw) {
   const category = toArray(raw.category ?? raw.categories);
   if (!category.length) return null;
 
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
+  // Single fixed main price: if multiple prices exist (e.g. lower/higher for different kedas or bundles),
+  // delete the lower price and let the higher price be the main price.
+  const mainPrice = Math.max(...prices);
+  const unitLabel = typeof (raw.unitLabel ?? raw.priceToken) === "string"
+    ? (raw.unitLabel ?? raw.priceToken).trim()
+    : "";
 
   const rawShopBy = raw.shopBy && typeof raw.shopBy === "object" && !Array.isArray(raw.shopBy) ? raw.shopBy : {};
   const shopBy = Object.fromEntries(
@@ -157,10 +161,13 @@ export function normaliseProduct(id, raw) {
     href: `/shop/${encodeURIComponent(slug)}`,
     image: primaryImage,
     images: images.length ? images : primaryImage ? [primaryImage] : [],
-    minPrice,
-    maxPrice,
-    hasVariablePricing: maxPrice > minPrice,
-    unitLabel: typeof raw.unitLabel === "string" ? raw.unitLabel.trim() : "",
+    price: mainPrice,
+    mainPrice,
+    minPrice: mainPrice,
+    maxPrice: mainPrice,
+    hasVariablePricing: false,
+    unitLabel,
+    priceToken: unitLabel,
     category,
     shopBy,
     occasion: shopBy.occasion ?? [],
@@ -235,14 +242,8 @@ export function closetLineKey(productId, selections = {}) {
   return entries.length ? `${productId}::${JSON.stringify(entries)}` : `${productId}::`;
 }
 
-/** The price a given set of selections resolves to, when determinable. */
+/** The price a given set of selections resolves to. With single fixed pricing, this is always the main price. */
 export function priceForSelections(product, selections = {}) {
   if (!product) return null;
-  if (!product.variants.length) return product.minPrice;
-  const match = product.variants.find((variant) =>
-    Object.entries(variant.options ?? {}).every(
-      ([key, value]) => String(selections?.[key] ?? "") === String(value)
-    )
-  );
-  return match ? match.price : product.minPrice;
+  return product.mainPrice ?? product.price ?? product.minPrice;
 }

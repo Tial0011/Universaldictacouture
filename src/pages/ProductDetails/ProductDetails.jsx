@@ -97,9 +97,6 @@ function Piece({ product, backToShop, backState }) {
   const [message, setMessage] = useState("");
   const [actionError, setActionError] = useState("");
   const saved = isSaved(product.id);
-  const estimatedPrice = product.hasVariablePricing && !product.variants.some(variant =>
-    Object.entries(variant.options).every(([name, value]) => String(selections[name] || "") === String(value))
-  );
   const details = [
     ["Category", product.category],
     ["Fabric", product.fabric],
@@ -169,11 +166,16 @@ function Piece({ product, backToShop, backState }) {
             <div className="product-details__heading">
               <p className="product-details__eyebrow">Universal Dicta Couture</p>
               <h1 id="piece-title">{product.name}</h1>
-              <p className="product-details__price" aria-live="polite" aria-atomic="true">
-                {estimatedPrice && <span>From</span>}
-                {formatNaira(priceForSelections(product, selections))}
-                {product.unitLabel && <span>{product.unitLabel}</span>}
-              </p>
+              <div className="product-details__price-block" aria-live="polite" aria-atomic="true">
+                <p className="product-details__price">
+                  {formatNaira(product.mainPrice ?? product.price)}
+                </p>
+                {product.unitLabel && (
+                  <p className="product-details__price-token">
+                    {product.unitLabel}
+                  </p>
+                )}
+              </div>
             </div>
 
             <form className="product-details__form" onSubmit={handleAdd} aria-busy={busy}>

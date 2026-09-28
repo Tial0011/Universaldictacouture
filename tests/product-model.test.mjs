@@ -36,3 +36,26 @@ test("product descriptions reach public details and sharing without fabricated l
 test("published products without a primary image do not enter the public catalogue", () => {
   assert.equal(normaliseProduct("no-image", { name: "Incomplete", price: 100, status: "published", category: ["Fabric"] }), null);
 });
+
+test("when multiple prices exist, the lower price is eliminated and the higher price is main price", () => {
+  const multiPriceProduct = normaliseProduct("multi-price", {
+    name: "Bundle Piece",
+    status: "published",
+    price: 165000,
+    unitLabel: "for complete",
+    category: ["Aso Oke"],
+    primaryImage: { url: "https://example.test/bundle.jpg" },
+    variants: [
+      { price: 180000, options: { Bundle: "Complete" } },
+      { price: 150000, options: { Bundle: "Single" } },
+    ],
+  });
+  assert.equal(multiPriceProduct.mainPrice, 180000);
+  assert.equal(multiPriceProduct.price, 180000);
+  assert.equal(multiPriceProduct.minPrice, 180000);
+  assert.equal(multiPriceProduct.maxPrice, 180000);
+  assert.equal(multiPriceProduct.hasVariablePricing, false);
+  assert.equal(multiPriceProduct.unitLabel, "for complete");
+  assert.equal(multiPriceProduct.priceToken, "for complete");
+  assert.equal(priceForSelections(multiPriceProduct, { Bundle: "Single" }), 180000);
+});

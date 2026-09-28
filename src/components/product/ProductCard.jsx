@@ -36,21 +36,15 @@ function buildSubtitle(product) {
 }
 
 function ProductPrice({ product }) {
-  const price = formatNaira(product.minPrice);
-  const unit = product.unitLabel ? ` ${product.unitLabel}` : "";
+  const price = formatNaira(product.mainPrice ?? product.price ?? product.minPrice);
+  const token = product.unitLabel;
 
-  if (product.hasVariablePricing) {
-    return (
-      <p className="product-card__price">
-        <span className="visually-hidden">Price from </span>
-        <span className="product-card__from" aria-hidden="true">From </span>
-        {price}
-        {unit}
-      </p>
-    );
-  }
-
-  return <p className="product-card__price">{price}{unit}</p>;
+  return (
+    <div className="product-card__price-wrap">
+      <p className="product-card__price">{price}</p>
+      {token && <p className="product-card__price-token">{token}</p>}
+    </div>
+  );
 }
 
 /**

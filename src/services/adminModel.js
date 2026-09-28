@@ -43,6 +43,20 @@ export function prepareRecord(kind, raw) {
       data.price = Number(data.price);
       if (!Number.isFinite(data.price) || data.price < 0) throw new Error("Enter a valid price of zero or more.");
     } else data.price = null;
+    const token = typeof (data.unitLabel ?? data.priceToken) === "string"
+      ? (data.unitLabel ?? data.priceToken).trim()
+      : "";
+    data.unitLabel = token;
+    data.priceToken = token;
+    if (Array.isArray(data.variants) && data.variants.length > 0) {
+      const variantPrices = data.variants
+        .map((v) => Number(v.price))
+        .filter((p) => Number.isFinite(p) && p >= 0);
+      if (variantPrices.length > 0 && data.price !== null) {
+        data.price = Math.max(data.price, ...variantPrices);
+      }
+      data.variants = data.variants.map((v) => ({ ...v, price: data.price }));
+    }
     if (data.status === "published") {
       if (data.price === null || !data.category.length) {
         throw new Error("Add a price and at least one category before publishing.");

@@ -9,9 +9,9 @@ export function productDescription(product) {
     .map(([label, values]) => `${label}: ${values.join(", ")}`).join("\n");
 }
 function pieceSections(product) {
-  const price = product?.minPrice ?? product?.price;
+  const price = product?.mainPrice ?? product?.price ?? product?.minPrice;
   return [clean(product?.name) || "Customer story", "Universal Dicta Couture", productDescription(product),
-    typeof price === "number" && Number.isFinite(price) ? `${product?.hasVariablePricing ? "From " : ""}${formatNaira(price)}${product?.unitLabel ? ` ${product.unitLabel}` : ""}` : "",
+    typeof price === "number" && Number.isFinite(price) ? `${formatNaira(price)}${product?.unitLabel ? ` (${product.unitLabel})` : ""}` : "",
   ].filter(Boolean);
 }
 function productUrl(product, origin) {

@@ -290,7 +290,7 @@ export default function Header() {
           <HeaderLink to="/" label="Home" icon="home" end />
           <HeaderLink to="/shop" label="Shop" icon="bag" />
           <HeaderLink to="/chats" label="Chats" icon="chat" />
-          <HeaderLink to="/my-closet" label="My Closet" icon="closet" />
+          <HeaderLink to="/my-closet" label="My Closet" icon="heart" />
         </nav>
 
         {pathname !== "/chats" && <NavLink className="site-header__chat-launcher" to="/chats" aria-label="Chat with Dicta Couturier">
