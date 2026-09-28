@@ -431,3 +431,32 @@
     background: Highlight;
   }
 }
+
+.home-section--shop-by .discovery__list {
+  gap: var(--space-xs);
+}
+
+.home-section--shop-by .discovery__list > li {
+  flex-basis: clamp(10rem, 27vw, 13rem);
+}
+
+.home-section--shop-by .discovery__item {
+  padding: 0.4rem;
+  border-radius: 0.5rem;
+  background-color: var(--color-ivory);
+}
+
+.home-section--shop-by .discovery__media {
+  aspect-ratio: 4 / 5;
+  border-radius: 0.25rem;
+}
+
+.home-section--shop-by .discovery__caption {
+  padding: 0.65rem 0.25rem 0.2rem;
+}
+
+@media (min-width: 640px) {
+  .home-section--shop-by .discovery__list > li {
+    flex-basis: clamp(11rem, 19vw, 14rem);
+  }
+}

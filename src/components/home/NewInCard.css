@@ -8,7 +8,7 @@
 .menu-grid {
   display: flex;
   flex-wrap: nowrap;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   margin: 0;
   padding: 0.25rem 0.25rem 1rem;
   list-style: none;
@@ -29,10 +29,6 @@
 }
 
 @media (min-width: 640px) {
-  .menu-grid {
-    gap: var(--space-md);
-  }
-
   .menu-grid > li {
     flex-basis: clamp(11rem, 22vw, 14.5rem);
   }
