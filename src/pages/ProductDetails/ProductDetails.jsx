@@ -176,18 +176,6 @@ function Piece({ product, backToShop, backState }) {
               </p>
             </div>
 
-            {product.description && <p className="product-details__description">{product.description}</p>}
-            {details.length > 0 && (
-              <dl className="product-details__attributes">
-                {details.map(([label, values]) => (
-                  <div key={label}>
-                    <dt>{label}</dt>
-                    <dd>{values.join(" · ")}</dd>
-                  </div>
-                ))}
-              </dl>
-            )}
-
             <form className="product-details__form" onSubmit={handleAdd} aria-busy={busy}>
               {product.options.length > 0 && (
                 <fieldset className="product-details__options" disabled={busy}>
@@ -218,6 +206,18 @@ function Piece({ product, backToShop, backState }) {
                     );
                   })}
                 </fieldset>
+              )}
+
+              {product.description && <p className="product-details__description">{product.description}</p>}
+              {details.length > 0 && (
+                <dl className="product-details__attributes">
+                  {details.map(([label, values]) => (
+                    <div key={label}>
+                      <dt>{label}</dt>
+                      <dd>{values.join(" · ")}</dd>
+                    </div>
+                  ))}
+                </dl>
               )}
 
               <div className="product-details__actions">

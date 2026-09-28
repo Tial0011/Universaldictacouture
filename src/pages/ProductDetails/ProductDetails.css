@@ -1,7 +1,11 @@
-.product-details__back {
-  margin-bottom: var(--space-md);
+.product-details {
+  padding-block: clamp(1.5rem, 2vw, 2.5rem);
 }
-.product-details__description { white-space: pre-line; overflow-wrap: anywhere; line-height: 1.7; color: var(--color-text-secondary); }
+
+.product-details__back {
+  margin-bottom: var(--space-sm);
+}
+.product-details__description { margin: var(--space-sm) 0; white-space: pre-line; overflow-wrap: anywhere; line-height: 1.6; color: var(--color-text-secondary); }
 
 .product-details__gallery { min-width: 0; }
 .product-details__thumbnails { display: flex; gap: var(--space-2xs); overflow-x: auto; padding: var(--space-xs) 2px; }
@@ -11,7 +15,7 @@
 
 .product-details__layout {
   display: grid;
-  gap: clamp(1.5rem, 4vw, 4rem);
+  gap: clamp(1.25rem, 2.5vw, 2.5rem);
   align-items: start;
 }
 
@@ -40,12 +44,12 @@
 }
 
 .product-details__heading {
-  padding-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
   border-bottom: 1px solid var(--color-border);
 }
 
 .product-details__eyebrow {
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-2xs);
   color: var(--color-brand);
   font-size: 0.6875rem;
   font-weight: 600;
@@ -65,7 +69,7 @@
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.4rem 0.65rem;
-  margin: var(--space-sm) 0 0;
+  margin: var(--space-xs) 0 0;
   color: var(--color-brand);
   font-size: var(--text-lg);
   font-weight: 600;
@@ -78,8 +82,8 @@
 
 .product-details__attributes {
   display: grid;
-  gap: 0.75rem;
-  margin: var(--space-md) 0;
+  gap: var(--space-2xs);
+  margin: var(--space-sm) 0;
   font-size: var(--text-sm);
 }
 
@@ -100,20 +104,20 @@
 }
 
 .product-details__form {
-  margin-top: var(--space-md);
+  margin-top: var(--space-sm);
 }
 
 .product-details__options {
   display: grid;
   min-width: 0;
-  gap: var(--space-sm);
-  margin: 0 0 var(--space-md);
+  gap: var(--space-xs);
+  margin: 0 0 var(--space-sm);
   padding: 0;
   border: 0;
 }
 
 .product-details__options legend {
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-2xs);
   padding: 0;
   font-size: var(--text-base);
   font-weight: 600;
@@ -158,7 +162,12 @@
 
 .product-details__actions {
   display: grid;
-  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2xs);
+}
+
+.product-details__actions > :first-child {
+  grid-column: 1 / -1;
 }
 
 .product-details__feedback {
