@@ -20,8 +20,8 @@ const ITEMS = [
   {
     id: "custom",
     label: "Custom Style",
-    caption: "Create What You Want",
-    compactCaption: "Made for you",
+    caption: "Order in Your Own Style, Order in Your Own Pattern, Order in Your Own Quantity",
+    compactCaption: "Order in your own style, order in your own pattern, order in your own quantity",
     icon: "hanger",
     to: "/custom-style",
   },
