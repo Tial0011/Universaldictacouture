@@ -89,7 +89,7 @@ export default function DiscoveryModule({
     };
   }, [currentGroup, items.length, railControls]);
 
-  if (!module || (!arrowNavigation && !items.length)) return null;
+  if (!module || (!groups?.length && !items.length)) return null;
 
   const hasTabs = !arrowNavigation && groups?.length > 1;
   const currentIndex = groups?.findIndex((group) => group.id === currentGroup) ?? -1;
@@ -168,7 +168,7 @@ export default function DiscoveryModule({
       ))}
     </ul>
   ) : (
-    <p id={`discovery-panel-${module.id}`} className="discovery__empty">No categories are available in this group yet.</p>
+    <p id={`discovery-panel-${module.id}`} className="discovery__empty" role={hasTabs ? "tabpanel" : undefined} aria-labelledby={hasTabs ? `discovery-tab-${currentGroup}` : undefined}>No categories are available in this group yet. Choose another group to keep exploring.</p>
   );
 
   return (

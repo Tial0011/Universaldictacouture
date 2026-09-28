@@ -13,6 +13,7 @@ export default function AuthGateDialog({ gate, onClose }) {
   useEffect(() => {
     if (!gate) return undefined;
     const previous = document.body.style.overflow;
+    const previousFocus = document.activeElement;
     document.body.style.overflow = "hidden";
     closeRef.current?.focus();
     const keydown = (event) => {
@@ -27,14 +28,14 @@ export default function AuthGateDialog({ gate, onClose }) {
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     };
     document.addEventListener("keydown", keydown);
-    return () => { document.body.style.overflow = previous; document.removeEventListener("keydown", keydown); };
+    return () => { document.body.style.overflow = previous; document.removeEventListener("keydown", keydown); if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true }); };
   }, [gate, onClose]);
   if (!gate) return null;
 
-  const signIn = () => {
+  const openAccount = (destination) => {
     const state = { returnTo: gate.returnTo, returnState: gate.returnState || null };
     onClose();
-    navigate("/signin", { state });
+    navigate(destination, { state });
   };
 
   return <div className="auth-gate" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
@@ -44,12 +45,13 @@ export default function AuthGateDialog({ gate, onClose }) {
       <LockMark />
       <p className="auth-gate__eyebrow">Universal Dicta Couture</p>
       <h2 id="auth-gate-title">Sign in to continue</h2>
-      <p id="auth-gate-copy">This feature is reserved for signed-in Universal Dicta Couture customers. Sign in to continue from where you left off.</p>
+      <p id="auth-gate-copy">Keep your favourite pieces and conversations together. Sign in or create your account to continue.</p>
       <div className="auth-gate__actions">
-        <Button onClick={signIn}>SIGN IN →</Button>
-        <Button variant="secondary" onClick={onClose}>GO BACK</Button>
+        <Button onClick={() => openAccount("/signin")}>SIGN IN →</Button>
+        <Button variant="secondary" onClick={() => openAccount("/signup")}>CREATE AN ACCOUNT</Button>
+        <Button variant="ghost" onClick={onClose}>KEEP BROWSING</Button>
       </div>
-      <p className="auth-gate__return">We’ll return you to this page after sign in. Your final action will still be yours to confirm.</p>
+      <p className="auth-gate__return">We’ll bring you back to where you left off.</p>
     </section>
   </div>;
 }

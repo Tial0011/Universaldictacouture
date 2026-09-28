@@ -55,7 +55,7 @@ function ProductPrice({ product }) {
 
 /**
  * Shared product card. The Shop variant follows the Section 4 card
- * contract (image, heart, name, live price/unit, SHOP THIS PIECE) while
+ * contract (image, heart, name, live price/unit, SHOP PIECE) while
  * other destinations keep their existing compact preview treatment.
  */
 export default function ProductCard({
@@ -72,7 +72,7 @@ export default function ProductCard({
   const isShopCard = variant === "shop";
   const saved = isSaved(product.id);
   const subtitle = isShopCard ? "" : buildSubtitle(product);
-  const ctaLabel = isShopCard ? "SHOP THIS PIECE" : "View Piece";
+  const ctaLabel = isShopCard ? "SHOP PIECE" : "View Piece";
   const imageTransformation = view === "list"
     ? LIST_IMAGE
     : isShopCard

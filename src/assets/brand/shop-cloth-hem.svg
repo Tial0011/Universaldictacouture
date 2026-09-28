@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="100" viewBox="0 0 1440 100" fill="none">
+<!-- Hand-drawn cloth folds inspired by the burgundy and gold reference hem. -->
+<defs>
+<linearGradient id="cloth" x1="0" y1="0" x2="0" y2="100" gradientUnits="userSpaceOnUse"><stop stop-color="#9b3034"/><stop offset=".32" stop-color="#70151d"/><stop offset=".68" stop-color="#43090d"/><stop offset="1" stop-color="#7a2428"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="0" y2="100" gradientUnits="userSpaceOnUse"><stop stop-color="#a07841"/><stop offset=".4" stop-color="#ead4a1"/><stop offset=".66" stop-color="#c09b5e"/><stop offset="1" stop-color="#8f6635"/></linearGradient>
+<pattern id="thread" width="12" height="8" patternUnits="userSpaceOnUse"><path d="M0 1h12M0 4h12M2 0v8M7 0v8" stroke="#e3b77b" stroke-opacity=".3" stroke-width=".65"/><path d="M3 2h3M9 6h2" stroke="#f1d3a0" stroke-opacity=".55" stroke-width="1"/></pattern>
+<path id="fold" d="M0 18C180-18 265 67 490 44S745 8 945 40 1270 70 1440 12V100H0Z"/>
+<clipPath id="edge"><use href="#fold"/></clipPath>
+</defs>
+<use href="#fold" fill="url(#cloth)"/>
+<g clip-path="url(#edge)">
+<path d="M-80 12C220 95 310 110 540 35S900 26 1050 90 1320 110 1490 42" stroke="#26070b" stroke-width="45" opacity=".42"/>
+<path d="M-80 8C220 91 310 106 540 31S900 22 1050 86 1320 106 1490 38" stroke="url(#gold)" stroke-width="18"/>
+<path d="M-80-7C220 76 310 91 540 16S900 7 1050 71 1320 91 1490 23" stroke="#d8b87e" stroke-width="1.3"/>
+<path d="M-80 24C220 107 310 122 540 47S900 38 1050 102 1320 122 1490 54" stroke="#b08d57" stroke-width="1" stroke-dasharray="2 3"/>
+<path fill="url(#thread)" d="M0 0h1440v100H0Z"/>
+<path d="M-20 92C200 12 380 120 640 70S985 54 1120 44 1320 65 1460 82" stroke="#24070a" stroke-opacity=".45" stroke-width="10"/>
+<path d="M-20 87C200 7 380 115 640 65S985 49 1120 39 1320 60 1460 77" stroke="#efc590" stroke-opacity=".34" stroke-width="1.4"/>
+</g>
+<path d="M0 18C180-18 265 67 490 44S745 8 945 40 1270 70 1440 12" stroke="#c69c60" stroke-opacity=".75" stroke-width="1"/>
+</svg>

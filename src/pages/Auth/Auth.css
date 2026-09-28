@@ -24,3 +24,26 @@
 .auth-flow__timer { font-variant-numeric:tabular-nums; color:var(--color-text-secondary); text-align:center; font-size:var(--text-sm); }
 .auth-success { text-align:center; }
 .auth-success .auth-flow__mark { width:4.5rem; height:4.5rem; margin-inline:auto; background:var(--color-brand); color:white; }
+
+.auth-flow {gap:1.1rem;}
+.auth-flow__mark {width:2.5rem;height:2.5rem;font-size:1rem;box-shadow:0 0 0 4px rgba(176,141,87,.06);}
+.auth-flow h1 {font-size:clamp(2.15rem,4vw,3.25rem);font-weight:500;line-height:1.05;letter-spacing:-.025em;text-wrap:balance;}
+.auth-flow__eyebrow {font-size:.62rem;letter-spacing:.16em;}
+.auth-flow__intro > p:last-child {font-size:.875rem;line-height:1.65;}
+.auth-flow__form {gap:1rem;}
+.auth-field input {min-height:3rem;font-size:1rem;background:var(--color-white);border-radius:2px;}
+.auth-field__hint {margin:0;color:var(--color-text-secondary);font-size:.72rem;}
+.auth-password-toggle {display:grid;place-items:center;width:var(--touch-target);height:var(--touch-target);}
+.auth-password-toggle svg {width:1.2rem;height:1.2rem;}
+.auth-choice-row {gap:.65rem;align-items:center;}
+.auth-choice-row .choice {font-size:.75rem;}
+.auth-choice-row > a {font-size:.78rem;display:inline-flex;align-items:center;min-height:var(--touch-target);}
+.auth-flow__form > .btn {min-height:3.1rem;font-size:.8rem;letter-spacing:.05em;}
+.auth-flow__switch {font-size:.82rem;}
+.auth-flow__switch a {display:inline-flex;align-items:center;min-height:var(--touch-target);font-weight:600;}
+.auth-flow__status {font-size:.875rem;overflow-wrap:anywhere;text-align:left;}
+.auth-flow__fineprint {font-size:.7rem;line-height:1.7;}
+.auth-flow__form[aria-busy="true"] {cursor:progress;}
+@media(max-width:600px){.auth-flow__mark{display:none;}.auth-flow__rule{display:none;}.auth-flow{gap:1rem;}.auth-flow__intro{gap:.6rem;}.auth-flow h1{font-size:2.35rem;}}
+
+@media(min-width:600px){.auth-flow__form--signup {grid-template-columns:repeat(2,minmax(0,1fr));}.auth-flow__form--signup > * {grid-column:1/-1;}.auth-flow__form--signup > .auth-field:nth-child(1),.auth-flow__form--signup > .auth-field:nth-child(2),.auth-flow__form--signup > .auth-field:nth-child(4),.auth-flow__form--signup > .auth-field:nth-child(5){grid-column:auto;}}

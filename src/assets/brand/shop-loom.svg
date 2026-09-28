@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="240" viewBox="0 0 192 240" fill="none">
+<defs><g id="diamond"><path d="M0-48v6h-6v6h-6v6h-6v6h-6v6h-6v6h-6v6h-6v12h6v6h6v6h6v6h6v6h6v6h6v6h6v6h12v-6h6v-6h6v-6h6v-6h6v-6h6v-6h6v-6h6V-6h-6v-6h-6v-6h-6v-6h-6v-6h-6v-6h-6v-6h-6v-6Z"/><path d="m6-31 31 31L6 31-25 0Z m0 12 19 19L6 19-13 0Z"/><path d="M2-4h8v8H2Z" fill="#d3bc8a" stroke="none"/></g></defs>
+<g stroke="#d3bc8a" stroke-width=".7">
+<path d="M6 0v240M11 0v240M181 0v240M186 0v240" opacity=".8"/>
+<path d="M30 0v240M162 0v240" stroke-dasharray="2 5" opacity=".5"/>
+<path d="M0 4h192M0 9h192M0 115h192M0 125h192M0 231h192M0 236h192" opacity=".4"/>
+<use href="#diamond" x="90" y="62"/><use href="#diamond" x="90" y="182"/>
+<path d="m43 120 7-7 7 7-7 7Zm92 0 7-7 7 7-7 7ZM12 60l7-7 7 7-7 7Zm154 0 7-7 7 7-7 7ZM12 180l7-7 7 7-7 7Zm154 0 7-7 7 7-7 7Z"/>
+<path d="m75 120 7-7 7 7-7 7Zm28 0 7-7 7 7-7 7Z" opacity=".7"/>
+</g></svg>

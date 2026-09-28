@@ -13,3 +13,9 @@
 .auth-gate__actions { width:100%; display:grid; gap:.65rem; margin-top:.45rem; }
 .auth-gate__actions .btn { width:100%; }
 .auth-gate__return { color:var(--color-text-secondary); font-size:var(--text-xs); }
+
+.auth-gate__dialog {max-height:calc(100dvh - 3rem);overflow-y:auto;border-radius:3px;}
+.auth-gate__weave {background:linear-gradient(rgba(251,248,242,.91),rgba(251,248,242,.93)),var(--pattern-atlas) center/auto 100%;}
+.auth-gate__dialog::before {transform:none;bottom:0;height:4px;}
+.auth-gate__dialog::after {display:none;}
+.auth-gate__actions .btn {min-height:3rem;font-size:.8rem;}

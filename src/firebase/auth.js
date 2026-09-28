@@ -13,6 +13,8 @@ import app, { isFirebaseConfigured } from "./config";
 
 export const auth = isFirebaseConfigured ? getAuth(app) : null;
 
+let authenticationInProgress = false;
+
 const SESSION_POLICY_KEY = "udc:auth:session-policy";
 const DEFAULT_STANDARD_HOURS = 24;
 const DEFAULT_EXTENDED_DAYS = 30;
@@ -49,6 +51,7 @@ export function clearSessionPolicy() {
 }
 
 export function sessionPolicyExpired() {
+  if (authenticationInProgress) return false;
   try {
     const value = JSON.parse(localStorage.getItem(SESSION_POLICY_KEY) || "null");
     return Boolean(value?.expiresAt && Number(value.expiresAt) <= Date.now());
@@ -71,18 +74,28 @@ export function subscribeToAuthChanges(callback) {
 }
 
 export async function signIn(email, password, { keepSignedIn = false } = {}) {
-  const instance = await applyPersistence();
-  const credential = await signInWithEmailAndPassword(instance, email, password);
-  storeSessionPolicy(keepSignedIn);
-  return credential;
+  authenticationInProgress = true;
+  try {
+    const instance = await applyPersistence();
+    const credential = await signInWithEmailAndPassword(instance, email, password);
+    storeSessionPolicy(keepSignedIn);
+    return credential;
+  } finally { authenticationInProgress = false; }
 }
 
-export async function signUp(email, password, displayName, { keepSignedIn = false } = {}) {
-  const instance = await applyPersistence();
-  const credential = await createUserWithEmailAndPassword(instance, email, password);
-  if (displayName) await updateProfile(credential.user, { displayName });
-  storeSessionPolicy(keepSignedIn);
-  return credential;
+export async function signUp(email, password, { keepSignedIn = false } = {}) {
+  authenticationInProgress = true;
+  try {
+    const instance = await applyPersistence();
+    const credential = await createUserWithEmailAndPassword(instance, email, password);
+    storeSessionPolicy(keepSignedIn);
+    return credential;
+  } finally { authenticationInProgress = false; }
+}
+
+// Profile setup can be retried without creating a second account.
+export function updateAccountName(user, displayName) {
+  return updateProfile(user, { displayName });
 }
 
 export function changePendingEmail(user, email, actionCodeSettings) {

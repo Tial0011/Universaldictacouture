@@ -326,3 +326,12 @@
     transition: none;
   }
 }
+
+/* A quieter woven band beneath the richly detailed collection entrance. */
+.discovery--shop .discovery__groups {max-width:44rem;gap:.25rem;padding:.35rem;background:rgba(255,255,255,.56);border-radius:3px;box-shadow:none;}
+.discovery--shop .discovery__group {min-height:var(--touch-target);border-radius:2px;padding:.5rem .4rem;overflow:visible;text-overflow:clip;white-space:normal;font-size:clamp(.7rem,2.3vw,.86rem);line-height:1.35;}
+.discovery--shop .discovery__group.is-active {box-shadow:none;}
+.discovery--shop .discovery__item {padding:.3rem;background:rgba(255,255,255,.7);border-radius:2px;box-shadow:none;}
+.discovery--shop .discovery__media {background:var(--color-couture-surface);}
+.discovery--shop .discovery__name {font-family:var(--font-body);font-size:.75rem;font-weight:500;line-height:1.4;}
+@media(max-width:480px){.discovery--shop .discovery__rail-arrow{width:var(--touch-target);min-width:var(--touch-target);height:var(--touch-target);}}

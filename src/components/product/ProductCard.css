@@ -279,7 +279,7 @@
 
 /* ---------- Section 4 Shop card variant ----------
    The Shop catalogue is fabric-first and always uses the approved
-   image / heart / name / price-unit / SHOP THIS PIECE hierarchy. */
+   image / heart / name / price-unit / SHOP PIECE hierarchy. */
 .product-card--shop {
   --product-card-media-ratio: 4 / 5;
   padding: 0;

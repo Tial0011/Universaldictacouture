@@ -1,9 +1,12 @@
-import { lazy } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import SiteLayout from "./components/navigation/SiteLayout";
 import AdminLayout from "./components/navigation/AdminLayout";
 import AdminAccess from "./components/admin/AdminAccess";
 import RequireAuth from "./components/auth/RequireAuth";
+
+import PageBoundary from "./components/common/PageBoundary";
+import LoadingSpinner from "./components/common/LoadingSpinner";
 
 import Home from "./pages/Home/Home";
 const Shop = lazy(() => import("./pages/Shop/Shop"));
@@ -31,6 +34,16 @@ const AdminChats = lazy(() => import("./pages/admin/Chats/Chats"));
 const AdminReviews = lazy(() => import("./pages/admin/Reviews/Reviews"));
 const AdminAppearance = lazy(() => import("./pages/admin/Appearance/Appearance"));
 
+function AuthRoute() {
+  const location = useLocation();
+  const routeKey = location.pathname + location.search;
+  return <PageBoundary key={routeKey}>
+    <Suspense fallback={<main className="container section"><LoadingSpinner label="Opening your account" /></main>}>
+      <Auth key={routeKey} />
+    </Suspense>
+  </PageBoundary>;
+}
+
 export default function App() {
   return (
     <Routes>
@@ -52,7 +65,7 @@ export default function App() {
         <Route path="*" element={<NotFound />} />
       </Route>
 
-      {["/signin", "/signup", "/verify-email", "/forgot-password", "/reset-password", "/auth/action", "/account-unavailable"].map((path) => <Route key={path} path={path} element={<Auth />} />)}
+      {["/signin", "/signup", "/verify-email", "/forgot-password", "/reset-password", "/auth/action", "/account-unavailable"].map((path) => <Route key={path} path={path} element={<AuthRoute />} />)}
 
       <Route
         path="/admin"
