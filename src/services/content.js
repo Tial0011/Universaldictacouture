@@ -35,7 +35,7 @@ export const APPROVED_HERO_COPY = {
   secondary: "Modern You",
   body: "Beautifully crafted Aso Oke for every occasion. Classic, elegant and proudly Nigerian.",
   primaryCta: { label: "Shop the Collection", to: "/shop" },
-  secondaryCta: { label: "Explore All Styles", to: "/shop" },
+  secondaryCta: { label: "Explore All Styles", to: "/shop?discovery=style" },
 };
 
 /** Approved Shop by Occasion examples, used only when they exist in the catalogue. */
@@ -206,8 +206,8 @@ export function buildOccasionDiscovery(products, title = "Shop by Occasion") {
  * Shop discovery is generated from the Shop By groups configured by the
  * admin and the values genuinely assigned to published products. The three
  * core groups are Occasion, Style and Fabric & Pattern, but extra groups can
- * be added without changing this builder. Empty groups remain visible so the
- * admin can immediately see which part of the catalogue still needs data.
+ * be added without changing this builder. Empty groups stay in Admin configuration
+ * but do not render as dead public discovery tabs.
  */
 export const SHOP_DISCOVERY_GROUPS = DEFAULT_SHOP_BY_GROUPS;
 
@@ -239,8 +239,12 @@ export function buildShopDiscovery(products, title = "Shop By", groupDefinitions
       });
     });
 
-    groups.push({ id: group.id || key, label: group.label || key, order: groups.length });
+    // The Shop discovery surface only renders catalogue-backed groups.
+    // An admin-configured group with no published products is valid config,
+    // but it should not become an empty public tab.
     if (!found.size) return;
+
+    groups.push({ id: group.id || key, label: group.label || key, order: groups.length });
 
     const ordered = [...found.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
     const usedImages = new Set();
@@ -267,7 +271,7 @@ export function buildShopDiscovery(products, title = "Shop By", groupDefinitions
     });
   });
 
-  if (!groups.length) return null;
+  if (!groups.length || !items.length) return null;
   return { id: "shop-discovery", title, groups, items };
 }
 
@@ -301,7 +305,7 @@ export async function fetchCustomStylePromo() {
  * Returns { category: [], occasion: [], ... } with trimmed, deduped labels.
  */
 export async function fetchTaxonomyLabels() {
-  const empty = { category: [], occasion: [], style: [], fabric: [], colour: [], size: [] };
+  const empty = { category: [], occasion: [], style: [], fabric: [], colour: [] };
   if (!isFirebaseConfigured) return empty;
   try {
     const snapshot = await getDocs(query(collection(db, "taxonomy"), limit(500)));

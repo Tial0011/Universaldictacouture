@@ -90,9 +90,9 @@ export default function Home() {
     () => buildShopDiscovery(products, "Shop By", shopByGroups),
     [products, shopByGroups]
   );
-  // New In is always the newest published pieces (see selectNewIn),
-  // capped at 20 — never a manually curated set — so "View all" can
-  // simply point at the shop's default, newest-first view.
+  // New In is an admin-managed merchandising context. The homepage
+  // previews the first 20 valid members; View all reopens that same
+  // context in Shop instead of conflating it with Newest First.
   const newInProducts = selectNewIn(products, 20);
 
   return (
@@ -115,7 +115,7 @@ export default function Home() {
               module={shopByModule}
               className="discovery--home"
               groupNavigation="arrows"
-              viewAllTo="/shop"
+              viewAllTo={(groupId) => groupId ? `/shop?discovery=${encodeURIComponent(groupId)}` : "/shop"}
             />
           </div>
         ) : null}
@@ -124,7 +124,7 @@ export default function Home() {
           products={newInProducts}
           isLoading={isLoading}
           error={error}
-          viewAllTo="/shop"
+          viewAllTo="/shop?newin=1"
         />
 
         <CustomStylePromo image={customStyleImage} />

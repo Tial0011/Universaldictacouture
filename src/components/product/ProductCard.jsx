@@ -6,9 +6,8 @@ import { useToast } from "../../context/ToastContext";
 import { formatNaira } from "../../utils/formatters";
 import "./ProductCard.css";
 
-// Product previews must show the complete upload. Resize without cropping;
-// the card contains the image proportionally inside its media frame.
 const GRID_IMAGE = "w_720,h_720,c_limit,q_auto,f_auto";
+const SHOP_GRID_IMAGE = "w_720,h_900,c_fill,g_auto,q_auto,f_auto";
 const LIST_IMAGE = "w_480,h_480,c_limit,q_auto,f_auto";
 
 function HeartIcon({ filled }) {
@@ -30,7 +29,6 @@ function HeartIcon({ filled }) {
   );
 }
 
-/** "Deep Burgundy – Traditional Weave": colour, then weave, when the piece has them. */
 function buildSubtitle(product) {
   const colour = (product.colour ?? []).slice(0, 2).join(", ");
   const fabric = product.fabric?.[0] ?? "";
@@ -45,83 +43,92 @@ function ProductPrice({ product }) {
     return (
       <p className="product-card__price">
         <span className="visually-hidden">Price from </span>
-        <span className="product-card__from" aria-hidden="true">
-          From{" "}
-        </span>
+        <span className="product-card__from" aria-hidden="true">From </span>
         {price}
         {unit}
       </p>
     );
   }
 
-  return (
-    <p className="product-card__price">
-      {price}
-      {unit}
-    </p>
-  );
+  return <p className="product-card__price">{price}{unit}</p>;
 }
 
 /**
- * Shop product card. One clear action — View Piece — because sizes and
- * other required choices are made on Product Details; the heart saves
- * the piece for later. `view` switches between the two-up grid card and
- * the horizontal list-row card.
+ * Shared product card. The Shop variant follows the Section 4 card
+ * contract (image, heart, name, live price/unit, SHOP THIS PIECE) while
+ * other destinations keep their existing compact preview treatment.
  */
-export default function ProductCard({ product, view = "grid", imageLoading = "lazy" }) {
-  const { isSaved, toggleSaved, isPersistent } = useSavedPieces();
+export default function ProductCard({
+  product,
+  view = "grid",
+  variant = "default",
+  navigationState,
+  onNavigate,
+  imageLoading = "lazy",
+}) {
+  const { isSaved, toggleSaved } = useSavedPieces();
   const { showToast } = useToast();
 
+  const isShopCard = variant === "shop";
   const saved = isSaved(product.id);
-  const subtitle = buildSubtitle(product);
+  const subtitle = isShopCard ? "" : buildSubtitle(product);
+  const ctaLabel = isShopCard ? "SHOP THIS PIECE" : "View Piece";
+  const imageTransformation = view === "list"
+    ? LIST_IMAGE
+    : isShopCard
+      ? SHOP_GRID_IMAGE
+      : GRID_IMAGE;
 
   const handleSave = () => {
     const nowSaved = toggleSaved(product.id);
-    showToast(
-      nowSaved
-        ? isPersistent
-          ? "Saved to My Closet → My Pieces."
-          : "Saved for this visit. Create a Profile to keep your pieces."
-        : "Removed from My Pieces."
-    );
+    showToast(nowSaved ? "Added to My Closet." : "Removed from My Closet.");
   };
 
   return (
-    <article className={`product-card${view === "list" ? " product-card--list" : ""}`}>
+    <article className={`product-card${view === "list" ? " product-card--list" : ""}${isShopCard ? " product-card--shop" : ""}`}>
       <div className="product-card__media">
-        <Link to={product.href} className="product-card__media-link" tabIndex={-1} aria-hidden="true">
+        <Link
+          to={product.href}
+          state={navigationState}
+          className="product-card__media-link"
+          tabIndex={-1}
+          aria-hidden="true"
+          onClick={onNavigate}
+        >
           <ProductImage
             image={product.image}
             alt={product.name}
-            transformation={view === "list" ? LIST_IMAGE : GRID_IMAGE}
+            transformation={imageTransformation}
             loading={imageLoading}
             sizes={
               view === "list"
                 ? "(min-width: 640px) 220px, 40vw"
-                : "(min-width: 1280px) 20vw, (min-width: 768px) 30vw, 45vw"
+                : isShopCard
+                  ? "(min-width: 1500px) 16vw, (min-width: 1024px) 22vw, (min-width: 640px) 31vw, 48vw"
+                  : "(min-width: 1280px) 20vw, (min-width: 768px) 30vw, 45vw"
             }
           />
         </Link>
 
-          <button
-            type="button"
-            className={`product-card__save${saved ? " is-saved" : ""}`}
-            onClick={handleSave}
-            aria-pressed={saved}
-            aria-label={saved ? `Remove ${product.name} from My Pieces` : `Save ${product.name} to My Pieces`}
-          >
-            <HeartIcon filled={saved} />
-          </button>
+        <button
+          type="button"
+          className={`product-card__save${saved ? " is-saved" : ""}`}
+          onClick={handleSave}
+          aria-pressed={saved}
+          aria-label={saved ? `Remove ${product.name} from My Closet` : `Add ${product.name} to My Closet`}
+        >
+          <HeartIcon filled={saved} />
+        </button>
       </div>
 
       <div className="product-card__body">
         <h3 className="product-card__name">
-          <Link to={product.href}>{product.name}</Link>
+          <Link to={product.href} state={navigationState} onClick={onNavigate}>{product.name}</Link>
         </h3>
         {subtitle ? <p className="product-card__subtitle">{subtitle}</p> : null}
         <ProductPrice product={product} />
-        <Link to={product.href} className="product-card__cta">
-          <span>View Piece</span>
+        <Link to={product.href} state={navigationState} className="product-card__cta" onClick={onNavigate}>
+          <span>{ctaLabel}</span>
           <StitchArrowIcon size={16} className="product-card__cta-icon" />
           <span className="visually-hidden"> {product.name}</span>
         </Link>

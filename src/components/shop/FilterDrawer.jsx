@@ -1,11 +1,20 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Mobile filter sheet. Focus is moved into the sheet, trapped while it
- * is open, and returned to the control that opened it on close.
- * Escape closes it.
+ * Mobile/tablet filter sheet. Focus moves into the sheet, is trapped while
+ * open, and returns to the opener on close. Selections can remain pending
+ * until the customer deliberately chooses Apply Filters.
  */
-export default function FilterDrawer({ isOpen, onClose, title = "Filter", children }) {
+export default function FilterDrawer({
+  isOpen,
+  onClose,
+  onApply,
+  onClearAll,
+  canClear = false,
+  canApply = true,
+  title = "Filters",
+  children,
+}) {
   const panelRef = useRef(null);
   const closeRef = useRef(null);
 
@@ -76,10 +85,23 @@ export default function FilterDrawer({ isOpen, onClose, title = "Filter", childr
             className="filter-drawer__close"
             onClick={onClose}
           >
-            Done
+            Cancel
           </button>
         </div>
         <div className="filter-drawer__body">{children}</div>
+        <div className="filter-drawer__actions">
+          <button
+            type="button"
+            className="btn btn--secondary"
+            onClick={onClearAll}
+            disabled={!canClear}
+          >
+            Clear All
+          </button>
+          <button type="button" className="btn btn--primary" onClick={onApply} disabled={!canApply}>
+            Apply Filters
+          </button>
+        </div>
       </div>
     </div>
   );

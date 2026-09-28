@@ -15,9 +15,8 @@ export const FILTER_DIMENSIONS = [
   { key: "category", label: "Category" },
   { key: "occasion", label: "Occasion" },
   { key: "style", label: "Style" },
-  { key: "fabric", label: "Fabric & Pattern" },
+  { key: "fabric", label: "Fabric / Weave" },
   { key: "colour", label: "Colour" },
-  { key: "size", label: "Size" },
 ];
 
 function toArray(value) {
@@ -106,6 +105,10 @@ export function normaliseProduct(id, raw) {
   // A piece with no uploaded photo stays publishable with an empty
   // media frame; never substitute a photograph of another product.
   const primaryImage = normaliseImage(raw.primaryImage) || images[0] || null;
+  // Section 4 public completeness gate: an eligible published piece must
+  // have a real primary image. A configured image that later fails to load
+  // is handled by ProductImage's branded fallback without fabricating media.
+  if (!primaryImage) return null;
 
   const options = normaliseOptions(raw.options);
   const variants = normaliseVariants(raw.variants);
@@ -187,7 +190,6 @@ function buildSearchText(product) {
       ...product.fabric,
       ...Object.values(product.shopBy ?? {}).flat(),
       ...product.colour,
-      ...product.size,
       ...product.aliases,
       ...product.keywords,
     ].join(" ")

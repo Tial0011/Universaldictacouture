@@ -5,7 +5,8 @@ test("draft permits incomplete price but publishing requires price and category"
   assert.equal(prepareRecord("products", { name: "Aso Oke", status: "draft", price: "" }).price, null);
   assert.throws(() => prepareRecord("products", { name: "Aso Oke", status: "published", price: "", category: "Fabric" }));
   assert.throws(() => prepareRecord("products", { name: "Aso Oke", status: "published", price: 100, category: "" }));
-  const result = prepareRecord("products", { name: " Aso Oke ", status: "published", price: "12000", category: "Fabric, Fabric, Ready to wear" });
+  assert.throws(() => prepareRecord("products", { name: "Aso Oke", status: "published", price: 100, category: "Fabric" }), /product photo/i);
+  const result = prepareRecord("products", { name: " Aso Oke ", status: "published", price: "12000", category: "Fabric, Fabric, Ready to wear", primaryImage: { url: "https://example.test/aso-oke.jpg" } });
   assert.equal(result.price, 12000);
   assert.deepEqual(result.category, ["Fabric", "Ready to wear"]);
 });

@@ -9,8 +9,8 @@
  * an empty screen.
  */
 
-import { FILTER_DIMENSIONS } from "../services/productModel";
-import { matchesQuery } from "./search";
+import { FILTER_DIMENSIONS } from "../services/productModel.js";
+import { matchesQuery } from "./search.js";
 
 export const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
@@ -30,7 +30,6 @@ export const EMPTY_STATE = {
   sort: "newest",
   newIn: false,
   discovery: "",
-  view: "grid",
 };
 
 function toPrice(value) {
@@ -42,7 +41,10 @@ function toPrice(value) {
 export function parseShopState(searchParams) {
   const filters = {};
   DIMENSION_KEYS.forEach((key) => {
-    filters[key] = searchParams.getAll(key).map((value) => value.trim()).filter(Boolean);
+    filters[key] = searchParams.getAll(key)
+      .map((value) => value.trim())
+      .filter(Boolean)
+      .filter((value) => !(key === "style" && value.toLowerCase() === "custom style"));
   });
 
   let min = toPrice(searchParams.get("min"));
@@ -74,8 +76,6 @@ export function parseShopState(searchParams) {
     sort: SORT_VALUES.includes(sort) ? sort : "newest",
     newIn: searchParams.get("newin") === "1",
     discovery: (searchParams.get("discovery") ?? "").trim(),
-    // Grid is the default; only the list view is written to the URL.
-    view: searchParams.get("view") === "list" ? "list" : "grid",
   };
 }
 
@@ -96,7 +96,6 @@ export function buildSearchParams(state) {
   if (state.sort && state.sort !== "newest") params.set("sort", state.sort);
   if (state.newIn) params.set("newin", "1");
   if (state.discovery) params.set("discovery", state.discovery);
-  if (state.view === "list") params.set("view", "list");
 
   return params;
 }
@@ -105,6 +104,7 @@ export function hasActiveRefinements(state) {
   return Boolean(
     state.query ||
       state.newIn ||
+      state.discovery ||
       state.min !== null ||
       state.max !== null ||
       DIMENSION_KEYS.some((key) => (state.filters?.[key] ?? []).length > 0) ||
@@ -197,7 +197,7 @@ export function buildFacets(products, state, taxonomyByDimension = null) {
     pool.forEach((product) => {
       (product[dimension.key] ?? []).forEach((value) => {
         const label = String(value).trim();
-        if (!label) return;
+        if (!label || (dimension.key === "style" && label.toLowerCase() === "custom style")) return;
         remember(label, 1);
       });
     });
@@ -209,7 +209,7 @@ export function buildFacets(products, state, taxonomyByDimension = null) {
       : [];
     taxonomyLabels.forEach((raw) => {
       const label = String(raw ?? "").trim();
-      if (!label) return;
+      if (!label || (dimension.key === "style" && label.toLowerCase() === "custom style")) return;
       const lower = label.toLowerCase();
       if (lowerToLabel.has(lower)) return;
       lowerToLabel.set(lower, label);
@@ -219,7 +219,7 @@ export function buildFacets(products, state, taxonomyByDimension = null) {
     const selected = state.filters?.[dimension.key] ?? [];
     selected.forEach((value) => {
       const trimmed = String(value ?? "").trim();
-      if (!trimmed) return;
+      if (!trimmed || (dimension.key === "style" && trimmed.toLowerCase() === "custom style")) return;
       const lower = trimmed.toLowerCase();
       if (lowerToLabel.has(lower)) return;
       lowerToLabel.set(lower, trimmed);

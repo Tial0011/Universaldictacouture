@@ -276,3 +276,95 @@
   align-self: flex-start;
   padding-inline: var(--space-md);
 }
+
+/* ---------- Section 4 Shop card variant ----------
+   The Shop catalogue is fabric-first and always uses the approved
+   image / heart / name / price-unit / SHOP THIS PIECE hierarchy. */
+.product-card--shop {
+  --product-card-media-ratio: 4 / 5;
+  padding: 0;
+  overflow: hidden;
+  border-color: rgba(96, 16, 19, 0.13);
+  border-radius: 10px;
+  box-shadow: 0 3px 14px rgba(31, 17, 18, 0.035);
+}
+
+.product-card--shop .product-card__media {
+  border-radius: 0;
+  background:
+    linear-gradient(135deg, rgba(96, 16, 19, 0.035), transparent 45%),
+    var(--color-ivory-deep);
+}
+
+.product-card--shop .product-card__media .product-image {
+  object-fit: cover;
+}
+
+.product-card--shop .product-card__save {
+  top: .2rem;
+  right: .2rem;
+  color: var(--color-white);
+}
+
+.product-card--shop .product-card__save::before {
+  inset: .42rem;
+  background: rgba(67, 9, 13, 0.46);
+  border-color: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(4px);
+}
+
+.product-card--shop .product-card__save.is-saved {
+  color: var(--color-white);
+}
+
+.product-card--shop .product-card__save.is-saved::before {
+  background: var(--color-brand);
+  border-color: rgba(255, 255, 255, .94);
+}
+
+.product-card--shop .product-card__body {
+  gap: .2rem;
+  padding: .62rem .58rem .58rem;
+}
+
+.product-card--shop .product-card__name {
+  font-size: clamp(.9rem, .84rem + .28vw, 1.04rem);
+  font-weight: var(--weight-semibold);
+  line-height: 1.16;
+}
+
+.product-card--shop .product-card__price {
+  padding-bottom: .42rem;
+  font-family: var(--font-body);
+  font-size: clamp(.84rem, .8rem + .16vw, .95rem);
+  line-height: 1.25;
+}
+
+.product-card--shop .product-card__price .product-card__from,
+.product-card--shop .product-card__price {
+  color: var(--color-text-primary);
+}
+
+.product-card--shop .product-card__cta {
+  min-height: 2.7rem;
+  padding-inline: .55rem;
+  font-size: clamp(.72rem, .68rem + .15vw, .82rem);
+  font-weight: var(--weight-semibold);
+  letter-spacing: .045em;
+  border-radius: 3px;
+}
+
+@media (hover: hover) {
+  .product-card--shop:hover {
+    transform: translateY(-2px);
+    border-color: rgba(96, 16, 19, 0.28);
+    box-shadow: 0 10px 26px rgba(31, 17, 18, 0.075);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card--shop,
+  .product-card--shop .product-card__cta-icon {
+    transition: none;
+  }
+}

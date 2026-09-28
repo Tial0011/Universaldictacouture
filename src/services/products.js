@@ -74,20 +74,13 @@ export async function fetchPublishedProducts() {
 }
 
 /**
- * Homepage New In: the newest published pieces, and nothing else.
- *
- * The complete published catalogue is sorted newest-first by
- * publishedAt FIRST (see sortByNewest), and only THEN capped at `max`
- * — never the other way around — so publishing a new piece always
- * promotes it to position #1 and the oldest piece in the previous set
- * falls out automatically once more than `max` pieces are published.
- * publishedAt is set once, at first publish, and never touched again
- * on later edits (see productModel / admin.js), so editing an older
- * piece never makes it look new. This never reads isNewIn and never
- * depends on any manual admin selection.
+ * New In is an explicit admin-managed merchandising context. The homepage
+ * previews up to `max` eligible members, ordered by first-published date so
+ * the presentation stays deterministic; Shop `?newin=1` uses the same
+ * `isNewIn` membership flag. Editing an item never changes its chronology.
  */
 export function selectNewIn(products, max = 20) {
-  return sortByNewest(products).slice(0, max);
+  return sortByNewest(products.filter((product) => product.isNewIn)).slice(0, max);
 }
 
 export function sortByNewest(products) {

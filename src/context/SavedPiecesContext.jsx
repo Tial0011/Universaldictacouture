@@ -19,9 +19,19 @@ function readAccountRecord(key) {
   return parseRecord(raw);
 }
 function readGuestRecord() {
-  let raw;
-  try { raw = sessionStorage.getItem(GUEST_KEY); } catch { /* blocked storage */ }
-  return parseRecord(raw);
+  // Guest Shop saves are device/browser-local catalogue state. Prefer
+  // localStorage so they survive ordinary return visits, while still
+  // accepting the older sessionStorage record during migration.
+  let localRaw;
+  let sessionRaw;
+  try { localRaw = localStorage.getItem(GUEST_KEY); } catch { /* blocked storage */ }
+  try { sessionRaw = sessionStorage.getItem(GUEST_KEY); } catch { /* blocked storage */ }
+  const local = parseRecord(localRaw);
+  const session = parseRecord(sessionRaw);
+  return {
+    productIds: itemIds([...local.productIds, ...session.productIds]),
+    pending: [...local.pending, ...session.pending],
+  };
 }
 function writeAccountRecord(key, record) {
   const value = JSON.stringify(record);
@@ -29,8 +39,16 @@ function writeAccountRecord(key, record) {
   catch { try { sessionStorage.setItem(key, value); return "session"; } catch { return "memory"; } }
 }
 function writeGuestRecord(record) {
-  try { sessionStorage.setItem(GUEST_KEY, JSON.stringify(record)); return "session"; }
-  catch { return "memory"; }
+  const value = JSON.stringify(record);
+  try {
+    localStorage.setItem(GUEST_KEY, value);
+    // Clear the old session-only copy after a successful persistent write.
+    try { sessionStorage.removeItem(GUEST_KEY); } catch { /* blocked storage */ }
+    return "browser";
+  } catch {
+    try { sessionStorage.setItem(GUEST_KEY, value); return "session"; }
+    catch { return "memory"; }
+  }
 }
 export function SavedPiecesProvider({ children }) {
   const { user } = useAuth();

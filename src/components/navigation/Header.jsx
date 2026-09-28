@@ -3,7 +3,6 @@ import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import Logo from "../brand/Logo";
 import { BRAND } from "../brand/brandLanguage";
 import { useAuth } from "../../context/AuthContext";
-import { useAuthGate } from "../../context/AuthGateContext";
 import CustomStyleIcon from "./icons/CustomStyleIcon";
 import ReviewsIcon from "./icons/ReviewsIcon";
 import "./Header.css";
@@ -77,7 +76,6 @@ function HeaderLink({ to, label, end = false, onNavigate, icon, description }) {
 
 export default function Header() {
   const { user } = useAuth();
-  const { requestAuth } = useAuthGate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
   const drawerId = useId();
@@ -135,10 +133,6 @@ export default function Header() {
 
   const submitSearch = (event) => {
     event.preventDefault();
-    if (!user) {
-      requestAuth({ returnTo: "/shop?focus=search", returnState: { shopSearchDraft: search.trim() } });
-      return;
-    }
     const query = search.trim();
     navigate(query ? `/shop?q=${encodeURIComponent(query)}` : "/shop?focus=search");
   };
@@ -220,13 +214,10 @@ export default function Header() {
             </NavLink>
 
             <div className="site-header__mobile-actions">
-              {user ? <NavLink className="site-header__action" to="/shop?focus=search" aria-label="Search" title="Search">
+              <NavLink className="site-header__action" to="/shop?focus=search" aria-label="Search" title="Search">
                 <Icon name="search" size={20} />
                 <span>Search</span>
-              </NavLink> : <button className="site-header__action" type="button" aria-label="Search" title="Search" onClick={() => requestAuth({ returnTo: "/shop?focus=search" })}>
-                <Icon name="search" size={20} />
-                <span>Search</span>
-              </button>}
+              </NavLink>
               <NavLink className={({ isActive }) => `site-header__action${isActive ? " is-active" : ""}`} to="/custom-style" aria-label="Custom Style" title="Custom Style">
                 <CustomStyleIcon size={21} />
                 <span>Custom</span>

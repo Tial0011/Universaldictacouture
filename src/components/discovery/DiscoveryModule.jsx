@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import ProductImage from "../product/ProductImage";
 import ViewAllLink from "../common/ViewAllLink";
@@ -12,6 +12,10 @@ function GroupArrow({ direction }) {
       <path d={direction === "previous" ? "M12.5 15L7.5 10L12.5 5" : "M7.5 5L12.5 10L7.5 15"} />
     </svg>
   );
+}
+
+function prefersReducedMotion() {
+  return typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 }
 
 /**
@@ -32,16 +36,23 @@ export default function DiscoveryModule({
   resolveDestination,
   hideTitleWithTabs = false,
   groupNavigation = "tabs",
+  activeGroup: controlledActiveGroup,
+  onGroupChange,
+  railControls = false,
+  onItemClick,
 }) {
-  const [activeGroup, setActiveGroup] = useState(module?.groups?.[0]?.id ?? "");
+  const [internalActiveGroup, setInternalActiveGroup] = useState(module?.groups?.[0]?.id ?? "");
   const tabRefs = useRef({});
+  const railRef = useRef(null);
+  const [railState, setRailState] = useState({ previous: false, next: false });
   const Heading = headingLevel;
 
   const groups = module?.groups;
   const arrowNavigation = groupNavigation === "arrows" && groups?.length > 0;
-  // Fall back to first group if current activeGroup doesn't exist
-  const currentGroup = groups?.some((group) => group.id === activeGroup)
-    ? activeGroup
+  const requestedGroup = controlledActiveGroup || internalActiveGroup;
+  // Fall back to first group if current activeGroup doesn't exist.
+  const currentGroup = groups?.some((group) => group.id === requestedGroup)
+    ? requestedGroup
     : (groups?.[0]?.id ?? "");
 
   const items = useMemo(() => {
@@ -50,6 +61,33 @@ export default function DiscoveryModule({
     if (arrowNavigation) return module.items.filter((item) => item.group === currentGroup);
     return module.items.filter((item) => !item.group || item.group === currentGroup);
   }, [module, groups, currentGroup, arrowNavigation]);
+
+  const updateRailState = () => {
+    const rail = railRef.current;
+    if (!rail) return;
+    const maxScroll = Math.max(0, rail.scrollWidth - rail.clientWidth);
+    setRailState({
+      previous: rail.scrollLeft > 2,
+      next: rail.scrollLeft < maxScroll - 2,
+    });
+  };
+
+  useEffect(() => {
+    if (!railControls) return undefined;
+    const rail = railRef.current;
+    if (!rail) return undefined;
+
+    rail.scrollTo({ left: 0, behavior: "auto" });
+    const frame = requestAnimationFrame(updateRailState);
+    const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(updateRailState) : null;
+    observer?.observe(rail);
+    window.addEventListener("resize", updateRailState);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer?.disconnect();
+      window.removeEventListener("resize", updateRailState);
+    };
+  }, [currentGroup, items.length, railControls]);
 
   if (!module || (!arrowNavigation && !items.length)) return null;
 
@@ -62,7 +100,8 @@ export default function DiscoveryModule({
   const titleAccent = titleWords.slice(-1).join(" ");
 
   const selectGroup = (id, { focus = false } = {}) => {
-    setActiveGroup(id);
+    if (onGroupChange) onGroupChange(id);
+    else setInternalActiveGroup(id);
     if (focus) tabRefs.current[id]?.focus();
   };
 
@@ -77,6 +116,60 @@ export default function DiscoveryModule({
     event.preventDefault();
     selectGroup(groups[next].id, { focus: true });
   };
+
+  const scrollRail = (direction) => {
+    const rail = railRef.current;
+    if (!rail) return;
+    const distance = Math.max(rail.clientWidth * 0.72, 180);
+    rail.scrollBy({
+      left: direction === "previous" ? -distance : distance,
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+    });
+  };
+
+  const resolvedViewAllTo = typeof viewAllTo === "function" ? viewAllTo(currentGroup) : viewAllTo;
+
+  const list = items.length ? (
+    <ul
+      ref={railControls ? railRef : undefined}
+      key={arrowNavigation ? currentGroup : undefined}
+      className="discovery__list"
+      id={`discovery-panel-${module.id}`}
+      role={hasTabs ? "tabpanel" : undefined}
+      aria-labelledby={hasTabs ? `discovery-tab-${currentGroup}` : arrowNavigation ? `discovery-${module.id}` : undefined}
+      onScroll={railControls ? updateRailState : undefined}
+    >
+      {items.map((item) => (
+        <li key={item.id}>
+          <Link
+            to={resolveDestination ? resolveDestination(item) : item.destination}
+            className="discovery__item"
+            onClick={() => onItemClick?.(item)}
+          >
+            <span className="discovery__media">
+              {(renderMedia && renderMedia(item)) ?? (
+                <ProductImage
+                  image={item.image}
+                  alt=""
+                  transformation={arrowNavigation
+                    ? "w_420,h_420,c_fill,g_auto,q_auto,f_auto"
+                    : "w_520,h_360,c_fill,g_auto,q_auto,f_auto"}
+                />
+              )}
+            </span>
+            {arrowNavigation ? (
+              <span className="discovery__caption">
+                <span className="discovery__name">{item.name}</span>
+                <StitchArrowIcon size={16} className="discovery__caption-arrow" />
+              </span>
+            ) : <span className="discovery__name">{item.name}</span>}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p id={`discovery-panel-${module.id}`} className="discovery__empty">No categories are available in this group yet.</p>
+  );
 
   return (
     <section className={`discovery ${className}`.trim()} aria-labelledby={`discovery-${module.id}`}>
@@ -118,9 +211,9 @@ export default function DiscoveryModule({
                 <GroupArrow direction="next" />
               </button>
             </div>
-            {viewAllTo ? <ViewAllLink to={viewAllTo} className="discovery__view-all" /> : null}
+            {resolvedViewAllTo ? <ViewAllLink to={resolvedViewAllTo} className="discovery__view-all" /> : null}
           </div>
-        ) : viewAllTo ? <ViewAllLink to={viewAllTo} /> : null}
+        ) : resolvedViewAllTo ? <ViewAllLink to={resolvedViewAllTo} /> : null}
       </div>
 
       {arrowNavigation && groups.length > 1 ? (
@@ -161,44 +254,29 @@ export default function DiscoveryModule({
         </div>
       ) : null}
 
-      {items.length ? (
-        <ul
-          key={arrowNavigation ? currentGroup : undefined}
-          className="discovery__list"
-          id={`discovery-panel-${module.id}`}
-          role={hasTabs ? "tabpanel" : undefined}
-          aria-labelledby={hasTabs ? `discovery-tab-${currentGroup}` : arrowNavigation ? `discovery-${module.id}` : undefined}
-        >
-          {items.map((item) => (
-            <li key={item.id}>
-              <Link
-                to={resolveDestination ? resolveDestination(item) : item.destination}
-                className="discovery__item"
-              >
-                <span className="discovery__media">
-                  {(renderMedia && renderMedia(item)) ?? (
-                    <ProductImage
-                      image={item.image}
-                      alt=""
-                      transformation={arrowNavigation
-                        ? "w_420,h_420,c_fill,g_auto,q_auto,f_auto"
-                        : "w_420,h_420,c_limit,q_auto,f_auto"}
-                    />
-                  )}
-                </span>
-                {arrowNavigation ? (
-                  <span className="discovery__caption">
-                    <span className="discovery__name">{item.name}</span>
-                    <StitchArrowIcon size={16} className="discovery__caption-arrow" />
-                  </span>
-                ) : <span className="discovery__name">{item.name}</span>}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p id={`discovery-panel-${module.id}`} className="discovery__empty">No categories are available in this group yet.</p>
-      )}
+      {railControls && items.length ? (
+        <div className="discovery__rail">
+          <button
+            type="button"
+            className="discovery__rail-arrow discovery__rail-arrow--previous"
+            aria-label={`Previous ${groups?.find((group) => group.id === currentGroup)?.label || "Shop By"} choices`}
+            disabled={!railState.previous}
+            onClick={() => scrollRail("previous")}
+          >
+            <GroupArrow direction="previous" />
+          </button>
+          {list}
+          <button
+            type="button"
+            className="discovery__rail-arrow discovery__rail-arrow--next"
+            aria-label={`Next ${groups?.find((group) => group.id === currentGroup)?.label || "Shop By"} choices`}
+            disabled={!railState.next}
+            onClick={() => scrollRail("next")}
+          >
+            <GroupArrow direction="next" />
+          </button>
+        </div>
+      ) : list}
     </section>
   );
 }

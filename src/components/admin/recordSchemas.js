@@ -13,7 +13,6 @@ export const SCHEMAS = {
       text("category", "Categories", { type: "values", hint: "Separate multiple labels with commas." }),
       text("shopBy", "Shop By", { type: "shopBy", hint: "Choose the reusable Shop By values that describe this product. Manage the available groups and choices from the Shop By admin page." }),
       text("colour", "Colour", { type: "values", hint: "Separate multiple labels with commas." }),
-      text("size", "Size", { type: "values", hint: "Separate multiple labels with commas." }),
       text("isNewIn", "Feature in New In", { type: "checkbox" }),
       text("keywords", "Search keywords", { type: "values" }), text("aliases", "Alternative names", { type: "values" }),
       text("images", "Product photos", { type: "images", hint: "The first photo is the cover. JPEG, PNG or WebP, up to 4 MB each." }),

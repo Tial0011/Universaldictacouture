@@ -1,12 +1,9 @@
 import { useEffect, useId, useState } from "react";
 
 /**
- * Filter panel. The same component fills the desktop sidebar and the
- * mobile drawer, so the two can never drift apart.
- *
- * Checkboxes within a dimension are OR; dimensions combine with AND.
- * The price range is applied on submit rather than on every keystroke,
- * which keeps a half-typed number from emptying the grid.
+ * Shared Shop filter panel used by the desktop sidebar and the mobile
+ * filter sheet. Checkboxes are OR within a dimension; dimensions combine
+ * with AND. Public catalogue counts are deliberately not displayed.
  */
 export default function ShopFilters({
   facets,
@@ -15,49 +12,60 @@ export default function ShopFilters({
   onToggleNewIn,
   onPriceChange,
   onClearAll,
+  onValidityChange,
   hasRefinements,
   idPrefix = "filters",
+  showClear = true,
 }) {
   const priceId = useId();
   const [min, setMin] = useState(state.min === null ? "" : String(state.min));
   const [max, setMax] = useState(state.max === null ? "" : String(state.max));
   const [priceError, setPriceError] = useState("");
 
-  // Keep the inputs aligned with the URL (Back/Forward, Clear All).
   useEffect(() => {
     setMin(state.min === null ? "" : String(state.min));
     setMax(state.max === null ? "" : String(state.max));
     setPriceError("");
-  }, [state.min, state.max]);
+    onValidityChange?.(true);
+  }, [state.min, state.max, onValidityChange]);
 
-  const applyPrice = (event) => {
-    event.preventDefault();
-    const minValue = min === "" ? null : Number(min);
-    const maxValue = max === "" ? null : Number(max);
+  const syncPrice = (nextMin, nextMax) => {
+    const minValue = nextMin === "" ? null : Number(nextMin);
+    const maxValue = nextMax === "" ? null : Number(nextMax);
 
+    let error = "";
     if ((minValue !== null && !Number.isFinite(minValue)) ||
       (maxValue !== null && !Number.isFinite(maxValue))) {
-      setPriceError("Enter prices as numbers.");
-      return;
-    }
-    if (minValue !== null && minValue < 0) {
-      setPriceError("Prices cannot be negative.");
-      return;
-    }
-    if (minValue !== null && maxValue !== null && minValue > maxValue) {
-      setPriceError("The lowest price must be less than the highest.");
-      return;
+      error = "Enter prices as numbers.";
+    } else if ((minValue !== null && minValue < 0) || (maxValue !== null && maxValue < 0)) {
+      error = "Prices cannot be negative.";
+    } else if (minValue !== null && maxValue !== null && minValue > maxValue) {
+      error = "Minimum Price must not exceed Maximum Price.";
     }
 
-    setPriceError("");
-    onPriceChange(minValue, maxValue);
+    setPriceError(error);
+    onValidityChange?.(!error);
+    if (!error) onPriceChange(minValue, maxValue);
+  };
+
+  const changeMin = (value) => {
+    setMin(value);
+    syncPrice(value, max);
+  };
+
+  const changeMax = (value) => {
+    setMax(value);
+    syncPrice(min, value);
   };
 
   return (
     <div className="shop-filters">
       <div className="shop-filters__head">
-        <h2 className="shop-filters__title">Filter</h2>
-        {hasRefinements ? (
+        <div>
+          <p className="shop-filters__eyebrow">Refine the collection</p>
+          <h2 className="shop-filters__title">Filters</h2>
+        </div>
+        {showClear && hasRefinements ? (
           <button type="button" className="shop-filters__clear" onClick={onClearAll}>
             Clear All
           </button>
@@ -65,14 +73,14 @@ export default function ShopFilters({
       </div>
 
       <fieldset className="shop-filters__group">
-        <legend className="field__label">New In</legend>
+        <legend className="field__label">Collection</legend>
         <label className="choice">
           <input
             type="checkbox"
             checked={state.newIn}
             onChange={(event) => onToggleNewIn(event.target.checked)}
           />
-          <span>Show New In only</span>
+          <span>New In</span>
         </label>
       </fieldset>
 
@@ -89,10 +97,7 @@ export default function ShopFilters({
                     checked={checked}
                     onChange={() => onToggleValue(dimension.key, entry.value)}
                   />
-                  <span>
-                    {entry.value}
-                    <span className="shop-filters__count"> ({entry.count})</span>
-                  </span>
+                  <span>{entry.value}</span>
                 </label>
               );
             })}
@@ -100,51 +105,46 @@ export default function ShopFilters({
         </fieldset>
       ))}
 
-      <form className="shop-filters__group shop-filters__price" onSubmit={applyPrice} noValidate>
-        <fieldset>
-          <legend className="field__label">Price Range (₦)</legend>
-          <div className="shop-filters__price-inputs">
-            <div className="field">
-              <label className="field__label" htmlFor={`${idPrefix}-${priceId}-min`}>
-                Lowest
-              </label>
-              <input
-                id={`${idPrefix}-${priceId}-min`}
-                className="form-control"
-                type="number"
-                inputMode="numeric"
-                min="0"
-                step="1"
-                value={min}
-                onChange={(event) => setMin(event.target.value)}
-                aria-describedby={`${idPrefix}-${priceId}-error`}
-              />
-            </div>
-            <div className="field">
-              <label className="field__label" htmlFor={`${idPrefix}-${priceId}-max`}>
-                Highest
-              </label>
-              <input
-                id={`${idPrefix}-${priceId}-max`}
-                className="form-control"
-                type="number"
-                inputMode="numeric"
-                min="0"
-                step="1"
-                value={max}
-                onChange={(event) => setMax(event.target.value)}
-                aria-describedby={`${idPrefix}-${priceId}-error`}
-              />
-            </div>
+      <fieldset className="shop-filters__group shop-filters__price">
+        <legend className="field__label">Price Range (₦)</legend>
+        <div className="shop-filters__price-inputs">
+          <div className="field">
+            <label className="field__label" htmlFor={`${idPrefix}-${priceId}-min`}>
+              Minimum Price
+            </label>
+            <input
+              id={`${idPrefix}-${priceId}-min`}
+              className="form-control"
+              type="number"
+              inputMode="numeric"
+              min="0"
+              step="1"
+              value={min}
+              onChange={(event) => changeMin(event.target.value)}
+              aria-describedby={`${idPrefix}-${priceId}-error`}
+            />
           </div>
-          <p className="field__error" id={`${idPrefix}-${priceId}-error`} role="alert">
-            {priceError}
-          </p>
-          <button type="submit" className="btn btn--secondary shop-filters__apply">
-            Apply price range
-          </button>
-        </fieldset>
-      </form>
+          <div className="field">
+            <label className="field__label" htmlFor={`${idPrefix}-${priceId}-max`}>
+              Maximum Price
+            </label>
+            <input
+              id={`${idPrefix}-${priceId}-max`}
+              className="form-control"
+              type="number"
+              inputMode="numeric"
+              min="0"
+              step="1"
+              value={max}
+              onChange={(event) => changeMax(event.target.value)}
+              aria-describedby={`${idPrefix}-${priceId}-error`}
+            />
+          </div>
+        </div>
+        <p className="field__error" id={`${idPrefix}-${priceId}-error`} role="alert">
+          {priceError}
+        </p>
+      </fieldset>
     </div>
   );
 }

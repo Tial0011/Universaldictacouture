@@ -1,4 +1,4 @@
-export const DIMENSIONS = ["category", "occasion", "style", "fabric", "colour", "size"];
+export const DIMENSIONS = ["category", "occasion", "style", "fabric", "colour"];
 export const HERO_CONCEPTS = ["ready-to-wear", "aso-oke-fabric", "custom-style", "shop-by-occasion", "bridal-event-dressing"];
 export function splitValues(value) {
   return [...new Set((Array.isArray(value) ? value : String(value || "").split(",")).map(v => String(v).trim()).filter(Boolean))];
@@ -43,8 +43,14 @@ export function prepareRecord(kind, raw) {
       data.price = Number(data.price);
       if (!Number.isFinite(data.price) || data.price < 0) throw new Error("Enter a valid price of zero or more.");
     } else data.price = null;
-    if (data.status === "published" && (data.price === null || !data.category.length)) {
-      throw new Error("Add a price and at least one category before publishing.");
+    if (data.status === "published") {
+      if (data.price === null || !data.category.length) {
+        throw new Error("Add a price and at least one category before publishing.");
+      }
+      const productImages = Array.isArray(data.images) ? data.images.filter(Boolean) : [];
+      if (!data.primaryImage && productImages.length === 0) {
+        throw new Error("Add at least one product photo before publishing.");
+      }
     }
     data.archived = data.status === "archived";
   }

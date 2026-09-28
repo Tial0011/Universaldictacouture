@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { getImageUrl } from "../../cloudinary/cloudinary";
 import "./ProductImage.css";
 
@@ -5,9 +6,9 @@ import "./ProductImage.css";
  * Product / editorial imagery.
  *
  * Cloudinary public IDs are delivered through a sized, auto-format
- * transformation; a plain URL is used as-is. When an image is missing
- * the frame stays empty rather than showing a stand-in photograph of a
- * piece that is not the product.
+ * transformation; a plain URL is used as-is. Missing or failed media
+ * degrades to the existing neutral branded frame instead of exposing
+ * browser broken-image UI.
  */
 export default function ProductImage({
   image,
@@ -18,9 +19,22 @@ export default function ProductImage({
   sizes,
 }) {
   const src = image?.publicId ? getImageUrl(image.publicId, transformation) : image?.url || "";
+  const [failed, setFailed] = useState(false);
 
-  if (!src) {
-    return <span className={`product-image product-image--empty ${className}`} aria-hidden="true" />;
+  useEffect(() => {
+    setFailed(false);
+  }, [src]);
+
+  if (!src || failed) {
+    const label = alt || image?.alt || "";
+    return (
+      <span
+        className={`product-image product-image--empty ${className}`}
+        role={label ? "img" : undefined}
+        aria-label={label ? `${label} image unavailable` : undefined}
+        aria-hidden={label ? undefined : "true"}
+      />
+    );
   }
 
   return (
@@ -31,6 +45,7 @@ export default function ProductImage({
       loading={loading}
       decoding="async"
       sizes={sizes}
+      onError={() => setFailed(true)}
     />
   );
 }

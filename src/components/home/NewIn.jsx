@@ -32,9 +32,9 @@ function ChevronIcon({ direction }) {
 }
 
 /**
- * New In. `products` is always the newest published pieces (see
- * selectNewIn in services/products) — never a manually curated list
- * and never filtered by category — rendered as a single horizontal
+ * New In. `products` is the admin-curated New In merchandising set
+ * (see selectNewIn in services/products), ordered deterministically by
+ * first-published chronology and rendered as a single horizontal
  * carousel so the homepage stays compact instead of growing into a
  * multi-row grid. The header, arrows and scroll progress are
  * coordinated with the Shop By carousel above it; the cards themselves

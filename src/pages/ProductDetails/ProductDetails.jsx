@@ -16,6 +16,14 @@ import "./ProductDetails.css";
 
 export default function ProductDetails() {
   const { productId } = useParams();
+  const location = useLocation();
+  const requestedReturn = location.state?.shopReturn;
+  const backToShop = typeof requestedReturn === "string" && (requestedReturn === "/shop" || requestedReturn.startsWith("/shop?"))
+    ? requestedReturn
+    : "/shop";
+  const backState = location.state?.shopVisibleCount
+    ? { restoreVisibleCount: location.state.shopVisibleCount }
+    : undefined;
   const { products, isLoading, error, retry } = useCatalogue();
   const product = products.find((item) => item.slug === productId || item.id === productId);
 
@@ -48,7 +56,7 @@ export default function ProductDetails() {
           <p role="alert">The collection could not be loaded. Please try again.</p>
           <div className="product-details__state-actions">
             <Button onClick={retry}>Try again</Button>
-            <Button to="/shop" variant="ghost">Back to shop</Button>
+            <Button to={backToShop} state={backState} variant="ghost">Back to shop</Button>
           </div>
         </div>
       </section>
@@ -62,16 +70,16 @@ export default function ProductDetails() {
           <p className="product-details__eyebrow">The collection</p>
           <h1>Piece unavailable</h1>
           <p>This piece is no longer available. Explore the current collection to find your next piece.</p>
-          <Button to="/shop">Back to shop</Button>
+          <Button to={backToShop} state={backState}>Back to shop</Button>
         </div>
       </section>
     );
   }
 
-  return <Piece key={product.id} product={product} />;
+  return <Piece key={product.id} product={product} backToShop={backToShop} backState={backState} />;
 }
 
-function Piece({ product }) {
+function Piece({ product, backToShop, backState }) {
   const { addToCloset } = useCloset();
   const { user } = useAuth();
   const { requestAuth } = useAuthGate();
@@ -144,7 +152,7 @@ function Piece({ product }) {
     <section className="section product-details" aria-labelledby="piece-title">
       <div className="container">
         <div className="product-details__back">
-          <Button to="/shop" variant="ghost">Back to shop</Button>
+          <Button to={backToShop} state={backState} variant="ghost">Back to shop</Button>
         </div>
         <div className="product-details__layout">
           <div className="product-details__gallery">
