@@ -22,7 +22,30 @@ export async function saveAdminRecord(kind, raw) {
   const data = prepareRecord(kind, raw);
   const reference = raw.id ? doc(target(kind), raw.id) : doc(target(kind));
   if (!raw.id) data.createdAt = serverTimestamp();
-  if (kind === "products" && data.status === "published" && !data.publishedAt) data.publishedAt = serverTimestamp();
+  if (kind === "products") {
+    const existingPublishedAt = raw.publishedAt || raw.firstPublishedAt;
+    if (existingPublishedAt) {
+      data.publishedAt = existingPublishedAt;
+    } else if (data.status === "published") {
+      if (raw.id) {
+        try {
+          const snapshot = await getDocFromServer(reference);
+          const currentData = snapshot.data() || {};
+          const prior = currentData?.publishedAt || currentData?.firstPublishedAt;
+          if (prior) {
+            data.publishedAt = prior;
+          } else {
+            data.publishedAt = serverTimestamp();
+          }
+        } catch (error) {
+          // Omit mutation: do not silently assign a new timestamp if the read fails.
+          // This safely preserves any existing publication history in Firestore.
+        }
+      } else {
+        data.publishedAt = serverTimestamp();
+      }
+    }
+  }
   if (kind === "reviews") {
     // First-publication time is immutable. Hiding or editing a review never
     // resets it, so an old review cannot become the newest homepage story.

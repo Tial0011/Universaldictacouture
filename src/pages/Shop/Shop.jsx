@@ -29,7 +29,7 @@ import {
 } from "../../utils/shopState";
 import "./Shop.css";
 
-const SHOP_LEDE = "Handwoven heritage, shaped for the way you live now. Discover Aso Oke for celebrations, everyday elegance and everything in between.";
+const SHOP_LEDE = "Timeless styles for every occasion. Tradition, elegance and modern sophistication.";
 const DIMENSION_KEYS = FILTER_DIMENSIONS.map((dimension) => dimension.key);
 const SHOP_RETURN_KEY = "udc:shop:return-position";
 

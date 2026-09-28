@@ -72,7 +72,8 @@ export default function ProductCard({
   const isShopCard = variant === "shop";
   const saved = isSaved(product.id);
   const subtitle = isShopCard ? "" : buildSubtitle(product);
-  const ctaLabel = isShopCard ? "SHOP PIECE" : "View Piece";
+  const ctaLabel = isShopCard ? "SHOP THIS PIECE \u2192" : "View Piece";
+  const showCtaIcon = !isShopCard;
   const imageTransformation = view === "list"
     ? LIST_IMAGE
     : isShopCard
@@ -129,7 +130,7 @@ export default function ProductCard({
         <ProductPrice product={product} />
         <Link to={product.href} state={navigationState} className="product-card__cta" onClick={onNavigate}>
           <span>{ctaLabel}</span>
-          <StitchArrowIcon size={16} className="product-card__cta-icon" />
+          {showCtaIcon ? <StitchArrowIcon size={16} className="product-card__cta-icon" /> : null}
           <span className="visually-hidden"> {product.name}</span>
         </Link>
       </div>
