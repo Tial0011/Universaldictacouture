@@ -43,6 +43,7 @@ export function prepareRecord(kind, raw) {
       data.price = Number(data.price);
       if (!Number.isFinite(data.price) || data.price < 0) throw new Error("Enter a valid price of zero or more.");
     } else data.price = null;
+    data.mainPrice = data.price;
     const token = typeof (data.unitLabel ?? data.priceToken) === "string"
       ? (data.unitLabel ?? data.priceToken).trim()
       : "";
@@ -54,6 +55,7 @@ export function prepareRecord(kind, raw) {
         .filter((p) => Number.isFinite(p) && p >= 0);
       if (variantPrices.length > 0 && data.price !== null) {
         data.price = Math.max(data.price, ...variantPrices);
+        data.mainPrice = data.price;
       }
       data.variants = data.variants.map((v) => ({ ...v, price: data.price }));
     }

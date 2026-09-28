@@ -8,9 +8,13 @@ import {
   saveShopByGroup,
   shopByKey,
 } from "../../../services/shopBy";
+import { fetchPublishedProducts } from "../../../services/products";
+
+const MAX_CHOICES_PER_GROUP = 10;
 
 export default function Discovery() {
   const [groups, setGroups] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState("");
   const [error, setError] = useState("");
@@ -24,7 +28,12 @@ export default function Discovery() {
     setLoading(true);
     setError("");
     try {
-      setGroups(await fetchShopByGroups());
+      const [loadedGroups, loadedProducts] = await Promise.all([
+        fetchShopByGroups(),
+        fetchPublishedProducts().catch(() => []),
+      ]);
+      setGroups(loadedGroups);
+      setProducts(loadedProducts);
     } catch (loadError) {
       setError(loadError?.message || "Unable to load Shop By groups.");
     } finally {
@@ -57,8 +66,36 @@ export default function Discovery() {
   function addValue(group) {
     const value = String(newValues[group.id] || "").trim();
     if (!value) return;
+    if ((group.values || []).length >= MAX_CHOICES_PER_GROUP) {
+      setError(`Maximum of ${MAX_CHOICES_PER_GROUP} choices allowed for ${group.label}.`);
+      return;
+    }
     updateGroup(group.id, { values: cleanShopByValues([...(group.values || []), value]) });
     setNewValues((current) => ({ ...current, [group.id]: "" }));
+  }
+
+  function removeValue(group, value) {
+    const nextValues = (group.values || []).filter((entry) => entry !== value);
+    const faces = { ...(group.faces || {}) };
+    delete faces[value.toLowerCase()];
+    updateGroup(group.id, { values: nextValues, faces });
+  }
+
+  function updateFace(groupId, choiceValue, productId) {
+    const key = choiceValue.toLowerCase();
+    setGroups((current) =>
+      current.map((group) => {
+        if (group.id !== groupId) return group;
+        const faces = { ...(group.faces || {}) };
+        if (productId) {
+          faces[key] = productId;
+        } else {
+          delete faces[key];
+        }
+        return { ...group, faces };
+      })
+    );
+    setNotice("");
   }
 
   async function createGroup(event) {
@@ -134,7 +171,10 @@ export default function Discovery() {
             <div>
               <p className="admin-eyebrow">Shop by</p>
               <h2>{group.label}</h2>
-              <p className="field__hint">These are the reusable choices available on the product upload form.</p>
+              <p className="field__hint">
+                Manage choices and designated face cover pieces. Maximum {MAX_CHOICES_PER_GROUP} choices per group.
+                {" "}<span className="shop-by-admin-count">({(group.values || []).length}/{MAX_CHOICES_PER_GROUP} used)</span>
+              </p>
             </div>
             {!coreIds.has(group.id) ? <Button variant="ghost" disabled={saving === group.id} onClick={() => removeGroup(group)}>Delete group</Button> : null}
           </div>
@@ -147,21 +187,118 @@ export default function Discovery() {
           ) : null}
 
           <div className="shop-by-admin-values">
-            {(group.values || []).length ? group.values.map((value) => (
-              <div className="shop-by-admin-value" key={value}>
-                <span>{value}</span>
-                <button type="button" className="shop-by-admin-remove" aria-label={`Delete ${value} from ${group.label}`} onClick={() => updateGroup(group.id, { values: group.values.filter((entry) => entry !== value) })}>×</button>
-              </div>
-            )) : <p className="field__hint">No choices yet. Add the first one below.</p>}
+            {(group.values || []).length ? (
+              group.values.map((value) => {
+                const choiceLower = value.toLowerCase();
+                const matchingProducts = products.filter((p) => {
+                  const assigned = [
+                    ...(p.shopBy?.[group.key] || []),
+                    ...(p[group.key] || []),
+                  ].map((v) => String(v).trim().toLowerCase());
+                  return assigned.includes(choiceLower);
+                });
+                const otherProducts = products.filter(
+                  (p) => !matchingProducts.some((m) => m.id === p.id)
+                );
+                const currentFaceId = group.faces?.[choiceLower] || "";
+                const currentFaceProduct = products.find(
+                  (p) => p.id === currentFaceId || p.slug === currentFaceId
+                );
+
+                return (
+                  <div className="shop-by-admin-choice-card" key={value}>
+                    <div className="shop-by-admin-choice-head">
+                      <strong className="shop-by-admin-choice-title">{value}</strong>
+                      <button
+                        type="button"
+                        className="shop-by-admin-remove"
+                        aria-label={`Delete ${value} from ${group.label}`}
+                        onClick={() => removeValue(group, value)}
+                      >
+                        ×
+                      </button>
+                    </div>
+
+                    <div className="shop-by-admin-face-field">
+                      <label
+                        className="shop-by-admin-face-label"
+                        htmlFor={`face-${group.id}-${value}`}
+                      >
+                        Face of {group.label} {value}
+                      </label>
+                      <div className="shop-by-admin-face-row">
+                        <select
+                          id={`face-${group.id}-${value}`}
+                          className="shop-by-admin-face-select"
+                          value={currentFaceId}
+                          onChange={(event) => updateFace(group.id, value, event.target.value)}
+                        >
+                          <option value="">Default (First product with photo)</option>
+                          {matchingProducts.length > 0 ? (
+                            <optgroup label={`Products in ${value} (${matchingProducts.length})`}>
+                              {matchingProducts.map((p) => (
+                                <option key={p.id} value={p.id}>
+                                  ★ {p.name}
+                                </option>
+                              ))}
+                            </optgroup>
+                          ) : null}
+                          {otherProducts.length > 0 ? (
+                            <optgroup label="All other products">
+                              {otherProducts.map((p) => (
+                                <option key={p.id} value={p.id}>
+                                  {p.name}
+                                </option>
+                              ))}
+                            </optgroup>
+                          ) : null}
+                        </select>
+                        {currentFaceProduct?.image?.url ? (
+                          <img
+                            src={currentFaceProduct.image.url}
+                            alt=""
+                            className="shop-by-admin-face-thumb"
+                          />
+                        ) : null}
+                      </div>
+                      <span className="field__hint">
+                        {currentFaceProduct
+                          ? `Cover: ${currentFaceProduct.name}`
+                          : `Default: automatically picks photo from ${value} products.`}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="field__hint">No choices yet. Add the first one below (up to {MAX_CHOICES_PER_GROUP}).</p>
+            )}
           </div>
 
           <div className="admin-list-tools">
             <div className="field">
-              <label className="field__label" htmlFor={`shop-by-value-${group.id}`}>Add a {group.label} choice</label>
-              <input id={`shop-by-value-${group.id}`} value={newValues[group.id] || ""} onChange={(event) => setNewValues((current) => ({ ...current, [group.id]: event.target.value }))} placeholder={group.id === "occasion" ? "e.g. Birthday" : "Enter a reusable choice"} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); addValue(group); } }} />
+              <label className="field__label" htmlFor={`shop-by-value-${group.id}`}>
+                Add a {group.label} choice {(group.values || []).length >= MAX_CHOICES_PER_GROUP ? "(Maximum 10 reached)" : ""}
+              </label>
+              <input
+                id={`shop-by-value-${group.id}`}
+                value={newValues[group.id] || ""}
+                disabled={(group.values || []).length >= MAX_CHOICES_PER_GROUP}
+                onChange={(event) => setNewValues((current) => ({ ...current, [group.id]: event.target.value }))}
+                placeholder={(group.values || []).length >= MAX_CHOICES_PER_GROUP ? "Maximum 10 choices reached" : (group.id === "occasion" ? "e.g. Birthday" : "Enter a reusable choice")}
+                onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); addValue(group); } }}
+              />
             </div>
-            <Button variant="secondary" onClick={() => addValue(group)} disabled={!String(newValues[group.id] || "").trim()}>Add choice</Button>
-            <Button onClick={() => save(group)} disabled={saving === group.id} isLoading={saving === group.id}>Save {group.label}</Button>
+            <Button
+              variant="secondary"
+              onClick={() => addValue(group)}
+              disabled={(group.values || []).length >= MAX_CHOICES_PER_GROUP || !String(newValues[group.id] || "").trim()}
+            >
+              Add choice
+            </Button>
+            <Button onClick={() => save(group)} disabled={saving === group.id} isLoading={saving === group.id}>
+              Save {group.label}
+            </Button>
           </div>
         </section>
       ))}

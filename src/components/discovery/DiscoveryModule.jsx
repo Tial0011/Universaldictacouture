@@ -45,6 +45,9 @@ export default function DiscoveryModule({
   const tabRefs = useRef({});
   const railRef = useRef(null);
   const [railState, setRailState] = useState({ previous: false, next: false });
+  const isInteractingRef = useRef(false);
+  const resumeTimerRef = useRef(null);
+  const rewindingRef = useRef(false);
   const Heading = headingLevel;
 
   const groups = module?.groups;
@@ -67,9 +70,21 @@ export default function DiscoveryModule({
     if (!rail) return;
     const maxScroll = Math.max(0, rail.scrollWidth - rail.clientWidth);
     setRailState({
-      previous: rail.scrollLeft > 2,
-      next: rail.scrollLeft < maxScroll - 2,
+      previous: rail.scrollLeft > 6,
+      next: rail.scrollLeft < maxScroll - 6,
     });
+  };
+
+  const handleInteractionStart = () => {
+    clearTimeout(resumeTimerRef.current);
+    isInteractingRef.current = true;
+  };
+
+  const handleInteractionEnd = () => {
+    clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = setTimeout(() => {
+      isInteractingRef.current = false;
+    }, 2400);
   };
 
   useEffect(() => {
@@ -86,6 +101,57 @@ export default function DiscoveryModule({
       cancelAnimationFrame(frame);
       observer?.disconnect();
       window.removeEventListener("resize", updateRailState);
+    };
+  }, [currentGroup, items.length, railControls]);
+
+  // Gentle, calm continuous drift for the discovery rail
+  useEffect(() => {
+    if (!railControls || prefersReducedMotion()) return undefined;
+    const rail = railRef.current;
+    if (!rail) return undefined;
+
+    let animId = null;
+    let lastTime = performance.now();
+
+    const tick = (now) => {
+      const dt = Math.min(now - lastTime, 50);
+      lastTime = now;
+
+      if (!isInteractingRef.current && !rewindingRef.current && rail) {
+        const maxScroll = Math.max(0, rail.scrollWidth - rail.clientWidth);
+        if (maxScroll > 10) {
+          if (rail.scrollLeft >= maxScroll - 4) {
+            rewindingRef.current = true;
+            resumeTimerRef.current = setTimeout(() => {
+              if (rail) {
+                rail.scrollTo({ left: 0, behavior: "smooth" });
+                resumeTimerRef.current = setTimeout(() => {
+                  rewindingRef.current = false;
+                  updateRailState();
+                }, 1600);
+              } else {
+                rewindingRef.current = false;
+              }
+            }, 2500);
+          } else {
+            // Calm, elegant speed (~18px per second)
+            rail.scrollLeft += (dt / 1000) * 18;
+            updateRailState();
+          }
+        }
+      }
+      animId = requestAnimationFrame(tick);
+    };
+
+    const startTimer = setTimeout(() => {
+      lastTime = performance.now();
+      animId = requestAnimationFrame(tick);
+    }, 1400);
+
+    return () => {
+      clearTimeout(startTimer);
+      clearTimeout(resumeTimerRef.current);
+      if (animId) cancelAnimationFrame(animId);
     };
   }, [currentGroup, items.length, railControls]);
 
@@ -138,6 +204,12 @@ export default function DiscoveryModule({
       role={hasTabs ? "tabpanel" : undefined}
       aria-labelledby={hasTabs ? `discovery-tab-${currentGroup}` : arrowNavigation ? `discovery-${module.id}` : undefined}
       onScroll={railControls ? updateRailState : undefined}
+      onMouseEnter={handleInteractionStart}
+      onMouseLeave={handleInteractionEnd}
+      onTouchStart={handleInteractionStart}
+      onTouchEnd={handleInteractionEnd}
+      onPointerDown={handleInteractionStart}
+      onPointerUp={handleInteractionEnd}
     >
       {items.map((item) => (
         <li key={item.id}>
@@ -255,26 +327,32 @@ export default function DiscoveryModule({
       ) : null}
 
       {railControls && items.length ? (
-        <div className="discovery__rail">
-          <button
-            type="button"
-            className="discovery__rail-arrow discovery__rail-arrow--previous"
-            aria-label={`Previous ${groups?.find((group) => group.id === currentGroup)?.label || "Shop By"} choices`}
-            disabled={!railState.previous}
-            onClick={() => scrollRail("previous")}
-          >
-            <GroupArrow direction="previous" />
-          </button>
+        <div
+          className="discovery__rail"
+          onMouseEnter={handleInteractionStart}
+          onMouseLeave={handleInteractionEnd}
+        >
+          {railState.previous ? (
+            <button
+              type="button"
+              className="discovery__rail-arrow discovery__rail-arrow--previous"
+              aria-label={`Previous ${groups?.find((group) => group.id === currentGroup)?.label || "Shop By"} choices`}
+              onClick={() => scrollRail("previous")}
+            >
+              <GroupArrow direction="previous" />
+            </button>
+          ) : null}
           {list}
-          <button
-            type="button"
-            className="discovery__rail-arrow discovery__rail-arrow--next"
-            aria-label={`Next ${groups?.find((group) => group.id === currentGroup)?.label || "Shop By"} choices`}
-            disabled={!railState.next}
-            onClick={() => scrollRail("next")}
-          >
-            <GroupArrow direction="next" />
-          </button>
+          {railState.next ? (
+            <button
+              type="button"
+              className="discovery__rail-arrow discovery__rail-arrow--next"
+              aria-label={`Next ${groups?.find((group) => group.id === currentGroup)?.label || "Shop By"} choices`}
+              onClick={() => scrollRail("next")}
+            >
+              <GroupArrow direction="next" />
+            </button>
+          ) : null}
         </div>
       ) : list}
     </section>

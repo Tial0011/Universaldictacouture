@@ -8,8 +8,8 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import { db } from "../firebase/firestore";
-import { isFirebaseConfigured } from "../firebase/config";
+import { db } from "../firebase/firestore.js";
+import { isFirebaseConfigured } from "../firebase/config.js";
 
 export const DEFAULT_SHOP_BY_GROUPS = [
   { id: "occasion", label: "Occasion", key: "occasion", param: "occasion", order: 0, locked: true, values: [] },
@@ -41,7 +41,8 @@ export function cleanShopByValues(values) {
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
-    });
+    })
+    .slice(0, 10);
 }
 
 function normaliseStoredGroup(raw = {}) {
@@ -57,6 +58,7 @@ function normaliseStoredGroup(raw = {}) {
     locked: Boolean(fallback),
     active: raw.active !== false,
     values: cleanShopByValues(raw.values),
+    faces: raw.faces && typeof raw.faces === "object" ? { ...raw.faces } : {},
   };
 }
 
@@ -108,6 +110,7 @@ export async function fetchShopByGroups() {
         locked: true,
         active: saved?.active !== false,
         values: cleanShopByValues([...(saved?.values ?? []), ...legacyValues[fallback.id]]),
+        faces: saved?.faces && typeof saved.faces === "object" ? { ...saved.faces } : {},
       };
     });
 
@@ -135,6 +138,7 @@ async function writeGroups(groups) {
         order: Number.isFinite(Number(group.order)) ? Number(group.order) : index,
         active: group.active !== false,
         values: cleanShopByValues(group.values),
+        faces: group.faces && typeof group.faces === "object" ? { ...group.faces } : {},
       })),
       updatedAt: serverTimestamp(),
     },
@@ -157,6 +161,7 @@ export async function saveShopByGroup(raw) {
     order: Number.isFinite(Number(raw.order)) ? Number(raw.order) : groups.length,
     active: raw.active !== false,
     values: cleanShopByValues(raw.values),
+    faces: raw.faces && typeof raw.faces === "object" ? { ...raw.faces } : {},
   };
   const next = groups.some((group) => group.id === key)
     ? groups.map((group) => group.id === key ? { ...group, ...nextGroup } : group)

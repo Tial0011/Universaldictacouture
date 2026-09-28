@@ -37,7 +37,7 @@ function buildSubtitle(product) {
 
 function ProductPrice({ product }) {
   const price = formatNaira(product.mainPrice ?? product.price ?? product.minPrice);
-  const token = product.unitLabel;
+  const token = product.unitLabel || product.priceToken;
 
   return (
     <div className="product-card__price-wrap">
@@ -66,7 +66,7 @@ export default function ProductCard({
   const isShopCard = variant === "shop";
   const saved = isSaved(product.id);
   const subtitle = isShopCard ? "" : buildSubtitle(product);
-  const ctaLabel = isShopCard ? "SHOP THIS PIECE \u2192" : "View Piece";
+  const ctaLabel = isShopCard ? "SHOP PIECE \u2192" : "View Piece";
   const showCtaIcon = !isShopCard;
   const imageTransformation = view === "list"
     ? LIST_IMAGE

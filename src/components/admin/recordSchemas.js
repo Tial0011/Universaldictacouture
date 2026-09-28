@@ -7,7 +7,7 @@ export const SCHEMAS = {
     initial: { name: "", price: "", unitLabel: "", status: "draft", category: "", shopBy: {}, occasion: [], style: [], fabric: [], images: [], isNewIn: false },
     fields: [
       text("name", "Product name", { required: true }),
-      text("price", "Main price (NGN)", { type: "number", hint: "Required before publishing. Enter the single fixed main price in naira." }),
+      text("price", "Main Price", { type: "number", hint: "Required before publishing. Enter the single fixed main price in naira (NGN)." }),
       text("unitLabel", "Price token (What this price is for)", { hint: "Shown under the price to specify what it covers (e.g. for complete, for one bundle, for only one strand of, per keda, per yard)." }),
       text("description", "Product description", { type: "textarea", hint: "Describe the fabric, finish and fit. Shown on the product page and included when customers share this piece (up to 4,000 characters)." }),
       text("status", "Visibility", { type: "select", options: ["draft", "published", "archived"] }),

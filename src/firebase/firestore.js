@@ -1,5 +1,5 @@
 import { getFirestore } from "firebase/firestore";
-import app, { isFirebaseConfigured } from "./config";
+import app, { isFirebaseConfigured } from "./config.js";
 
 /**
  * The shared Firestore instance, or null while Firebase is

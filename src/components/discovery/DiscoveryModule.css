@@ -156,16 +156,14 @@
 
 .discovery--shop .discovery__rail {
   position: relative;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: stretch;
-  gap: var(--space-2xs);
+  width: 100%;
 }
 
 .discovery--shop .discovery__rail-arrow {
-  position: relative;
-  z-index: 2;
-  align-self: center;
+  position: absolute;
+  top: calc(50% - 1.2rem);
+  transform: translateY(-50%);
+  z-index: 5;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -174,23 +172,29 @@
   height: var(--touch-target);
   padding: 0;
   color: var(--color-brand);
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(251, 248, 242, 0.94);
   border: 1px solid var(--color-border-luxury);
   border-radius: var(--radius-pill);
-  box-shadow: 0 5px 18px rgba(31, 17, 18, 0.07);
+  box-shadow: 0 4px 14px rgba(31, 17, 18, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
   transition: background-color var(--duration-fast) var(--ease-standard),
     border-color var(--duration-fast) var(--ease-standard),
     color var(--duration-fast) var(--ease-standard),
-    opacity var(--duration-fast) var(--ease-standard);
+    transform var(--duration-fast) var(--ease-standard);
 }
 
-.discovery--shop .discovery__rail-arrow:disabled {
-  opacity: 0.34;
-  cursor: default;
+.discovery--shop .discovery__rail-arrow--previous {
+  left: 0.25rem;
+}
+
+.discovery--shop .discovery__rail-arrow--next {
+  right: 0.25rem;
 }
 
 @media (hover: hover) {
-  .discovery--shop .discovery__rail-arrow:not(:disabled):hover {
+  .discovery--shop .discovery__rail-arrow:hover {
     color: var(--color-text-on-brand);
     background: var(--color-brand);
     border-color: var(--color-brand);
@@ -202,10 +206,9 @@
   gap: var(--space-xs);
   min-width: 0;
   margin: 0;
-  padding: 0 0 var(--space-3xs);
+  padding: 4px 0 var(--space-3xs) 0;
   overflow-x: auto;
   overscroll-behavior-inline: contain;
-  scroll-snap-type: x mandatory;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -299,25 +302,18 @@
 }
 
 @media (max-width: 480px) {
-  .discovery--shop .discovery__rail {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .discovery--shop .discovery__rail-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 2.4rem;
-    min-width: 2.4rem;
-    height: 2.4rem;
+    width: 2.2rem;
+    min-width: 2.2rem;
+    height: 2.2rem;
   }
 
-  .discovery--shop .discovery__rail-arrow--previous { left: .25rem; }
-  .discovery--shop .discovery__rail-arrow--next { right: .25rem; }
+  .discovery--shop .discovery__rail-arrow--previous { left: .15rem; }
+  .discovery--shop .discovery__rail-arrow--next { right: .15rem; }
 
   .discovery--shop .discovery__list {
-    padding-inline: 2.8rem;
-    scroll-padding-inline: 2.8rem;
+    padding-inline: 0;
+    scroll-padding-inline: 0;
   }
 }
 
@@ -335,5 +331,4 @@
 .discovery--shop .discovery__item {padding:.4rem;}
 .discovery--shop .discovery__media {background:var(--color-couture-media);}
 .discovery--shop .discovery__name {font-family:var(--font-display);font-size:clamp(.95rem,.85rem + .3vw,1.08rem);font-weight:var(--weight-semibold);line-height:1.15;}
-@media(max-width:480px){.discovery--shop .discovery__rail-arrow{width:var(--touch-target);min-width:var(--touch-target);height:var(--touch-target);}}
 

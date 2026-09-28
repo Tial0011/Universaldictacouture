@@ -10,11 +10,11 @@
  */
 
 import { collection, getDocs, limit, query, where } from "firebase/firestore";
-import { db } from "../firebase/firestore";
-import { isFirebaseConfigured } from "../firebase/config";
+import { db } from "../firebase/firestore.js";
+import { isFirebaseConfigured } from "../firebase/config.js";
 import heroReadyToWear from "../assets/images/hero/hero-ready-to-wear.jpg";
-import { DEFAULT_SHOP_BY_GROUPS } from "./shopBy";
-import { normaliseReviewRecord, selectLatestPublishedReviews, sortPublishedReviews } from "./reviewModel";
+import { DEFAULT_SHOP_BY_GROUPS } from "./shopBy.js";
+import { normaliseReviewRecord, selectLatestPublishedReviews, sortPublishedReviews } from "./reviewModel.js";
 
 
 
@@ -211,7 +211,7 @@ export function buildOccasionDiscovery(products, title = "Shop by Occasion") {
  */
 export const SHOP_DISCOVERY_GROUPS = DEFAULT_SHOP_BY_GROUPS;
 
-const SHOP_DISCOVERY_MAX_PER_GROUP = 12;
+const SHOP_DISCOVERY_MAX_PER_GROUP = 10;
 
 export function buildShopDiscovery(products, title = "Shop By", groupDefinitions = SHOP_DISCOVERY_GROUPS) {
   const groups = [];
@@ -249,10 +249,25 @@ export function buildShopDiscovery(products, title = "Shop By", groupDefinitions
     const ordered = [...found.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
     const usedImages = new Set();
     ordered.slice(0, SHOP_DISCOVERY_MAX_PER_GROUP).forEach((entry, index) => {
-      const image =
-        entry.images.find((candidate) => !usedImages.has(candidate.publicId || candidate.url)) ??
-        entry.images[0] ??
-        null;
+      // Look for a designated Face product for this choice (e.g. Face of Occasion Alex)
+      const faceProductId =
+        group.faces?.[entry.name.toLowerCase()] ||
+        group.faces?.[entry.name];
+      let image = null;
+      if (faceProductId) {
+        const faceProduct = products.find(
+          (candidate) => candidate.id === faceProductId || candidate.slug === faceProductId
+        );
+        if (faceProduct?.image) {
+          image = faceProduct.image;
+        }
+      }
+      if (!image) {
+        image =
+          entry.images.find((candidate) => !usedImages.has(candidate.publicId || candidate.url)) ??
+          entry.images[0] ??
+          null;
+      }
       if (image) usedImages.add(image.publicId || image.url);
 
       const destination = group.param && group.param !== "shopby"
