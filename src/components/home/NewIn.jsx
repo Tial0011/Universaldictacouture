@@ -42,36 +42,67 @@ function ChevronIcon({ direction }) {
  */
 export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" }) {
   const trackRef = useRef(null);
+  const isInteractingRef = useRef(false);
+  const resumeTimerRef = useRef(null);
   const [scrollState, setScrollState] = useState({
     index: 0,
     canPrev: false,
-    canNext: false,
+    canNext: true,
   });
+
+  const handleInteractionStart = () => {
+    clearTimeout(resumeTimerRef.current);
+    isInteractingRef.current = true;
+  };
+
+  const handleInteractionEnd = () => {
+    clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = setTimeout(() => {
+      isInteractingRef.current = false;
+    }, 2400);
+  };
+
+  const update = () => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    if (products.length > 2) {
+      const halfWidth = track.scrollWidth / 2;
+      if (halfWidth > 0) {
+        if (track.scrollLeft >= halfWidth * 1.5) {
+          track.scrollLeft -= halfWidth;
+        } else if (track.scrollLeft <= 2 && isInteractingRef.current) {
+          track.scrollLeft += halfWidth;
+        }
+      }
+    }
+
+    const cards = Array.from(track.querySelectorAll("[data-new-in-item]"));
+    let index = 0;
+    let distance = Infinity;
+    const baseCards = cards.slice(0, products.length);
+    baseCards.forEach((card, cardIndex) => {
+      const cardPos = card.offsetLeft - track.offsetLeft;
+      const effectiveScroll = products.length > 2
+        ? track.scrollLeft % (track.scrollWidth / 2 || 1)
+        : track.scrollLeft;
+      const nextDistance = Math.abs(cardPos - effectiveScroll);
+      if (nextDistance < distance) {
+        distance = nextDistance;
+        index = cardIndex;
+      }
+    });
+
+    setScrollState({
+      index: index % Math.max(1, products.length),
+      canPrev: track.scrollLeft > 8,
+      canNext: true,
+    });
+  };
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return undefined;
-
-    const update = () => {
-      // Nearest-card index, purely for the "01 / 20" readout — mirrors
-      // the same approach already used by the Review & Feeds carousel.
-      const cards = Array.from(track.querySelectorAll("[data-new-in-item]"));
-      let index = 0;
-      let distance = Infinity;
-      cards.forEach((card, cardIndex) => {
-        const nextDistance = Math.abs(card.offsetLeft - track.scrollLeft - track.offsetLeft);
-        if (nextDistance < distance) {
-          distance = nextDistance;
-          index = cardIndex;
-        }
-      });
-
-      setScrollState({
-        index,
-        canPrev: track.scrollLeft > 8,
-        canNext: track.scrollLeft + track.clientWidth < track.scrollWidth - 8,
-      });
-    };
 
     update();
     track.addEventListener("scroll", update, { passive: true });
@@ -80,6 +111,47 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
     return () => {
       track.removeEventListener("scroll", update);
       observer?.disconnect();
+    };
+  }, [products, isLoading, error]);
+
+  // Gentle, continuous seamless motion for New In
+  useEffect(() => {
+    if (isLoading || error || products.length <= 2) return undefined;
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    if (reduced) return undefined;
+    const track = trackRef.current;
+    if (!track) return undefined;
+
+    let animId = null;
+    let lastTime = performance.now();
+
+    const tick = (now) => {
+      const dt = Math.min(now - lastTime, 50);
+      lastTime = now;
+
+      if (!isInteractingRef.current && track) {
+        const halfWidth = track.scrollWidth / 2;
+        if (halfWidth > track.clientWidth) {
+          if (track.scrollLeft >= halfWidth) {
+            track.scrollLeft -= halfWidth;
+          } else if (track.scrollLeft <= 0) {
+            track.scrollLeft += halfWidth;
+          }
+          track.scrollLeft += (dt / 1000) * 18;
+        }
+      }
+      animId = requestAnimationFrame(tick);
+    };
+
+    const startTimer = setTimeout(() => {
+      lastTime = performance.now();
+      animId = requestAnimationFrame(tick);
+    }, 1200);
+
+    return () => {
+      clearTimeout(startTimer);
+      clearTimeout(resumeTimerRef.current);
+      if (animId) cancelAnimationFrame(animId);
     };
   }, [products, isLoading, error]);
 
@@ -156,10 +228,26 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
       ) : null}
 
       {!isLoading && !error && products.length > 0 ? (
-        <ul className="menu-grid" id="new-in-track" ref={trackRef} aria-label="New In">
+        <ul
+          className="menu-grid"
+          id="new-in-track"
+          ref={trackRef}
+          aria-label="New In"
+          onMouseEnter={handleInteractionStart}
+          onMouseLeave={handleInteractionEnd}
+          onTouchStart={handleInteractionStart}
+          onTouchEnd={handleInteractionEnd}
+          onPointerDown={handleInteractionStart}
+          onPointerUp={handleInteractionEnd}
+        >
           {products.map((product, index) => (
             <li key={product.id} data-new-in-item>
               <NewInCard product={product} imageLoading={index < 4 ? "eager" : "lazy"} />
+            </li>
+          ))}
+          {products.length > 2 && products.map((product) => (
+            <li key={`${product.id}-dup`} data-new-in-item aria-hidden="true">
+              <NewInCard product={product} imageLoading="lazy" />
             </li>
           ))}
         </ul>

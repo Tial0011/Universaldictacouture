@@ -3,7 +3,7 @@
 .review-carousel__description { margin:-.2rem 0 .75rem; font-size:.72rem; color:var(--color-text-secondary); }
 .review-carousel .discovery__head-actions { margin-left:auto; }
 @media(max-width:360px) { .review-carousel.discovery--home .discovery__head { flex-wrap:wrap; } .review-carousel.discovery--home .discovery__title { flex-basis:100%; } }
-.review-carousel__track { display:flex; gap:1rem; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:thin; scrollbar-color:#d9c5be transparent; padding:0 0 .65rem; }
+.review-carousel__track { display:flex; gap:1rem; overflow-x:auto; scroll-snap-type:x proximity; scrollbar-width:thin; scrollbar-color:#d9c5be transparent; padding:0 0 .65rem; }
 .review-carousel__item { flex:0 0 calc((100% - 2rem) / 3); min-width:0; scroll-snap-align:start; }
 @media(max-width:767px) { .review-carousel__item { flex-basis:calc((100% - 1rem) / 2); } }
 @media(max-width:540px) { .review-carousel__item { flex-basis:100%; } }

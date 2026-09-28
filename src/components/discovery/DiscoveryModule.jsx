@@ -44,11 +44,12 @@ export default function DiscoveryModule({
   const [internalActiveGroup, setInternalActiveGroup] = useState(module?.groups?.[0]?.id ?? "");
   const tabRefs = useRef({});
   const railRef = useRef(null);
-  const [railState, setRailState] = useState({ previous: false, next: false });
+  const [railState, setRailState] = useState({ previous: false, next: true });
   const isInteractingRef = useRef(false);
   const resumeTimerRef = useRef(null);
-  const rewindingRef = useRef(false);
   const Heading = headingLevel;
+
+  const shouldAutoScroll = railControls || className.includes("discovery--home");
 
   const groups = module?.groups;
   const arrowNavigation = groupNavigation === "arrows" && groups?.length > 0;
@@ -68,10 +69,9 @@ export default function DiscoveryModule({
   const updateRailState = () => {
     const rail = railRef.current;
     if (!rail) return;
-    const maxScroll = Math.max(0, rail.scrollWidth - rail.clientWidth);
     setRailState({
       previous: rail.scrollLeft > 6,
-      next: rail.scrollLeft < maxScroll - 6,
+      next: true,
     });
   };
 
@@ -87,8 +87,24 @@ export default function DiscoveryModule({
     }, 2400);
   };
 
+  const handleScroll = () => {
+    const rail = railRef.current;
+    if (!rail) return;
+    if (shouldAutoScroll && items.length > 2) {
+      const halfWidth = rail.scrollWidth / 2;
+      if (halfWidth > 0) {
+        if (rail.scrollLeft >= halfWidth * 1.5) {
+          rail.scrollLeft -= halfWidth;
+        } else if (rail.scrollLeft <= 2 && isInteractingRef.current) {
+          rail.scrollLeft += halfWidth;
+        }
+      }
+    }
+    updateRailState();
+  };
+
   useEffect(() => {
-    if (!railControls) return undefined;
+    if (!shouldAutoScroll) return undefined;
     const rail = railRef.current;
     if (!rail) return undefined;
 
@@ -102,11 +118,11 @@ export default function DiscoveryModule({
       observer?.disconnect();
       window.removeEventListener("resize", updateRailState);
     };
-  }, [currentGroup, items.length, railControls]);
+  }, [currentGroup, items.length, shouldAutoScroll]);
 
-  // Gentle, calm continuous drift for the discovery rail
+  // Gentle, calm continuous seamless drift for the discovery rail
   useEffect(() => {
-    if (!railControls || prefersReducedMotion()) return undefined;
+    if (!shouldAutoScroll || items.length <= 2 || prefersReducedMotion()) return undefined;
     const rail = railRef.current;
     if (!rail) return undefined;
 
@@ -117,27 +133,16 @@ export default function DiscoveryModule({
       const dt = Math.min(now - lastTime, 50);
       lastTime = now;
 
-      if (!isInteractingRef.current && !rewindingRef.current && rail) {
-        const maxScroll = Math.max(0, rail.scrollWidth - rail.clientWidth);
-        if (maxScroll > 10) {
-          if (rail.scrollLeft >= maxScroll - 4) {
-            rewindingRef.current = true;
-            resumeTimerRef.current = setTimeout(() => {
-              if (rail) {
-                rail.scrollTo({ left: 0, behavior: "smooth" });
-                resumeTimerRef.current = setTimeout(() => {
-                  rewindingRef.current = false;
-                  updateRailState();
-                }, 1600);
-              } else {
-                rewindingRef.current = false;
-              }
-            }, 2500);
-          } else {
-            // Calm, elegant speed (~18px per second)
-            rail.scrollLeft += (dt / 1000) * 18;
-            updateRailState();
+      if (!isInteractingRef.current && rail) {
+        const halfWidth = rail.scrollWidth / 2;
+        if (halfWidth > rail.clientWidth) {
+          if (rail.scrollLeft >= halfWidth) {
+            rail.scrollLeft -= halfWidth;
+          } else if (rail.scrollLeft <= 0) {
+            rail.scrollLeft += halfWidth;
           }
+          rail.scrollLeft += (dt / 1000) * 18;
+          updateRailState();
         }
       }
       animId = requestAnimationFrame(tick);
@@ -146,14 +151,14 @@ export default function DiscoveryModule({
     const startTimer = setTimeout(() => {
       lastTime = performance.now();
       animId = requestAnimationFrame(tick);
-    }, 1400);
+    }, 1200);
 
     return () => {
       clearTimeout(startTimer);
       clearTimeout(resumeTimerRef.current);
       if (animId) cancelAnimationFrame(animId);
     };
-  }, [currentGroup, items.length, railControls]);
+  }, [currentGroup, items.length, shouldAutoScroll]);
 
   if (!module || (!groups?.length && !items.length)) return null;
 
@@ -197,13 +202,13 @@ export default function DiscoveryModule({
 
   const list = items.length ? (
     <ul
-      ref={railControls ? railRef : undefined}
+      ref={shouldAutoScroll ? railRef : undefined}
       key={arrowNavigation ? currentGroup : undefined}
       className="discovery__list"
       id={`discovery-panel-${module.id}`}
       role={hasTabs ? "tabpanel" : undefined}
       aria-labelledby={hasTabs ? `discovery-tab-${currentGroup}` : arrowNavigation ? `discovery-${module.id}` : undefined}
-      onScroll={railControls ? updateRailState : undefined}
+      onScroll={shouldAutoScroll ? handleScroll : undefined}
       onMouseEnter={handleInteractionStart}
       onMouseLeave={handleInteractionEnd}
       onTouchStart={handleInteractionStart}
@@ -216,6 +221,34 @@ export default function DiscoveryModule({
           <Link
             to={resolveDestination ? resolveDestination(item) : item.destination}
             className="discovery__item"
+            onClick={() => onItemClick?.(item)}
+          >
+            <span className="discovery__media">
+              {(renderMedia && renderMedia(item)) ?? (
+                <ProductImage
+                  image={item.image}
+                  alt=""
+                  transformation={arrowNavigation
+                    ? "w_420,h_420,c_fill,g_auto,q_auto,f_auto"
+                    : "w_520,h_360,c_fill,g_auto,q_auto,f_auto"}
+                />
+              )}
+            </span>
+            {arrowNavigation ? (
+              <span className="discovery__caption">
+                <span className="discovery__name">{item.name}</span>
+                <StitchArrowIcon size={16} className="discovery__caption-arrow" />
+              </span>
+            ) : <span className="discovery__name">{item.name}</span>}
+          </Link>
+        </li>
+      ))}
+      {shouldAutoScroll && items.length > 2 && items.map((item) => (
+        <li key={`${item.id}-dup`} aria-hidden="true">
+          <Link
+            to={resolveDestination ? resolveDestination(item) : item.destination}
+            className="discovery__item"
+            tabIndex={-1}
             onClick={() => onItemClick?.(item)}
           >
             <span className="discovery__media">

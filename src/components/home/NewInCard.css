@@ -16,7 +16,7 @@
   overscroll-behavior-inline: contain;
   scroll-snap-type: x proximity;
   scroll-padding-inline: 0.25rem;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(96, 16, 19, 0.3) transparent;
   -webkit-overflow-scrolling: touch;
