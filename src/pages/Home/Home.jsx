@@ -6,7 +6,7 @@ import NewIn from "../../components/home/NewIn";
 import CustomStylePromo from "../../components/home/CustomStylePromo";
 import ReviewsPreview from "../../components/home/ReviewsPreview";
 import StyleCircle from "../../components/home/StyleCircle";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
+
 import { useCatalogue } from "../../hooks/useCatalogue";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import heroReadyToWear from "../../assets/images/hero/hero-ready-to-wear.jpg";
@@ -19,8 +19,9 @@ import {
 } from "../../services/content";
 import { DEFAULT_SHOP_BY_GROUPS, fetchShopByGroups } from "../../services/shopBy";
 import { selectNewIn } from "../../services/products";
-import "./Home.css";
+
 import "../../components/home/home-sections.css";
+import "./Home.css";
 
 const FALLBACK_SLIDE = [
   {
@@ -43,7 +44,7 @@ export default function Home() {
     publicId: "",
     alt: "",
   });
-  const [isHeroReady, setIsHeroReady] = useState(false);
+
 
   useDocumentMeta({
     title: "Universal Dicta Couture — Aso Oke for every occasion",
@@ -59,9 +60,7 @@ export default function Home() {
       .then((result) => {
         if (active && result.length) setSlides(result);
       })
-      .finally(() => {
-        if (active) setIsHeroReady(true);
-      });
+      .catch(() => { /* Keep the approved local hero available when content is offline. */ });
 
     fetchShopByGroups().then((groups) => {
       if (active && groups.length) setShopByGroups(groups);
@@ -97,13 +96,7 @@ export default function Home() {
 
   return (
     <>
-      {isHeroReady ? (
-        <HeroCarousel slides={slides} />
-      ) : (
-        <div className="home-hero-placeholder">
-          <LoadingSpinner label="Loading featured collections" />
-        </div>
-      )}
+      <HeroCarousel slides={slides} />
 
       {/* Cultural flow: Aso Oke woven design system flowing from benefits strip downward */}
       <div className="home-cultural-flow">

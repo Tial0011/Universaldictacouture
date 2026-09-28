@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="560" viewBox="0 0 1440 560" fill="none">
+<defs>
+ <pattern id="loom" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M0 0H16M0 0V16" stroke="#b08d57" stroke-opacity=".15" stroke-width=".5"/><path d="M8 0V16M0 8H16" stroke="#601013" stroke-opacity=".06" stroke-width=".5"/></pattern>
+ <pattern id="diamonds" width="64" height="96" patternUnits="userSpaceOnUse"><path d="M32 6L54 48 32 90 10 48Z M32 18L46 48 32 78 18 48Z M32 34L39 48 32 62 25 48Z" stroke="#b08d57" stroke-width=".8"/><path d="M0 0V96M64 0V96M4 0V96M60 0V96" stroke="#b08d57" stroke-opacity=".5" stroke-width=".5"/><path d="M30 46h4v4h-4z" fill="#b08d57"/></pattern>
+ <g id="rosette"><circle r="94"/><circle r="88" stroke-dasharray="1 5"/><circle r="75"/><path d="M0-69 18-18 69 0 18 18 0 69-18 18-69 0-18-18Z M0-51 12-12 51 0 12 12 0 51-12 12-51 0-12-12Z"/><path d="m0-94 66 28 28 66-28 66-66 28-66-28-28-66 28-66Z M-53-53 53 53M53-53-53 53"/><circle r="8"/><path d="M-110 0h12M98 0h12M0-110v12M0 98v12"/></g>
+ <g id="contour"><path d="M-60 20C170-40 102 163 246 205S235 367 390 429 470 532 436 650"/><path d="M-60 37C154-14 86 168 235 221S221 385 375 444 451 545 420 650"/><path d="M-60 54C138 10 69 173 220 238S205 400 360 459 432 558 404 650"/><path d="M-60 71C122 35 52 178 205 255S189 416 344 475 413 571 388 650"/><path d="M-60 88C106 60 35 183 190 272S173 432 328 490 394 584 372 650"/><path d="M-60 105C90 85 18 188 175 289S157 448 312 505 375 597 356 650"/><path d="M-60 122C74 110 1 193 160 306S141 464 296 520 356 610 340 650"/></g>
+</defs>
+<path fill="url(#loom)" d="M0 0h1440v560H0z"/>
+<g stroke="#b08d57" stroke-opacity=".45" stroke-width=".7"><use href="#contour"/><use href="#contour" transform="translate(1440 560) rotate(180)"/></g>
+<path fill="url(#diamonds)" d="M38 0h64v560H38zM1338 0h64v560h-64z" opacity=".55"/>
+<g stroke="#b08d57" stroke-width=".75" opacity=".58"><use href="#rosette" x="226" y="280"/><use href="#rosette" x="1214" y="280"/></g>
+<g stroke="#601013" stroke-opacity=".14" stroke-width=".6"><path d="M120 24h1200v512H120z M128 32h1184v496H128z"/><path d="M120 80h40V24M1280 24v56h40M120 480h40v56M1280 536v-56h40"/></g>
+</svg>

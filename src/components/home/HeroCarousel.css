@@ -1,279 +1,41 @@
-.hero {
-  position: relative;
-  background-color: var(--color-white);
-  border-bottom: 1px solid var(--color-border);
+.hero { position:relative; isolation:isolate; background:var(--color-ivory); border-bottom:1px solid var(--color-border-luxury); }
+.hero__viewport { display:grid; }
+.hero__slide { grid-area:1/1; display:grid; position:relative; opacity:0; visibility:hidden; transition:opacity .4s ease, visibility 0s .4s; }
+.hero__slide.is-current { opacity:1; visibility:visible; transition-delay:0s; }
+.hero__media { position:relative; height:clamp(20rem,82vw,30rem); overflow:hidden; background:var(--color-couture-surface); }
+.hero__image { width:100%;height:100%;object-fit:cover;object-position:center 38%; }
+.hero__image--desktop { display:none; }
+.hero__content { position:relative; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:1rem; padding:2rem var(--content-padding-inline) 2.5rem; background:linear-gradient(100deg,rgba(251,248,242,.93),rgba(251,248,242,.83)),var(--pattern-atlas) center/auto 100%; }
+.hero__content::before { content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,var(--color-wine) 0 28%,var(--color-gold) 28% 29%,var(--color-ivory-deep) 29% 70%,var(--color-gold) 70% 71%,var(--color-wine) 71%); }
+.hero__eyebrow { display:flex;align-items:center;gap:.8rem;margin:0;font-size:.7rem;font-weight:600;letter-spacing:.18em;color:var(--color-brand); }
+.hero__eyebrow::before {content:"";width:2rem;height:1px;background:var(--color-gold);}
+.hero__headline { margin:0;font-size:clamp(2.7rem,9vw,4rem);line-height:.98;letter-spacing:-.035em;color:var(--color-brand-deep);font-weight:500; }
+.hero__line {display:block;}
+.hero__secondary {display:block;margin-top:.12em;font-style:italic;color:color-mix(in srgb,var(--color-wine) 54%,var(--color-gold));font-weight:400;}
+.hero__body {margin:0;max-width:34ch;font-size:var(--text-sm);line-height:1.75;color:var(--color-text-secondary);}
+.hero__actions {display:flex;flex-wrap:wrap;gap:.7rem;margin-top:.5rem;}
+.hero__actions .btn {min-height:3rem;font-size:.8rem;padding-inline:1.25rem;}
+.hero__actions .btn--primary {box-shadow:0 6px 20px rgba(96,16,19,.12);}
+.hero__actions .btn--secondary {background:rgba(255,255,255,.65);}
+.hero__control {position:absolute;top:50%;z-index:2;display:flex;align-items:center;justify-content:center;width:var(--touch-target);height:var(--touch-target);background:var(--color-ivory);color:var(--color-brand);border:1px solid var(--color-border-luxury);border-radius:50%;cursor:pointer;box-shadow:var(--shadow-soft);}
+.hero__control--previous {left:.65rem;}.hero__control--next {right:.65rem;}
+.hero__pagination {position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:.15rem;}
+.hero__dot {width:var(--touch-target);height:var(--touch-target);display:grid;place-items:center;background:transparent;border:0;cursor:pointer;}
+.hero__dot::after {content:"";width:.4rem;height:.4rem;background:transparent;border:1px solid var(--color-brand);border-radius:50%;}
+.hero__dot.is-current::after {width:1.35rem;border-radius:1rem;background:var(--color-brand);}
+.hero:has(.hero__pagination) .hero__content {padding-bottom:3rem;}
+@media(min-width:900px){
+ .hero__slide {grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:clamp(34rem,47vw,43rem);}
+ .hero__media {grid-column:2;grid-row:1;height:100%;min-height:34rem;}
+ .hero__image--mobile {display:none;}.hero__image--desktop {display:block;position:absolute;inset:0;}
+ .hero__content {grid-column:1;grid-row:1;padding:3.5rem clamp(3rem,6.5vw,8rem);gap:1.25rem;}
+ .hero__content::before {inset:1.2rem 1.2rem 1.2rem auto;width:1px;height:auto;background:var(--color-border-luxury);}
+ .hero__content::after {content:"";position:absolute;inset:1.2rem;border:1px solid var(--color-border-luxury);border-right:0;pointer-events:none;}
+ .hero__headline {font-size:clamp(3.5rem,5.1vw,6rem);}
+ .hero__body {font-size:var(--text-base);}
+ .hero__pagination {right:50%;bottom:.5rem;}
+ .hero__control {top:auto;bottom:1.1rem;}
+ .hero__control--previous {left:auto;right:4.5rem;}.hero__control--next {right:1.1rem;}
 }
-
-.hero__viewport {
-  display: grid;
-}
-
-/* Slides stack so the section keeps the height of the tallest one and
-   nothing jumps as the carousel advances. */
-.hero__slide {
-  position: relative;
-  grid-area: 1 / 1;
-  display: grid;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity var(--duration-slow) var(--ease-standard),
-    visibility 0s linear var(--duration-slow);
-}
-
-.hero__slide.is-current {
-  opacity: 1;
-  visibility: visible;
-  transition-delay: 0s;
-}
-
-.hero__media {
-  position: absolute;
-  inset: 0;
-  grid-area: 1 / 1;
-  overflow: hidden;
-}
-
-.hero__image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.hero__image--desktop {
-  display: none;
-}
-
-.hero__content {
-  position: relative;
-  grid-area: 1 / 1;
-  align-self: end;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-xs);
-  padding-block: var(--space-lg);
-  /* Mobile portrait proportions */
-  min-height: min(76vh, 34rem);
-  justify-content: flex-end;
-}
-
-/* A slide with imagery gets a wash so the copy stays legible; a slide
-   without imagery simply sits on the ivory page. */
-.hero__media:has(.product-image:not(.product-image--empty)) + .hero__content {
-  background: linear-gradient(
-    to top,
-    rgba(31, 17, 18, 0.72) 0%,
-    rgba(31, 17, 18, 0.45) 45%,
-    rgba(31, 17, 18, 0.05) 100%
-  );
-  color: var(--color-white);
-}
-
-.hero__media:has(.product-image:not(.product-image--empty)) + .hero__content :is(h1, .hero__eyebrow, .hero__body) {
-  color: var(--color-white);
-}
-
-/* A short rule leads the eyebrow: "— PREMIUM ASO OKE". */
-.hero__eyebrow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  margin: 0;
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-caps);
-  color: var(--color-brand);
-}
-
-.hero__eyebrow::before {
-  content: "";
-  flex: 0 0 auto;
-  width: 2.25rem;
-  height: 1px;
-  background-color: currentColor;
-}
-
-.hero__headline {
-  margin: 0;
-  font-size: var(--text-3xl);
-  line-height: var(--leading-tight);
-}
-
-.hero__line {
-  display: block;
-}
-
-.hero__secondary {
-  display: block;
-  font-style: italic;
-}
-
-.hero__body {
-  margin: 0;
-  max-width: 34ch;
-  font-size: var(--text-md);
-  line-height: var(--leading-relaxed);
-}
-
-.hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-  margin-top: var(--space-2xs);
-}
-
-/* Controls */
-.hero__control {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: var(--touch-target);
-  height: var(--touch-target);
-  color: var(--color-text-primary);
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid var(--color-border-control);
-  border-radius: var(--radius-pill);
-}
-
-.hero__control--previous {
-  left: var(--space-sm);
-}
-
-.hero__control--next {
-  right: var(--space-sm);
-}
-
-.hero__pagination {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: var(--space-sm);
-  display: flex;
-  justify-content: center;
-  gap: var(--space-3xs);
-}
-
-.hero__dot {
-  width: var(--touch-target);
-  height: var(--touch-target);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 0;
-}
-
-/* The dot itself is drawn small; the button around it stays 44px. */
-.hero__dot::after {
-  content: "";
-  width: 0.5rem;
-  height: 0.5rem;
-  border: 1px solid var(--color-ink);
-  background: transparent;
-  border-radius: var(--radius-pill);
-}
-
-.hero__dot.is-current::after {
-  width: 1.5rem;
-  border-radius: var(--radius-pill);
-  background: var(--color-brand);
-  border-color: var(--color-brand);
-}
-
-@media (hover: hover) {
-  .hero__control:hover {
-    color: var(--color-brand);
-    border-color: var(--color-brand);
-  }
-}
-
-@media (min-width: 768px) {
-  .hero__image--mobile {
-    display: none;
-  }
-
-  .hero__image--desktop {
-    object-position: center 30%;
-    display: block;
-  }
-
-  .hero__content {
-    min-height: min(74vh, 40rem);
-    justify-content: center;
-    align-self: center;
-    gap: var(--space-sm);
-    padding-block: var(--space-xl);
-  }
-
-  .hero__media:has(.product-image:not(.product-image--empty)) + .hero__content {
-    background: linear-gradient(
-      to right,
-      rgba(31, 17, 18, 0.7) 0%,
-      rgba(31, 17, 18, 0.35) 55%,
-      rgba(31, 17, 18, 0) 100%
-    );
-  }
-
-  .hero__control {
-    display: inline-flex;
-  }
-}
-
-@media (min-width: 1280px) {
-  .hero__content {
-    min-height: min(72vh, 44rem);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero__slide {
-    transition: none;
-  }
-}
-
-/* ---------- Gold + white treatment on photographic slides ----------
-   Gold is decorative on the ivory page (2.9:1), but on the dark wash
-   over the photograph a lightened gold reads clearly, so the eyebrow
-   (with its rule) and the italic second line take it there. The
-   second button turns white to match. A slide without imagery keeps
-   the wine treatment above. */
-.hero__media:has(.product-image:not(.product-image--empty)) + .hero__content {
-  --hero-gold: color-mix(in srgb, var(--color-gold) 82%, var(--color-white));
-}
-
-.hero__media:has(.product-image:not(.product-image--empty)) + .hero__content .hero__eyebrow {
-  color: var(--hero-gold);
-}
-
-/* Large italic text can carry a richer, truer gold than the small eyebrow. */
-.hero__media:has(.product-image:not(.product-image--empty)) + .hero__content .hero__secondary {
-  color: color-mix(in srgb, var(--color-gold) 94%, var(--color-white));
-}
-
-.hero__media:has(.product-image:not(.product-image--empty)) + .hero__content .hero__headline {
-  text-shadow: 0 2px 18px rgba(31, 17, 18, 0.35);
-}
-
-.hero__media:has(.product-image:not(.product-image--empty)) + .hero__content .btn--secondary {
-  color: var(--color-white);
-  background-color: transparent;
-  border-color: rgba(255, 255, 255, 0.9);
-}
-
-.hero__media:has(.product-image:not(.product-image--empty)) + .hero__content .btn--secondary:active:not(:disabled) {
-  color: var(--color-brand);
-  background-color: var(--color-white);
-  border-color: var(--color-white);
-}
-
-@media (hover: hover) {
-  .hero__media:has(.product-image:not(.product-image--empty)) + .hero__content .btn--secondary:hover:not(:disabled) {
-    color: var(--color-brand);
-    background-color: var(--color-white);
-    border-color: var(--color-white);
-  }
-}
+@media(max-width:899px){.hero__control {top:15rem;} .hero__content {margin-top:-.5rem;} }
+@media(prefers-reduced-motion:reduce){.hero__slide{transition:none;}}

@@ -84,6 +84,11 @@
       rgba(176, 141, 87, 0.016) 10px
     );
 
+  /* Shared display fabric: richer than the page, quieter than the photograph. */
+  --color-couture-surface: #eee7de;
+  --color-couture-media: #f8f4ed;
+  --pattern-atlas: url("../assets/brand/couture-atlas.svg");
+
   /* ---------- Typography ---------- */
   --font-display: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
   --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;

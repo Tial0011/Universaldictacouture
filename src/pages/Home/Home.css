@@ -1,14 +1,15 @@
-/* The hero is the page's one large moment; everything below it keeps
-   the quiet, evenly spaced editorial rhythm of the design system. */
-body:has(#main-content > .trust-strip-wrap) {
-  --content-max-width: clamp(77.5rem, 85vw, 92.5rem);
-}
-
-.home-hero-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: min(60vh, 28rem);
-  background-color: var(--color-white);
-  border-bottom: 1px solid var(--color-border);
-}
+/* Page rhythm and fabric layers shared with the collection. */
+.home-cultural-flow {background:linear-gradient(rgba(251,248,242,.97),rgba(251,248,242,.96)),var(--pattern-atlas) center top/1440px auto;}
+.home-cultural-flow .home-section {padding-block:clamp(2rem,4vw,4rem);}
+.home-cultural-flow .home-section--shop-by {padding-block:clamp(1.75rem,3vw,3rem) 0;}
+.home-cultural-flow .home-section--shop-by + .home-section {padding-top:clamp(2rem,4vw,4rem);}
+.home-cultural-flow .custom-promo {background:linear-gradient(100deg,rgba(67,9,13,.85),rgba(67,9,13,.96)),var(--pattern-atlas) center/cover;box-shadow:none;}
+.home-cultural-flow .custom-promo__inner {min-height:clamp(18rem,32vw,27rem);}
+.home-cultural-flow .custom-promo__copy {padding-block:2rem;}
+.home-cultural-flow .custom-promo__cta {box-shadow:none;border-color:var(--color-gold-soft);}
+.home-cultural-flow .home-section__note {padding:1.5rem;border:1px solid var(--color-border-luxury);background:rgba(255,255,255,.6);}
+.home-cultural-flow .menu-card {padding:.6rem;background:var(--color-couture-surface);border-radius:3px;border-color:rgba(176,141,87,.3);box-shadow:0 5px 18px rgba(67,9,13,.04);}
+.home-cultural-flow .menu-card__media {background:var(--color-couture-media);border-radius:1px;border-color:rgba(255,255,255,.65);}
+.home-cultural-flow .menu-card__body {padding:.9rem .3rem .3rem;}
+.home-cultural-flow .menu-card__cta {border-radius:2px;}
+.home-cultural-flow .menu-card__media .product-image--empty {background:var(--color-couture-media);}

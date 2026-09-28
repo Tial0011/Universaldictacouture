@@ -65,6 +65,7 @@ export default function HeroCarousel({ slides }) {
   const touchStart = useRef(null);
   const prefersReducedMotion = usePrefersReducedMotion();
   const count = slides.length;
+  const activeIndex = index < count ? index : 0;
 
   const goTo = useCallback(
     (next) => {
@@ -120,12 +121,12 @@ export default function HeroCarousel({ slides }) {
         {slides.map((item, slideIndex) => (
           <div
             key={item.id}
-            className={`hero__slide${slideIndex === index ? " is-current" : ""}`}
+            className={`hero__slide${slideIndex === activeIndex ? " is-current" : ""}`}
             role={count > 1 ? "group" : undefined}
             aria-roledescription={count > 1 ? "slide" : undefined}
             aria-label={count > 1 ? `${slideIndex + 1} of ${count}` : undefined}
-            aria-hidden={slideIndex === index ? undefined : true}
-            inert={slideIndex === index ? undefined : true}
+            aria-hidden={slideIndex === activeIndex ? undefined : true}
+            inert={slideIndex === activeIndex ? undefined : true}
           >
             <div className="hero__media">
               <ProductImage
@@ -144,7 +145,7 @@ export default function HeroCarousel({ slides }) {
               />
             </div>
 
-            <div className="container hero__content">
+            <div className="hero__content">
               <p className="hero__eyebrow">{item.eyebrow}</p>
               <h1 className="hero__headline">
                 <HeadlineLines text={item.headline} />
@@ -188,10 +189,10 @@ export default function HeroCarousel({ slides }) {
               <button
                 key={item.id}
                 type="button"
-                className={`hero__dot${slideIndex === index ? " is-current" : ""}`}
+                className={`hero__dot${slideIndex === activeIndex ? " is-current" : ""}`}
                 onClick={() => goTo(slideIndex)}
                 aria-label={`Go to slide ${slideIndex + 1}`}
-                aria-current={slideIndex === index ? "true" : undefined}
+                aria-current={slideIndex === activeIndex ? "true" : undefined}
               />
             ))}
           </div>

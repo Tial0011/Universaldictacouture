@@ -351,13 +351,14 @@ export default function Shop() {
               </ol>
             </nav>
             <p className="shop__eyebrow">The Aso Oke edit</p>
-            <h1 className="shop__title" id="shop-title">Shop Aso Oke<span>Reimagined.</span></h1>
+            <h1 className="shop__title" id="shop-title">Shop Aso Oke<span>{" "}Reimagined.</span></h1>
             <p className="shop__lede">{SHOP_LEDE}</p>
             <Link className="shop__hero-link" to="/chats" state={{ draft: couturierDraft }}>
               <ChatIcon size={18} />
               <span>Ask the Couturier</span>
               <span aria-hidden="true">→</span>
             </Link>
+            <p className="shop__signature">WEAR CULTURE, PRESERVE HERITAGE!</p>
           </div>
 
         </div>
@@ -460,7 +461,8 @@ export default function Shop() {
             <div className="shop__state">
               <p className="shop__state-kicker">The collection</p>
               <h2>New pieces are being prepared.</h2>
-              <p>No fabrics have been published yet. Please check back soon.</p>
+              <p>Explore Custom Style, or speak with a Dicta Couturier about the piece you have in mind.</p>
+              <Link className="btn btn--secondary" to="/custom-style">Explore Custom Style</Link>
             </div>
           ) : null}
 
