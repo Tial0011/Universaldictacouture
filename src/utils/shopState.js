@@ -290,7 +290,15 @@ export function buildChips(state) {
   });
 
   if (state.min !== null || state.max !== null) {
-    chips.push({ id: "price", label: "Price range", text: "Price range", type: "price" });
+    let priceText = "Price range";
+    if (state.min !== null && state.max !== null) {
+      priceText = `₦${state.min.toLocaleString()} – ₦${state.max.toLocaleString()}`;
+    } else if (state.min !== null) {
+      priceText = `From ₦${state.min.toLocaleString()}`;
+    } else if (state.max !== null) {
+      priceText = `Up to ₦${state.max.toLocaleString()}`;
+    }
+    chips.push({ id: "price", label: `Price: ${priceText}`, text: priceText, type: "price" });
   }
 
   return chips;
