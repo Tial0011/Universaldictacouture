@@ -680,29 +680,43 @@
 }
 .shop__intro::before { left: 14px; border-left: 3px double rgba(211,188,138,.5); }
 .shop__intro::after { right: 14px; border-right: 3px double rgba(211,188,138,.5); }
-.shop__intro-copy { background: none; }
-.shop__breadcrumb { left: max(5.5rem, 7vw); top: 1rem; }
-.shop__breadcrumb a,
-.shop__breadcrumb [aria-current="page"] { color: #f4e8dc; }
-.shop__eyebrow { margin: 0 0 .65rem; color: var(--color-gold-soft); font-size: .63rem; letter-spacing: .25em; }
-.shop__title { color: var(--color-ivory); font-size: clamp(3rem, 4.8vw, 4.3rem); text-shadow: 0 2px 14px rgba(20,7,19,.24); }
-.shop__title span { color: #e9ca91; }
-.shop__lede { color: #f4e8dc; margin-top: .8rem; font-size: .92rem; line-height: 1.6; max-width: 55ch; }
-.shop__hero-link {
-  padding: .4rem .75rem;
+.shop__intro-content {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  max-width: 1000px;
+  position: relative;
+  z-index: 1;
+}
+.shop__intro-main { flex: 1; }
+.shop__title { color: var(--color-ivory); font-size: clamp(2.8rem, 4vw, 3.6rem); text-shadow: 0 2px 14px rgba(20,7,19,.24); line-height: 1.1; }
+.shop__lede { color: #f4e8dc; margin-top: .6rem; font-size: .95rem; line-height: 1.5; max-width: 48ch; }
+.shop__intro-assist {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .5rem;
+  padding-bottom: .2rem;
+}
+.shop__assist-text { color: var(--color-gold-soft); font-size: .75rem; font-weight: var(--weight-medium); letter-spacing: .02em; }
+.shop__assist-link {
+  display: inline-flex;
+  align-items: center;
   gap: .4rem;
-  font-size: .72rem;
-  min-height: 44px;
-  margin-top: .85rem;
+  padding: .45rem .85rem;
+  font-size: .75rem;
+  font-weight: var(--weight-medium);
   color: var(--color-ivory);
   background: rgba(67,9,13,.65);
-  border-color: #c7a56c;
-  box-shadow: inset 0 0 0 3px rgba(199,165,108,.07);
+  border: 1px solid #c7a56c;
+  border-radius: 3px;
+  transition: all .2s;
 }
-.shop__hero-link svg { width: 15px; height: 15px; }
-.shop__hero-link span:last-child { margin-left: .15rem; }
-.shop__hero-link:focus-visible { outline-color: var(--color-ivory); }
-.shop__signature { color: var(--color-gold-soft); margin-top: .85rem; font-size: .55rem; }
+.shop__assist-link:hover { background: rgba(67,9,13,.85); }
+.shop__assist-link svg { width: 16px; height: 16px; }
+.shop__assist-link span:last-child { margin-left: .2rem; }
+.shop__assist-link:focus-visible { outline: 2px solid var(--color-ivory); outline-offset: 2px; }
 .shop .product-card {
   background: url('../../assets/brand/couture-stitch.svg') center / 56px 80px, var(--color-couture-surface);
   border-color: rgba(153,117,70,.32);
@@ -716,11 +730,10 @@
   .shop__intro::before, .shop__intro::after { width: 12px; top: 10px; bottom: 17px; }
   .shop__intro::before { left: 7px; }
   .shop__intro::after { right: 7px; }
-  .shop__intro-copy { background: none; padding-inline: .4rem; }
-  .shop__title { font-size: clamp(2.55rem, 10vw, 3.3rem); }
-  .shop__lede { max-width: 36ch; font-size: .82rem; }
-  .shop__hero-link { margin-top: .65rem; }
-  .shop__signature { font-size: .5rem; letter-spacing: .14em; }
+  .shop__intro-content { flex-direction: column; align-items: flex-start; gap: 1.2rem; padding-inline: .4rem; }
+  .shop__title { font-size: clamp(2.4rem, 9vw, 3rem); }
+  .shop__lede { font-size: .88rem; max-width: 100%; }
+  .shop__intro-assist { width: 100%; padding-top: .4rem; border-top: 1px solid rgba(211,188,138,.2); }
 }
 @media (prefers-reduced-motion: reduce) {
   .shop__intro-wrap::before,

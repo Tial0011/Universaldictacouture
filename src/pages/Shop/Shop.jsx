@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import ProductGrid from "../../components/product/ProductGrid";
+import ProductImage from "../../components/product/ProductImage";
 import DiscoveryModule from "../../components/discovery/DiscoveryModule";
 import ShopFilters from "../../components/shop/ShopFilters";
 import FilterDrawer from "../../components/shop/FilterDrawer";
@@ -343,22 +344,19 @@ export default function Shop() {
     <div className="shop">
       <section className="shop__intro-wrap" aria-labelledby="shop-title">
         <div className="container shop__intro">
-          <div className="shop__intro-copy">
-            <nav className="shop__breadcrumb" aria-label="Breadcrumb">
-              <ol>
-                <li><Link to="/">Home</Link></li>
-                <li aria-current="page">Shop</li>
-              </ol>
-            </nav>
-            <p className="shop__eyebrow">The Aso Oke</p>
-            <h1 className="shop__title" id="shop-title">Shop Aso Oke<span>{" "}Reimagined.</span></h1>
-            <p className="shop__lede">{SHOP_LEDE}</p>
-            <Link className="shop__hero-link" to="/chats" state={{ draft: couturierDraft }}>
-              <ChatIcon size={18} />
-              <span>Ask the Couturier</span>
-              <span aria-hidden="true">→</span>
-            </Link>
-            <p className="shop__signature">WEAR CULTURE, PRESERVE HERITAGE!</p>
+          <div className="shop__intro-content">
+            <div className="shop__intro-main">
+              <h1 className="shop__title" id="shop-title">Shop</h1>
+              <p className="shop__lede">{SHOP_LEDE}</p>
+            </div>
+            <div className="shop__intro-assist">
+              <p className="shop__assist-text">Need help choosing?</p>
+              <Link className="shop__assist-link" to="/chats" state={{ draft: couturierDraft }}>
+                <ChatIcon size={18} />
+                <span>Chat with a Couturier</span>
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
           </div>
         </div>
         <div className="shop__cloth-hem" aria-hidden="true" />
@@ -371,6 +369,7 @@ export default function Shop() {
             className="discovery--shop"
             hideTitleWithTabs
             activeGroup={activeDiscoveryGroup}
+            renderMedia={(item) => <ProductImage image={item.image} alt="" transformation="w_480,h_600,c_fill,g_auto,q_auto,f_auto" />}
             onGroupChange={(groupId) => updateState({ ...state, discovery: groupId })}
             resolveDestination={resolveTileDestination}
             railControls
