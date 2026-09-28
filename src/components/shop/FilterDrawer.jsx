@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 
 /**
  * Mobile/tablet filter sheet. Focus moves into the sheet, is trapped while
- * open, and returns to the opener on close. Selections can remain pending
- * until the customer deliberately chooses Apply Filters.
+ * open, and returns to the opener on close. Selections remain pending until
+ * the customer deliberately chooses Apply Filters.
  */
 export default function FilterDrawer({
   isOpen,
@@ -17,6 +17,12 @@ export default function FilterDrawer({
 }) {
   const panelRef = useRef(null);
   const closeRef = useRef(null);
+  const onCloseRef = useRef(onClose);
+  const titleId = useId();
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -24,16 +30,17 @@ export default function FilterDrawer({
     const previouslyFocused = document.activeElement;
     closeRef.current?.focus();
 
+    const requestClose = () => onCloseRef.current?.();
     const onKeyDown = (event) => {
       if (event.key === "Escape") {
         event.stopPropagation();
-        onClose();
+        requestClose();
         return;
       }
       if (event.key !== "Tab" || !panelRef.current) return;
 
       const focusable = panelRef.current.querySelectorAll(
-        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled])'
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
       );
       if (!focusable.length) return;
       const first = focusable[0];
@@ -57,7 +64,7 @@ export default function FilterDrawer({
       document.body.style.overflow = overflow;
       if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -66,19 +73,20 @@ export default function FilterDrawer({
       <button
         type="button"
         className="filter-drawer__scrim"
-        aria-label="Close filters"
+        aria-label="Cancel and close filters"
         tabIndex={-1}
         onClick={onClose}
       />
       <div
+        id="shop-filter-drawer"
         ref={panelRef}
         className="filter-drawer__panel"
         role="dialog"
         aria-modal="true"
-        aria-label={title}
+        aria-labelledby={titleId}
       >
         <div className="filter-drawer__bar">
-          <span className="filter-drawer__title">{title}</span>
+          <span className="filter-drawer__title" id={titleId}>{title}</span>
           <button
             ref={closeRef}
             type="button"

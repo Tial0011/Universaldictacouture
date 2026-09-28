@@ -3,11 +3,21 @@ import assert from "node:assert/strict";
 import { normaliseProduct, FILTER_DIMENSIONS } from "../src/services/productModel.js";
 import {
   EMPTY_STATE,
+  SORT_OPTIONS,
+  applyFilterDraft,
   applyShopState,
+  buildChips,
   buildSearchParams,
+  clearAllRefinements,
+  clearFilterSelections,
+  copyShopState,
   filterProducts,
+  hasFilterSelections,
   parseShopState,
+  removeShopRefinement,
   sortProducts,
+  toggleFilterValue,
+  validatePriceRange,
 } from "../src/utils/shopState.js";
 
 function piece(id, overrides = {}) {
@@ -357,3 +367,281 @@ test("P: default/empty state produces a clean empty URL", () => {
     assert.deepEqual(parsed.filters[key], []);
   });
 });
+
+// ── Task 4 filters / sort / active-context hardening ─────────────────────
+
+test("Task 4: approved public sort labels are exact and no marketplace sorts are added", () => {
+  assert.deepEqual(
+    SORT_OPTIONS.map(({ value, label }) => [value, label]),
+    [
+      ["newest", "Newest First"],
+      ["price-asc", "Price: Low to High"],
+      ["price-desc", "Price: High to Low"],
+    ]
+  );
+});
+
+test("Task 4: Category is OR within the dimension", () => {
+  const products = [
+    piece("fabric", { category: ["Fabric"] }),
+    piece("set", { category: ["Complete Set"] }),
+    piece("accessory", { category: ["Accessory"] }),
+  ];
+  const state = {
+    ...EMPTY_STATE,
+    filters: { ...EMPTY_STATE.filters, category: ["Fabric", "Complete Set"] },
+  };
+  assert.deepEqual(filterProducts(products, state).map((p) => p.id), ["fabric", "set"]);
+});
+
+test("Task 4: Occasion is OR within the dimension", () => {
+  const products = [
+    piece("wedding", { occasion: ["Wedding"] }),
+    piece("church", { occasion: ["Church"] }),
+    piece("birthday", { occasion: ["Birthday"] }),
+  ];
+  const state = {
+    ...EMPTY_STATE,
+    filters: { ...EMPTY_STATE.filters, occasion: ["Wedding", "Church"] },
+  };
+  assert.deepEqual(filterProducts(products, state).map((p) => p.id), ["wedding", "church"]);
+});
+
+test("Task 4: Style, Fabric / Weave and Colour support multi-select OR semantics", () => {
+  const products = [
+    piece("one", { style: ["A"], fabric: ["Loom"], colour: ["Wine"] }),
+    piece("two", { style: ["B"], fabric: ["Rope"], colour: ["Gold"] }),
+    piece("three", { style: ["C"], fabric: ["Plain"], colour: ["Blue"] }),
+  ];
+  const styleState = {
+    ...EMPTY_STATE,
+    filters: { ...EMPTY_STATE.filters, style: ["A", "B"] },
+  };
+  const fabricState = {
+    ...EMPTY_STATE,
+    filters: { ...EMPTY_STATE.filters, fabric: ["Loom", "Rope"] },
+  };
+  const colourState = {
+    ...EMPTY_STATE,
+    filters: { ...EMPTY_STATE.filters, colour: ["Wine", "Gold"] },
+  };
+  assert.deepEqual(filterProducts(products, styleState).map((p) => p.id), ["one", "two"]);
+  assert.deepEqual(filterProducts(products, fabricState).map((p) => p.id), ["one", "two"]);
+  assert.deepEqual(filterProducts(products, colourState).map((p) => p.id), ["one", "two"]);
+});
+
+test("Task 4: price range supports min-only, max-only and bounded range", () => {
+  const products = [
+    piece("low", { price: 10000 }),
+    piece("mid", { price: 30000 }),
+    piece("high", { price: 70000 }),
+  ];
+  assert.deepEqual(filterProducts(products, { ...EMPTY_STATE, min: 30000 }).map((p) => p.id), ["mid", "high"]);
+  assert.deepEqual(filterProducts(products, { ...EMPTY_STATE, max: 30000 }).map((p) => p.id), ["low", "mid"]);
+  assert.deepEqual(filterProducts(products, { ...EMPTY_STATE, min: 20000, max: 60000 }).map((p) => p.id), ["mid"]);
+});
+
+test("Task 4: draft price validation blocks Min greater than Max and rejects malformed values", () => {
+  assert.deepEqual(validatePriceRange("10000", "50000"), { min: 10000, max: 50000, error: "" });
+  assert.deepEqual(validatePriceRange("10000", ""), { min: 10000, max: null, error: "" });
+  assert.deepEqual(validatePriceRange("", "50000"), { min: null, max: 50000, error: "" });
+  assert.equal(validatePriceRange("90000", "20000").error, "Minimum Price must not exceed Maximum Price.");
+  assert.equal(validatePriceRange("-1", "20000").error, "Prices cannot be negative.");
+  assert.equal(validatePriceRange("abc", "20000").error, "Enter prices as numbers.");
+});
+
+test("Task 4: reversed URL price range normalizes safely and malformed price is never serialized", () => {
+  const reversed = new URLSearchParams("min=90000&max=20000");
+  const parsed = parseShopState(reversed);
+  assert.equal(parsed.min, 20000);
+  assert.equal(parsed.max, 90000);
+
+  const malformed = parseShopState(new URLSearchParams("min=nope&max=-1"));
+  assert.equal(malformed.min, null);
+  assert.equal(malformed.max, null);
+  assert.equal(buildSearchParams(malformed).has("min"), false);
+  assert.equal(buildSearchParams(malformed).has("max"), false);
+});
+
+test("Task 4: price sorts use numeric product prices", () => {
+  const products = [
+    piece("thirty", { price: 30000 }),
+    piece("ten", { price: 10000 }),
+    piece("twenty", { price: 20000 }),
+  ];
+  assert.deepEqual(sortProducts(products, "price-asc").map((p) => p.id), ["ten", "twenty", "thirty"]);
+  assert.deepEqual(sortProducts(products, "price-desc").map((p) => p.id), ["thirty", "twenty", "ten"]);
+});
+
+test("Task 4: Filter + Search combine instead of replacing one another", () => {
+  const products = [
+    piece("match", { name: "Royal Wine", colour: ["Wine"] }),
+    piece("wrong-colour", { name: "Royal Wine", colour: ["Blue"] }),
+    piece("wrong-query", { name: "Heritage", colour: ["Wine"] }),
+  ];
+  const state = {
+    ...EMPTY_STATE,
+    query: "royal",
+    filters: { ...EMPTY_STATE.filters, colour: ["Wine"] },
+  };
+  assert.deepEqual(applyShopState(products, state).map((p) => p.id), ["match"]);
+});
+
+test("Task 4: Filter + Sort combine without clearing either state", () => {
+  const products = [
+    piece("older", { category: ["Fabric"], publishedAt: "2026-08-01T00:00:00Z" }),
+    piece("newer", { category: ["Fabric"], publishedAt: "2026-09-01T00:00:00Z" }),
+    piece("other", { category: ["Accessory"], publishedAt: "2026-09-20T00:00:00Z" }),
+  ];
+  const state = {
+    ...EMPTY_STATE,
+    sort: "newest",
+    filters: { ...EMPTY_STATE.filters, category: ["Fabric"] },
+  };
+  assert.deepEqual(applyShopState(products, state).map((p) => p.id), ["newer", "older"]);
+  assert.deepEqual(parseShopState(buildSearchParams(state)).filters.category, ["Fabric"]);
+});
+
+test("Task 4: Discovery context coexists with a committed filter", () => {
+  const state = {
+    ...EMPTY_STATE,
+    discovery: "occasion",
+    filters: { ...EMPTY_STATE.filters, occasion: ["Church"] },
+  };
+  const parsed = parseShopState(buildSearchParams(state));
+  assert.equal(parsed.discovery, "occasion");
+  assert.deepEqual(parsed.filters.occasion, ["Church"]);
+});
+
+test("Task 4: New In remains a distinct context and combines with filters", () => {
+  const products = [
+    piece("new-wine", { isNewIn: true, colour: ["Wine"] }),
+    piece("new-blue", { isNewIn: true, colour: ["Blue"] }),
+    piece("old-wine", { isNewIn: false, colour: ["Wine"] }),
+  ];
+  const state = {
+    ...EMPTY_STATE,
+    newIn: true,
+    filters: { ...EMPTY_STATE.filters, colour: ["Wine"] },
+  };
+  assert.deepEqual(applyShopState(products, state).map((p) => p.id), ["new-wine"]);
+});
+
+test("Task 4: one chip removal preserves every unrelated refinement", () => {
+  const state = {
+    ...EMPTY_STATE,
+    query: "royal",
+    discovery: "occasion",
+    newIn: true,
+    min: 10000,
+    filters: {
+      ...EMPTY_STATE.filters,
+      occasion: ["Church", "Wedding"],
+      colour: ["Wine"],
+    },
+  };
+  const chips = buildChips(state, { discoveryLabel: "Occasion" });
+  const church = chips.find((chip) => chip.dimension === "occasion" && chip.value === "Church");
+  const next = removeShopRefinement(state, church);
+  assert.deepEqual(next.filters.occasion, ["Wedding"]);
+  assert.deepEqual(next.filters.colour, ["Wine"]);
+  assert.equal(next.query, "royal");
+  assert.equal(next.discovery, "occasion");
+  assert.equal(next.newIn, true);
+  assert.equal(next.min, 10000);
+});
+
+test("Task 4: Discovery appears as removable active context", () => {
+  const state = { ...EMPTY_STATE, discovery: "fabric" };
+  const chips = buildChips(state, { discoveryLabel: "Fabric & Pattern" });
+  assert.deepEqual(chips, [{
+    id: "discovery",
+    label: "Shop By: Fabric & Pattern",
+    text: "Shop By: Fabric & Pattern",
+    type: "discovery",
+  }]);
+  assert.equal(removeShopRefinement(state, chips[0]).discovery, "");
+});
+
+test("Task 4: primary Clear All clears refinements but preserves Sort", () => {
+  const state = {
+    ...EMPTY_STATE,
+    query: "aso oke",
+    sort: "price-desc",
+    discovery: "style",
+    newIn: true,
+    min: 5000,
+    max: 70000,
+    shopBy: { custom: ["Editorial"] },
+    filters: { ...EMPTY_STATE.filters, style: ["Classic"] },
+  };
+  const cleared = clearAllRefinements(state);
+  assert.equal(cleared.sort, "price-desc");
+  assert.equal(cleared.query, "");
+  assert.equal(cleared.discovery, "");
+  assert.equal(cleared.newIn, false);
+  assert.equal(cleared.min, null);
+  assert.equal(cleared.max, null);
+  assert.deepEqual(cleared.shopBy, {});
+  FILTER_DIMENSIONS.forEach(({ key }) => assert.deepEqual(cleared.filters[key], []));
+});
+
+test("Task 4: mobile filter draft is isolated until Apply", () => {
+  const committed = {
+    ...EMPTY_STATE,
+    query: "heritage",
+    sort: "price-asc",
+    discovery: "occasion",
+    filters: { ...EMPTY_STATE.filters, colour: ["Wine"] },
+  };
+  let draft = copyShopState(committed);
+  draft = toggleFilterValue(draft, "occasion", "Church");
+  draft = { ...draft, min: 25000 };
+
+  // Pending edits never mutate the committed canonical object.
+  assert.deepEqual(committed.filters.occasion, []);
+  assert.equal(committed.min, null);
+
+  const applied = applyFilterDraft(committed, draft);
+  assert.deepEqual(applied.filters.occasion, ["Church"]);
+  assert.equal(applied.min, 25000);
+  assert.equal(applied.query, "heritage");
+  assert.equal(applied.sort, "price-asc");
+  assert.equal(applied.discovery, "occasion");
+});
+
+test("Task 4: mobile filter Clear All clears only sheet-owned draft state", () => {
+  const draft = {
+    ...EMPTY_STATE,
+    query: "heritage",
+    sort: "price-desc",
+    discovery: "style",
+    shopBy: { custom: ["Editorial"] },
+    newIn: true,
+    min: 10000,
+    max: 50000,
+    filters: { ...EMPTY_STATE.filters, colour: ["Wine"] },
+  };
+  assert.equal(hasFilterSelections(draft), true);
+  const cleared = clearFilterSelections(draft);
+  assert.equal(cleared.query, "heritage");
+  assert.equal(cleared.sort, "price-desc");
+  assert.equal(cleared.discovery, "style");
+  assert.deepEqual(cleared.shopBy, { custom: ["Editorial"] });
+  assert.equal(hasFilterSelections(cleared), false);
+});
+
+test("Task 4: canonical writes deduplicate repeated values and never restore Custom Style", () => {
+  const state = {
+    ...EMPTY_STATE,
+    filters: {
+      ...EMPTY_STATE.filters,
+      occasion: ["Church", "church", "Church"],
+      style: ["Custom Style", "Classic", "classic"],
+    },
+  };
+  const params = buildSearchParams(state);
+  assert.deepEqual(params.getAll("occasion"), ["Church"]);
+  assert.deepEqual(params.getAll("style"), ["Classic"]);
+});
+

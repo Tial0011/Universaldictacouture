@@ -21,12 +21,19 @@ import { DEFAULT_SHOP_BY_GROUPS, fetchShopByGroups } from "../../services/shopBy
 import { FILTER_DIMENSIONS } from "../../services/productModel";
 import {
   SORT_OPTIONS,
+  applyFilterDraft,
   applyShopState,
   buildChips,
   buildFacets,
   buildSearchParams,
+  clearAllRefinements,
+  clearFilterSelections,
+  copyShopState,
   hasActiveRefinements,
+  hasFilterSelections,
   parseShopState,
+  removeShopRefinement,
+  toggleFilterValue,
 } from "../../utils/shopState";
 import "./Shop.css";
 
@@ -62,42 +69,6 @@ function ChatIcon({ size = 20 }) {
       <path d="M8 11.5h.01M12 11.5h.01M16 11.5h.01" />
     </svg>
   );
-}
-
-function copyShopState(source) {
-  return {
-    ...source,
-    filters: Object.fromEntries(
-      Object.entries(source.filters || {}).map(([key, values]) => [key, [...values]])
-    ),
-    shopBy: Object.fromEntries(
-      Object.entries(source.shopBy || {}).map(([key, values]) => [key, [...values]])
-    ),
-  };
-}
-
-function clearedShopState(source) {
-  return {
-    ...source,
-    query: "",
-    filters: Object.fromEntries(DIMENSION_KEYS.map((key) => [key, []])),
-    shopBy: {},
-    min: null,
-    max: null,
-    newIn: false,
-    discovery: "",
-  };
-}
-
-function toggleDimension(source, dimension, value) {
-  const current = source.filters?.[dimension] ?? [];
-  const nextValues = current.includes(value)
-    ? current.filter((entry) => entry !== value)
-    : [...current, value];
-  return {
-    ...source,
-    filters: { ...source.filters, [dimension]: nextValues },
-  };
 }
 
 function SortControl({ value, onChange }) {
@@ -160,6 +131,7 @@ export default function Shop() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerState, setDrawerState] = useState(() => copyShopState(state));
   const [drawerFiltersValid, setDrawerFiltersValid] = useState(true);
+  const [drawerResetToken, setDrawerResetToken] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const resultsRef = useRef(null);
   const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
@@ -222,32 +194,19 @@ export default function Shop() {
   }, [setSearchParams]);
 
   const toggleValue = useCallback((dimension, value) => {
-    updateState(toggleDimension(state, dimension, value));
-  }, [state, updateState]);
-
-  const toggleShopBy = useCallback((group, value) => {
-    const current = state.shopBy?.[group] ?? [];
-    const nextValues = current.includes(value)
-      ? current.filter((entry) => entry !== value)
-      : [...current, value];
-    updateState({ ...state, shopBy: { ...(state.shopBy || {}), [group]: nextValues } });
+    updateState(toggleFilterValue(state, dimension, value));
   }, [state, updateState]);
 
   const removeChip = useCallback((chip) => {
-    if (chip.type === "query") updateState({ ...state, query: "" });
-    else if (chip.type === "newIn") updateState({ ...state, newIn: false });
-    else if (chip.type === "price") updateState({ ...state, min: null, max: null });
-    else if (chip.type === "shopBy") toggleShopBy(chip.group, chip.value);
-    else toggleValue(chip.dimension, chip.value);
-  }, [state, updateState, toggleShopBy, toggleValue]);
+    updateState(removeShopRefinement(state, chip));
+  }, [state, updateState]);
 
   const clearAll = useCallback(() => {
-    updateState(clearedShopState(state));
+    updateState(clearAllRefinements(state));
   }, [state, updateState]);
 
   const results = useMemo(() => applyShopState(catalogue, state), [catalogue, state]);
   const facets = useMemo(() => buildFacets(catalogue, state, taxonomy), [catalogue, state, taxonomy]);
-  const chips = useMemo(() => buildChips(state), [state]);
 
   const discoveryModule = useMemo(
     () => buildShopDiscovery(catalogue, "Shop By", shopByGroups),
@@ -257,6 +216,11 @@ export default function Shop() {
   const activeDiscoveryGroup = discoveryModule?.groups?.some((group) => group.id === state.discovery)
     ? state.discovery
     : (discoveryModule?.groups?.[0]?.id ?? "");
+  const activeDiscoveryLabel = discoveryModule?.groups?.find((group) => group.id === state.discovery)?.label || "";
+  const chips = useMemo(
+    () => buildChips(state, { discoveryLabel: activeDiscoveryLabel }),
+    [state, activeDiscoveryLabel]
+  );
 
   const resolveTileDestination = useCallback((item) => {
     const [path, queryString = ""] = item.destination.split("?");
@@ -293,18 +257,35 @@ export default function Shop() {
     } catch { /* blocked storage */ }
   }, [location.search, visibleCount]);
 
-  const openDrawer = () => {
+  const openDrawer = useCallback(() => {
     setDrawerState(copyShopState(state));
     setDrawerFiltersValid(true);
+    setDrawerResetToken((token) => token + 1);
     setIsDrawerOpen(true);
-  };
+  }, [state]);
+
+  const closeDrawer = useCallback(() => {
+    setIsDrawerOpen(false);
+  }, []);
+
+  const clearDrawerDraft = useCallback(() => {
+    setDrawerState((current) => clearFilterSelections(current));
+    setDrawerFiltersValid(true);
+    setDrawerResetToken((token) => token + 1);
+  }, []);
+
+  const applyDrawerDraft = useCallback(() => {
+    if (!drawerFiltersValid) return;
+    updateState(applyFilterDraft(state, drawerState));
+    setIsDrawerOpen(false);
+  }, [drawerFiltersValid, drawerState, state, updateState]);
 
   const drawerFacets = useMemo(
     () => buildFacets(catalogue, drawerState, taxonomy),
     [catalogue, drawerState, taxonomy]
   );
 
-  const drawerHasRefinements = hasActiveRefinements(drawerState);
+  const drawerHasRefinements = hasFilterSelections(drawerState);
 
   const desktopFilterPanel = (
     <ShopFilters
@@ -313,8 +294,7 @@ export default function Shop() {
       onToggleValue={toggleValue}
       onToggleNewIn={(checked) => updateState({ ...state, newIn: checked })}
       onPriceChange={(min, max) => updateState({ ...state, min, max })}
-      onClearAll={clearAll}
-      hasRefinements={hasActiveRefinements(state)}
+      showClear={false}
     />
   );
 
@@ -322,13 +302,12 @@ export default function Shop() {
     <ShopFilters
       facets={drawerFacets}
       state={drawerState}
-      onToggleValue={(dimension, value) => setDrawerState((current) => toggleDimension(current, dimension, value))}
+      onToggleValue={(dimension, value) => setDrawerState((current) => toggleFilterValue(current, dimension, value))}
       onToggleNewIn={(checked) => setDrawerState((current) => ({ ...current, newIn: checked }))}
       onPriceChange={(min, max) => setDrawerState((current) => ({ ...current, min, max }))}
-      onClearAll={() => setDrawerState((current) => clearedShopState(current))}
-      hasRefinements={drawerHasRefinements}
       showClear={false}
       idPrefix="drawer-filters"
+      resetToken={drawerResetToken}
       onValidityChange={setDrawerFiltersValid}
     />
   );
@@ -386,7 +365,7 @@ export default function Shop() {
       ) : null}
 
       <div className={`container shop__layout${isSidebarOpen ? "" : " shop__layout--filters-closed"}`}>
-        <aside className="shop__sidebar" aria-label="Filters" aria-hidden={!isSidebarOpen}>
+        <aside id="shop-filter-sidebar" className="shop__sidebar" aria-label="Filters" aria-hidden={!isSidebarOpen}>
           {desktopFilterPanel}
         </aside>
 
@@ -420,6 +399,8 @@ export default function Shop() {
               className="shop__filter-button"
               onClick={openDrawer}
               aria-haspopup="dialog"
+              aria-controls="shop-filter-drawer"
+              aria-expanded={isDrawerOpen}
             >
               <SlidersIcon size={20} />
               <span>Filters</span>
@@ -428,6 +409,7 @@ export default function Shop() {
             <button
               type="button"
               className="shop__sidebar-toggle"
+              aria-controls="shop-filter-sidebar"
               aria-expanded={isSidebarOpen}
               onClick={() => setIsSidebarOpen((open) => !open)}
             >
@@ -511,13 +493,10 @@ export default function Shop() {
 
       <FilterDrawer
         isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        onApply={() => {
-          updateState(drawerState);
-          setIsDrawerOpen(false);
-        }}
-        onClearAll={() => setDrawerState((current) => clearedShopState(current))}
-        canClear={drawerHasRefinements}
+        onClose={closeDrawer}
+        onApply={applyDrawerDraft}
+        onClearAll={clearDrawerDraft}
+        canClear={drawerHasRefinements || !drawerFiltersValid}
         canApply={drawerFiltersValid}
       >
         {drawerFilterPanel}

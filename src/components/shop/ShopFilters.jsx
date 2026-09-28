@@ -1,4 +1,5 @@
 import { useEffect, useId, useState } from "react";
+import { validatePriceRange } from "../../utils/shopState";
 
 /**
  * Shared Shop filter panel used by the desktop sidebar and the mobile
@@ -16,6 +17,7 @@ export default function ShopFilters({
   hasRefinements,
   idPrefix = "filters",
   showClear = true,
+  resetToken = 0,
 }) {
   const priceId = useId();
   const [min, setMin] = useState(state.min === null ? "" : String(state.min));
@@ -27,22 +29,10 @@ export default function ShopFilters({
     setMax(state.max === null ? "" : String(state.max));
     setPriceError("");
     onValidityChange?.(true);
-  }, [state.min, state.max, onValidityChange]);
+  }, [state.min, state.max, onValidityChange, resetToken]);
 
   const syncPrice = (nextMin, nextMax) => {
-    const minValue = nextMin === "" ? null : Number(nextMin);
-    const maxValue = nextMax === "" ? null : Number(nextMax);
-
-    let error = "";
-    if ((minValue !== null && !Number.isFinite(minValue)) ||
-      (maxValue !== null && !Number.isFinite(maxValue))) {
-      error = "Enter prices as numbers.";
-    } else if ((minValue !== null && minValue < 0) || (maxValue !== null && maxValue < 0)) {
-      error = "Prices cannot be negative.";
-    } else if (minValue !== null && maxValue !== null && minValue > maxValue) {
-      error = "Minimum Price must not exceed Maximum Price.";
-    }
-
+    const { min: minValue, max: maxValue, error } = validatePriceRange(nextMin, nextMax);
     setPriceError(error);
     onValidityChange?.(!error);
     if (!error) onPriceChange(minValue, maxValue);
@@ -122,6 +112,7 @@ export default function ShopFilters({
               value={min}
               onChange={(event) => changeMin(event.target.value)}
               aria-describedby={`${idPrefix}-${priceId}-error`}
+              aria-invalid={Boolean(priceError)}
             />
           </div>
           <div className="field">
@@ -138,6 +129,7 @@ export default function ShopFilters({
               value={max}
               onChange={(event) => changeMax(event.target.value)}
               aria-describedby={`${idPrefix}-${priceId}-error`}
+              aria-invalid={Boolean(priceError)}
             />
           </div>
         </div>
