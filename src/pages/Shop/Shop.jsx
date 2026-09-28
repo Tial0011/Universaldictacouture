@@ -29,7 +29,7 @@ import {
 } from "../../utils/shopState";
 import "./Shop.css";
 
-const SHOP_LEDE = "Timeless styles for every occasion. Tradition, elegance and modern sophistication.";
+const SHOP_LEDE = "Handwoven heritage, shaped for the way you live now. Discover Aso Oke for celebrations, everyday elegance and everything in between.";
 const DIMENSION_KEYS = FILTER_DIMENSIONS.map((dimension) => dimension.key);
 const SHOP_RETURN_KEY = "udc:shop:return-position";
 
@@ -350,23 +350,16 @@ export default function Shop() {
                 <li aria-current="page">Shop</li>
               </ol>
             </nav>
-            <p className="shop__eyebrow">The fabric collection</p>
-            <h1 className="shop__title" id="shop-title">Shop</h1>
+            <p className="shop__eyebrow">The Aso Oke edit</p>
+            <h1 className="shop__title" id="shop-title">Shop Aso Oke<span>Reimagined.</span></h1>
             <p className="shop__lede">{SHOP_LEDE}</p>
-          </div>
-
-          <aside className="shop__couturier" aria-label="Dicta Couturier assistance">
-            <span className="shop__couturier-mark" aria-hidden="true"><ChatIcon size={22} /></span>
-            <span className="shop__couturier-copy">
-              <strong>Need help choosing?</strong>
-              <span>Get personal guidance on fabrics, colours or styles.</span>
-            </span>
-            <Link className="shop__couturier-link" to="/chats" state={{ draft: couturierDraft }}>
+            <Link className="shop__hero-link" to="/chats" state={{ draft: couturierDraft }}>
               <ChatIcon size={18} />
-              <span>Chat with a Dicta Couturier</span>
+              <span>Ask the Couturier</span>
               <span aria-hidden="true">→</span>
             </Link>
-          </aside>
+          </div>
+
         </div>
       </section>
 
