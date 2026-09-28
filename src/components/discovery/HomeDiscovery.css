@@ -249,7 +249,7 @@
   overflow-x: auto;
   margin: 0;
   padding: 0.5rem 0.25rem 1rem;
-  scroll-snap-type: x proximity;
+  scroll-snap-type: none;
   scroll-padding-inline: 0.25rem;
   /* Deliberate, controlled motion on this axis rather than an instant
      jump — the item list itself has no button-driven steps, but this
@@ -263,7 +263,6 @@
 .discovery--home .discovery__list > li {
   flex: 0 0 clamp(8.75rem, 28vw, 12.5rem);
   min-width: 0;
-  scroll-snap-align: start;
 }
 
 .discovery--home .discovery__item {

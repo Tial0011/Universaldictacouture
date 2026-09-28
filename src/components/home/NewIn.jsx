@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import NewInCard from "./NewInCard";
 import LoadingSpinner from "../common/LoadingSpinner";
@@ -46,9 +46,31 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
   const resumeTimerRef = useRef(null);
   const [scrollState, setScrollState] = useState({
     index: 0,
-    canPrev: false,
+    canPrev: true,
     canNext: true,
   });
+
+  const repeatCount = useMemo(() => {
+    if (products.length < 2) return 1;
+    if (products.length <= 3) return 6;
+    if (products.length <= 6) return 4;
+    return 3;
+  }, [products.length]);
+
+  const repeatedProducts = useMemo(() => {
+    if (products.length <= 1) return products.map((product) => ({ product, key: product.id, isDuplicate: false }));
+    const result = [];
+    for (let r = 0; r < repeatCount; r++) {
+      products.forEach((product) => {
+        result.push({
+          product,
+          key: r === 0 ? product.id : `${product.id}-dup-${r}`,
+          isDuplicate: r > 0,
+        });
+      });
+    }
+    return result;
+  }, [products, repeatCount]);
 
   const handleInteractionStart = () => {
     clearTimeout(resumeTimerRef.current);
@@ -65,37 +87,41 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
   const update = () => {
     const track = trackRef.current;
     if (!track) return;
+    const cards = Array.from(track.querySelectorAll("[data-new-in-item]"));
+    if (!cards.length || !products.length) return;
 
-    if (products.length > 2) {
-      const halfWidth = track.scrollWidth / 2;
-      if (halfWidth > 0) {
-        if (track.scrollLeft >= halfWidth * 1.5) {
-          track.scrollLeft -= halfWidth;
-        } else if (track.scrollLeft <= 2 && isInteractingRef.current) {
-          track.scrollLeft += halfWidth;
-        }
+    const firstCard = cards[0];
+    const secondSetFirst = cards[products.length];
+    const loopWidth = secondSetFirst && firstCard
+      ? secondSetFirst.offsetLeft - firstCard.offsetLeft
+      : 0;
+
+    if (loopWidth > 0) {
+      if (track.scrollLeft >= loopWidth * 2) {
+        track.scrollLeft -= loopWidth;
+      } else if (track.scrollLeft <= 2 && isInteractingRef.current) {
+        track.scrollLeft += loopWidth;
       }
     }
 
-    const cards = Array.from(track.querySelectorAll("[data-new-in-item]"));
+    const effectiveScroll = loopWidth > 0 ? track.scrollLeft % loopWidth : track.scrollLeft;
+
     let index = 0;
     let distance = Infinity;
-    const baseCards = cards.slice(0, products.length);
-    baseCards.forEach((card, cardIndex) => {
+    for (let i = 0; i < products.length; i++) {
+      const card = cards[i];
+      if (!card) break;
       const cardPos = card.offsetLeft - track.offsetLeft;
-      const effectiveScroll = products.length > 2
-        ? track.scrollLeft % (track.scrollWidth / 2 || 1)
-        : track.scrollLeft;
       const nextDistance = Math.abs(cardPos - effectiveScroll);
       if (nextDistance < distance) {
         distance = nextDistance;
-        index = cardIndex;
+        index = i;
       }
-    });
+    }
 
     setScrollState({
-      index: index % Math.max(1, products.length),
-      canPrev: track.scrollLeft > 8,
+      index: index % products.length,
+      canPrev: true,
       canNext: true,
     });
   };
@@ -116,7 +142,7 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
 
   // Gentle, continuous seamless motion for New In
   useEffect(() => {
-    if (isLoading || error || products.length <= 2) return undefined;
+    if (isLoading || error || products.length <= 1) return undefined;
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     if (reduced) return undefined;
     const track = trackRef.current;
@@ -130,14 +156,21 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
       lastTime = now;
 
       if (!isInteractingRef.current && track) {
-        const halfWidth = track.scrollWidth / 2;
-        if (halfWidth > track.clientWidth) {
-          if (track.scrollLeft >= halfWidth) {
-            track.scrollLeft -= halfWidth;
-          } else if (track.scrollLeft <= 0) {
-            track.scrollLeft += halfWidth;
+        const cards = track.children;
+        if (cards && cards.length >= products.length * 2) {
+          const firstCard = cards[0];
+          const secondSetFirst = cards[products.length];
+          if (firstCard && secondSetFirst) {
+            const loopWidth = secondSetFirst.offsetLeft - firstCard.offsetLeft;
+            if (loopWidth > 0) {
+              if (track.scrollLeft >= loopWidth) {
+                track.scrollLeft -= loopWidth;
+              } else if (track.scrollLeft <= 0) {
+                track.scrollLeft += loopWidth;
+              }
+              track.scrollLeft += (dt / 1000) * 20;
+            }
           }
-          track.scrollLeft += (dt / 1000) * 18;
         }
       }
       animId = requestAnimationFrame(tick);
@@ -179,7 +212,7 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
                 aria-label="Previous new pieces"
                 className="discovery__group-arrow discovery__group-arrow--previous"
                 aria-controls="new-in-track"
-                disabled={!scrollState.canPrev}
+                disabled={false}
                 onClick={() => scroll(-1)}
               >
                 <ChevronIcon direction="previous" />
@@ -189,7 +222,7 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
                 aria-label="Next new pieces"
                 className="discovery__group-arrow discovery__group-arrow--next"
                 aria-controls="new-in-track"
-                disabled={!scrollState.canNext}
+                disabled={false}
                 onClick={() => scroll(1)}
               >
                 <ChevronIcon direction="next" />
@@ -240,14 +273,9 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
           onPointerDown={handleInteractionStart}
           onPointerUp={handleInteractionEnd}
         >
-          {products.map((product, index) => (
-            <li key={product.id} data-new-in-item>
+          {repeatedProducts.map(({ product, key, isDuplicate }, index) => (
+            <li key={key} data-new-in-item aria-hidden={isDuplicate ? "true" : undefined}>
               <NewInCard product={product} imageLoading={index < 4 ? "eager" : "lazy"} />
-            </li>
-          ))}
-          {products.length > 2 && products.map((product) => (
-            <li key={`${product.id}-dup`} data-new-in-item aria-hidden="true">
-              <NewInCard product={product} imageLoading="lazy" />
             </li>
           ))}
         </ul>

@@ -66,6 +66,30 @@ export default function DiscoveryModule({
     return module.items.filter((item) => !item.group || item.group === currentGroup);
   }, [module, groups, currentGroup, arrowNavigation]);
 
+  const repeatCount = useMemo(() => {
+    if (items.length < 2) return 1;
+    if (items.length <= 3) return 6;
+    if (items.length <= 6) return 4;
+    return 3;
+  }, [items.length]);
+
+  const repeatedItems = useMemo(() => {
+    if (!shouldAutoScroll || items.length <= 1) {
+      return items.map((item) => ({ item, key: item.id, isDuplicate: false }));
+    }
+    const result = [];
+    for (let r = 0; r < repeatCount; r++) {
+      items.forEach((item) => {
+        result.push({
+          item,
+          key: r === 0 ? item.id : `${item.id}-dup-${r}`,
+          isDuplicate: r > 0,
+        });
+      });
+    }
+    return result;
+  }, [items, shouldAutoScroll, repeatCount]);
+
   const updateRailState = () => {
     const rail = railRef.current;
     if (!rail) return;
@@ -90,13 +114,20 @@ export default function DiscoveryModule({
   const handleScroll = () => {
     const rail = railRef.current;
     if (!rail) return;
-    if (shouldAutoScroll && items.length > 2) {
-      const halfWidth = rail.scrollWidth / 2;
-      if (halfWidth > 0) {
-        if (rail.scrollLeft >= halfWidth * 1.5) {
-          rail.scrollLeft -= halfWidth;
-        } else if (rail.scrollLeft <= 2 && isInteractingRef.current) {
-          rail.scrollLeft += halfWidth;
+    if (shouldAutoScroll && items.length > 1) {
+      const children = rail.children;
+      if (children && children.length >= items.length * 2) {
+        const first = children[0];
+        const secondSetFirst = children[items.length];
+        if (first && secondSetFirst) {
+          const loopWidth = secondSetFirst.offsetLeft - first.offsetLeft;
+          if (loopWidth > 0) {
+            if (rail.scrollLeft >= loopWidth * 2) {
+              rail.scrollLeft -= loopWidth;
+            } else if (rail.scrollLeft <= 2 && isInteractingRef.current) {
+              rail.scrollLeft += loopWidth;
+            }
+          }
         }
       }
     }
@@ -122,7 +153,7 @@ export default function DiscoveryModule({
 
   // Gentle, calm continuous seamless drift for the discovery rail
   useEffect(() => {
-    if (!shouldAutoScroll || items.length <= 2 || prefersReducedMotion()) return undefined;
+    if (!shouldAutoScroll || items.length <= 1 || prefersReducedMotion()) return undefined;
     const rail = railRef.current;
     if (!rail) return undefined;
 
@@ -134,15 +165,22 @@ export default function DiscoveryModule({
       lastTime = now;
 
       if (!isInteractingRef.current && rail) {
-        const halfWidth = rail.scrollWidth / 2;
-        if (halfWidth > rail.clientWidth) {
-          if (rail.scrollLeft >= halfWidth) {
-            rail.scrollLeft -= halfWidth;
-          } else if (rail.scrollLeft <= 0) {
-            rail.scrollLeft += halfWidth;
+        const children = rail.children;
+        if (children && children.length >= items.length * 2) {
+          const first = children[0];
+          const secondSetFirst = children[items.length];
+          if (first && secondSetFirst) {
+            const loopWidth = secondSetFirst.offsetLeft - first.offsetLeft;
+            if (loopWidth > 0) {
+              if (rail.scrollLeft >= loopWidth) {
+                rail.scrollLeft -= loopWidth;
+              } else if (rail.scrollLeft <= 0) {
+                rail.scrollLeft += loopWidth;
+              }
+              rail.scrollLeft += (dt / 1000) * 20;
+              updateRailState();
+            }
           }
-          rail.scrollLeft += (dt / 1000) * 18;
-          updateRailState();
         }
       }
       animId = requestAnimationFrame(tick);
@@ -216,39 +254,12 @@ export default function DiscoveryModule({
       onPointerDown={handleInteractionStart}
       onPointerUp={handleInteractionEnd}
     >
-      {items.map((item) => (
-        <li key={item.id}>
+      {repeatedItems.map(({ item, key, isDuplicate }) => (
+        <li key={key} aria-hidden={isDuplicate ? "true" : undefined}>
           <Link
             to={resolveDestination ? resolveDestination(item) : item.destination}
             className="discovery__item"
-            onClick={() => onItemClick?.(item)}
-          >
-            <span className="discovery__media">
-              {(renderMedia && renderMedia(item)) ?? (
-                <ProductImage
-                  image={item.image}
-                  alt=""
-                  transformation={arrowNavigation
-                    ? "w_420,h_420,c_fill,g_auto,q_auto,f_auto"
-                    : "w_520,h_360,c_fill,g_auto,q_auto,f_auto"}
-                />
-              )}
-            </span>
-            {arrowNavigation ? (
-              <span className="discovery__caption">
-                <span className="discovery__name">{item.name}</span>
-                <StitchArrowIcon size={16} className="discovery__caption-arrow" />
-              </span>
-            ) : <span className="discovery__name">{item.name}</span>}
-          </Link>
-        </li>
-      ))}
-      {shouldAutoScroll && items.length > 2 && items.map((item) => (
-        <li key={`${item.id}-dup`} aria-hidden="true">
-          <Link
-            to={resolveDestination ? resolveDestination(item) : item.destination}
-            className="discovery__item"
-            tabIndex={-1}
+            tabIndex={isDuplicate ? -1 : undefined}
             onClick={() => onItemClick?.(item)}
           >
             <span className="discovery__media">

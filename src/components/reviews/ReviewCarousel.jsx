@@ -1,4 +1,4 @@
-import { Children, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { Children, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ViewAllLink from "../common/ViewAllLink";
 import "../discovery/DiscoveryModule.css";
 import "../discovery/HomeDiscovery.css";
@@ -10,7 +10,29 @@ export default function ReviewCarousel({ children, title, headingId, description
   const items = Children.toArray(children);
   const isInteractingRef = useRef(false);
   const resumeTimerRef = useRef(null);
-  const [position, setPosition] = useState({ index: 0, start: true, end: false });
+  const [position, setPosition] = useState({ index: 0, start: false, end: false });
+
+  const repeatCount = useMemo(() => {
+    if (items.length < 2) return 1;
+    if (items.length <= 3) return 6;
+    if (items.length <= 6) return 4;
+    return 3;
+  }, [items.length]);
+
+  const repeatedItems = useMemo(() => {
+    if (items.length <= 1) return items.map((child) => ({ child, key: child.key, isDuplicate: false }));
+    const result = [];
+    for (let r = 0; r < repeatCount; r++) {
+      items.forEach((child, i) => {
+        result.push({
+          child,
+          key: r === 0 ? child.key : `${child.key || i}-dup-${r}`,
+          isDuplicate: r > 0,
+        });
+      });
+    }
+    return result;
+  }, [items, repeatCount]);
 
   const handleInteractionStart = () => {
     clearTimeout(resumeTimerRef.current);
@@ -29,23 +51,29 @@ export default function ReviewCarousel({ children, title, headingId, description
     if (!node) return undefined;
 
     const measure = () => {
-      if (items.length > 2) {
-        const halfWidth = node.scrollWidth / 2;
-        if (halfWidth > 0) {
-          if (node.scrollLeft >= halfWidth * 1.5) {
-            node.scrollLeft -= halfWidth;
-          } else if (node.scrollLeft <= 2 && isInteractingRef.current) {
-            node.scrollLeft += halfWidth;
-          }
+      const cards = node.children;
+      if (!cards.length || !items.length) return;
+      const first = cards[0];
+      const secondSetFirst = cards[items.length];
+      const loopWidth = secondSetFirst && first
+        ? secondSetFirst.offsetLeft - first.offsetLeft
+        : 0;
+
+      if (loopWidth > 0) {
+        if (node.scrollLeft >= loopWidth * 2) {
+          node.scrollLeft -= loopWidth;
+        } else if (node.scrollLeft <= 2 && isInteractingRef.current) {
+          node.scrollLeft += loopWidth;
         }
       }
-      const first = node.firstElementChild;
+
       const step = first ? first.getBoundingClientRect().width + (parseFloat(getComputedStyle(node).gap) || 0) : 1;
-      const rawIndex = Math.round(node.scrollLeft / step);
+      const effectiveScroll = loopWidth > 0 ? node.scrollLeft % loopWidth : node.scrollLeft;
+      const rawIndex = Math.round(effectiveScroll / step);
       const relativeIndex = Math.min(Math.max(0, items.length - 1), rawIndex % Math.max(1, items.length));
       setPosition({
         index: relativeIndex,
-        start: node.scrollLeft <= 2,
+        start: false,
         end: false,
       });
     };
@@ -62,7 +90,7 @@ export default function ReviewCarousel({ children, title, headingId, description
 
   // Gentle, continuous seamless motion for Review & Feeds
   useEffect(() => {
-    if (items.length <= 2) return undefined;
+    if (items.length <= 1) return undefined;
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     if (reduced) return undefined;
     const node = track.current;
@@ -76,14 +104,21 @@ export default function ReviewCarousel({ children, title, headingId, description
       lastTime = now;
 
       if (!isInteractingRef.current && node) {
-        const halfWidth = node.scrollWidth / 2;
-        if (halfWidth > node.clientWidth) {
-          if (node.scrollLeft >= halfWidth) {
-            node.scrollLeft -= halfWidth;
-          } else if (node.scrollLeft <= 0) {
-            node.scrollLeft += halfWidth;
+        const cards = node.children;
+        if (cards && cards.length >= items.length * 2) {
+          const first = cards[0];
+          const secondSetFirst = cards[items.length];
+          if (first && secondSetFirst) {
+            const loopWidth = secondSetFirst.offsetLeft - first.offsetLeft;
+            if (loopWidth > 0) {
+              if (node.scrollLeft >= loopWidth) {
+                node.scrollLeft -= loopWidth;
+              } else if (node.scrollLeft <= 0) {
+                node.scrollLeft += loopWidth;
+              }
+              node.scrollLeft += (dt / 1000) * 20;
+            }
           }
-          node.scrollLeft += (dt / 1000) * 18;
         }
       }
       animId = requestAnimationFrame(tick);
@@ -134,7 +169,7 @@ export default function ReviewCarousel({ children, title, headingId, description
                 type="button"
                 aria-label={direction < 0 ? "Previous review" : "Next review"}
                 aria-controls={trackId}
-                disabled={direction < 0 ? position.start : false}
+                disabled={false}
                 onClick={() => move(direction)}
               >
                 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -171,13 +206,12 @@ export default function ReviewCarousel({ children, title, headingId, description
         onPointerDown={handleInteractionStart}
         onPointerUp={handleInteractionEnd}
       >
-        {items.map((child) => (
-          <div className="review-carousel__item" key={child.key}>
-            {child}
-          </div>
-        ))}
-        {items.length > 2 && items.map((child, i) => (
-          <div className="review-carousel__item" key={`${child.key || i}-dup`} aria-hidden="true">
+        {repeatedItems.map(({ child, key, isDuplicate }) => (
+          <div
+            className="review-carousel__item"
+            key={key}
+            aria-hidden={isDuplicate ? "true" : undefined}
+          >
             {child}
           </div>
         ))}

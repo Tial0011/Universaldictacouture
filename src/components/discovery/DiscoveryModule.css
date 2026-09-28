@@ -220,7 +220,6 @@
 .discovery--shop .discovery__list > li {
   flex: 0 0 clamp(7.5rem, 30vw, 9rem);
   min-width: 0;
-  scroll-snap-align: start;
 }
 
 .discovery--shop .discovery__item {
