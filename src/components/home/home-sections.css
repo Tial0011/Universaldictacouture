@@ -265,9 +265,9 @@
 .custom-promo__media {
   position: relative;
   min-height: 100%;
-  /* The photo fades out toward the copy, so there is no hard edge. */
-  -webkit-mask-image: linear-gradient(to right, #000 62%, transparent 100%);
-  mask-image: linear-gradient(to right, #000 62%, transparent 100%);
+  /* Crisp, cloud-free photograph with an ultra-thin 4% edge feather at the boundary. */
+  -webkit-mask-image: linear-gradient(to right, #000 96%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 96%, transparent 100%);
 }
 
 .custom-promo__media .product-image {
@@ -375,9 +375,9 @@
   }
 
   .custom-promo__media {
-    /* On wide screens the photo also dissolves on its left edge. */
-    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14%, #000 66%, transparent 100%);
-    mask-image: linear-gradient(to right, transparent 0, #000 14%, #000 66%, transparent 100%);
+    /* Remove heavy clouds — full clarity across 96% with a razor-thin 4% blend into the copy. */
+    -webkit-mask-image: linear-gradient(to right, #000 96%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 96%, transparent 100%);
   }
 
   .custom-promo__copy {
