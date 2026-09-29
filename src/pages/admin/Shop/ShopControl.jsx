@@ -59,20 +59,10 @@ export default function ShopControl() {
         </div>
       </header>
 
-      <nav className="admin-shop-workspace-nav" aria-label="Shop workspace">
-        <a href="#shop-overview">Overview</a>
-        <Link to="/admin/products">Products</Link>
-        <Link to="/admin/products?view=new-in">New In</Link>
-        <Link to="/admin/discovery">Shop By</Link>
-        <Link to="/admin/taxonomy">Catalogue Structure</Link>
-        <Link to="/admin/products">Search / Keywords</Link>
-        <a href="#shop-health">Shop Health</a>
-      </nav>
-
       {state.error && <div className="admin-notice" role="alert"><p>{state.error}</p><Button variant="secondary" onClick={load}>Retry</Button></div>}
       {state.loading && <p role="status">Loading Shop operations…</p>}
 
-      <section id="shop-overview" aria-labelledby="shop-actions-title">
+      <section aria-labelledby="shop-actions-title">
         <div className="admin-section-heading">
           <div><p className="admin-eyebrow">Daily operations</p><h2 id="shop-actions-title">Manage the customer Shop</h2></div>
         </div>
@@ -89,7 +79,7 @@ export default function ShopControl() {
           <Link className="admin-panel admin-section-card" to="/admin/taxonomy">
             <h3>Catalogue structure</h3><p>Manage Category, Occasion, Style, Fabric / Weave and Colour labels.</p><span className="admin-card-action">Manage labels <span aria-hidden="true">→</span></span>
           </Link>
-          <Link className="admin-panel admin-section-card" to="/admin/products">
+          <Link className="admin-panel admin-section-card" to="/admin/products?focus=search">
             <h3>Search terms</h3><p>Manage genuine aliases and keywords inside each product without changing its public name.</p><span className="admin-card-action">Edit search metadata <span aria-hidden="true">→</span></span>
           </Link>
         </div>

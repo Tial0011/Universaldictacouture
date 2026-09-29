@@ -183,6 +183,24 @@ export async function deleteShopByGroup(groupId) {
   await writeGroups(groups.filter((group) => group.id !== key));
 }
 
+export async function removeProductFromShopByFaces(productId, slug = "") {
+  if (!db) throw new Error("Connect Firebase before cleaning Shop By references.");
+  const identities = new Set([productId, slug].map((value) => String(value || "").trim()).filter(Boolean));
+  if (!identities.size) return 0;
+  const groups = await fetchShopByGroups({ includeInactive: true });
+  let removed = 0;
+  const next = groups.map((group) => {
+    const faces = Object.fromEntries(Object.entries(group.faces || {}).filter(([, identity]) => {
+      const keep = !identities.has(String(identity || "").trim());
+      if (!keep) removed += 1;
+      return keep;
+    }));
+    return { ...group, faces };
+  });
+  if (removed) await writeGroups(next);
+  return removed;
+}
+
 export function shopByDestination(group, value) {
   const key = shopByKey(group?.key || group?.id || group?.label);
   const choice = String(value || "").trim();

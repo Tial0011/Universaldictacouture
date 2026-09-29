@@ -13,15 +13,13 @@ const discovery = await readFile(new URL("../src/pages/admin/Discovery/Discovery
 const shopBy = await readFile(new URL("../src/services/shopBy.js", import.meta.url), "utf8");
 const rules = await readFile(new URL("../firestore.rules", import.meta.url), "utf8");
 
-test("Task 8A/retroactive pass: protected admin routing exposes one global Shop workspace entry", () => {
+test("Task 8A/retroactive refinement: protected admin routing exposes one consolidated Shop entry", () => {
   assert.match(app, /<AdminAccess>[\s\S]*<AdminLayout \/>/);
   assert.match(app, /path="shop" element=\{<AdminShop \/>\}/);
   assert.match(sections, /label: "Shop"/);
   assert.match(sections, /Shop operations/);
-  assert.doesNotMatch(sections, /label: "Products"/);
-  assert.doesNotMatch(sections, /label: "Shop By"/);
-  assert.doesNotMatch(sections, /label: "Categories & attributes"/);
-  assert.match(layout, /shopAdminPaths/);
+  assert.match(layout, /isShopAdminPath/);
+  assert.match(layout, /ShopWorkspaceNav/);
 });
 
 test("Task 8A: Shop Control maps customer Shop systems to clear admin destinations", () => {
@@ -40,7 +38,7 @@ test("Task 8A: Product Manager surfaces readiness, New In and safe public previe
   assert.match(manager, /needs-attention/);
   assert.match(manager, /new-in/);
   assert.match(manager, /View in Shop/);
-  assert.match(manager, /status\(record\) === "published"/);
+  assert.match(manager, /record\.status === "published"/);
   assert.match(manager, /saveProductLifecycle\("published"\)/);
   assert.match(manager, /saveProductLifecycle\("draft"\)/);
   assert.match(manager, /saveProductLifecycle\("archived"\)/);

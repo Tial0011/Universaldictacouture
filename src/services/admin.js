@@ -1,7 +1,8 @@
 import { collection, deleteDoc, doc, getCountFromServer, getDocFromServer, getDocsFromServer, query, orderBy, documentId, limit, startAfter, setDoc, serverTimestamp, where } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { prepareRecord } from "./adminModel";
-import { deleteStoredImage, ownedNetlifyStorageKey } from "./imageStorage";
+import { cleanupOwnedProductImages } from "./imageStorage";
+import { removeProductFromShopByFaces } from "./shopBy";
 const COLLECTIONS = new Set(["products", "heroSlides", "reviews", "discoveryModules", "taxonomy"]);
 export const PAGE_SIZE = 20;
 function target(kind) {
@@ -68,92 +69,34 @@ export async function saveAdminRecord(kind, raw) {
   return reference.id;
 }
 
-function productImages(record = {}) {
-  const images = [];
-  if (record.primaryImage) images.push(record.primaryImage);
-  if (Array.isArray(record.images)) images.push(...record.images);
-  else if (record.images) images.push(record.images);
-  return images;
-}
-
-function imageCleanupPlan(record = {}) {
-  const images = productImages(record);
-  const managedKeys = [...new Set(images.map(ownedNetlifyStorageKey).filter(Boolean))];
-  const external = new Set();
-  images.forEach((image) => {
-    if (!image || ownedNetlifyStorageKey(image)) return;
-    if (typeof image === "string") external.add(`url:${image}`);
-    else if (typeof image === "object") external.add(`external:${image.url || image.secureUrl || image.secure_url || image.publicId || image.public_id || JSON.stringify(image)}`);
-  });
-  return { managedKeys, externalReferences: external.size };
-}
-
-async function deleteProductRecord(id) {
-  const reference = doc(target("products"), id);
-  const snapshot = await getDocFromServer(reference);
-  if (!snapshot.exists()) throw new Error("This product no longer exists.");
-  const record = { ...snapshot.data(), id: snapshot.id };
-  const { managedKeys, externalReferences } = imageCleanupPlan(record);
-  let sharedKeys = new Set();
-  let referenceCheckFailed = false;
-
-  if (managedKeys.length) {
-    try {
-      const catalogue = await getDocsFromServer(target("products"));
-      const shared = new Set();
-      catalogue.docs.forEach((entry) => {
-        if (entry.id === id) return;
-        const other = imageCleanupPlan(entry.data()).managedKeys;
-        other.forEach((key) => { if (managedKeys.includes(key)) shared.add(key); });
-      });
-      sharedKeys = shared;
-    } catch {
-      // Deletion of the product record can still proceed, but owned media is
-      // kept when reference safety cannot be proven. The caller reports this
-      // as partial cleanup rather than risking another product's image.
-      referenceCheckFailed = true;
-    }
-  }
-
-  await deleteDoc(reference);
-
-  const deletedMedia = [];
-  const failedMedia = [];
-  const skippedSharedMedia = [];
-  if (!referenceCheckFailed) {
-    for (const key of managedKeys) {
-      if (sharedKeys.has(key)) {
-        skippedSharedMedia.push(key);
-        continue;
-      }
-      try {
-        await deleteStoredImage(key);
-        deletedMedia.push(key);
-      } catch (error) {
-        failedMedia.push({ key, message: error?.message || "Stored image cleanup failed." });
-      }
-    }
-  }
-
-  return {
-    kind: "products",
-    id,
-    recordDeleted: true,
-    deletedMedia,
-    failedMedia,
-    skippedSharedMedia,
-    externalReferences,
-    mediaCleanupSkipped: referenceCheckFailed,
-  };
-}
-
 export async function deleteAdminRecord(kind, id) {
   if (!["products", "reviews", "heroSlides"].includes(kind)) throw new Error("Deletion is not available for this content section.");
   if (!id) throw new Error("Choose a record to delete.");
-  if (kind === "products") return deleteProductRecord(id);
   await deleteDoc(doc(target(kind), id));
-  return { kind, id, recordDeleted: true };
 }
+
+export async function deleteProductPermanently(record) {
+  if (!record?.id) throw new Error("Choose a product to delete.");
+  // Delete the catalogue record first. This prevents a failed database delete
+  // from leaving a still-live product with missing owned media.
+  await deleteAdminRecord("products", record.id);
+  let merchandisingCleanup = { removed: 0, failed: false };
+  try {
+    merchandisingCleanup = { removed: await removeProductFromShopByFaces(record.id, record.slug), failed: false };
+  } catch {
+    merchandisingCleanup = { removed: 0, failed: true };
+  }
+  const cleanup = await cleanupOwnedProductImages(record);
+  return {
+    id: record.id,
+    deleted: true,
+    mediaDeleted: cleanup.deleted.length,
+    mediaFailed: cleanup.failed,
+    merchandisingCleanup,
+    legacyOrExternalRetained: cleanup.legacyOrExternalRetained,
+  };
+}
+
 export function adminError(error) {
   if (error?.code === "permission-denied") return "Access was denied. Check your admin access and the published Firestore rules.";
   if (error?.code === "resource-exhausted") return "The database usage limit has been reached. Please try again later.";

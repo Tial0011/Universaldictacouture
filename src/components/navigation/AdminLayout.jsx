@@ -2,7 +2,8 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { signOutUser } from "../../firebase/auth";
-import { ADMIN_SECTIONS } from "../admin/adminSections";
+import { ADMIN_SECTIONS, isShopAdminPath } from "../admin/adminSections";
+import ShopWorkspaceNav from "../admin/ShopWorkspaceNav";
 import Logo from "../brand/Logo";
 import Button from "../common/Button";
 import LoadingSpinner from "../common/LoadingSpinner";
@@ -13,20 +14,19 @@ export default function AdminLayout() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const shopAdminPaths = ["/admin/shop", "/admin/products", "/admin/discovery", "/admin/taxonomy"];
-  const isShopAdminPath = shopAdminPaths.some((path) => pathname === path || pathname.startsWith(path + "/"));
   const [menuOpen, setMenuOpen] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const main = useRef(null);
-  const title = isShopAdminPath ? "Shop" : ADMIN_SECTIONS.find(section => section.path === pathname)?.label || (pathname === "/admin/settings" ? "Setup & access" : "Overview");
+  const shopSection = isShopAdminPath(pathname);
+  const title = shopSection ? "Shop" : ADMIN_SECTIONS.find(section => section.path === pathname)?.label || (pathname === "/admin/settings" ? "Setup & access" : "Overview");
   useEffect(() => { main.current?.focus(); }, [pathname]);
   async function logout() {
     setBusy(true); setError("");
     try { await signOutUser(); navigate("/", { replace: true }); } catch { setError("Unable to sign out. Please try again."); }
     finally { setBusy(false); }
   }
-  const navLink = (path, label) => <NavLink to={path} end onClick={() => setMenuOpen(false)} className={({ isActive }) => (isActive || (path === "/admin/shop" && isShopAdminPath)) ? "is-active" : ""}>{label}</NavLink>;
+  const navLink = (path, label, forceActive = false) => <NavLink to={path} end onClick={() => setMenuOpen(false)} className={({ isActive }) => isActive || forceActive ? "is-active" : ""} aria-current={forceActive ? "page" : undefined}>{label}</NavLink>;
   return <div className="admin-layout">
     <a className="skip-link" href="#admin-main">Skip to admin content</a>
     <aside className="admin-layout__sidebar" aria-label="Admin navigation">
@@ -37,7 +37,7 @@ export default function AdminLayout() {
       <nav id="admin-navigation" className={menuOpen ? "admin-nav is-open" : "admin-nav"}>
         {navLink("/admin", "Overview")}
         {["Shop operations", "Website content", "Customers"].map(group => <div className="admin-nav__group" key={group}>
-          <p>{group}</p><ul>{ADMIN_SECTIONS.filter(section => section.group === group).map(section => <li key={section.path}>{navLink(section.path, section.label)}</li>)}</ul>
+          <p>{group}</p><ul>{ADMIN_SECTIONS.filter(section => section.group === group).map(section => <li key={section.path}>{navLink(section.path, section.label, section.path === "/admin/shop" && shopSection)}</li>)}</ul>
         </div>)}
         <div className="admin-nav__group">{navLink("/admin/settings", "Setup & access")}</div>
         <div className="admin-nav__group admin-nav__utilities">
@@ -50,7 +50,7 @@ export default function AdminLayout() {
     <div className="admin-workspace">
       <header className="admin-topbar"><p>Admin <span aria-hidden="true">/</span> <strong>{title}</strong></p></header>
       {error && <p className="field__error" role="alert">{error}</p>}
-      <main id="admin-main" tabIndex={-1} ref={main} className="admin-layout__content"><PageBoundary key={pathname}><Suspense fallback={<LoadingSpinner label="Loading admin page" />}><Outlet /></Suspense></PageBoundary></main>
+      <main id="admin-main" tabIndex={-1} ref={main} className="admin-layout__content">{shopSection && <ShopWorkspaceNav />}<PageBoundary key={pathname}><Suspense fallback={<LoadingSpinner label="Loading admin page" />}><Outlet /></Suspense></PageBoundary></main>
       <footer className="admin-footer">Signed in as {user?.email || "administrator"}</footer>
     </div>
   </div>;

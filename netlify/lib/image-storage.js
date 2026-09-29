@@ -2,7 +2,7 @@ import sharp from "sharp";
 import { randomUUID } from "node:crypto";
 export const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 const TYPES = { "image/jpeg": "jpeg", "image/png": "png", "image/webp": "webp" };
-export const STORAGE_KEY_PATTERN = /^[a-f0-9-]{36}\.webp$/;
+const KEY = /^[a-f0-9-]{36}\.webp$/;
 class HttpError extends Error {
   constructor(status, message) { super(message); this.status = status; }
 }
@@ -38,7 +38,7 @@ export function createImageHandler({ getStore, authorize = requireAdmin }) {
     try {
       if (request.method === "GET" || request.method === "HEAD") {
         const key = new URL(request.url).searchParams.get("key") || "";
-        if (!STORAGE_KEY_PATTERN.test(key)) return json({ error: "Image not found." }, 404);
+        if (!KEY.test(key)) return json({ error: "Image not found." }, 404);
         const result = await getStore().get(key, { type: "arrayBuffer", consistency: "strong" });
         if (!result) return json({ error: "Image not found." }, 404);
         return new Response(request.method === "HEAD" ? null : result, { headers: {
@@ -51,12 +51,9 @@ export function createImageHandler({ getStore, authorize = requireAdmin }) {
       if (request.method === "DELETE") {
         await authorize(request);
         const key = new URL(request.url).searchParams.get("key") || "";
-        if (!STORAGE_KEY_PATTERN.test(key)) throw new HttpError(400, "Choose a valid managed image.");
-        const store = getStore();
-        const existing = await store.get(key, { type: "arrayBuffer", consistency: "strong" });
-        if (!existing) throw new HttpError(404, "Stored image was not found.");
-        await store.delete(key);
-        return json({ deleted: true, storageKey: key });
+        if (!KEY.test(key)) throw new HttpError(400, "Choose a valid managed image.");
+        await getStore().delete(key);
+        return json({ deleted: true, key });
       }
       if (request.method !== "POST") return new Response(null, { status: 405, headers: { Allow: "GET, HEAD, POST, DELETE" } });
       const uid = await authorize(request);
