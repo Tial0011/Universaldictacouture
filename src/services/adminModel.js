@@ -30,16 +30,16 @@ export function productReadiness(raw = {}, { allowGeneratedIdentity = false } = 
   const imageSource = Array.isArray(raw.images) ? raw.images : raw.images ? [raw.images] : [];
   const hasImage = hasUsableImage(raw.primaryImage) || imageSource.some(hasUsableImage);
   const hasIdentity = Boolean(String(raw.slug || raw.id || "").trim()) || allowGeneratedIdentity;
+  const unit = String(raw.unitLabel ?? raw.priceToken ?? "").trim();
   const blockers = [];
   if (!name) blockers.push({ key: "name", label: "Product name" });
   if (!Number.isFinite(price) || price < 0) blockers.push({ key: "price", label: "Valid NGN price" });
   if (!hasImage) blockers.push({ key: "image", label: "Primary product image" });
   if (!categories.length) blockers.push({ key: "category", label: "At least one category" });
   if (!hasIdentity) blockers.push({ key: "identity", label: "Stable product identity" });
+  if (!unit) blockers.push({ key: "unit", label: "Commercial unit" });
 
   const warnings = [];
-  const unit = String(raw.unitLabel ?? raw.priceToken ?? "").trim();
-  if (!unit) warnings.push({ key: "unit", label: "Commercial unit is not set" });
 
   const lifecycle = String(raw.status || "draft").trim().toLowerCase();
   let state = "draft";
@@ -70,6 +70,7 @@ export function productReadiness(raw = {}, { allowGeneratedIdentity = false } = 
       { key: "image", label: "Primary image", complete: hasImage },
       { key: "identity", label: "Stable product identity", complete: hasIdentity },
       { key: "category", label: "Required taxonomy", complete: categories.length > 0 },
+      { key: "unit", label: "Commercial unit", complete: Boolean(unit) },
     ],
   };
 }
@@ -125,8 +126,8 @@ export function prepareRecord(kind, raw) {
       data.variants = data.variants.map((v) => ({ ...v, price: data.price }));
     }
     if (data.status === "published") {
-      if (data.price === null || !data.category.length) {
-        throw new Error("Add a price and at least one category before publishing.");
+      if (data.price === null || !data.category.length || !data.unitLabel) {
+        throw new Error("Add a price, commercial unit and at least one category before publishing.");
       }
       const productImages = Array.isArray(data.images) ? data.images.filter(hasUsableImage) : [];
       if (!hasUsableImage(data.primaryImage) && productImages.length === 0) {

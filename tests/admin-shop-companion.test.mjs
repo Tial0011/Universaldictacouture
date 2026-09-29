@@ -9,6 +9,8 @@ const layoutCss = await readFile(new URL("../src/components/navigation/AdminLayo
 const manager = await readFile(new URL("../src/components/admin/RecordManager.jsx", import.meta.url), "utf8");
 const imageField = await readFile(new URL("../src/components/admin/ImageField.jsx", import.meta.url), "utf8");
 const shopControl = await readFile(new URL("../src/pages/admin/Shop/ShopControl.jsx", import.meta.url), "utf8");
+const discovery = await readFile(new URL("../src/pages/admin/Discovery/Discovery.jsx", import.meta.url), "utf8");
+const shopBy = await readFile(new URL("../src/services/shopBy.js", import.meta.url), "utf8");
 const rules = await readFile(new URL("../firestore.rules", import.meta.url), "utf8");
 
 test("Task 8A: protected admin routing exposes a dedicated Shop Control entry", () => {
@@ -36,6 +38,18 @@ test("Task 8A: Product Manager surfaces readiness, New In and safe public previe
   assert.match(manager, /new-in/);
   assert.match(manager, /View in Shop/);
   assert.match(manager, /status\(record\) === "published"/);
+  assert.match(manager, /saveProductLifecycle\("published"\)/);
+  assert.match(manager, /saveProductLifecycle\("draft"\)/);
+  assert.match(manager, /saveProductLifecycle\("archived"\)/);
+});
+
+test("Task 9A: Shop By admin can inspect inactive groups, reorder them and preview real customer state", () => {
+  assert.match(discovery, /includeInactive: true/);
+  assert.match(discovery, /Display order/);
+  assert.match(discovery, /Active in customer Shop/);
+  assert.match(discovery, /Preview in Shop/);
+  assert.match(shopBy, /includeInactive = false/);
+  assert.match(shopBy, /shopByDestination/);
 });
 
 test("Task 8A: image administration identifies the cover and gives non-destructive large-image guidance", () => {
@@ -57,5 +71,6 @@ test("Task 8A: Firestore keeps admin writes protected and excludes Size from Sho
   assert.match(rules, /function isAdmin\(\)/);
   assert.match(rules, /allow create, update: if isAdmin\(\)/);
   assert.match(rules, /dimension in \['category', 'occasion', 'style', 'fabric', 'colour'\]/);
+  assert.match(rules, /request\.resource\.data\.unitLabel is string/);
   assert.doesNotMatch(rules, /dimension in \[[^\]]*'size'/);
 });

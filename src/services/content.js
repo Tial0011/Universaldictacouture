@@ -13,7 +13,7 @@ import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import { db } from "../firebase/firestore.js";
 import { isFirebaseConfigured } from "../firebase/config.js";
 import heroReadyToWear from "../assets/images/hero/hero-ready-to-wear.jpg";
-import { DEFAULT_SHOP_BY_GROUPS } from "./shopBy.js";
+import { DEFAULT_SHOP_BY_GROUPS, shopByDestination } from "./shopBy.js";
 import { normaliseReviewRecord, selectLatestPublishedReviews, sortPublishedReviews } from "./reviewModel.js";
 
 
@@ -216,8 +216,9 @@ const SHOP_DISCOVERY_MAX_PER_GROUP = 10;
 export function buildShopDiscovery(products, title = "Shop By", groupDefinitions = SHOP_DISCOVERY_GROUPS) {
   const groups = [];
   const items = [];
+  const definitions = Array.isArray(groupDefinitions) ? groupDefinitions : SHOP_DISCOVERY_GROUPS;
 
-  (groupDefinitions?.length ? groupDefinitions : SHOP_DISCOVERY_GROUPS).forEach((group) => {
+  definitions.forEach((group) => {
     const key = group.key || group.id;
     if (!key || group.active === false) return;
 
@@ -270,15 +271,11 @@ export function buildShopDiscovery(products, title = "Shop By", groupDefinitions
       }
       if (image) usedImages.add(image.publicId || image.url);
 
-      const destination = group.param && group.param !== "shopby"
-        ? `/shop?${group.param}=${encodeURIComponent(entry.name)}`
-        : `/shop?shopby=${encodeURIComponent(`${key}:${entry.name}`)}`;
-
       items.push({
         id: `${key}-${index}`,
         name: entry.name,
         image,
-        destination,
+        destination: shopByDestination(group, entry.name),
         group: group.id || key,
         order: index,
         published: true,

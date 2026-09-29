@@ -174,7 +174,7 @@ export default function Shop() {
     Promise.all([fetchShopByGroups(), fetchTaxonomyLabels()])
       .then(([groups, labels]) => {
         if (!active) return;
-        if (groups.length) setShopByGroups(groups);
+        setShopByGroups(groups);
         setTaxonomy(labels);
       })
       .finally(() => {

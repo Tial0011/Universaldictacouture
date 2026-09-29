@@ -9,14 +9,14 @@ const cardCss = await readFile(new URL("../src/components/product/ProductCard.cs
 const shopCss = await readFile(new URL("../src/pages/Shop/Shop.css", import.meta.url), "utf8");
 const copySource = await readFile(new URL("../src/utils/productCopy.js", import.meta.url), "utf8");
 
-test("Shop card exposes the approved anatomy and owner-locked SHOP PIECE CTA", () => {
+test("Shop card exposes the Revision 4 anatomy and exact SHOP THIS PIECE CTA", () => {
   assert.match(cardSource, /ProductImage/);
   assert.match(cardSource, /product-card__save/);
   assert.match(cardSource, /product-card__name/);
   assert.match(cardSource, /ProductPrice/);
-  assert.match(copySource, /PRODUCT_SHOP_CTA = "SHOP PIECE"/);
-  assert.match(cardSource, /const ctaLabel = PRODUCT_SHOP_CTA/);
-  assert.doesNotMatch(cardSource, /SHOP THIS PIECE|VIEW PIECE|View Piece/);
+  assert.match(copySource, /SECTION4_SHOP_CARD_CTA = "SHOP THIS PIECE →"/);
+  assert.match(cardSource, /const ctaLabel = isShopCard \? SECTION4_SHOP_CARD_CTA : PRODUCT_SHOP_CTA/);
+  assert.doesNotMatch(cardSource, /VIEW PIECE|View Piece/);
 });
 
 test("image, name and CTA all use the same canonical product href", () => {

@@ -33,6 +33,12 @@ service cloud.firestore {
             && request.resource.data.price >= 0
             && request.resource.data.category is list
             && request.resource.data.category.size() > 0
+            && ((request.resource.data.keys().hasAny(['unitLabel'])
+                && request.resource.data.unitLabel is string
+                && request.resource.data.unitLabel.size() > 0)
+              || (request.resource.data.keys().hasAny(['priceToken'])
+                && request.resource.data.priceToken is string
+                && request.resource.data.priceToken.size() > 0))
             && hasPublicProductImage(request.resource.data)));
       allow delete: if false;
     }

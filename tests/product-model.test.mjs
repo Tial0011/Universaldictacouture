@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { normaliseProduct, resolveSelections, priceForSelections, closetLineKey } from "../src/services/productModel.js";
 
 const product = normaliseProduct("piece", {
-  name: "Aso Oke", status: "published", price: 100, category: ["Fabric"], primaryImage: { url: "https://example.test/piece.jpg" },
+  name: "Aso Oke", status: "published", price: 100, unitLabel: "per set", category: ["Fabric"], primaryImage: { url: "https://example.test/piece.jpg" },
   options: [
     { name: "Size", required: true, values: ["M", "L"] },
     { name: "Finish", required: false, values: ["Plain", "Embroidered"] },
@@ -27,7 +27,7 @@ test("missing required options block a selection; optional choices remain option
   assert.equal(resolveSelections(product, { Size: "M", Finish: "Unknown" }).resolved.Finish, undefined);
 });
 test("product descriptions reach public details and sharing without fabricated legacy copy", () => {
-  const raw = { name: "Cloth", price: 200, status: "published", category: ["Fabric"], primaryImage: { url: "https://example.test/cloth.jpg" } };
+  const raw = { name: "Cloth", price: 200, unitLabel: "per bundle", status: "published", category: ["Fabric"], primaryImage: { url: "https://example.test/cloth.jpg" } };
   assert.equal(normaliseProduct("p", { ...raw, description: "  Woven in wine.  " }).description, "Woven in wine.");
   assert.equal(normaliseProduct("p", raw).description, "");
 });

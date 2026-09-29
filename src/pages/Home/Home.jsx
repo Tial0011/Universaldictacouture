@@ -63,7 +63,7 @@ export default function Home() {
       .catch(() => { /* Keep the local hero visible when remote content is offline. */ });
 
     fetchShopByGroups().then((groups) => {
-      if (active && groups.length) setShopByGroups(groups);
+      if (active) setShopByGroups(groups);
     });
 
     fetchCustomStylePromo().then((result) => {

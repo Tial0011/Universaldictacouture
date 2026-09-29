@@ -33,13 +33,15 @@ test("public model rejects incomplete published records without inventing data",
   assert.equal(normaliseProduct("formatted-price", published({ price: "₦25,000" })), null);
   assert.equal(normaliseProduct("missing-category", published({ category: [] })), null);
   assert.equal(normaliseProduct("missing-image", published({ primaryImage: null, images: [] })), null);
+  assert.equal(normaliseProduct("missing-unit", published({ unitLabel: "", priceToken: "" })), null);
 });
 
 test("admin publish gate rejects incomplete data and accepts a complete product", () => {
   assert.throws(() => prepareRecord("products", { status: "published", price: 1, category: "Fabric", primaryImage: image }), /Product name/i);
   assert.throws(() => prepareRecord("products", { name: "Piece", status: "published", price: "", category: "Fabric", primaryImage: image }), /price/i);
   assert.throws(() => prepareRecord("products", { name: "Piece", status: "published", price: 1, category: "", primaryImage: image }), /category/i);
-  assert.throws(() => prepareRecord("products", { name: "Piece", status: "published", price: 1, category: "Fabric", primaryImage: {} }), /valid product photo/i);
+  assert.throws(() => prepareRecord("products", { name: "Piece", status: "published", price: 1, category: "Fabric", unitLabel: "per set", primaryImage: {} }), /valid product photo/i);
+  assert.throws(() => prepareRecord("products", { name: "Piece", status: "published", price: 1, category: "Fabric", primaryImage: image }), /commercial unit/i);
   const ready = prepareRecord("products", { name: " Piece ", status: "published", price: "25000", unitLabel: "per set", category: "Fabric", primaryImage: image });
   assert.equal(ready.name, "Piece");
   assert.equal(ready.price, 25000);
@@ -120,6 +122,7 @@ test("public Firestore query is constrained to published status and publish rule
   assert.match(productSource, /where\("status", "==", "published"\)/);
   assert.match(rules, /request\.resource\.data\.price is number/);
   assert.match(rules, /request\.resource\.data\.category is list/);
+  assert.match(rules, /unitLabel/);
   assert.match(rules, /hasPublicProductImage\(request\.resource\.data\)/);
   // Size may remain a legacy/internal taxonomy value, but FILTER_DIMENSIONS
   // keeps it out of the V1 public Shop.

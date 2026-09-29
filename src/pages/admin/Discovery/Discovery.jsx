@@ -7,6 +7,7 @@ import {
   fetchShopByGroups,
   saveShopByGroup,
   shopByKey,
+  shopByDestination,
 } from "../../../services/shopBy";
 import { fetchPublishedProducts } from "../../../services/products";
 import { adminError } from "../../../services/admin";
@@ -30,7 +31,7 @@ export default function Discovery() {
     setError("");
     try {
       const [loadedGroups, loadedProducts] = await Promise.all([
-        fetchShopByGroups(),
+        fetchShopByGroups({ includeInactive: true }),
         fetchPublishedProducts().catch(() => []),
       ]);
       setGroups(loadedGroups);
@@ -145,7 +146,7 @@ export default function Discovery() {
         <div>
           <p className="admin-eyebrow">Catalogue structure</p>
           <h1>Shop By</h1>
-          <p>Manage the groups customers browse on the website. Occasion, Style and Fabric &amp; Pattern are the core groups; you can add more groups such as Event, Trending or Native.</p>
+          <p>Manage the groups customers browse on the website. Occasion, Style and Fabric &amp; Pattern are the launch defaults; groups can be renamed, reordered or temporarily hidden without changing their stable identity.</p>
         </div>
       </header>
 
@@ -155,12 +156,12 @@ export default function Discovery() {
       <section className="admin-panel admin-stack">
         <div>
           <h2>Add another Shop By group</h2>
-          <p>Examples: Event, Trending, Native. After creating it, add its reusable choices below and assign those choices when editing a product.</p>
+          <p>Examples: Collection, Season or Heritage. After creating it, add real catalogue-backed choices below and assign those choices when editing a product.</p>
         </div>
         <form className="admin-list-tools" onSubmit={createGroup}>
           <div className="field">
             <label className="field__label" htmlFor="shop-by-new-group">Group name</label>
-            <input id="shop-by-new-group" value={newGroupName} onChange={(event) => setNewGroupName(event.target.value)} placeholder="e.g. Event" />
+            <input id="shop-by-new-group" value={newGroupName} maxLength={80} onChange={(event) => setNewGroupName(event.target.value)} placeholder="e.g. Collection" />
           </div>
           <Button type="submit" disabled={!newGroupName.trim() || saving === "new"} isLoading={saving === "new"}>Add Shop By group</Button>
         </form>
@@ -173,19 +174,28 @@ export default function Discovery() {
               <p className="admin-eyebrow">Shop by</p>
               <h2>{group.label}</h2>
               <p className="field__hint">
-                Manage choices and designated face cover pieces. Maximum {MAX_CHOICES_PER_GROUP} choices per group.
+                Manage choices, visibility, order and designated face cover pieces. Maximum {MAX_CHOICES_PER_GROUP} choices per group.
                 {" "}<span className="shop-by-admin-count">({(group.values || []).length}/{MAX_CHOICES_PER_GROUP} used)</span>
               </p>
             </div>
             {!coreIds.has(group.id) ? <Button variant="ghost" disabled={saving === group.id} onClick={() => removeGroup(group)}>Delete group</Button> : null}
           </div>
 
-          {!coreIds.has(group.id) ? (
+          <div className="admin-list-tools">
             <div className="field">
               <label className="field__label" htmlFor={`shop-by-label-${group.id}`}>Group name</label>
-              <input id={`shop-by-label-${group.id}`} value={group.label} onChange={(event) => updateGroup(group.id, { label: event.target.value })} />
+              <input id={`shop-by-label-${group.id}`} maxLength={80} value={group.label} onChange={(event) => updateGroup(group.id, { label: event.target.value })} />
+              {coreIds.has(group.id) ? <p className="field__hint">Renaming changes the customer-facing label only; the stable Shop state key remains protected.</p> : null}
             </div>
-          ) : null}
+            <div className="field">
+              <label className="field__label" htmlFor={`shop-by-order-${group.id}`}>Display order</label>
+              <input id={`shop-by-order-${group.id}`} type="number" min="0" step="1" value={group.order ?? 0} onChange={(event) => updateGroup(group.id, { order: Number(event.target.value) })} />
+            </div>
+            <label className="choice admin-shop-by-choice" htmlFor={`shop-by-active-${group.id}`}>
+              <input id={`shop-by-active-${group.id}`} type="checkbox" checked={group.active !== false} onChange={(event) => updateGroup(group.id, { active: event.target.checked })} />
+              <span>Active in customer Shop</span>
+            </label>
+          </div>
 
           <div className="shop-by-admin-values">
             {(group.values || []).length ? (
@@ -267,6 +277,9 @@ export default function Discovery() {
                           ? `Cover: ${currentFaceProduct.name}`
                           : `Default: automatically picks photo from ${value} products.`}
                       </span>
+                    </div>
+                    <div className="admin-actions">
+                      <Button to={shopByDestination(group, value)} target="_blank" rel="noopener noreferrer" variant="ghost">Preview in Shop</Button>
                     </div>
                   </div>
                 );

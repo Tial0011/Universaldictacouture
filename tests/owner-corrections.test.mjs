@@ -12,12 +12,13 @@ const details = await readFile(new URL("../src/pages/ProductDetails/ProductDetai
 const productCopy = await readFile(new URL("../src/utils/productCopy.js", import.meta.url), "utf8");
 const chatProductTag = await readFile(new URL("../src/components/chat/ChatProductTag.jsx", import.meta.url), "utf8");
 
-test("owner-locked product CTA copy is permanently SHOP PIECE", () => {
+test("owner product-entry copy stays scoped while Revision 4 Shop card uses its exact CTA", () => {
   assert.match(productCopy, /PRODUCT_SHOP_CTA = "SHOP PIECE"/);
-  assert.match(productCard, /const ctaLabel = PRODUCT_SHOP_CTA/);
+  assert.match(productCopy, /SECTION4_SHOP_CARD_CTA = "SHOP THIS PIECE →"/);
+  assert.match(productCard, /const ctaLabel = isShopCard \? SECTION4_SHOP_CARD_CTA : PRODUCT_SHOP_CTA/);
   assert.match(newInCard, /PRODUCT_SHOP_CTA/);
   assert.match(chatProductTag, /PRODUCT_SHOP_CTA/);
-  assert.doesNotMatch(productCard, /SHOP THIS PIECE|VIEW PIECE|View Piece/);
+  assert.doesNotMatch(productCard, /VIEW PIECE|View Piece/);
   assert.doesNotMatch(chatProductTag, /View piece|VIEW PIECE|SHOP THIS PIECE/);
   assert.doesNotMatch(newInCard, />View Piece</);
 });

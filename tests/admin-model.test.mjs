@@ -5,8 +5,9 @@ test("draft permits incomplete price but publishing requires price and category"
   assert.equal(prepareRecord("products", { name: "Aso Oke", status: "draft", price: "" }).price, null);
   assert.throws(() => prepareRecord("products", { name: "Aso Oke", status: "published", price: "", category: "Fabric" }));
   assert.throws(() => prepareRecord("products", { name: "Aso Oke", status: "published", price: 100, category: "" }));
-  assert.throws(() => prepareRecord("products", { name: "Aso Oke", status: "published", price: 100, category: "Fabric" }), /product photo/i);
-  const result = prepareRecord("products", { name: " Aso Oke ", status: "published", price: "12000", category: "Fabric, Fabric, Ready to wear", primaryImage: { url: "https://example.test/aso-oke.jpg" } });
+  assert.throws(() => prepareRecord("products", { name: "Aso Oke", status: "published", price: 100, category: "Fabric", unitLabel: "per set" }), /product photo/i);
+  assert.throws(() => prepareRecord("products", { name: "Aso Oke", status: "published", price: 100, category: "Fabric", primaryImage: { url: "https://example.test/aso-oke.jpg" } }), /commercial unit/i);
+  const result = prepareRecord("products", { name: " Aso Oke ", status: "published", price: "12000", unitLabel: "per set", category: "Fabric, Fabric, Ready to wear", primaryImage: { url: "https://example.test/aso-oke.jpg" } });
   assert.equal(result.price, 12000);
   assert.deepEqual(result.category, ["Fabric", "Ready to wear"]);
 });
@@ -53,7 +54,7 @@ test("new review workflow rejects more than one customer photo", () => {
 test("Task 8A: product readiness is deterministic and names exact publication blockers", () => {
   const incomplete = productReadiness({ id: "piece-1", name: "", price: "", category: [], images: [], status: "draft" });
   assert.equal(incomplete.state, "needs-attention");
-  assert.deepEqual(incomplete.blockers.map((item) => item.key), ["name", "price", "image", "category"]);
+  assert.deepEqual(incomplete.blockers.map((item) => item.key), ["name", "price", "image", "category", "unit"]);
 
   const ready = productReadiness({ id: "piece-1", name: "Aso Oke", price: 25000, category: ["Fabric"], images: [{ url: "https://example.test/piece.jpg" }], status: "draft", unitLabel: "per bundle" });
   assert.equal(ready.state, "ready");
@@ -61,8 +62,8 @@ test("Task 8A: product readiness is deterministic and names exact publication bl
   assert.equal(ready.warnings.length, 0);
 
   const published = productReadiness({ id: "piece-1", name: "Aso Oke", price: 25000, category: ["Fabric"], images: [{ url: "https://example.test/piece.jpg" }], status: "published" });
-  assert.equal(published.state, "published");
-  assert.match(published.warnings[0].label, /Commercial unit/i);
+  assert.equal(published.state, "needs-attention");
+  assert.equal(published.blockers.some((item) => item.key === "unit"), true);
 });
 
 test("Task 8A: customer preview uses stable slug/id and Shop V1 taxonomy excludes Size", () => {

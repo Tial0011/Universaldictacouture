@@ -66,7 +66,7 @@ export default function RecordManager({ kind }) {
   useEffect(() => {
     if (kind !== "products") return;
     let current = true;
-    fetchShopByGroups().then((groups) => {
+    fetchShopByGroups({ includeInactive: true }).then((groups) => {
       if (current && groups.length) setShopByGroups(groups);
     });
     return () => { current = false; };
@@ -153,18 +153,44 @@ export default function RecordManager({ kind }) {
     setDirty(true);
   }
 
-  async function save(event) {
-    event.preventDefault(); setSaving(true); setError(""); setNotice("");
+  async function persist(rawRecord, successMessage = "Saved successfully.") {
+    setSaving(true); setError(""); setNotice("");
     try {
-      const raw = { ...editor };
+      const raw = { ...rawRecord };
       if (kind === "products" && Object.hasOwn(raw, "images")) raw.primaryImage = raw.images?.[0] || null;
       await saveAdminRecord(kind, raw);
       if (kind === "products") invalidateCatalogue();
-      setNotice("Saved successfully."); setEditor(null); setDirty(false); setReviewProductSearch("");
+      setNotice(successMessage); setEditor(null); setDirty(false); setReviewProductSearch("");
       setParams(nextListParams(), { replace: true }); setLoading(true); setPendingPage(undefined); setRevision(v => v + 1);
       addButtonArea.current?.querySelector("button")?.focus();
     } catch (error) { setError(adminError(error)); }
     finally { setSaving(false); }
+  }
+
+  async function save(event) {
+    event.preventDefault();
+    await persist(editor);
+  }
+
+  async function saveProductLifecycle(nextStatus) {
+    if (kind !== "products" || !editor || saving || uploading) return;
+    const next = { ...editor, status: nextStatus };
+    if (nextStatus === "published") {
+      const readiness = productReadiness(next, { allowGeneratedIdentity: !next.id });
+      if (!readiness.ready) {
+        setError(`Cannot publish yet. Complete: ${readiness.blockers.map((item) => item.label).join(", ")}.`);
+        return;
+      }
+    }
+    if (nextStatus === "archived" && !window.confirm("Archive this product? It will leave the public Shop but its record and history will be retained.")) return;
+    const message = nextStatus === "published"
+      ? "Product published. You can now inspect it in the customer Shop."
+      : nextStatus === "archived"
+        ? "Product archived. Its record is retained but it is no longer public."
+        : editor.status === "archived"
+          ? "Product restored to draft."
+          : "Product unpublished. It is no longer eligible for the public Shop.";
+    await persist(next, message);
   }
 
   async function remove(record) {
@@ -226,7 +252,7 @@ export default function RecordManager({ kind }) {
             const selected = Array.isArray(rawSelected) ? rawSelected.map(String) : String(rawSelected || "").split(",").map(entry => entry.trim()).filter(Boolean);
             const choices = [...new Set([...(group.values || []), ...selected])];
             return <fieldset className="admin-shop-by-group" key={group.id}>
-              <legend><span>Shop by</span> {group.label}</legend>
+              <legend><span>Shop by</span> {group.label}{group.active === false ? " (inactive)" : ""}</legend>
               {choices.length ? <div className="admin-shop-by-choices">{choices.map((choice) => {
                 const checked = selected.some((entry) => entry.toLowerCase() === choice.toLowerCase());
                 return <label className="choice admin-shop-by-choice" key={choice}><input type="checkbox" checked={checked} onChange={() => {
@@ -300,8 +326,16 @@ export default function RecordManager({ kind }) {
           {editor.id && !dirty && editor.status === "published" && editorReadiness.ready && productAdminHref(editor) ? <Button to={productAdminHref(editor)} target="_blank" rel="noopener noreferrer" variant="secondary">View in Shop</Button> : null}
         </div>
         <ul className="admin-readiness__checks">{editorReadiness.checks.map((check) => <li key={check.key} className={check.complete ? "is-complete" : "is-missing"}><span aria-hidden="true">{check.complete ? "✓" : "!"}</span><span>{check.label}</span></li>)}</ul>
-        {editorReadiness.blockers.length ? <p className="field__error" role="status">Before publishing: {editorReadiness.blockers.map((item) => item.label).join(", ")}.</p> : <p className="admin-positive">All required publication information is ready.</p>}
+        {editorReadiness.blockers.length ? <p id="product-readiness-blockers" className="field__error" role="status">Before publishing: {editorReadiness.blockers.map((item) => item.label).join(", ")}.</p> : <p className="admin-positive">All required publication information is ready.</p>}
         {editorReadiness.warnings.length ? <p className="field__hint">Suggested check: {editorReadiness.warnings.map((item) => item.label).join(", ")}.</p> : null}
+        <div className="admin-actions admin-publication-actions" aria-label="Product publication actions">
+          {editor.status === "published"
+            ? <Button variant="secondary" disabled={saving || uploading} isLoading={saving} onClick={() => saveProductLifecycle("draft")}>Unpublish</Button>
+            : <Button disabled={saving || uploading || !editorReadiness.ready} aria-describedby={!editorReadiness.ready ? "product-readiness-blockers" : undefined} isLoading={saving} onClick={() => saveProductLifecycle("published")}>Publish</Button>}
+          {editor.status === "archived"
+            ? <Button variant="secondary" disabled={saving || uploading} onClick={() => saveProductLifecycle("draft")}>Restore to draft</Button>
+            : <Button variant="ghost" disabled={saving || uploading} onClick={() => saveProductLifecycle("archived")}>Archive</Button>}
+        </div>
       </aside>}
       <form onSubmit={save} className="admin-stack">{renderEditorFields()}
         <div className="admin-form-actions"><Button type="submit" disabled={uploading} isLoading={saving}>{saving ? "Saving…" : "Save " + schema.singular}</Button><Button variant="secondary" disabled={saving || uploading} onClick={cancel}>Cancel</Button><span className="field__hint">{uploading ? "Uploading photos…" : dirty ? "Unsaved changes" : "No unsaved changes"}</span></div>

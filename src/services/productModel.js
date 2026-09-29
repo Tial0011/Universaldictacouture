@@ -129,6 +129,10 @@ export function normaliseProduct(id, raw) {
   const unitLabel = typeof (raw.unitLabel ?? raw.priceToken) === "string"
     ? (raw.unitLabel ?? raw.priceToken).trim()
     : "";
+  // Section 4 cards must communicate a truthful commercial basis alongside
+  // price. Legacy published records with no configured unit are incomplete
+  // public catalogue data and stay out of the customer Shop until corrected.
+  if (!unitLabel) return null;
 
   const rawShopBy = raw.shopBy && typeof raw.shopBy === "object" && !Array.isArray(raw.shopBy) ? raw.shopBy : {};
   const shopBy = Object.fromEntries(

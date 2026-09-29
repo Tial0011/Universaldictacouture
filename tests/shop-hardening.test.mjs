@@ -60,11 +60,11 @@ test("Task 8: Search, Filters, Sort, chips and mobile drawer retain accessible n
   assert.match(shopCss, /scroll-margin-block-end:\s*calc\(76px \+ env\(safe-area-inset-bottom\)\)/);
 });
 
-test("Task 8: My Closet heart and SHOP PIECE remain independent accessible controls", () => {
+test("Task 9: My Closet heart and exact Shop CTA remain independent accessible controls", () => {
   assert.match(productCard, /aria-pressed=\{saved\}/);
   assert.match(productCard, /aria-label=\{saved \? `Remove \$\{product\.name\} from My Closet`/);
-  assert.match(productCard, /const ctaLabel = PRODUCT_SHOP_CTA/);
-  assert.doesNotMatch(productCard, /SHOP THIS PIECE|VIEW PIECE|View Piece/);
+  assert.match(productCard, /const ctaLabel = isShopCard \? SECTION4_SHOP_CARD_CTA : PRODUCT_SHOP_CTA/);
+  assert.doesNotMatch(productCard, /VIEW PIECE|View Piece/);
 });
 
 test("Task 8: image delivery remains responsive/lazy without Product Details gallery preloading", () => {

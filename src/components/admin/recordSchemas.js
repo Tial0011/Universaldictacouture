@@ -17,7 +17,7 @@ export const SCHEMAS = {
       text("isNewIn", "Feature in New In", { type: "checkbox", section: "merchandising", hint: "New In is curated manually and is separate from Newest First." }),
       text("keywords", "Search keywords", { type: "values", section: "merchandising", hint: "Use real search terms that help customers find this product." }),
       text("aliases", "Alternative names", { type: "values", section: "merchandising", hint: "Add genuine synonyms or alternate product names without changing the public product name." }),
-      text("status", "Visibility", { type: "select", section: "publication", options: ["draft", "published", "archived"] }),
+      text("status", "Publication state", { type: "select", section: "publication", options: ["draft", "published", "archived"], hint: "Published products can appear in the customer Shop only when every readiness requirement passes. Draft stays private; Archived retains the record but removes it from normal public inventory." }),
     ],
   },
   taxonomy: {

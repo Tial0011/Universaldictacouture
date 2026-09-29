@@ -25,7 +25,7 @@ export default function ShopControl() {
       const [counts, productPage, shopByGroups] = await Promise.all([
         loadProductStatusCounts(),
         loadAdminPage("products"),
-        fetchShopByGroups(),
+        fetchShopByGroups({ includeInactive: true }),
       ]);
       setState({ loading: false, error: "", counts, products: productPage.records, shopByGroups });
     } catch (error) {
@@ -43,6 +43,7 @@ export default function ShopControl() {
     [state.products]
   );
   const activeShopBy = state.shopByGroups.filter((group) => group.active !== false);
+  const inactiveShopBy = state.shopByGroups.length - activeShopBy.length;
 
   return (
     <div className="admin-stack">
@@ -113,7 +114,7 @@ export default function ShopControl() {
       <div className="admin-health-grid admin-health-grid--two">
         <section className="admin-panel admin-stack" aria-labelledby="merch-title">
           <div><p className="admin-eyebrow">Merchandising</p><h2 id="merch-title">Shop By &amp; New In</h2></div>
-          <p>{activeShopBy.length} active Shop By group{activeShopBy.length === 1 ? "" : "s"} are currently available to the customer experience.</p>
+          <p>{activeShopBy.length} active Shop By group{activeShopBy.length === 1 ? "" : "s"} are currently available to the customer experience.{inactiveShopBy ? ` ${inactiveShopBy} configured group${inactiveShopBy === 1 ? " is" : "s are"} currently inactive.` : ""}</p>
           <p className="field__hint"><strong>New In</strong> is curated manually on products and does not change Newest First chronology.</p>
           <div className="admin-actions"><Button to="/admin/discovery" variant="secondary">Open Shop By</Button><Button to="/admin/products?view=new-in" variant="ghost">Open New In</Button></div>
         </section>

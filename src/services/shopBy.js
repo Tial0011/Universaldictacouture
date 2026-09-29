@@ -52,7 +52,7 @@ function normaliseStoredGroup(raw = {}) {
   return {
     id: key,
     key,
-    label: String(fallback?.label || raw.label || key).trim(),
+    label: String(raw.label || fallback?.label || key).trim(),
     param: fallback?.param || "shopby",
     order: Number.isFinite(Number(raw.order)) ? Number(raw.order) : (fallback?.order ?? 99),
     locked: Boolean(fallback),
@@ -77,7 +77,7 @@ async function readConfigGroups() {
  * Existing legacy taxonomy labels are merged into those core groups so
  * previous admin data is immediately available as reusable choices.
  */
-export async function fetchShopByGroups() {
+export async function fetchShopByGroups({ includeInactive = false } = {}) {
   const defaults = DEFAULT_SHOP_BY_GROUPS.map((group) => ({ ...group, active: true, values: [] }));
   if (!isFirebaseConfigured || !db) return defaults;
 
@@ -106,7 +106,7 @@ export async function fetchShopByGroups() {
         id: fallback.id,
         key: fallback.key,
         param: fallback.param,
-        label: fallback.label,
+        label: String(saved?.label || fallback.label).trim() || fallback.label,
         locked: true,
         active: saved?.active !== false,
         values: cleanShopByValues([...(saved?.values ?? []), ...legacyValues[fallback.id]]),
@@ -114,8 +114,9 @@ export async function fetchShopByGroups() {
       };
     });
 
-    const custom = [...stored.values()].filter((group) => group.active !== false);
-    return [...core, ...custom].sort((a, b) => a.order - b.order || a.label.localeCompare(b.label));
+    const all = [...core, ...stored.values()]
+      .sort((a, b) => a.order - b.order || a.label.localeCompare(b.label));
+    return includeInactive ? all : all.filter((group) => group.active !== false);
   } catch (error) {
     if (import.meta.env.DEV) console.error(error);
     return defaults;
@@ -151,14 +152,16 @@ export async function saveShopByGroup(raw) {
   const key = shopByKey(raw?.key || raw?.id || raw?.label);
   const label = String(raw?.label || "").trim();
   if (!key || !label) throw new Error("Enter a Shop By group name.");
+  if (label.length > 80) throw new Error("Keep the Shop By group name within 80 characters.");
+  const order = Number(raw?.order);
+  if (!Number.isFinite(order) || order < 0) throw new Error("Display order must be zero or more.");
 
-  const fallback = DEFAULT_SHOP_BY_GROUPS.find((group) => group.id === key);
-  const groups = await fetchShopByGroups();
+  const groups = await fetchShopByGroups({ includeInactive: true });
   const nextGroup = {
     id: key,
     key,
-    label: fallback?.label || label,
-    order: Number.isFinite(Number(raw.order)) ? Number(raw.order) : groups.length,
+    label,
+    order,
     active: raw.active !== false,
     values: cleanShopByValues(raw.values),
     faces: raw.faces && typeof raw.faces === "object" ? { ...raw.faces } : {},
@@ -176,6 +179,16 @@ export async function deleteShopByGroup(groupId) {
   if (DEFAULT_SHOP_BY_GROUPS.some((group) => group.id === key)) {
     throw new Error("Occasion, Style and Fabric & Pattern are core Shop By groups and cannot be removed.");
   }
-  const groups = await fetchShopByGroups();
+  const groups = await fetchShopByGroups({ includeInactive: true });
   await writeGroups(groups.filter((group) => group.id !== key));
+}
+
+export function shopByDestination(group, value) {
+  const key = shopByKey(group?.key || group?.id || group?.label);
+  const choice = String(value || "").trim();
+  if (!key || !choice) return "/shop";
+  const param = String(group?.param || "shopby").trim();
+  return param && param !== "shopby"
+    ? `/shop?${encodeURIComponent(param)}=${encodeURIComponent(choice)}`
+    : `/shop?shopby=${encodeURIComponent(`${key}:${choice}`)}`;
 }

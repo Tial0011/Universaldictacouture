@@ -111,7 +111,7 @@ test("Homepage entry contracts remain canonical and keep New In distinct from Ne
   assert.match(contentSource, /secondaryCta: \{ label: "Explore All Styles", to: "\/shop\?discovery=style" \}/);
   assert.match(homeSource, /viewAllTo=\"\/shop\?newin=1\"/);
   assert.match(homeSource, /viewAllTo=\{\(groupId\) => groupId \? `\/shop\?discovery=\$\{encodeURIComponent\(groupId\)\}` : "\/shop"\}/);
-  assert.match(contentSource, /destination = group\.param[\s\S]*`\/shop\?\$\{group\.param\}=\$\{encodeURIComponent\(entry\.name\)\}`/);
+  assert.match(contentSource, /destination: shopByDestination\(group, entry\.name\)/);
   assert.doesNotMatch(homeSource, /newin=1[^\n]*sort=/i);
 });
 
