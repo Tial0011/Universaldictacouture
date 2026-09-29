@@ -139,12 +139,14 @@ export default function ReviewCarousel({ children, title, headingId, description
   const move = (direction) => {
     const node = track.current;
     if (!node) return;
+    handleInteractionStart();
     const first = node.firstElementChild;
     const step = first ? first.getBoundingClientRect().width + (parseFloat(getComputedStyle(node).gap) || 0) : 280;
     node.scrollBy({
       left: step * direction,
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
     });
+    handleInteractionEnd();
   };
 
   return (
@@ -199,12 +201,16 @@ export default function ReviewCarousel({ children, title, headingId, description
         ref={track}
         tabIndex={items.length ? 0 : -1}
         aria-label="Customer reviews — scroll to browse"
-        onMouseEnter={handleInteractionStart}
-        onMouseLeave={handleInteractionEnd}
+        onWheel={() => {
+          handleInteractionStart();
+          handleInteractionEnd();
+        }}
         onTouchStart={handleInteractionStart}
         onTouchEnd={handleInteractionEnd}
         onPointerDown={handleInteractionStart}
         onPointerUp={handleInteractionEnd}
+        onPointerCancel={handleInteractionEnd}
+        onPointerLeave={handleInteractionEnd}
       >
         {repeatedItems.map(({ child, key, isDuplicate }) => (
           <div

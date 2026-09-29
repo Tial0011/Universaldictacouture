@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import ProductGrid from "../../components/product/ProductGrid";
 import ProductImage from "../../components/product/ProductImage";
@@ -35,33 +35,18 @@ import {
   removeShopRefinement,
   toggleFilterValue,
 } from "../../utils/shopState";
+import {
+  appendedCount,
+  createShopBrowseSnapshot,
+  nextVisibleCount,
+  readShopBrowseSnapshot,
+  restoredVisibleCount,
+  writeShopBrowseSnapshot,
+} from "../../utils/shopBrowseState";
 import "./Shop.css";
 
 const SHOP_LEDE = "Timeless styles for every occasion. Tradition, elegance and modern sophistication.";
 const DIMENSION_KEYS = FILTER_DIMENSIONS.map((dimension) => dimension.key);
-const SHOP_RETURN_KEY = "udc:shop:return-position";
-
-function readShopReturn(path) {
-  if (typeof window === "undefined") return null;
-  try {
-    const parsed = JSON.parse(sessionStorage.getItem(SHOP_RETURN_KEY) || "null");
-    if (!parsed || parsed.path !== path) return null;
-    const scrollY = Number(parsed.scrollY);
-    const visibleCount = Number(parsed.visibleCount);
-    return {
-      path,
-      scrollY: Number.isFinite(scrollY) && scrollY >= 0 ? scrollY : 0,
-      visibleCount: Number.isFinite(visibleCount) && visibleCount > 0 ? visibleCount : null,
-    };
-  } catch {
-    return null;
-  }
-}
-
-function clearShopReturn() {
-  try { sessionStorage.removeItem(SHOP_RETURN_KEY); } catch { /* blocked storage */ }
-}
-
 function ChatIcon({ size = 20 }) {
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
@@ -123,17 +108,45 @@ export default function Shop() {
   const state = useMemo(() => parseShopState(searchParams), [searchParams]);
   const searchKey = searchParams.toString();
   const currentShopPath = `/shop${location.search}`;
-  const [returnSnapshot] = useState(() => readShopReturn(currentShopPath));
-  const restoredCount = Number(location.state?.restoreVisibleCount ?? returnSnapshot?.visibleCount);
+  const restoreBrowseKey = String(location.state?.restoreBrowseKey || location.key || "");
+  const storedReturnSnapshot = useMemo(
+    () => readShopBrowseSnapshot(restoreBrowseKey, currentShopPath),
+    [restoreBrowseKey, currentShopPath]
+  );
+  const legacyRestoredCount = Number(location.state?.restoreVisibleCount);
+  const routeReturnSnapshot = useMemo(() => {
+    const anchorProductId = String(location.state?.restoreAnchorProductId || "").trim();
+    if (!anchorProductId) return null;
+    return createShopBrowseSnapshot({
+      path: currentShopPath,
+      anchorProductId,
+      anchorResultIndex: null,
+      visibleCount: Number.isFinite(legacyRestoredCount) ? legacyRestoredCount : batchSize,
+      scrollY: 0,
+      anchorViewportTop: null,
+    });
+  }, [batchSize, currentShopPath, legacyRestoredCount, location.state?.restoreAnchorProductId]);
+  const returnSnapshot = storedReturnSnapshot || routeReturnSnapshot;
   const [searchDraft, setSearchDraft] = useState(() => String(location.state?.shopSearchDraft || state.query || ""));
-  const [visibleCount, setVisibleCount] = useState(() => Number.isFinite(restoredCount) ? Math.max(batchSize, restoredCount) : batchSize);
+  const [visibleCount, setVisibleCount] = useState(() => {
+    if (returnSnapshot) return restoredVisibleCount(returnSnapshot, batchSize);
+    return Number.isFinite(legacyRestoredCount) ? Math.max(batchSize, legacyRestoredCount) : batchSize;
+  });
   const [loadAnnouncement, setLoadAnnouncement] = useState("");
+  const [isLoadMorePending, setIsLoadMorePending] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState("");
+  const [restoreNotice, setRestoreNotice] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerState, setDrawerState] = useState(() => copyShopState(state));
   const [drawerFiltersValid, setDrawerFiltersValid] = useState(true);
   const [drawerResetToken, setDrawerResetToken] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const resultsRef = useRef(null);
+  const batchSizeRef = useRef(batchSize);
+  const previousSearchKeyRef = useRef(searchKey);
+  const restorationDoneKeyRef = useRef("");
+  const loadMorePendingRef = useRef(false);
+  const loadMoreFrameRef = useRef(null);
   const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
   const [taxonomy, setTaxonomy] = useState(null);
 
@@ -172,22 +185,37 @@ export default function Shop() {
     setSearchDraft(state.query);
   }, [state.query]);
 
-  // A changed public Shop state restarts progressive loading. Returning
-  // from Product Details may explicitly restore the previous loaded depth.
   useEffect(() => {
-    const restore = Number(location.state?.restoreVisibleCount ?? returnSnapshot?.visibleCount);
-    setVisibleCount(Number.isFinite(restore) ? Math.max(batchSize, restore) : batchSize);
-    setLoadAnnouncement("");
-  }, [batchSize, searchKey, location.state?.restoreVisibleCount, returnSnapshot?.visibleCount]);
+    batchSizeRef.current = batchSize;
+  }, [batchSize]);
 
+  useEffect(() => () => {
+    if (loadMoreFrameRef.current) cancelAnimationFrame(loadMoreFrameRef.current);
+  }, []);
+
+  // Public/shareable Shop state owns the result set. When it changes, restart
+  // progressive reveal for that new result set and return to the results
+  // region. Responsive breakpoint changes deliberately do not reset depth.
   useEffect(() => {
-    if (isLoading || !returnSnapshot || returnSnapshot.path !== currentShopPath) return;
+    if (previousSearchKeyRef.current === searchKey) return;
+    previousSearchKeyRef.current = searchKey;
+    restorationDoneKeyRef.current = "";
+    if (loadMoreFrameRef.current) cancelAnimationFrame(loadMoreFrameRef.current);
+    loadMoreFrameRef.current = null;
+    loadMorePendingRef.current = false;
+    setIsLoadMorePending(false);
+    setVisibleCount(batchSizeRef.current);
+    setLoadAnnouncement("");
+    setLoadMoreError("");
+    setRestoreNotice("");
     const frame = requestAnimationFrame(() => {
-      window.scrollTo({ top: returnSnapshot.scrollY, left: 0, behavior: "auto" });
-      clearShopReturn();
+      resultsRef.current?.scrollIntoView({
+        block: "start",
+        behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+      });
     });
     return () => cancelAnimationFrame(frame);
-  }, [currentShopPath, isLoading, returnSnapshot]);
+  }, [searchKey]);
 
   const updateState = useCallback((next, { replace = false } = {}) => {
     setSearchParams(buildSearchParams(next), { replace });
@@ -242,20 +270,75 @@ export default function Shop() {
 
   const visible = results.slice(0, visibleCount);
   const remaining = Math.max(0, results.length - visible.length);
+
+  useLayoutEffect(() => {
+    if (isLoading || !returnSnapshot || restorationDoneKeyRef.current === restoreBrowseKey) return;
+
+    const targetIndex = results.findIndex((product) =>
+      product.id === returnSnapshot.anchorProductId || product.slug === returnSnapshot.anchorProductId
+    );
+
+    if (targetIndex >= 0 && visibleCount <= targetIndex) {
+      setVisibleCount((count) => Math.max(count, targetIndex + 1, restoredVisibleCount(returnSnapshot, batchSizeRef.current)));
+      return;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      let restored = false;
+
+      if (targetIndex >= 0) {
+        const nodes = resultsRef.current?.querySelectorAll("[data-product-id]") ?? [];
+        const target = Array.from(nodes).find((node) => node.dataset.productId === results[targetIndex]?.id);
+        if (target) {
+          const preferredTop = returnSnapshot.anchorViewportTop;
+          if (Number.isFinite(preferredTop)) {
+            const top = Math.max(0, target.getBoundingClientRect().top + window.scrollY - preferredTop);
+            window.scrollTo({ top, left: 0, behavior: "auto" });
+          } else {
+            target.scrollIntoView({ block: "center", behavior: "auto" });
+          }
+          restored = true;
+        }
+      }
+
+      if (!restored && Number.isFinite(returnSnapshot.scrollY) && returnSnapshot.scrollY > 0) {
+        window.scrollTo({ top: returnSnapshot.scrollY, left: 0, behavior: "auto" });
+        restored = true;
+      }
+
+      if (!restored && returnSnapshot.anchorProductId) {
+        resultsRef.current?.scrollIntoView({ block: "start", behavior: "auto" });
+      }
+
+      if (targetIndex < 0 && returnSnapshot.anchorProductId) {
+        setRestoreNotice("That piece is no longer in this Shop view. Your browsing context was kept.");
+      }
+
+      restorationDoneKeyRef.current = restoreBrowseKey;
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [batchSize, isLoading, restoreBrowseKey, results, returnSnapshot, visibleCount]);
+
   const navigationState = useMemo(() => ({
     shopReturn: `/shop${location.search}`,
     shopVisibleCount: visibleCount,
-  }), [location.search, visibleCount]);
+    shopBrowseKey: location.key,
+  }), [location.key, location.search, visibleCount]);
 
-  const rememberShopPosition = useCallback(() => {
-    try {
-      sessionStorage.setItem(SHOP_RETURN_KEY, JSON.stringify({
-        path: `/shop${location.search}`,
-        scrollY: window.scrollY,
-        visibleCount,
-      }));
-    } catch { /* blocked storage */ }
-  }, [location.search, visibleCount]);
+  const rememberShopPosition = useCallback((product, event) => {
+    if (!product?.id) return;
+    const card = event?.currentTarget?.closest?.("[data-product-id]");
+    const snapshot = createShopBrowseSnapshot({
+      path: `/shop${location.search}`,
+      anchorProductId: product.id,
+      anchorResultIndex: results.findIndex((entry) => entry.id === product.id),
+      visibleCount,
+      scrollY: window.scrollY,
+      anchorViewportTop: card?.getBoundingClientRect?.().top,
+    });
+    if (snapshot) writeShopBrowseSnapshot(location.key, snapshot);
+  }, [location.key, location.search, results, visibleCount]);
 
   const openDrawer = useCallback(() => {
     setDrawerState(copyShopState(state));
@@ -286,6 +369,30 @@ export default function Shop() {
   );
 
   const drawerHasRefinements = hasFilterSelections(drawerState);
+
+  const loadMorePieces = useCallback(() => {
+    if (loadMorePendingRef.current) return;
+    const nextCount = nextVisibleCount(visibleCount, batchSize, results.length);
+    const added = appendedCount(visibleCount, nextCount, results.length);
+    if (added <= 0) return;
+
+    loadMorePendingRef.current = true;
+    setIsLoadMorePending(true);
+    setLoadMoreError("");
+
+    loadMoreFrameRef.current = requestAnimationFrame(() => {
+      try {
+        setVisibleCount(nextCount);
+        setLoadAnnouncement(`${added} more ${added === 1 ? "piece" : "pieces"} loaded.`);
+      } catch {
+        setLoadMoreError("We couldn't reveal more pieces. Please try again.");
+      } finally {
+        loadMorePendingRef.current = false;
+        loadMoreFrameRef.current = null;
+        setIsLoadMorePending(false);
+      }
+    });
+  }, [batchSize, results.length, visibleCount]);
 
   const desktopFilterPanel = (
     <ShopFilters
@@ -422,6 +529,8 @@ export default function Shop() {
 
           <FilterChips chips={chips} onRemove={removeChip} onClearAll={clearAll} />
 
+          {restoreNotice ? <p className="shop__restore-notice" role="status">{restoreNotice}</p> : null}
+
           <p className="visually-hidden" role="status" aria-live="polite">
             {isLoading ? "Loading pieces." : error ? "The collection could not be loaded." : results.length === 0 ? "No pieces match the current Shop state." : "Product results updated."}
           </p>
@@ -469,17 +578,21 @@ export default function Shop() {
                 label="Shop results"
               />
               <div className="shop__load-more">
+                {loadMoreError ? (
+                  <div className="shop__load-more-error" role="alert">
+                    <span>{loadMoreError}</span>
+                    <button type="button" className="shop__load-more-retry" onClick={loadMorePieces}>Retry</button>
+                  </div>
+                ) : null}
                 {remaining > 0 ? (
                   <button
                     type="button"
                     className="shop__load-more-button"
-                    onClick={() => {
-                      const added = Math.min(batchSize, remaining);
-                      setVisibleCount((count) => count + batchSize);
-                      setLoadAnnouncement(`Loaded ${added} more ${added === 1 ? "piece" : "pieces"}.`);
-                    }}
+                    onClick={loadMorePieces}
+                    disabled={isLoadMorePending}
+                    aria-busy={isLoadMorePending || undefined}
                   >
-                    <span>Load More Pieces</span>
+                    <span>{isLoadMorePending ? "Loading Pieces…" : "Load More Pieces"}</span>
                     <ChevronDownIcon size={18} />
                   </button>
                 ) : (

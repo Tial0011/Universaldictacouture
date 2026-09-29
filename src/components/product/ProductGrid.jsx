@@ -20,7 +20,7 @@ export default function ProductGrid({
   return (
     <ul className={`product-grid${view === "list" ? " product-grid--list" : ""}`} aria-label={label}>
       {products.map((product, index) => (
-        <li key={product.id}>
+        <li key={product.id} data-product-id={product.id}>
           <ProductCard
             product={product}
             view={view}

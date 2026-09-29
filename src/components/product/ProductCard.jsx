@@ -131,19 +131,18 @@ export default function ProductCard({
   }, []);
 
   const handleNavigate = (event) => {
-    if (isPlainNavigation(event)) {
-      if (navigationLockRef.current) {
-        event.preventDefault();
-        return;
-      }
-      navigationLockRef.current = true;
-      setNavigationPending(true);
-      navigationTimerRef.current = setTimeout(() => {
-        navigationLockRef.current = false;
-        setNavigationPending(false);
-      }, 1200);
+    if (!isPlainNavigation(event)) return;
+    if (navigationLockRef.current) {
+      event.preventDefault();
+      return;
     }
-    onNavigate?.(event);
+    navigationLockRef.current = true;
+    setNavigationPending(true);
+    navigationTimerRef.current = setTimeout(() => {
+      navigationLockRef.current = false;
+      setNavigationPending(false);
+    }, 1200);
+    onNavigate?.(product, event);
   };
 
   const handleSave = async () => {
@@ -173,13 +172,16 @@ export default function ProductCard({
   };
 
   const navigationClass = navigationPending ? " is-navigation-pending" : "";
+  const resolvedNavigationState = isShopCard && navigationState
+    ? { ...navigationState, shopAnchorProductId: product.id }
+    : navigationState;
 
   return (
     <article className={`product-card${view === "list" ? " product-card--list" : ""}${isShopCard ? " product-card--shop" : ""}`}>
       <div className="product-card__media">
         <Link
           to={product.href}
-          state={navigationState}
+          state={resolvedNavigationState}
           className={`product-card__media-link${navigationClass}`}
           aria-label={`View ${product.name} details`}
           aria-disabled={navigationPending || undefined}
@@ -221,7 +223,7 @@ export default function ProductCard({
         <h3 className="product-card__name">
           <Link
             to={product.href}
-            state={navigationState}
+            state={resolvedNavigationState}
             aria-disabled={navigationPending || undefined}
             className={navigationClass.trim() || undefined}
             onClick={handleNavigate}
@@ -233,7 +235,7 @@ export default function ProductCard({
         <ProductPrice product={product} />
         <Link
           to={product.href}
-          state={navigationState}
+          state={resolvedNavigationState}
           className={`product-card__cta${navigationClass}`}
           aria-disabled={navigationPending || undefined}
           onClick={handleNavigate}

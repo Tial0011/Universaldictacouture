@@ -191,11 +191,13 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
   function scroll(direction) {
     const track = trackRef.current;
     if (!track) return;
+    handleInteractionStart();
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     track.scrollBy({
       left: direction * Math.max(240, track.clientWidth * 0.78),
       behavior: reduced ? "auto" : "smooth",
     });
+    handleInteractionEnd();
   }
 
   const showControls = !isLoading && !error && products.length > 1;
@@ -266,12 +268,16 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
           id="new-in-track"
           ref={trackRef}
           aria-label="New In"
-          onMouseEnter={handleInteractionStart}
-          onMouseLeave={handleInteractionEnd}
+          onWheel={() => {
+            handleInteractionStart();
+            handleInteractionEnd();
+          }}
           onTouchStart={handleInteractionStart}
           onTouchEnd={handleInteractionEnd}
           onPointerDown={handleInteractionStart}
           onPointerUp={handleInteractionEnd}
+          onPointerCancel={handleInteractionEnd}
+          onPointerLeave={handleInteractionEnd}
         >
           {repeatedProducts.map(({ product, key, isDuplicate }, index) => (
             <li key={key} data-new-in-item aria-hidden={isDuplicate ? "true" : undefined}>

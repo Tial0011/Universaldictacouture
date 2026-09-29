@@ -770,3 +770,54 @@
   border: 0;
   border-radius: 0;
 }
+
+/* Task 6 continuing-browse status: calm, non-blocking recovery copy. */
+.shop__restore-notice {
+  margin: .35rem 0 .15rem;
+  padding: .55rem .75rem;
+  color: var(--color-text-secondary);
+  background: rgba(255,255,255,.72);
+  border-left: 2px solid var(--color-accent);
+  font-size: var(--text-sm);
+}
+
+.shop__load-more {
+  flex-direction: column;
+  align-items: center;
+  gap: .65rem;
+}
+
+.shop__load-more-button:disabled {
+  cursor: wait;
+  opacity: .72;
+}
+
+.shop__load-more-error {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  max-width: 34rem;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.shop__load-more-retry {
+  min-height: var(--touch-target);
+  padding-inline: .8rem;
+  color: var(--color-brand);
+  background: transparent;
+  border: 1px solid var(--color-brand);
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.shop__load-more-retry:focus-visible,
+.shop__load-more-button:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+}

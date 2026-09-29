@@ -81,8 +81,13 @@ export default function ProductDetails() {
   const backToShop = typeof requestedReturn === "string" && (requestedReturn === "/shop" || requestedReturn.startsWith("/shop?"))
     ? requestedReturn
     : "/shop";
-  const backState = location.state?.shopVisibleCount
-    ? { restoreVisibleCount: location.state.shopVisibleCount }
+  const cameFromShop = backToShop === requestedReturn;
+  const backState = cameFromShop
+    ? {
+        restoreBrowseKey: location.state?.shopBrowseKey,
+        restoreVisibleCount: location.state?.shopVisibleCount,
+        restoreAnchorProductId: location.state?.shopAnchorProductId,
+      }
     : undefined;
   const { products, isLoading, error, retry } = useCatalogue();
   const product = products.find((item) => item.slug === productId || item.id === productId);
@@ -199,7 +204,7 @@ function Piece({ product, backToShop, backState }) {
             {breadcrumbs.map((crumb, index) => (
               <li key={index}>
                 {crumb.to
-                  ? <Link to={crumb.to}>{crumb.label}</Link>
+                  ? <Link to={crumb.to} state={crumb.to === backToShop ? backState : undefined}>{crumb.label}</Link>
                   : <span aria-current="page">{crumb.label}</span>
                 }
               </li>

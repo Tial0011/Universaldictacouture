@@ -229,11 +229,13 @@ export default function DiscoveryModule({
   const scrollRail = (direction) => {
     const rail = railRef.current;
     if (!rail) return;
+    handleInteractionStart();
     const distance = Math.max(rail.clientWidth * 0.72, 180);
     rail.scrollBy({
       left: direction === "previous" ? -distance : distance,
       behavior: prefersReducedMotion() ? "auto" : "smooth",
     });
+    handleInteractionEnd();
   };
 
   const resolvedViewAllTo = typeof viewAllTo === "function" ? viewAllTo(currentGroup) : viewAllTo;
@@ -247,12 +249,16 @@ export default function DiscoveryModule({
       role={hasTabs ? "tabpanel" : undefined}
       aria-labelledby={hasTabs ? `discovery-tab-${currentGroup}` : arrowNavigation ? `discovery-${module.id}` : undefined}
       onScroll={shouldAutoScroll ? handleScroll : undefined}
-      onMouseEnter={handleInteractionStart}
-      onMouseLeave={handleInteractionEnd}
+      onWheel={() => {
+        handleInteractionStart();
+        handleInteractionEnd();
+      }}
       onTouchStart={handleInteractionStart}
       onTouchEnd={handleInteractionEnd}
       onPointerDown={handleInteractionStart}
       onPointerUp={handleInteractionEnd}
+      onPointerCancel={handleInteractionEnd}
+      onPointerLeave={handleInteractionEnd}
     >
       {repeatedItems.map(({ item, key, isDuplicate }) => (
         <li key={key} aria-hidden={isDuplicate ? "true" : undefined}>
@@ -373,8 +379,6 @@ export default function DiscoveryModule({
       {railControls && items.length ? (
         <div
           className="discovery__rail"
-          onMouseEnter={handleInteractionStart}
-          onMouseLeave={handleInteractionEnd}
         >
           {railState.previous ? (
             <button

@@ -57,7 +57,7 @@ export const SCHEMAS = {
     ],
   },
   discoveryModules: {
-    title: "Shop discovery", singular: "section", description: "Create image tiles that guide customers to an occasion or collection. Keep one active section per placement; lower display order takes priority.",
+    title: "Shop Space", singular: "section", description: "Create image tiles that guide customers to an occasion or collection. Keep one active section per placement; lower display order takes priority.",
     initial: { title: "Shop by Occasion", placement: "home", active: false, order: 0, items: [], groups: [] },
     fields: [text("title", "Section title", { required: true }), text("placement", "Show on", { type: "select", options: ["home", "shop"] }), text("order", "Display order", { type: "number" }), text("items", "Discovery tiles", { type: "tiles" }), text("active", "Published on website", { type: "checkbox" })],
   },
