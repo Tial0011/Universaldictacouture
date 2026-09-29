@@ -34,7 +34,7 @@ export default function AdminLayout() {
       </div>
       <nav id="admin-navigation" className={menuOpen ? "admin-nav is-open" : "admin-nav"}>
         {navLink("/admin", "Overview")}
-        {["Catalogue", "Website content", "Customers"].map(group => <div className="admin-nav__group" key={group}>
+        {["Shop operations", "Website content", "Customers"].map(group => <div className="admin-nav__group" key={group}>
           <p>{group}</p><ul>{ADMIN_SECTIONS.filter(section => section.group === group).map(section => <li key={section.path}>{navLink(section.path, section.label)}</li>)}</ul>
         </div>)}
         <div className="admin-nav__group">{navLink("/admin/settings", "Setup & access")}</div>

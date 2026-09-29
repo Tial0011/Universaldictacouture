@@ -9,15 +9,17 @@ const newIn = await readFile(new URL("../src/components/home/NewIn.jsx", import.
 const reviews = await readFile(new URL("../src/components/reviews/ReviewCarousel.jsx", import.meta.url), "utf8");
 const homeCss = await readFile(new URL("../src/pages/Home/Home.css", import.meta.url), "utf8");
 const details = await readFile(new URL("../src/pages/ProductDetails/ProductDetails.jsx", import.meta.url), "utf8");
+const productCopy = await readFile(new URL("../src/utils/productCopy.js", import.meta.url), "utf8");
+const chatProductTag = await readFile(new URL("../src/components/chat/ChatProductTag.jsx", import.meta.url), "utf8");
 
-test("non-Shop product CTAs say SHOP PIECE instead of VIEW PIECE", () => {
-  assert.match(productCard, /: "SHOP PIECE"/);
-  assert.match(newInCard, />SHOP PIECE</);
+test("owner-locked product CTA copy is permanently SHOP PIECE", () => {
+  assert.match(productCopy, /PRODUCT_SHOP_CTA = "SHOP PIECE"/);
+  assert.match(productCard, /const ctaLabel = PRODUCT_SHOP_CTA/);
+  assert.match(newInCard, /PRODUCT_SHOP_CTA/);
+  assert.match(chatProductTag, /PRODUCT_SHOP_CTA/);
+  assert.doesNotMatch(productCard, /SHOP THIS PIECE|VIEW PIECE|View Piece/);
+  assert.doesNotMatch(chatProductTag, /View piece|VIEW PIECE|SHOP THIS PIECE/);
   assert.doesNotMatch(newInCard, />View Piece</);
-});
-
-test("Shop card retains the locked SHOP THIS PIECE CTA", () => {
-  assert.match(productCard, /SHOP THIS PIECE \\u2192/);
 });
 
 test("homepage rails use adaptive continuous motion on desktop as well as mobile", () => {

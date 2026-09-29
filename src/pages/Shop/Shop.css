@@ -230,7 +230,7 @@
   display: inline-flex;
   align-items: center;
   gap: .38rem;
-  min-height: 2.1rem;
+  min-height: var(--touch-target);
   padding: .25rem .72rem;
   font-family: var(--font-body);
   font-size: var(--text-xs);
@@ -244,8 +244,8 @@
 
 .filter-chips__clear {
   margin-left: auto;
-  min-height: 2.1rem;
-  padding-inline: .4rem;
+  min-height: var(--touch-target);
+  padding-inline: .55rem;
   font-family: var(--font-body);
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
@@ -258,6 +258,14 @@
 
 @media (hover: hover) {
   .filter-chips__chip:hover { background: rgba(96,16,19,.12); }
+}
+
+.filter-chips__chip:focus-visible,
+.filter-chips__clear:focus-visible,
+.shop__filter-button:focus-visible,
+.shop__sidebar-toggle:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
 
 /* ---------- Desktop filter panel ---------- */
@@ -820,4 +828,13 @@
 .shop__load-more-button:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 3px;
+}
+
+
+/* Keep keyboard-focused Shop controls clear of the sticky header and mobile bottom navigation. */
+@media (max-width: 767px) {
+  .shop__results :is(a, button, input, select):focus-visible {
+    scroll-margin-block-start: calc(var(--header-height) + 5rem);
+    scroll-margin-block-end: calc(76px + env(safe-area-inset-bottom));
+  }
 }

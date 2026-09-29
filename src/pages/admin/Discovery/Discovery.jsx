@@ -9,6 +9,7 @@ import {
   shopByKey,
 } from "../../../services/shopBy";
 import { fetchPublishedProducts } from "../../../services/products";
+import { adminError } from "../../../services/admin";
 
 const MAX_CHOICES_PER_GROUP = 10;
 
@@ -35,7 +36,7 @@ export default function Discovery() {
       setGroups(loadedGroups);
       setProducts(loadedProducts);
     } catch (loadError) {
-      setError(loadError?.message || "Unable to load Shop By groups.");
+      setError(adminError(loadError));
     } finally {
       setLoading(false);
     }
@@ -57,7 +58,7 @@ export default function Discovery() {
       setNotice(`${group.label} saved.`);
       await load();
     } catch (saveError) {
-      setError(saveError?.message || "Unable to save this Shop By group.");
+      setError(adminError(saveError));
     } finally {
       setSaving("");
     }
@@ -116,7 +117,7 @@ export default function Discovery() {
       setNotice(`${label} created.`);
       await load();
     } catch (createError) {
-      setError(createError?.message || "Unable to create the Shop By group.");
+      setError(adminError(createError));
     } finally {
       setSaving("");
     }
@@ -132,7 +133,7 @@ export default function Discovery() {
       setNotice(`${group.label} deleted.`);
       await load();
     } catch (deleteError) {
-      setError(deleteError?.message || "Unable to delete this Shop By group.");
+      setError(adminError(deleteError));
     } finally {
       setSaving("");
     }

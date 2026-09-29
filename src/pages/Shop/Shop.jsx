@@ -13,6 +13,7 @@ import {
 import { useCatalogue } from "../../hooks/useCatalogue";
 import { useBatchSize } from "../../hooks/useBatchSize";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
+import { SHOP_SEO } from "../../config/shopSeo";
 import {
   buildShopDiscovery,
   fetchTaxonomyLabels,
@@ -32,6 +33,7 @@ import {
   hasActiveRefinements,
   hasFilterSelections,
   parseShopState,
+  reconcileShopState,
   removeShopRefinement,
   toggleFilterValue,
 } from "../../utils/shopState";
@@ -45,7 +47,7 @@ import {
 } from "../../utils/shopBrowseState";
 import "./Shop.css";
 
-const SHOP_LEDE = "Timeless styles for every occasion. Tradition, elegance and modern sophistication.";
+const SHOP_LEDE = SHOP_SEO.description;
 const DIMENSION_KEYS = FILTER_DIMENSIONS.map((dimension) => dimension.key);
 function ChatIcon({ size = 20 }) {
   return (
@@ -136,6 +138,7 @@ export default function Shop() {
   const [isLoadMorePending, setIsLoadMorePending] = useState(false);
   const [loadMoreError, setLoadMoreError] = useState("");
   const [restoreNotice, setRestoreNotice] = useState("");
+  const [stateNotice, setStateNotice] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerState, setDrawerState] = useState(() => copyShopState(state));
   const [drawerFiltersValid, setDrawerFiltersValid] = useState(true);
@@ -147,29 +150,36 @@ export default function Shop() {
   const restorationDoneKeyRef = useRef("");
   const loadMorePendingRef = useRef(false);
   const loadMoreFrameRef = useRef(null);
+  const suppressNextResultResetRef = useRef(false);
   const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
   const [taxonomy, setTaxonomy] = useState(null);
+  const [shopConfigReady, setShopConfigReady] = useState(false);
 
   const searchRequested = searchParams.get("focus") === "search";
   const [searchOpen, setSearchOpen] = useState(searchRequested);
   const searchInputRef = useRef(null);
   const showSearch = searchOpen || Boolean(state.query);
   const refined = hasActiveRefinements(state) || state.sort !== "newest";
+  const hasQueryString = searchKey.length > 0;
 
   useDocumentMeta({
-    title: "Shop — Universal Dicta Couture",
-    description: SHOP_LEDE,
-    canonicalPath: "/shop",
-    noindex: refined,
+    title: SHOP_SEO.title,
+    description: SHOP_SEO.description,
+    canonicalPath: SHOP_SEO.canonicalPath,
+    noindex: refined || hasQueryString,
   });
 
   useEffect(() => {
     let active = true;
-    Promise.all([fetchShopByGroups(), fetchTaxonomyLabels()]).then(([groups, labels]) => {
-      if (!active) return;
-      if (groups.length) setShopByGroups(groups);
-      setTaxonomy(labels);
-    });
+    Promise.all([fetchShopByGroups(), fetchTaxonomyLabels()])
+      .then(([groups, labels]) => {
+        if (!active) return;
+        if (groups.length) setShopByGroups(groups);
+        setTaxonomy(labels);
+      })
+      .finally(() => {
+        if (active) setShopConfigReady(true);
+      });
     return () => { active = false; };
   }, []);
 
@@ -199,6 +209,10 @@ export default function Shop() {
   useEffect(() => {
     if (previousSearchKeyRef.current === searchKey) return;
     previousSearchKeyRef.current = searchKey;
+    if (suppressNextResultResetRef.current) {
+      suppressNextResultResetRef.current = false;
+      return;
+    }
     restorationDoneKeyRef.current = "";
     if (loadMoreFrameRef.current) cancelAnimationFrame(loadMoreFrameRef.current);
     loadMoreFrameRef.current = null;
@@ -208,6 +222,7 @@ export default function Shop() {
     setLoadAnnouncement("");
     setLoadMoreError("");
     setRestoreNotice("");
+    setStateNotice("");
     const frame = requestAnimationFrame(() => {
       resultsRef.current?.scrollIntoView({
         block: "start",
@@ -218,6 +233,7 @@ export default function Shop() {
   }, [searchKey]);
 
   const updateState = useCallback((next, { replace = false } = {}) => {
+    setStateNotice("");
     setSearchParams(buildSearchParams(next), { replace });
   }, [setSearchParams]);
 
@@ -233,6 +249,10 @@ export default function Shop() {
     updateState(clearAllRefinements(state));
   }, [state, updateState]);
 
+  const clearSearch = useCallback(() => {
+    updateState({ ...state, query: "" });
+  }, [state, updateState]);
+
   const results = useMemo(() => applyShopState(catalogue, state), [catalogue, state]);
   const facets = useMemo(() => buildFacets(catalogue, state, taxonomy), [catalogue, state, taxonomy]);
 
@@ -240,6 +260,31 @@ export default function Shop() {
     () => buildShopDiscovery(catalogue, "Shop By", shopByGroups),
     [catalogue, shopByGroups]
   );
+
+  useEffect(() => {
+    if (!shopConfigReady || isLoading || error) return;
+
+    let reconciled = state;
+    let removed = [];
+    if (catalogue.length > 0) {
+      const reconciliation = reconcileShopState(state, {
+        products: catalogue,
+        taxonomy,
+        discoveryGroups: discoveryModule?.groups ?? [],
+      });
+      reconciled = reconciliation.state;
+      removed = reconciliation.removed;
+    }
+
+    const canonicalParams = buildSearchParams(reconciled);
+    if (canonicalParams.toString() === searchParams.toString()) return;
+
+    suppressNextResultResetRef.current = true;
+    setSearchParams(canonicalParams, { replace: true });
+    if (removed.length) {
+      setStateNotice("Some previous Shop refinements are no longer available. The rest of your browsing context was kept.");
+    }
+  }, [catalogue, discoveryModule, error, isLoading, searchParams, setSearchParams, shopConfigReady, state, taxonomy]);
 
   const activeDiscoveryGroup = discoveryModule?.groups?.some((group) => group.id === state.discovery)
     ? state.discovery
@@ -530,6 +575,7 @@ export default function Shop() {
           <FilterChips chips={chips} onRemove={removeChip} onClearAll={clearAll} />
 
           {restoreNotice ? <p className="shop__restore-notice" role="status">{restoreNotice}</p> : null}
+          {stateNotice ? <p className="shop__restore-notice" role="status">{stateNotice}</p> : null}
 
           <p className="visually-hidden" role="status" aria-live="polite">
             {isLoading ? "Loading pieces." : error ? "The collection could not be loaded." : results.length === 0 ? "No pieces match the current Shop state." : "Product results updated."}
@@ -539,10 +585,10 @@ export default function Shop() {
           {isLoading ? <ShopSkeleton /> : null}
 
           {!isLoading && error ? (
-            <div className="shop__state shop__state--error">
+            <div className="shop__state shop__state--error" role="alert">
               <p className="shop__state-kicker">The collection is taking a little longer</p>
               <h2>We couldn’t load the Shop.</h2>
-              <p>{error}</p>
+              <p>Please check your connection and try again. Your Shop settings have not been changed.</p>
               <button type="button" className="btn btn--primary" onClick={retry}>Try again</button>
             </div>
           ) : null}
@@ -560,8 +606,15 @@ export default function Shop() {
             <div className="shop__state shop__state--empty">
               <p className="shop__state-kicker">Refine your search</p>
               <h2>{state.query ? `No match for “${state.query}”` : "No pieces match these refinements"}</h2>
-              <p>Keep your current idea, clear the refinements, or ask a Dicta Couturier for help finding the right fabric.</p>
+              <p>
+                {state.query
+                  ? "No matching pieces were found. Your search is still applied, so you can clear it or keep refining."
+                  : "Your current refinements produced no matching pieces. Remove a filter, clear the refinements, or ask a Dicta Couturier for help."}
+              </p>
               <div className="shop__state-actions">
+                {state.query ? (
+                  <button type="button" className="btn btn--secondary" onClick={clearSearch}>Clear Search</button>
+                ) : null}
                 <button type="button" className="btn btn--secondary" onClick={clearAll}>Clear All</button>
                 <Link className="btn btn--primary" to="/chats" state={{ draft: couturierDraft }}>Ask a Couturier</Link>
               </div>

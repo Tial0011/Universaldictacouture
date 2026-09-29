@@ -6,6 +6,7 @@ import Button from "../common/Button";
 
 export default function ImageField({ id, value, onChange, multiple = false, setUploading, maxImages = 8 }) {
   const [error, setError] = useState("");
+  const [guidance, setGuidance] = useState("");
   const [busy, setBusy] = useState(false);
   const images = multiple ? (Array.isArray(value) ? value : value ? [value] : []) : value ? [value] : [];
 
@@ -14,6 +15,7 @@ export default function ImageField({ id, value, onChange, multiple = false, setU
     event.target.value = "";
     if (!selected.length) return;
     setError("");
+    setGuidance(selected.some(file => file.size > 2.5 * 1024 * 1024) ? "Large image selected — it can upload, but a smaller optimized source may load faster for customers." : "");
     if (selected.some(file => !["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 4 * 1024 * 1024)) {
       setError("Choose JPEG, PNG or WebP images smaller than 4 MB."); return;
     }
@@ -52,10 +54,11 @@ export default function ImageField({ id, value, onChange, multiple = false, setU
     <input id={id} type="file" accept="image/jpeg,image/png,image/webp" multiple={multiple} disabled={busy} onChange={upload} />
     {busy && <p role="status">Uploading photos…</p>}
     {error && <p role="alert" className="field__error">{error}</p>}
+    {guidance && !error && <p role="status" className="field__hint">{guidance}</p>}
     <div className="admin-image-grid">{images.map((raw, index) => {
       const image = imageValue(raw);
       return <div className="admin-image" key={`${image.publicId || image.url || "photo"}-${index}`}>
-        <img src={image.url || getImageUrl(image.publicId)} alt={image.alt || "Uploaded photo " + (index + 1)} />
+        <img src={image.publicId ? getImageUrl(image.publicId, "c_limit,w_520,h_650,q_auto,f_auto") : image.url} alt={image.alt || "Uploaded photo " + (index + 1)} />
         <label htmlFor={id + "-alt-" + index}>Photo {index + 1} description</label>
         <input id={id + "-alt-" + index} value={image.alt || ""} maxLength={250} onChange={event => changeImage(index, { alt: event.target.value })} />
         <div className="admin-actions">

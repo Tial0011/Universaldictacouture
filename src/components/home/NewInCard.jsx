@@ -6,6 +6,7 @@ import { categoryIconFor } from "../product/icons/CategoryIcons";
 import { useSavedPieces } from "../../context/SavedPiecesContext";
 import { useToast } from "../../context/ToastContext";
 import { formatNaira } from "../../utils/formatters";
+import { PRODUCT_SHOP_CTA } from "../../utils/productCopy";
 import "./NewInCard.css";
 
 function HeartIcon({ filled }) {
@@ -118,7 +119,7 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
         </p>
 
         <Link to={product.href} className="menu-card__cta">
-          <span>SHOP PIECE</span>
+          <span>{PRODUCT_SHOP_CTA}</span>
           <StitchArrowIcon size={16} className="menu-card__cta-icon" />
         </Link>
       </div>

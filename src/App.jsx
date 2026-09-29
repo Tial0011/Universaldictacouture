@@ -25,6 +25,7 @@ const MyCloset = lazy(() => import("./pages/MyCloset/MyCloset"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const AdminSettings = lazy(() => import("./pages/admin/Settings/Settings"));
+const AdminShop = lazy(() => import("./pages/admin/Shop/ShopControl"));
 const Dashboard = lazy(() => import("./pages/admin/Dashboard/Dashboard"));
 const AdminProducts = lazy(() => import("./pages/admin/Products/Products"));
 const AdminTaxonomy = lazy(() => import("./pages/admin/Taxonomy/Taxonomy"));
@@ -76,6 +77,7 @@ export default function App() {
         }
       >
         <Route index element={<Dashboard />} />
+        <Route path="shop" element={<AdminShop />} />
         <Route path="products" element={<AdminProducts />} />
         <Route path="taxonomy" element={<AdminTaxonomy />} />
         <Route path="discovery" element={<AdminDiscovery />} />

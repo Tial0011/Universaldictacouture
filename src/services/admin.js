@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, getDocFromServer, getDocsFromServer, query, orderBy, documentId, limit, startAfter, setDoc, serverTimestamp } from "firebase/firestore";
+import { collection, deleteDoc, doc, getCountFromServer, getDocFromServer, getDocsFromServer, query, orderBy, documentId, limit, startAfter, setDoc, serverTimestamp, where } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { prepareRecord } from "./adminModel";
 const COLLECTIONS = new Set(["products", "heroSlides", "reviews", "discoveryModules", "taxonomy"]);
@@ -18,6 +18,17 @@ export async function loadAdminPage(kind, cursor = null) {
   const snapshot = await getDocsFromServer(query(target(kind), ...constraints));
   return { records: snapshot.docs.map(entry => ({ ...entry.data(), id: entry.id })), cursor: snapshot.docs.at(-1) || null, hasMore: snapshot.size === PAGE_SIZE };
 }
+
+export async function loadProductStatusCounts() {
+  if (!db) throw new Error("Connect Firebase before managing content.");
+  const statuses = ["draft", "published", "archived"];
+  const counts = await Promise.all(statuses.map(async (status) => {
+    const snapshot = await getCountFromServer(query(target("products"), where("status", "==", status)));
+    return [status, snapshot.data().count];
+  }));
+  return Object.fromEntries(counts);
+}
+
 export async function saveAdminRecord(kind, raw) {
   const data = prepareRecord(kind, raw);
   const reference = raw.id ? doc(target(kind), raw.id) : doc(target(kind));

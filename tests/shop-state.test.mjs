@@ -14,6 +14,7 @@ import {
   filterProducts,
   hasFilterSelections,
   parseShopState,
+  reconcileShopState,
   removeShopRefinement,
   sortProducts,
   toggleFilterValue,
@@ -645,3 +646,77 @@ test("Task 4: canonical writes deduplicate repeated values and never restore Cus
   assert.deepEqual(params.getAll("style"), ["Classic"]);
 });
 
+
+
+// ── Task 8 production hardening ───────────────────────────────────────────
+
+test("Task 8: user-controlled Shop URL text is bounded and excessive filter values are capped", () => {
+  const params = new URLSearchParams();
+  params.set("q", "x".repeat(400));
+  params.set("discovery", "d".repeat(200));
+  for (let index = 0; index < 40; index += 1) params.append("colour", `Colour-${index}`);
+
+  const parsed = parseShopState(params);
+  assert.equal(parsed.query.length, 160);
+  assert.equal(parsed.discovery.length, 80);
+  assert.equal(parsed.filters.colour.length, 24);
+});
+
+test("Task 8: stale filter/discovery values are removed without erasing valid Shop state", () => {
+  const products = [
+    piece("one", {
+      occasion: ["Wedding Guest"],
+      style: ["Classic"],
+      fabric: ["Handwoven"],
+      colour: ["Burgundy"],
+      shopBy: { occasion: ["Wedding Guest"], style: ["Classic"], fabric: ["Handwoven"] },
+    }),
+  ];
+  const state = {
+    ...EMPTY_STATE,
+    query: "royal",
+    sort: "price-desc",
+    discovery: "removed-group",
+    filters: {
+      ...EMPTY_STATE.filters,
+      occasion: ["Wedding Guest", "Removed Occasion"],
+      colour: ["Burgundy"],
+    },
+    shopBy: { fabric: ["Handwoven", "Removed Weave"] },
+  };
+
+  const reconciled = reconcileShopState(state, {
+    products,
+    taxonomy: {
+      category: ["Aso Oke Fabric"],
+      occasion: ["Wedding Guest"],
+      style: ["Classic"],
+      fabric: ["Handwoven"],
+      colour: ["Burgundy"],
+    },
+    discoveryGroups: [{ id: "occasion", label: "Occasion" }],
+  });
+
+  assert.equal(reconciled.state.query, "royal");
+  assert.equal(reconciled.state.sort, "price-desc");
+  assert.equal(reconciled.state.discovery, "");
+  assert.deepEqual(reconciled.state.filters.occasion, ["Wedding Guest"]);
+  assert.deepEqual(reconciled.state.filters.colour, ["Burgundy"]);
+  assert.deepEqual(reconciled.state.shopBy.fabric, ["Handwoven"]);
+  assert.equal(reconciled.removed.length, 3);
+});
+
+test("Task 8: valid stale-link values are canonicalized to current catalogue/taxonomy casing", () => {
+  const products = [piece("one", { colour: ["Burgundy"] })];
+  const state = {
+    ...EMPTY_STATE,
+    filters: { ...EMPTY_STATE.filters, colour: ["burgundy"] },
+  };
+  const { state: reconciled, removed } = reconcileShopState(state, {
+    products,
+    taxonomy: { colour: ["Burgundy"] },
+    discoveryGroups: [],
+  });
+  assert.deepEqual(reconciled.filters.colour, ["Burgundy"]);
+  assert.deepEqual(removed, []);
+});

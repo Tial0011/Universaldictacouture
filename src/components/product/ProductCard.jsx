@@ -5,6 +5,7 @@ import StitchArrowIcon from "../common/icons/StitchArrowIcon";
 import { useSavedPieces } from "../../context/SavedPiecesContext";
 import { useToast } from "../../context/ToastContext";
 import { formatNaira } from "../../utils/formatters";
+import { PRODUCT_SHOP_CTA } from "../../utils/productCopy";
 import "./ProductCard.css";
 
 const GRID_IMAGE = "w_720,h_720,c_limit,q_auto,f_auto";
@@ -89,7 +90,7 @@ function isPlainNavigation(event) {
 
 /**
  * Shared product card. The Shop variant follows the Section 4 card
- * contract (image, heart, name, live price/unit, SHOP THIS PIECE) while
+ * contract (image, heart, name, live price/unit, SHOP PIECE) while
  * other destinations keep their existing compact preview treatment.
  */
 export default function ProductCard({
@@ -111,7 +112,7 @@ export default function ProductCard({
   const isShopCard = variant === "shop";
   const saved = isSaved(product.id);
   const subtitle = isShopCard ? "" : buildSubtitle(product);
-  const ctaLabel = isShopCard ? "SHOP THIS PIECE \u2192" : "SHOP PIECE";
+  const ctaLabel = PRODUCT_SHOP_CTA;
   const showCtaIcon = !isShopCard;
   const imageTransformation = view === "list"
     ? LIST_IMAGE

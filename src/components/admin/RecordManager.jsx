@@ -7,6 +7,8 @@ import ImageField from "./ImageField";
 import Button from "../common/Button";
 import { DEFAULT_SHOP_BY_GROUPS, fetchShopByGroups } from "../../services/shopBy";
 import { fetchPublishedProducts } from "../../services/products";
+import { productAdminHref, productReadiness } from "../../services/adminModel";
+import { getImageUrl } from "../../cloudinary/cloudinary";
 
 export default function RecordManager({ kind }) {
   const schema = SCHEMAS[kind];
@@ -18,7 +20,11 @@ export default function RecordManager({ kind }) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState(() => {
+    if (kind !== "products") return "all";
+    const requested = params.get("view");
+    return ["draft", "published", "archived", "needs-attention", "new-in"].includes(requested) ? requested : "all";
+  });
   const [editor, setEditor] = useState(() => params.get("new") === "1" ? { ...schema.initial } : null);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -42,6 +48,20 @@ export default function RecordManager({ kind }) {
       .finally(() => { if (current) setLoading(false); });
     return () => { current = false; };
   }, [kind, pendingPage, revision]);
+
+  useEffect(() => {
+    if (kind !== "products") return;
+    const requested = params.get("view");
+    if (["draft", "published", "archived", "needs-attention", "new-in"].includes(requested)) setFilter(requested);
+  }, [kind, params]);
+
+  useEffect(() => {
+    if (kind !== "products" || editor || loading) return;
+    const editId = params.get("edit");
+    if (!editId) return;
+    const record = records.find((item) => item.id === editId);
+    if (record) open(record);
+  }, [kind, editor, loading, params, records]);
 
   useEffect(() => {
     if (kind !== "products") return;
@@ -106,10 +126,17 @@ export default function RecordManager({ kind }) {
     setDirty(false); setNotice(""); setError("");
   }
 
+  function nextListParams() {
+    const next = new URLSearchParams();
+    const view = params.get("view");
+    if (kind === "products" && view) next.set("view", view);
+    return next;
+  }
+
   function cancel() {
     if (dirty && !window.confirm("Discard your unsaved changes?")) return;
     setEditor(null); setDirty(false); setReviewProductSearch("");
-    setParams({}, { replace: true });
+    setParams(nextListParams(), { replace: true });
     addButtonArea.current?.querySelector("button")?.focus();
   }
 
@@ -134,7 +161,7 @@ export default function RecordManager({ kind }) {
       await saveAdminRecord(kind, raw);
       if (kind === "products") invalidateCatalogue();
       setNotice("Saved successfully."); setEditor(null); setDirty(false); setReviewProductSearch("");
-      setParams({}, { replace: true }); setLoading(true); setPendingPage(undefined); setRevision(v => v + 1);
+      setParams(nextListParams(), { replace: true }); setLoading(true); setPendingPage(undefined); setRevision(v => v + 1);
       addButtonArea.current?.querySelector("button")?.focus();
     } catch (error) { setError(adminError(error)); }
     finally { setSaving(false); }
@@ -160,7 +187,15 @@ export default function RecordManager({ kind }) {
     return (record.published || record.active) ? "published" : "draft";
   }
 
-  const visible = records.filter(record => (filter === "all" || status(record) === filter) && [record.name, record.title, record.headline, record.author, record.body].some(value => String(value || "").toLowerCase().includes(search.toLowerCase())));
+  function matchesFilter(record) {
+    if (filter === "all") return true;
+    if (kind === "products" && filter === "needs-attention") return productReadiness(record).state === "needs-attention";
+    if (kind === "products" && filter === "new-in") return record.isNewIn === true || record.newIn === true;
+    return status(record) === filter;
+  }
+
+  const visible = records.filter(record => matchesFilter(record) && [record.name, record.title, record.headline, record.author, record.body, record.id, record.slug].some(value => String(value || "").toLowerCase().includes(search.toLowerCase())));
+  const editorReadiness = kind === "products" && editor ? productReadiness(editor, { allowGeneratedIdentity: !editor.id }) : null;
 
   function field(definition) {
     const { key, label, type, options, hint, required, maxImages } = definition;
@@ -230,24 +265,62 @@ export default function RecordManager({ kind }) {
     </div>;
   }
 
+  const productSections = [
+    { key: "basic", label: "Basic information", description: "Name and describe the piece customers will see." },
+    { key: "pricing", label: "Pricing", description: "Set the authoritative NGN price and its truthful commercial unit." },
+    { key: "images", label: "Images", description: "Manage the cover image and supporting product photos." },
+    { key: "classification", label: "Catalogue classification", description: "Connect the product to Shop filters and Shop By discovery." },
+    { key: "merchandising", label: "Merchandising & search", description: "Curate New In and help customers find the piece with genuine search terms." },
+    { key: "publication", label: "Publication", description: "Choose whether this record is a draft, published or archived." },
+  ];
+
+  function renderEditorFields() {
+    if (kind !== "products") {
+      return <fieldset className="admin-form-fields" disabled={saving || uploading}>{schema.fields.map(field)}</fieldset>;
+    }
+    return <div className="admin-product-form-sections">{productSections.map((section) => {
+      const definitions = schema.fields.filter((definition) => definition.section === section.key);
+      if (!definitions.length) return null;
+      return <fieldset className="admin-form-fields admin-form-section" disabled={saving || uploading} key={section.key}>
+        <legend><span>{section.label}</span><small>{section.description}</small></legend>
+        {definitions.map(field)}
+      </fieldset>;
+    })}</div>;
+  }
+
   return <div className="admin-stack">
     <header className="admin-page-heading"><div><p className="admin-eyebrow">Studio management</p><h1>{schema.title}</h1><p>{schema.description}</p></div><div ref={addButtonArea}><Button disabled={saving || uploading} onClick={() => open(null)}>Add {schema.singular}</Button></div></header>
     {notice && <p role="status" className="admin-notice">{notice}</p>}
     {error && <div role="alert" className="admin-notice"><p>{error}</p>{!editor && <Button variant="secondary" onClick={() => { setLoading(true); setError(""); setRevision(v => v + 1); }}>Try again</Button>}</div>}
     {editor && <section className="admin-panel admin-stack" aria-labelledby="editor-title">
       <div><h2 id="editor-title" tabIndex={-1} ref={editorHeading}>{editor.id ? "Edit" : "Add"} {schema.singular}</h2><p>Changes appear on the website only after you save a published record.</p></div>
-      <form onSubmit={save} className="admin-stack"><fieldset className="admin-form-fields" disabled={saving || uploading}>{schema.fields.map(field)}</fieldset>
+      {kind === "products" && editorReadiness && <aside className="admin-readiness" aria-labelledby="product-readiness-title">
+        <div className="admin-section-heading">
+          <div><p className="admin-eyebrow">Publication readiness</p><h3 id="product-readiness-title">{editorReadiness.label}</h3></div>
+          {editor.id && !dirty && editor.status === "published" && editorReadiness.ready && productAdminHref(editor) ? <Button to={productAdminHref(editor)} target="_blank" rel="noopener noreferrer" variant="secondary">View in Shop</Button> : null}
+        </div>
+        <ul className="admin-readiness__checks">{editorReadiness.checks.map((check) => <li key={check.key} className={check.complete ? "is-complete" : "is-missing"}><span aria-hidden="true">{check.complete ? "✓" : "!"}</span><span>{check.label}</span></li>)}</ul>
+        {editorReadiness.blockers.length ? <p className="field__error" role="status">Before publishing: {editorReadiness.blockers.map((item) => item.label).join(", ")}.</p> : <p className="admin-positive">All required publication information is ready.</p>}
+        {editorReadiness.warnings.length ? <p className="field__hint">Suggested check: {editorReadiness.warnings.map((item) => item.label).join(", ")}.</p> : null}
+      </aside>}
+      <form onSubmit={save} className="admin-stack">{renderEditorFields()}
         <div className="admin-form-actions"><Button type="submit" disabled={uploading} isLoading={saving}>{saving ? "Saving…" : "Save " + schema.singular}</Button><Button variant="secondary" disabled={saving || uploading} onClick={cancel}>Cancel</Button><span className="field__hint">{uploading ? "Uploading photos…" : dirty ? "Unsaved changes" : "No unsaved changes"}</span></div>
       </form>
     </section>}
     <section className="admin-panel admin-stack" aria-label={schema.title + " list"}>
       <div className="admin-list-tools"><div className="field"><label htmlFor="admin-search">Search loaded records</label><input id="admin-search" type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder={"Find a " + schema.singular} /></div>
-      {kind !== "taxonomy" && <div className="field"><label htmlFor="admin-filter">Visibility</label><select id="admin-filter" value={filter} onChange={event => setFilter(event.target.value)}>{["all", "draft", "published", ...(kind === "products" ? ["archived"] : [])].map(status => <option key={status} value={status}>{status === "all" ? "All statuses" : status}</option>)}</select></div>}
+      {kind !== "taxonomy" && <div className="field"><label htmlFor="admin-filter">{kind === "products" ? "Product view" : "Visibility"}</label><select id="admin-filter" value={filter} onChange={event => { const next = event.target.value; setFilter(next); if (kind === "products") { const nextParams = new URLSearchParams(params); if (next === "all") nextParams.delete("view"); else nextParams.set("view", next); nextParams.delete("edit"); setParams(nextParams, { replace: true }); } }}>{(kind === "products" ? ["all", "published", "draft", "archived", "needs-attention", "new-in"] : ["all", "draft", "published"]).map(option => <option key={option} value={option}>{option === "all" ? (kind === "products" ? "All products" : "All statuses") : option === "needs-attention" ? "Needs attention" : option === "new-in" ? "New In" : option.replaceAll("-", " ")}</option>)}</select></div>}
       <Button variant="secondary" disabled={loading || saving || uploading} onClick={() => { setLoading(true); setError(""); setPendingPage(undefined); setRevision(v => v + 1); }}>Refresh</Button></div>
       <p className="field__hint">{records.length} loaded · {visible.length} shown. Load more to search additional records.</p>
       {loading && <p role="status">Loading records…</p>}
       {!loading && !error && !visible.length && <div className="admin-empty"><h2>{records.length ? "No matching records" : "A fresh start"}</h2><p>{records.length ? "Try a different search or visibility filter." : "Add your first " + schema.singular + " using the button above."}</p></div>}
-      {!!visible.length && <div className="admin-table-wrap"><table className="admin-table"><caption className="visually-hidden">{schema.title}</caption><thead><tr><th scope="col">Name</th><th scope="col">{kind === "taxonomy" ? "Type" : "Visibility"}</th><th scope="col">Action</th></tr></thead><tbody>{visible.map(record => <tr key={record.id}><td><strong>{record.name || record.title || record.headline || record.author || "Untitled"}</strong>{kind === "products" && <small>{record.price == null ? "Main price not set" : `Main price: ${new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" }).format(Number(record.price))}${record.unitLabel || record.priceToken ? ` (${record.unitLabel || record.priceToken})` : ""}`}</small>}{kind === "reviews" && record.productId && <small>Product: {reviewProducts.find(product => product.id === record.productId)?.name || record.productId}</small>}</td><td><span className={"admin-status admin-status--" + status(record)}>{status(record)}</span></td><td><div className="admin-actions"><Button variant="ghost" disabled={saving || uploading} onClick={() => open(record)} aria-label={"Edit " + (record.name || record.title || record.headline || record.author || schema.singular)}>Edit</Button>{["reviews", "heroSlides"].includes(kind) && <Button variant="ghost" disabled={saving || uploading} onClick={() => remove(record)} aria-label={`Delete ${record.author || record.headline || schema.singular}`}>Delete</Button>}</div></td></tr>)}</tbody></table></div>}
+      {!!visible.length && <div className="admin-table-wrap"><table className="admin-table"><caption className="visually-hidden">{schema.title}</caption><thead><tr><th scope="col">Name</th><th scope="col">{kind === "taxonomy" ? "Type" : "Visibility"}</th>{kind === "products" && <><th scope="col">Readiness</th><th scope="col">Merchandising</th></>}<th scope="col">Action</th></tr></thead><tbody>{visible.map(record => {
+        const readiness = kind === "products" ? productReadiness(record) : null;
+        const image = kind === "products" ? (record.primaryImage || (Array.isArray(record.images) ? record.images[0] : record.images)) : null;
+        const imageUrl = typeof image === "string" ? image : image?.publicId ? getImageUrl(image.publicId, "c_fill,g_auto,w_160,h_200,q_auto,f_auto") : image?.url || image?.secureUrl || image?.secure_url || "";
+        const publicHref = kind === "products" ? productAdminHref(record) : "";
+        return <tr key={record.id}><td><div className={kind === "products" ? "admin-product-summary" : undefined}>{kind === "products" && <div className="admin-product-thumb" aria-hidden="true">{imageUrl ? <img src={imageUrl} alt="" loading="lazy" /> : <span>UDC</span>}</div>}<div><strong>{record.name || record.title || record.headline || record.author || "Untitled"}</strong>{kind === "products" && <><small>{record.price == null ? "Main price not set" : `Main price: ${new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" }).format(Number(record.price))}${record.unitLabel || record.priceToken ? ` (${record.unitLabel || record.priceToken})` : ""}`}</small><small>{Array.isArray(record.category) ? record.category.join(" · ") : record.category || "Category not set"}</small></>}{kind === "reviews" && record.productId && <small>Product: {reviewProducts.find(product => product.id === record.productId)?.name || record.productId}</small>}</div></div></td><td><span className={"admin-status admin-status--" + status(record)}>{status(record)}</span></td>{kind === "products" && <><td><span className={"admin-status admin-status--" + readiness.state}>{readiness.label}</span>{readiness.blockers.length ? <small>{readiness.blockers.map((item) => item.label).join(" · ")}</small> : readiness.warnings.length ? <small>{readiness.warnings[0].label}</small> : null}</td><td>{record.isNewIn === true || record.newIn === true ? <span className="admin-status admin-status--new-in">New In</span> : <span className="field__hint">Standard catalogue</span>}</td></>}<td><div className="admin-actions"><Button variant="ghost" disabled={saving || uploading} onClick={() => { open(record); if (kind === "products") { const nextParams = new URLSearchParams(params); nextParams.set("edit", record.id); setParams(nextParams, { replace: true }); } }} aria-label={"Edit " + (record.name || record.title || record.headline || record.author || schema.singular)}>Edit</Button>{kind === "products" && readiness.ready && status(record) === "published" && publicHref ? <Button to={publicHref} target="_blank" rel="noopener noreferrer" variant="ghost">View in Shop</Button> : null}{["reviews", "heroSlides"].includes(kind) && <Button variant="ghost" disabled={saving || uploading} onClick={() => remove(record)} aria-label={`Delete ${record.author || record.headline || schema.singular}`}>Delete</Button>}</div></td></tr>;
+      })}</tbody></table></div>}
       {more && <Button variant="secondary" disabled={loading} onClick={() => { setLoading(true); setError(""); setPendingPage(cursor); }}>Load more</Button>}
     </section>
   </div>;

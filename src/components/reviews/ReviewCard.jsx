@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useAuthGate } from "../../context/AuthGateContext";
 import ProductImage from "../product/ProductImage";
 import { formatNaira, truncateText } from "../../utils/formatters";
+import { PRODUCT_SHOP_CTA } from "../../utils/productCopy";
 import { timestampDate } from "../../services/reviewModel";
 import { productChatContext } from "../../services/chatModel";
 import "./ReviewCard.css";
@@ -124,7 +125,7 @@ export default function ReviewCard({
             {presentation.price != null && <small>{formatNaira(presentation.price)}{presentation.variable ? " +" : ""}</small>}
           </div>
           {presentation.available
-            ? <Link className="udc-review-product__cta" to={presentation.href} aria-label={`Shop ${presentation.name}`}>Shop Piece <Icon name="arrow" /></Link>
+            ? <Link className="udc-review-product__cta" to={presentation.href} aria-label={`Shop ${presentation.name}`}>{PRODUCT_SHOP_CTA} <Icon name="arrow" /></Link>
             : <span className="udc-review-product__unavailable">Currently unavailable</span>}
         </> : <div className="udc-review-product__missing"><strong>Reviewed piece unavailable</strong><span>The customer story remains published, but this product is no longer in the live catalogue.</span></div>}
       </div>

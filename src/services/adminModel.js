@@ -11,12 +11,69 @@ export function imageValue(value) {
   return value || null;
 }
 
-function hasUsableImage(value) {
+export function hasUsableImage(value) {
   if (!value) return false;
   if (typeof value === "string") return Boolean(value.trim());
   if (typeof value !== "object" || Array.isArray(value)) return false;
   return Boolean(String(value.url || value.secureUrl || value.secure_url || value.publicId || value.public_id || "").trim());
 }
+
+export function productAdminHref(raw = {}) {
+  const identity = String(raw.slug || raw.id || "").trim();
+  return identity ? `/shop/${encodeURIComponent(identity)}` : "";
+}
+
+export function productReadiness(raw = {}, { allowGeneratedIdentity = false } = {}) {
+  const name = String(raw.name || "").trim();
+  const price = raw.price === "" || raw.price == null ? null : Number(raw.price);
+  const categories = splitValues(raw.category ?? raw.categories);
+  const imageSource = Array.isArray(raw.images) ? raw.images : raw.images ? [raw.images] : [];
+  const hasImage = hasUsableImage(raw.primaryImage) || imageSource.some(hasUsableImage);
+  const hasIdentity = Boolean(String(raw.slug || raw.id || "").trim()) || allowGeneratedIdentity;
+  const blockers = [];
+  if (!name) blockers.push({ key: "name", label: "Product name" });
+  if (!Number.isFinite(price) || price < 0) blockers.push({ key: "price", label: "Valid NGN price" });
+  if (!hasImage) blockers.push({ key: "image", label: "Primary product image" });
+  if (!categories.length) blockers.push({ key: "category", label: "At least one category" });
+  if (!hasIdentity) blockers.push({ key: "identity", label: "Stable product identity" });
+
+  const warnings = [];
+  const unit = String(raw.unitLabel ?? raw.priceToken ?? "").trim();
+  if (!unit) warnings.push({ key: "unit", label: "Commercial unit is not set" });
+
+  const lifecycle = String(raw.status || "draft").trim().toLowerCase();
+  let state = "draft";
+  let label = "Draft";
+  if (lifecycle === "archived") {
+    state = "archived";
+    label = "Archived";
+  } else if (blockers.length) {
+    state = "needs-attention";
+    label = "Needs attention";
+  } else if (lifecycle === "published") {
+    state = "published";
+    label = "Published";
+  } else {
+    state = "ready";
+    label = "Ready to publish";
+  }
+
+  return {
+    state,
+    label,
+    blockers,
+    warnings,
+    ready: blockers.length === 0,
+    checks: [
+      { key: "name", label: "Name", complete: Boolean(name) },
+      { key: "price", label: "Valid price", complete: Number.isFinite(price) && price >= 0 },
+      { key: "image", label: "Primary image", complete: hasImage },
+      { key: "identity", label: "Stable product identity", complete: hasIdentity },
+      { key: "category", label: "Required taxonomy", complete: categories.length > 0 },
+    ],
+  };
+}
+
 export function prepareRecord(kind, raw) {
   const data = { ...raw };
   delete data.id;
@@ -54,6 +111,7 @@ export function prepareRecord(kind, raw) {
     const token = typeof (data.unitLabel ?? data.priceToken) === "string"
       ? (data.unitLabel ?? data.priceToken).trim()
       : "";
+    if (token.length > 120) throw new Error("Keep the commercial unit within 120 characters.");
     data.unitLabel = token;
     data.priceToken = token;
     if (Array.isArray(data.variants) && data.variants.length > 0) {

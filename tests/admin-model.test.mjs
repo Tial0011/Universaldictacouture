@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { prepareRecord, localDestination } from "../src/services/adminModel.js";
+import { DIMENSIONS, localDestination, prepareRecord, productAdminHref, productReadiness } from "../src/services/adminModel.js";
 test("draft permits incomplete price but publishing requires price and category", () => {
   assert.equal(prepareRecord("products", { name: "Aso Oke", status: "draft", price: "" }).price, null);
   assert.throws(() => prepareRecord("products", { name: "Aso Oke", status: "published", price: "", category: "Fabric" }));
@@ -47,4 +47,26 @@ test("reviews use separate ratings, one image, a product and moderation status",
 test("new review workflow rejects more than one customer photo", () => {
   const images = ["https://example.test/1.jpg", "https://example.test/2.jpg"];
   assert.throws(() => prepareRecord("reviews", { author: "Amara", body: "Lovely", images, status: "pending", productId: "piece", customerServiceRating: 5, productQualityRating: 4 }));
+});
+
+
+test("Task 8A: product readiness is deterministic and names exact publication blockers", () => {
+  const incomplete = productReadiness({ id: "piece-1", name: "", price: "", category: [], images: [], status: "draft" });
+  assert.equal(incomplete.state, "needs-attention");
+  assert.deepEqual(incomplete.blockers.map((item) => item.key), ["name", "price", "image", "category"]);
+
+  const ready = productReadiness({ id: "piece-1", name: "Aso Oke", price: 25000, category: ["Fabric"], images: [{ url: "https://example.test/piece.jpg" }], status: "draft", unitLabel: "per bundle" });
+  assert.equal(ready.state, "ready");
+  assert.equal(ready.ready, true);
+  assert.equal(ready.warnings.length, 0);
+
+  const published = productReadiness({ id: "piece-1", name: "Aso Oke", price: 25000, category: ["Fabric"], images: [{ url: "https://example.test/piece.jpg" }], status: "published" });
+  assert.equal(published.state, "published");
+  assert.match(published.warnings[0].label, /Commercial unit/i);
+});
+
+test("Task 8A: customer preview uses stable slug/id and Shop V1 taxonomy excludes Size", () => {
+  assert.equal(productAdminHref({ id: "firestore-id", slug: "royal-weave" }), "/shop/royal-weave");
+  assert.equal(productAdminHref({ id: "firestore-id" }), "/shop/firestore-id");
+  assert.deepEqual(DIMENSIONS, ["category", "occasion", "style", "fabric", "colour"]);
 });

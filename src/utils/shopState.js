@@ -21,6 +21,20 @@ export const SORT_OPTIONS = [
 const SORT_VALUES = SORT_OPTIONS.map((option) => option.value);
 const DIMENSION_KEYS = FILTER_DIMENSIONS.map((dimension) => dimension.key);
 
+const MAX_QUERY_LENGTH = 160;
+const MAX_FILTER_VALUE_LENGTH = 80;
+const MAX_FILTER_VALUES_PER_DIMENSION = 24;
+const MAX_SHOP_BY_ENTRIES = 48;
+const MAX_DISCOVERY_ID_LENGTH = 80;
+
+function boundedText(value, maxLength) {
+  return String(value ?? "").trim().slice(0, maxLength);
+}
+
+function boundedUniqueTextValues(values = [], maxItems = MAX_FILTER_VALUES_PER_DIMENSION, maxLength = MAX_FILTER_VALUE_LENGTH) {
+  return uniqueTextValues(values.map((value) => boundedText(value, maxLength))).slice(0, maxItems);
+}
+
 export const EMPTY_STATE = {
   query: "",
   filters: Object.fromEntries(DIMENSION_KEYS.map((key) => [key, []])),
@@ -148,7 +162,7 @@ export function validatePriceRange(minInput, maxInput) {
 export function parseShopState(searchParams) {
   const filters = {};
   DIMENSION_KEYS.forEach((key) => {
-    filters[key] = uniqueTextValues(searchParams.getAll(key))
+    filters[key] = boundedUniqueTextValues(searchParams.getAll(key))
       .filter((value) => !(key === "style" && value.toLowerCase() === "custom style"));
   });
 
@@ -162,13 +176,13 @@ export function parseShopState(searchParams) {
 
   const sort = searchParams.get("sort");
   const shopBy = {};
-  searchParams.getAll("shopby").forEach((entry) => {
+  searchParams.getAll("shopby").slice(0, MAX_SHOP_BY_ENTRIES).forEach((entry) => {
     const separator = entry.indexOf(":");
     if (separator <= 0) return;
-    const group = entry.slice(0, separator).trim();
-    const value = entry.slice(separator + 1).trim();
+    const group = boundedText(entry.slice(0, separator), MAX_FILTER_VALUE_LENGTH);
+    const value = boundedText(entry.slice(separator + 1), MAX_FILTER_VALUE_LENGTH);
     if (!group || !value) return;
-    shopBy[group] = uniqueTextValues([...(shopBy[group] || []), value]);
+    shopBy[group] = boundedUniqueTextValues([...(shopBy[group] || []), value]);
   });
 
   // Promote shopby entries whose group key is a canonical filter dimension
@@ -183,14 +197,14 @@ export function parseShopState(searchParams) {
   });
 
   return {
-    query: (searchParams.get("q") ?? "").trim(),
+    query: boundedText(searchParams.get("q"), MAX_QUERY_LENGTH),
     filters,
     shopBy,
     min,
     max,
     sort: SORT_VALUES.includes(sort) ? sort : "newest",
     newIn: searchParams.get("newin") === "1",
-    discovery: (searchParams.get("discovery") ?? "").trim(),
+    discovery: boundedText(searchParams.get("discovery"), MAX_DISCOVERY_ID_LENGTH),
   };
 }
 
@@ -215,6 +229,81 @@ export function buildSearchParams(state) {
   if (state.discovery) params.set("discovery", state.discovery);
 
   return params;
+}
+
+/**
+ * Remove only catalogue/taxonomy/discovery values that are no longer valid.
+ * Public URL state remains authoritative; this is a compatibility pass for
+ * old shared links after admin-managed taxonomy or discovery changes.
+ */
+export function reconcileShopState(state, { products = [], taxonomy = null, discoveryGroups = [] } = {}) {
+  const next = copyShopState(state);
+  const removed = [];
+
+  const canonicalMap = (values = []) => {
+    const map = new Map();
+    values.forEach((raw) => {
+      const value = String(raw ?? "").trim();
+      if (!value) return;
+      const key = value.toLowerCase();
+      if (!map.has(key)) map.set(key, value);
+    });
+    return map;
+  };
+
+  DIMENSION_KEYS.forEach((dimension) => {
+    const available = [];
+    products.forEach((product) => available.push(...(product?.[dimension] ?? [])));
+    if (Array.isArray(taxonomy?.[dimension])) available.push(...taxonomy[dimension]);
+    const valid = canonicalMap(available);
+
+    next.filters[dimension] = (state.filters?.[dimension] ?? []).flatMap((raw) => {
+      const value = String(raw ?? "").trim();
+      const canonical = valid.get(value.toLowerCase());
+      if (canonical) return [canonical];
+      if (value) removed.push({ type: "filter", dimension, value });
+      return [];
+    });
+  });
+
+  const shopByMaps = new Map();
+  products.forEach((product) => {
+    Object.entries(product?.shopBy ?? {}).forEach(([group, values]) => {
+      const key = String(group ?? "").trim();
+      if (!key) return;
+      const existing = shopByMaps.get(key) ?? [];
+      existing.push(...(Array.isArray(values) ? values : []));
+      shopByMaps.set(key, existing);
+    });
+  });
+
+  const shopBy = {};
+  Object.entries(state.shopBy ?? {}).forEach(([group, values]) => {
+    const valid = canonicalMap(shopByMaps.get(group) ?? []);
+    const kept = (values ?? []).flatMap((raw) => {
+      const value = String(raw ?? "").trim();
+      const canonical = valid.get(value.toLowerCase());
+      if (canonical) return [canonical];
+      if (value) removed.push({ type: "shopBy", group, value });
+      return [];
+    });
+    if (kept.length) shopBy[group] = uniqueTextValues(kept);
+  });
+  next.shopBy = shopBy;
+
+  if (state.discovery) {
+    const validDiscovery = new Set(
+      (Array.isArray(discoveryGroups) ? discoveryGroups : [])
+        .map((group) => String(group?.id ?? "").trim())
+        .filter(Boolean)
+    );
+    if (!validDiscovery.has(state.discovery)) {
+      removed.push({ type: "discovery", value: state.discovery });
+      next.discovery = "";
+    }
+  }
+
+  return { state: next, removed };
 }
 
 export function hasActiveRefinements(state) {
