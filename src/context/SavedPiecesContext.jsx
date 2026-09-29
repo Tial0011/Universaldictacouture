@@ -4,7 +4,17 @@ import { db } from "../firebase/firestore";
 import { createSavedItemsStore, reviewIds as itemIds } from "../services/savedReviewStore";
 import { useAuth } from "./AuthContext";
 
-const SavedPiecesContext = createContext({ savedIds: [], isSaved: () => false, toggleSaved: () => false, retrySync: () => {}, isPersistent: false, isReady: true, storage: "memory", error: "" });
+const SavedPiecesContext = createContext({
+  savedIds: [],
+  isSaved: () => false,
+  toggleSaved: () => false,
+  toggleSavedConfirmed: async () => null,
+  retrySync: () => {},
+  isPersistent: false,
+  isReady: true,
+  storage: "memory",
+  error: "",
+});
 const GUEST_KEY = "udc:saved-pieces:guest";
 function parseRecord(raw) {
   try {
@@ -97,6 +107,7 @@ function SavedSession({ uid, children }) {
     savedIds: state.savedIds,
     isSaved: id => state.savedIds.includes(id),
     toggleSaved: id => store.toggle(id)?.added ?? false,
+    toggleSavedConfirmed: id => store.toggleConfirmed(id),
     retrySync: store.retry,
     isPersistent: !!uid && !!db,
     isReady: true,

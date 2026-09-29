@@ -143,3 +143,72 @@ test("blocked browser storage is reported without making the button inert", () =
   assert.deepEqual(store.getSnapshot().savedReviewIds, ["review"]);
   assert.match(store.getSnapshot().error, /Browser storage is unavailable/);
 });
+
+test("confirmed product save rolls back after an authoritative write failure", async () => {
+  const local = cache();
+  let writes = 0;
+  const store = createSavedItemsStore({
+    idsField: "productIds",
+    snapshotField: "savedIds",
+    itemLabel: "saved pieces",
+    persist: local.persist,
+    writeRemote: async () => {
+      writes += 1;
+      throw new Error("permission-denied");
+    },
+  });
+
+  store.start();
+  const result = await store.toggleConfirmed("piece-one");
+
+  assert.deepEqual(result, { added: true, storage: "browser", ok: false });
+  assert.equal(writes, 1);
+  assert.deepEqual(store.getSnapshot().savedIds, []);
+  assert.deepEqual(local.read().productIds, []);
+  assert.deepEqual(local.read().pending, []);
+  assert.match(store.getSnapshot().error, /Account sync is unavailable/);
+});
+
+test("confirmed product save keeps a successful authoritative write and remains deduplicated", async () => {
+  const local = cache();
+  const remote = new Set();
+  const store = createSavedItemsStore({
+    idsField: "productIds",
+    snapshotField: "savedIds",
+    itemLabel: "saved pieces",
+    initial: { productIds: ["piece-one", "piece-one"] },
+    persist: local.persist,
+    writeRemote: async (id, saved) => {
+      if (saved) remote.add(id);
+      else remote.delete(id);
+    },
+  });
+
+  store.start();
+  assert.deepEqual(store.getSnapshot().savedIds, ["piece-one"]);
+
+  const remove = await store.toggleConfirmed("piece-one");
+  assert.deepEqual(remove, { added: false, storage: "browser", ok: true });
+  assert.deepEqual(store.getSnapshot().savedIds, []);
+
+  const add = await store.toggleConfirmed("piece-one");
+  assert.deepEqual(add, { added: true, storage: "browser", ok: true });
+  assert.deepEqual(store.getSnapshot().savedIds, ["piece-one"]);
+  assert.deepEqual([...remote], ["piece-one"]);
+});
+
+test("confirmed guest product save stays browser-local without requiring an account", async () => {
+  const local = cache();
+  const store = createSavedItemsStore({
+    idsField: "productIds",
+    snapshotField: "savedIds",
+    itemLabel: "saved pieces",
+    persist: local.persist,
+  });
+
+  store.start();
+  const result = await store.toggleConfirmed("guest-piece");
+  assert.deepEqual(result, { added: true, storage: "browser", ok: true });
+  assert.deepEqual(store.getSnapshot().savedIds, ["guest-piece"]);
+  assert.deepEqual(local.read().productIds, ["guest-piece"]);
+});

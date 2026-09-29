@@ -67,7 +67,7 @@ export function createSavedItemsStore({ initial = {}, persist, loadRemote, write
   }
 
   function flush() {
-    if (!writeRemote || !pending.size) return Promise.resolve();
+    if (!writeRemote || !pending.size) return Promise.resolve(true);
     if (writing) return writing;
     writing = Promise.resolve().then(async () => {
       while (pending.size) {
@@ -78,15 +78,31 @@ export function createSavedItemsStore({ initial = {}, persist, loadRemote, write
         } catch {
           writeError = true;
           publish();
-          return;
+          return false;
         }
         if (pending.get(id)?.revision === operation.revision) pending.delete(id);
         writeError = false;
         saveLocal();
         publish();
       }
+      return true;
     }).finally(() => { writing = null; });
     return writing;
+  }
+
+  function toggleLocal(id, autoFlush = true) {
+    if (typeof id !== "string" || !id.trim()) return null;
+    const added = !ids.includes(id);
+    const operation = { saved: added, revision: ++revision };
+    ids = apply(ids, new Map([[id, operation]]));
+    if (writeRemote) {
+      pending.set(id, operation);
+      overrides.set(id, operation);
+    }
+    saveLocal();
+    publish();
+    if (autoFlush) void flush();
+    return { added, storage, operation };
   }
 
   publish();
@@ -102,18 +118,32 @@ export function createSavedItemsStore({ initial = {}, persist, loadRemote, write
       void flush();
     },
     toggle(id) {
-      if (typeof id !== "string" || !id.trim()) return null;
-      const added = !ids.includes(id);
-      const operation = { saved: added, revision: ++revision };
-      ids = apply(ids, new Map([[id, operation]]));
-      if (writeRemote) {
-        pending.set(id, operation);
-        overrides.set(id, operation);
+      const result = toggleLocal(id);
+      return result ? { added: result.added, storage: result.storage } : null;
+    },
+    async toggleConfirmed(id) {
+      const wasSaved = ids.includes(id);
+      const result = toggleLocal(id, false);
+      if (!result) return null;
+      const publicResult = { added: result.added, storage: result.storage };
+      if (!writeRemote) return { ...publicResult, ok: true };
+
+      const operation = result.operation;
+      const ok = await flush();
+      if (ok) return { ...publicResult, ok: true };
+
+      // Roll back only if this failed operation is still the latest intent for
+      // the item. A newer action from another surface must win.
+      const latest = pending.get(id) || overrides.get(id);
+      if (latest?.revision === operation.revision) {
+        const rollback = { saved: wasSaved, revision: ++revision };
+        ids = apply(ids, new Map([[id, rollback]]));
+        pending.delete(id);
+        overrides.delete(id);
+        saveLocal();
+        publish();
       }
-      saveLocal();
-      publish();
-      void flush();
-      return { added, storage };
+      return { ...publicResult, ok: false };
     },
     replaceGuestIds(next) {
       if (writeRemote) return;

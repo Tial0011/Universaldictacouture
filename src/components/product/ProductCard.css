@@ -288,7 +288,7 @@
 
 /* ---------- Section 4 Shop card variant ----------
    The Shop catalogue is fabric-first and always uses the approved
-   image / heart / name / price-unit / SHOP PIECE hierarchy. */
+   image / heart / name / price-unit / SHOP THIS PIECE hierarchy. */
 .product-card--shop {
   --product-card-media-ratio: 4 / 5;
   padding: 0;
@@ -361,7 +361,7 @@
 }
 
 .product-card--shop .product-card__cta {
-  min-height: 2.7rem;
+  min-height: var(--touch-target);
   padding-inline: .55rem;
   font-size: clamp(.72rem, .68rem + .15vw, .82rem);
   font-weight: var(--weight-semibold);
@@ -381,5 +381,70 @@
   .product-card--shop,
   .product-card--shop .product-card__cta-icon {
     transition: none;
+  }
+}
+
+/* ---------- Task 5 catalogue hardening ---------- */
+.product-card__media-link:focus-visible,
+.product-card__name a:focus-visible,
+.product-card__cta:focus-visible,
+.product-card__save:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.product-card__media .product-image--empty {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.product-card__media .product-image--empty::after {
+  content: "UDC";
+  font-family: var(--font-display);
+  font-size: clamp(.72rem, 1.8vw, 1rem);
+  font-weight: var(--weight-semibold);
+  letter-spacing: .16em;
+  color: rgba(96, 16, 19, .58);
+}
+
+.product-card__save:disabled {
+  cursor: wait;
+}
+
+.product-card__save.is-pending {
+  opacity: .68;
+}
+
+.product-card__media-link.is-navigation-pending,
+.product-card__name a.is-navigation-pending,
+.product-card__cta.is-navigation-pending {
+  cursor: progress;
+}
+
+.product-card__price-prefix {
+  font-weight: var(--weight-medium);
+}
+
+/* The Shop heart follows the literal saved-state contract:
+   outline when unsaved, filled burgundy when saved. */
+.product-card--shop .product-card__save,
+.product-card--shop .product-card__save.is-saved {
+  color: var(--color-brand);
+}
+
+.product-card--shop .product-card__save::before,
+.product-card--shop .product-card__save.is-saved::before {
+  background: rgba(255, 255, 255, .94);
+  border-color: rgba(96, 16, 19, .3);
+  backdrop-filter: blur(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card,
+  .product-card__cta,
+  .product-card__cta-icon,
+  .product-card__save {
+    transition: none !important;
   }
 }
