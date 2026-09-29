@@ -1,5 +1,20 @@
 export function reviewIds(value) {
-  return Array.isArray(value) ? [...new Set(value.filter((id) => typeof id === "string" && id.trim()))] : [];
+  if (!Array.isArray(value)) return [];
+  return [...new Set(
+    value
+      .filter((id) => typeof id === "string")
+      .map((id) => id.trim())
+      .filter(Boolean)
+  )];
+}
+
+/** Merge saved product identities without trusting stale guest references. */
+export function mergeValidatedSavedIds(accountIds, guestIds, validGuestIds = guestIds) {
+  const valid = new Set(reviewIds(validGuestIds));
+  return reviewIds([
+    ...reviewIds(accountIds),
+    ...reviewIds(guestIds).filter((id) => valid.has(id)),
+  ]);
 }
 
 /** Local bookmarks remain usable while account reads/writes are unavailable. */

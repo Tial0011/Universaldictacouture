@@ -111,7 +111,7 @@ export default function ProductCard({
   const isShopCard = variant === "shop";
   const saved = isSaved(product.id);
   const subtitle = isShopCard ? "" : buildSubtitle(product);
-  const ctaLabel = isShopCard ? "SHOP THIS PIECE \u2192" : "View Piece";
+  const ctaLabel = isShopCard ? "SHOP THIS PIECE \u2192" : "SHOP PIECE";
   const showCtaIcon = !isShopCard;
   const imageTransformation = view === "list"
     ? LIST_IMAGE

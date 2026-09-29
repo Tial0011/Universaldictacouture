@@ -4,6 +4,15 @@ import "../discovery/DiscoveryModule.css";
 import "../discovery/HomeDiscovery.css";
 import "./ReviewCarousel.css";
 
+function prefersReducedMotion() {
+  return typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+}
+
+function continuousRailSpeed(node) {
+  const width = node?.clientWidth || 0;
+  return Math.min(52, Math.max(24, width * 0.04));
+}
+
 export default function ReviewCarousel({ children, title, headingId, description, viewAll = false }) {
   const track = useRef(null);
   const trackId = useId();
@@ -80,19 +89,19 @@ export default function ReviewCarousel({ children, title, headingId, description
 
     measure();
     node.addEventListener("scroll", measure, { passive: true });
-    const observer = new ResizeObserver(measure);
-    observer.observe(node);
+    const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
+    observer?.observe(node);
+    window.addEventListener("resize", measure);
     return () => {
       node.removeEventListener("scroll", measure);
-      observer.disconnect();
+      observer?.disconnect();
+      window.removeEventListener("resize", measure);
     };
   }, [items.length]);
 
   // Gentle, continuous seamless motion for Review & Feeds
   useEffect(() => {
-    if (items.length <= 1) return undefined;
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-    if (reduced) return undefined;
+    if (items.length <= 1 || prefersReducedMotion()) return undefined;
     const node = track.current;
     if (!node) return undefined;
 
@@ -116,7 +125,7 @@ export default function ReviewCarousel({ children, title, headingId, description
               } else if (node.scrollLeft <= 0) {
                 node.scrollLeft += loopWidth;
               }
-              node.scrollLeft += (dt / 1000) * 20;
+              node.scrollLeft += (dt / 1000) * continuousRailSpeed(node);
             }
           }
         }
@@ -144,7 +153,7 @@ export default function ReviewCarousel({ children, title, headingId, description
     const step = first ? first.getBoundingClientRect().width + (parseFloat(getComputedStyle(node).gap) || 0) : 280;
     node.scrollBy({
       left: step * direction,
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
     });
     handleInteractionEnd();
   };

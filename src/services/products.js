@@ -18,6 +18,7 @@ import {
   collection,
   doc,
   getDoc,
+  getDocFromServer,
   getDocs,
   limit,
   query,
@@ -107,4 +108,43 @@ export async function revalidateProduct(productId) {
     if (import.meta.env.DEV) console.error(error);
     throw new CatalogueUnavailableError();
   }
+}
+
+/**
+ * Validate a small set of saved product identities against the authoritative
+ * public catalogue. This is deliberately targeted per saved ID so signing in
+ * does not download the full catalogue simply to merge My Closet.
+ *
+ * Permission-denied for an individual ID means it is not currently public
+ * under the product rules (for example archived/unpublished). Network/service
+ * failures abort the validation so guest state is retained for a later retry.
+ */
+export async function validatePublishedProductIds(productIds = []) {
+  const ids = [...new Set(
+    (Array.isArray(productIds) ? productIds : [])
+      .filter((id) => typeof id === "string")
+      .map((id) => id.trim())
+      .filter(Boolean)
+  )];
+  if (!ids.length) return [];
+  if (!isFirebaseConfigured) throw new CatalogueUnavailableError();
+
+  const valid = [];
+  const concurrency = 6;
+  for (let start = 0; start < ids.length; start += concurrency) {
+    const batch = ids.slice(start, start + concurrency);
+    const results = await Promise.all(batch.map(async (productId) => {
+      try {
+        const snapshot = await getDocFromServer(doc(db, PRODUCTS, productId));
+        if (!snapshot.exists()) return null;
+        return normaliseProduct(snapshot.id, snapshot.data()) ? snapshot.id : null;
+      } catch (error) {
+        if (error?.code === "permission-denied") return null;
+        if (import.meta.env.DEV) console.error(error);
+        throw new CatalogueUnavailableError();
+      }
+    }));
+    valid.push(...results.filter(Boolean));
+  }
+  return valid;
 }

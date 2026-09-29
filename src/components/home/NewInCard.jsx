@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import ProductImage from "../product/ProductImage";
 import StitchArrowIcon from "../common/icons/StitchArrowIcon";
@@ -28,24 +29,37 @@ function HeartIcon({ filled }) {
 
 /** A published piece using its own uploaded image. */
 export default function NewInCard({ product, imageLoading = "lazy" }) {
-  const { isSaved, toggleSaved, isPersistent } = useSavedPieces();
+  const { isSaved, toggleSavedConfirmed } = useSavedPieces();
   const { showToast } = useToast();
 
   const saved = isSaved(product.id);
+  const [savePending, setSavePending] = useState(false);
   const CategoryIcon = categoryIconFor(product.category);
   const categoryLabel = product.category.join(", ");
   const price = formatNaira(product.minPrice);
   const unit = product.unitLabel ? ` ${product.unitLabel}` : "";
 
-  const handleSave = () => {
-    const nowSaved = toggleSaved(product.id);
-    showToast(
-      nowSaved
-        ? isPersistent
-          ? "Saved to My Closet → My Pieces."
-          : "Saved for this visit. Create a Profile to keep your pieces."
-        : "Removed from My Pieces."
-    );
+  const handleSave = async () => {
+    if (savePending) return;
+    setSavePending(true);
+    try {
+      const result = await toggleSavedConfirmed(product.id);
+      if (!result?.ok) {
+        showToast("We couldn't update My Closet. Please try again.", "error");
+        return;
+      }
+      if (result.storage === "memory") {
+        showToast(result.added
+          ? "Added to My Closet for this visit. Browser storage is unavailable."
+          : "Removed from My Closet for this visit.", "error");
+        return;
+      }
+      showToast(result.added ? "Added to My Closet." : "Removed from My Closet.");
+    } catch {
+      showToast("We couldn't update My Closet. Please try again.", "error");
+    } finally {
+      setSavePending(false);
+    }
   };
 
   return (
@@ -63,13 +77,15 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
 
           <button
             type="button"
-            className={`menu-card__save${saved ? " is-saved" : ""}`}
+            className={`menu-card__save${saved ? " is-saved" : ""}${savePending ? " is-pending" : ""}`}
             onClick={handleSave}
             aria-pressed={saved}
+            aria-busy={savePending || undefined}
+            disabled={savePending}
             aria-label={
               saved
-                ? `Remove ${product.name} from My Pieces`
-                : `Save ${product.name} to My Pieces`
+                ? `Remove ${product.name} from My Closet`
+                : `Save ${product.name} to My Closet`
             }
           >
             <HeartIcon filled={saved} />
@@ -102,7 +118,7 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
         </p>
 
         <Link to={product.href} className="menu-card__cta">
-          <span>View Piece</span>
+          <span>SHOP PIECE</span>
           <StitchArrowIcon size={16} className="menu-card__cta-icon" />
         </Link>
       </div>

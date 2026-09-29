@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useState, useSyncExternalStore } from "react";
 import { arrayRemove, arrayUnion, doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase/firestore";
-import { createSavedItemsStore, reviewIds as itemIds } from "../services/savedReviewStore";
+import { createSavedItemsStore, mergeValidatedSavedIds, reviewIds as itemIds } from "../services/savedReviewStore";
 import { useAuth } from "./AuthContext";
+import { validatePublishedProductIds } from "../services/products";
 
 const SavedPiecesContext = createContext({
   savedIds: [],
@@ -65,24 +66,14 @@ export function SavedPiecesProvider({ children }) {
   return <SavedSession key={user?.uid || "guest"} uid={user?.uid}>{children}</SavedSession>;
 }
 function SavedSession({ uid, children }) {
+  const [guestMergeIds] = useState(() => uid ? readGuestRecord().productIds : []);
   const [store] = useState(() => {
     const key = uid ? `udc:saved-pieces:account:${uid}` : GUEST_KEY;
     const initial = uid ? readAccountRecord(key) : readGuestRecord();
-    const guestIds = uid ? readGuestRecord().productIds : [];
-    if (guestIds.length) {
-      initial.productIds = itemIds([...initial.productIds, ...guestIds]);
-      initial.pending = [...initial.pending, ...guestIds.map(id => ({ id, saved: true }))];
-    }
-    let guestCopied = false;
     return createSavedItemsStore({
       initial, idsField: "productIds", snapshotField: "savedIds", itemLabel: "saved pieces",
       persist(record) {
-        const storage = uid ? writeAccountRecord(key, record) : writeGuestRecord(record);
-        if (uid && guestIds.length && !guestCopied && storage !== "memory") {
-          writeGuestRecord({ productIds: readGuestRecord().productIds.filter(id => !guestIds.includes(id)), pending: [] });
-          guestCopied = true;
-        }
-        return storage;
+        return uid ? writeAccountRecord(key, record) : writeGuestRecord(record);
       },
       loadRemote: uid && db ? async () => {
         const snapshot = await getDoc(doc(db, "savedPieces", uid));
@@ -94,15 +85,76 @@ function SavedSession({ uid, children }) {
   });
   const state = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
   useEffect(() => {
+    let cancelled = false;
+    let mergeInFlight = null;
     store.start();
-    const retry = () => { void store.retry(); };
+
+    function mergeGuestSaves() {
+      if (!uid || !db || guestMergeIds.length === 0) return Promise.resolve();
+      if (mergeInFlight) return mergeInFlight;
+
+      mergeInFlight = (async () => {
+        try {
+          const validGuestIds = await validatePublishedProductIds(guestMergeIds);
+          if (cancelled) return;
+
+          // First reconcile the signed-in account from the server. If account
+          // sync is unavailable, retain guest state untouched for a later retry.
+          await store.retry();
+          if (cancelled || store.getSnapshot().error) return;
+
+          const currentAccountIds = store.getSnapshot().savedIds || [];
+          const merged = mergeValidatedSavedIds(currentAccountIds, guestMergeIds, validGuestIds);
+          const alreadySaved = new Set(currentAccountIds);
+          const safelyProcessed = new Set(guestMergeIds.filter((id) => !validGuestIds.includes(id)));
+
+          for (const id of merged) {
+            if (cancelled) return;
+            if (alreadySaved.has(id)) {
+              if (validGuestIds.includes(id)) safelyProcessed.add(id);
+              continue;
+            }
+            const result = await store.toggleConfirmed(id);
+            if (result?.ok) {
+              alreadySaved.add(id);
+              safelyProcessed.add(id);
+            }
+          }
+
+          if (cancelled || safelyProcessed.size === 0) return;
+          const latestGuest = readGuestRecord();
+          writeGuestRecord({
+            productIds: latestGuest.productIds.filter((id) => !safelyProcessed.has(id)),
+            pending: latestGuest.pending.filter((change) => !safelyProcessed.has(change?.id)),
+          });
+        } catch {
+          // Keep guest saves intact. A later online event or account session
+          // can retry validation without replacing existing account saves.
+        } finally {
+          mergeInFlight = null;
+        }
+      })();
+
+      return mergeInFlight;
+    }
+
+    void mergeGuestSaves();
+
+    const retry = () => {
+      void store.retry();
+      void mergeGuestSaves();
+    };
     const onStorage = event => {
       if (!uid && (event.key === GUEST_KEY || event.key === null)) store.replaceGuestIds(readGuestRecord().productIds);
     };
     window.addEventListener("online", retry);
     window.addEventListener("storage", onStorage);
-    return () => { window.removeEventListener("online", retry); window.removeEventListener("storage", onStorage); };
-  }, [store, uid]);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("online", retry);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, [store, uid, guestMergeIds]);
   return <SavedPiecesContext.Provider value={{
     savedIds: state.savedIds,
     isSaved: id => state.savedIds.includes(id),

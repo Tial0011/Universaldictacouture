@@ -12,6 +12,15 @@ import "../discovery/HomeDiscovery.css";
  * stroke/viewBox convention as the Shop By and Review & Feeds arrows,
  * and kept local to this component the same way those are.
  */
+function prefersReducedMotion() {
+  return typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+}
+
+function continuousRailSpeed(node) {
+  const width = node?.clientWidth || 0;
+  return Math.min(52, Math.max(24, width * 0.04));
+}
+
 function ChevronIcon({ direction }) {
   return (
     <svg
@@ -134,17 +143,17 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
     track.addEventListener("scroll", update, { passive: true });
     const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(update) : null;
     observer?.observe(track);
+    window.addEventListener("resize", update);
     return () => {
       track.removeEventListener("scroll", update);
       observer?.disconnect();
+      window.removeEventListener("resize", update);
     };
   }, [products, isLoading, error]);
 
   // Gentle, continuous seamless motion for New In
   useEffect(() => {
-    if (isLoading || error || products.length <= 1) return undefined;
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-    if (reduced) return undefined;
+    if (isLoading || error || products.length <= 1 || prefersReducedMotion()) return undefined;
     const track = trackRef.current;
     if (!track) return undefined;
 
@@ -168,7 +177,7 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
               } else if (track.scrollLeft <= 0) {
                 track.scrollLeft += loopWidth;
               }
-              track.scrollLeft += (dt / 1000) * 20;
+              track.scrollLeft += (dt / 1000) * continuousRailSpeed(track);
             }
           }
         }
@@ -192,10 +201,9 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
     const track = trackRef.current;
     if (!track) return;
     handleInteractionStart();
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     track.scrollBy({
       left: direction * Math.max(240, track.clientWidth * 0.78),
-      behavior: reduced ? "auto" : "smooth",
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
     });
     handleInteractionEnd();
   }

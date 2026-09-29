@@ -3,7 +3,15 @@
 .home-cultural-flow .home-section {padding-block:clamp(2rem,4vw,4rem);}
 .home-cultural-flow .home-section--shop-by {padding-block:clamp(1.75rem,3vw,3rem) 0;}
 .home-cultural-flow .home-section--shop-by + .home-section {padding-top:clamp(2rem,4vw,4rem);}
-.home-cultural-flow .custom-promo {background:linear-gradient(100deg,rgba(67,9,13,.85),rgba(67,9,13,.96)),var(--pattern-atlas) center/cover;box-shadow:none;}
+.home-cultural-flow .custom-promo {
+  /* Keep the Custom Style banner visually calm: the large atlas motif used to
+     place a strong decorative block over the copy/right edge on wide screens. */
+  background:
+    linear-gradient(100deg, rgba(67,9,13,.84), rgba(67,9,13,.95)),
+    var(--pattern-weave);
+  background-size: auto, 64px 64px;
+  box-shadow:none;
+}
 .home-cultural-flow .custom-promo__inner {min-height:clamp(18rem,32vw,27rem);}
 .home-cultural-flow .custom-promo__copy {padding-block:2rem;}
 .home-cultural-flow .custom-promo__cta {box-shadow:none;border-color:var(--color-gold-soft);}
@@ -16,3 +24,10 @@
 
 /* The product frame carries the same quiet woven signature as the shop. */
 .home-cultural-flow .menu-card { background: url('../../assets/brand/couture-stitch.svg') center / 56px 80px, var(--color-couture-surface); }
+
+/* Preserve the fashion photograph itself; only a razor-thin edge is feathered
+   into the copy so the subject stays sharp on phone and desktop. */
+.home-cultural-flow .custom-promo__media {
+  -webkit-mask-image: linear-gradient(to right, #000 98.75%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 98.75%, transparent 100%);
+}

@@ -10,6 +10,13 @@ export function imageValue(value) {
   if (typeof value === "string") return { url: value, alt: "" };
   return value || null;
 }
+
+function hasUsableImage(value) {
+  if (!value) return false;
+  if (typeof value === "string") return Boolean(value.trim());
+  if (typeof value !== "object" || Array.isArray(value)) return false;
+  return Boolean(String(value.url || value.secureUrl || value.secure_url || value.publicId || value.public_id || "").trim());
+}
 export function prepareRecord(kind, raw) {
   const data = { ...raw };
   delete data.id;
@@ -63,9 +70,9 @@ export function prepareRecord(kind, raw) {
       if (data.price === null || !data.category.length) {
         throw new Error("Add a price and at least one category before publishing.");
       }
-      const productImages = Array.isArray(data.images) ? data.images.filter(Boolean) : [];
-      if (!data.primaryImage && productImages.length === 0) {
-        throw new Error("Add at least one product photo before publishing.");
+      const productImages = Array.isArray(data.images) ? data.images.filter(hasUsableImage) : [];
+      if (!hasUsableImage(data.primaryImage) && productImages.length === 0) {
+        throw new Error("Add at least one valid product photo before publishing.");
       }
     }
     data.archived = data.status === "archived";

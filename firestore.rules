@@ -13,16 +13,27 @@ service cloud.firestore {
       allow list, write: if false;
     }
     match /products/{productId} {
+      function hasPublicProductImage(data) {
+        return (data.keys().hasAny(['primaryImage'])
+            && ((data.primaryImage is string && data.primaryImage.size() > 0)
+              || data.primaryImage is map))
+          || (data.keys().hasAny(['images'])
+            && data.images is list
+            && data.images.size() > 0);
+      }
       allow read: if resource.data.status == 'published' || isAdmin();
       allow create, update: if isAdmin()
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0
         && request.resource.data.status in ['draft', 'published', 'archived']
+        && request.resource.data.archived is bool
+        && request.resource.data.archived == (request.resource.data.status == 'archived')
         && (request.resource.data.status != 'published'
           || (request.resource.data.price is number
             && request.resource.data.price >= 0
             && request.resource.data.category is list
-            && request.resource.data.category.size() > 0));
+            && request.resource.data.category.size() > 0
+            && hasPublicProductImage(request.resource.data)));
       allow delete: if false;
     }
     match /heroSlides/{slideId} {

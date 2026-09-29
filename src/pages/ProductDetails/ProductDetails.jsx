@@ -148,7 +148,7 @@ function Piece({ product, backToShop, backState }) {
   const { user } = useAuth();
   const { requestAuth } = useAuthGate();
   const location = useLocation();
-  const { isSaved, toggleSaved, error: savedError } = useSavedPieces();
+  const { isSaved, toggleSavedConfirmed, error: savedError } = useSavedPieces();
   const images = [product.image, ...product.images].filter((image, index, entries) =>
     image && entries.findIndex(entry => entry && (entry.publicId || entry.url) === (image.publicId || image.url)) === index
   );
@@ -157,6 +157,7 @@ function Piece({ product, backToShop, backState }) {
   const [orderDetail, setOrderDetail] = useState("");
   const [message, setMessage] = useState("");
   const [actionError, setActionError] = useState("");
+  const [savePending, setSavePending] = useState(false);
   const saved = isSaved(product.id);
   const mainPrice = product.mainPrice ?? product.price ?? 0;
   const estimatedTotal = mainPrice * quantity;
@@ -165,12 +166,17 @@ function Piece({ product, backToShop, backState }) {
   const primaryColour = colours[0] || "";
   const detailRef = useRef(null);
 
-  function handleSave() {
+  async function handleSave() {
+    if (savePending) return;
     setActionError("");
+    setSavePending(true);
     try {
-      toggleSaved(product.id);
+      const result = await toggleSavedConfirmed(product.id);
+      if (!result?.ok) setActionError("We couldn't update My Closet. Please try again.");
     } catch {
-      setActionError("We couldn't update My Pieces. Please try again.");
+      setActionError("We couldn't update My Closet. Please try again.");
+    } finally {
+      setSavePending(false);
     }
   }
 
@@ -266,7 +272,9 @@ function Piece({ product, backToShop, backState }) {
                   className={`product-details__save-btn${saved ? " is-saved" : ""}`}
                   onClick={handleSave}
                   aria-pressed={saved}
-                  aria-label={saved ? `Remove ${product.name} from My Pieces` : `Save ${product.name} to My Pieces`}
+                  aria-busy={savePending || undefined}
+                  disabled={savePending}
+                  aria-label={saved ? `Remove ${product.name} from My Closet` : `Save ${product.name} to My Closet`}
                 >
                   <HeartIcon filled={saved} />
                 </button>
@@ -307,7 +315,7 @@ function Piece({ product, backToShop, backState }) {
 
             {/* Quantity block */}
             <div className="product-details__quantity-block">
-              <h2 className="product-details__quantity-title">Quantity of Fabric in Bundles</h2>
+              <h2 className="product-details__quantity-title">Quantity of Fabric</h2>
               <div className="product-details__quantity-row">
                 <button
                   type="button"
@@ -329,16 +337,16 @@ function Piece({ product, backToShop, backState }) {
                 </button>
               </div>
 
-              {/* Bundle price calculator */}
+              {/* Price calculator */}
               <div className="product-details__price-calc">
                 <div className="product-details__price-unit">
-                  <span className="product-details__price-unit-label">1{unitLabel ? ` ${unitLabel}` : " bundle"} =</span>
+                  <span className="product-details__price-unit-label">{unitLabel ? `Price basis: ${unitLabel}` : "Configured price"} =</span>
                   <span className="product-details__price-unit-value">{formatNaira(mainPrice)}</span>
                 </div>
                 {quantity > 1 && (
                   <div className="product-details__price-total">
                     <span className="product-details__price-total-label">
-                      Estimated total for<br />{quantity} bundle{quantity !== 1 ? "s" : ""}:
+                      Estimated total for<br />quantity {quantity}:
                     </span>
                     <span className="product-details__price-total-value">{formatNaira(estimatedTotal)}</span>
                   </div>
@@ -347,7 +355,7 @@ function Piece({ product, backToShop, backState }) {
 
               <div className="product-details__calc-note">
                 <InfoIcon />
-                <span>The amount of fabric required depends on your preferred style. Chat with a Couturier for free to know how many bundles may be suitable for your order.</span>
+                <span>The amount of fabric required depends on your preferred style. Chat with a Couturier for free to confirm the amount of fabric that may be suitable for your order.</span>
               </div>
             </div>
 
@@ -377,7 +385,7 @@ function Piece({ product, backToShop, backState }) {
             <Link
               to="/chats"
               state={{
-                draft: `Hello, I'd like to order ${quantity} ${quantity !== 1 ? "bundles" : "bundle"} of ${product.name}${orderDetail ? `. Extra detail: ${orderDetail}` : ""}. The estimated total is ${formatNaira(estimatedTotal)}.`,
+                draft: `Hello, I'd like to order quantity ${quantity} of ${product.name}${unitLabel ? ` (${unitLabel})` : ""}${orderDetail ? `. Extra detail: ${orderDetail}` : ""}. The estimated total is ${formatNaira(estimatedTotal)}.`,
                 productContext: productChatContext(product),
               }}
               className="product-details__review-btn"
@@ -408,7 +416,7 @@ function Piece({ product, backToShop, backState }) {
             <Link
               to="/chats"
               state={{
-                draft: `Hello, I need help deciding how many bundles of ${product.name} to order.`,
+                draft: `Hello, I need help deciding the right quantity of ${product.name} to order${unitLabel ? ` (${unitLabel})` : ""}.`,
                 productContext: productChatContext(product),
               }}
               className="product-details__help-cta"
@@ -417,7 +425,7 @@ function Piece({ product, backToShop, backState }) {
                 <ChatIcon />
               </span>
               <span className="product-details__help-text">
-                <strong>Need help with this fabric or unsure how many bundles to order?</strong>
+                <strong>Need help with this fabric or unsure how much to order?</strong>
                 <span>Chat with a Couturier for free.</span>
               </span>
               <ChevronIcon direction="right" />

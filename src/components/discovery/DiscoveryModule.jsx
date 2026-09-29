@@ -18,6 +18,11 @@ function prefersReducedMotion() {
   return typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 }
 
+function continuousRailSpeed(node) {
+  const width = node?.clientWidth || 0;
+  return Math.min(52, Math.max(24, width * 0.04));
+}
+
 /**
  * Configurable discovery module (Shop by Occasion, Style, Fabric & Pattern).
  *
@@ -177,7 +182,7 @@ export default function DiscoveryModule({
               } else if (rail.scrollLeft <= 0) {
                 rail.scrollLeft += loopWidth;
               }
-              rail.scrollLeft += (dt / 1000) * 20;
+              rail.scrollLeft += (dt / 1000) * continuousRailSpeed(rail);
               updateRailState();
             }
           }
