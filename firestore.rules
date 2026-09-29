@@ -40,7 +40,7 @@ service cloud.firestore {
                 && request.resource.data.priceToken is string
                 && request.resource.data.priceToken.size() > 0))
             && hasPublicProductImage(request.resource.data)));
-      allow delete: if false;
+      allow delete: if isAdmin();
     }
     match /heroSlides/{slideId} {
       allow read: if resource.data.published == true || isAdmin();

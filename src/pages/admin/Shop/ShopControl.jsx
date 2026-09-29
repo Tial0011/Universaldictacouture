@@ -59,10 +59,20 @@ export default function ShopControl() {
         </div>
       </header>
 
+      <nav className="admin-shop-workspace-nav" aria-label="Shop workspace">
+        <a href="#shop-overview">Overview</a>
+        <Link to="/admin/products">Products</Link>
+        <Link to="/admin/products?view=new-in">New In</Link>
+        <Link to="/admin/discovery">Shop By</Link>
+        <Link to="/admin/taxonomy">Catalogue Structure</Link>
+        <Link to="/admin/products">Search / Keywords</Link>
+        <a href="#shop-health">Shop Health</a>
+      </nav>
+
       {state.error && <div className="admin-notice" role="alert"><p>{state.error}</p><Button variant="secondary" onClick={load}>Retry</Button></div>}
       {state.loading && <p role="status">Loading Shop operations…</p>}
 
-      <section aria-labelledby="shop-actions-title">
+      <section id="shop-overview" aria-labelledby="shop-actions-title">
         <div className="admin-section-heading">
           <div><p className="admin-eyebrow">Daily operations</p><h2 id="shop-actions-title">Manage the customer Shop</h2></div>
         </div>
@@ -96,7 +106,7 @@ export default function ShopControl() {
         </section>
       )}
 
-      <section className="admin-panel admin-stack" aria-labelledby="readiness-title">
+      <section id="shop-health" className="admin-panel admin-stack" aria-labelledby="readiness-title">
         <div className="admin-section-heading">
           <div><p className="admin-eyebrow">Quality</p><h2 id="readiness-title">Product readiness</h2></div>
           <Button to="/admin/products?view=needs-attention" variant="secondary">Review all loaded issues</Button>

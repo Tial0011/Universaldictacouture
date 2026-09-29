@@ -20,6 +20,7 @@ export default function RecordManager({ kind }) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [search, setSearch] = useState("");
+  const [sortOrder, setSortOrder] = useState("loaded");
   const [filter, setFilter] = useState(() => {
     if (kind !== "products") return "all";
     const requested = params.get("view");
@@ -100,7 +101,7 @@ export default function RecordManager({ kind }) {
   useEffect(() => { if (editingId) editorHeading.current?.focus(); }, [editingId]);
 
   function open(record) {
-    if (uploading || saving || (dirty && !window.confirm("Discard your unsaved changes?"))) return;
+    if (uploading || saving || (dirty && !window.confirm("Discard your unsaved changes?"))) return false;
     let next = record ? { ...record } : { ...schema.initial };
     if (kind === "products" && record) {
       const allPrices = [
@@ -124,6 +125,16 @@ export default function RecordManager({ kind }) {
     }
     setEditor(next);
     setDirty(false); setNotice(""); setError("");
+    return true;
+  }
+
+  function openFromList(record) {
+    if (!open(record)) return;
+    if (kind === "products") {
+      const nextParams = new URLSearchParams(params);
+      nextParams.set("edit", record.id);
+      setParams(nextParams, { replace: true });
+    }
   }
 
   function nextListParams() {
@@ -194,14 +205,34 @@ export default function RecordManager({ kind }) {
   }
 
   async function remove(record) {
-    if (!["reviews", "heroSlides"].includes(kind) || !record?.id || saving || uploading) return;
-    const name = record.author || record.headline || `this ${schema.singular}`;
-    if (!window.confirm(`Permanently delete ${name}? This cannot be undone.`)) return;
+    if (!["products", "reviews", "heroSlides"].includes(kind) || !record?.id || saving || uploading) return;
+    const productName = String(record.name || "Untitled product").trim();
+    const name = kind === "products" ? `“${productName}”` : record.author || record.headline || `this ${schema.singular}`;
+    const prompt = kind === "products"
+      ? `Delete ${name} permanently?\n\nThis removes the product from the live catalogue and cannot be undone. Independent order, review and chat history is not deleted.`
+      : `Permanently delete ${name}? This cannot be undone.`;
+    if (!window.confirm(prompt)) return;
     setSaving(true); setError(""); setNotice("");
     try {
-      await deleteAdminRecord(kind, record.id);
-      if (editor?.id === record.id) setEditor(null);
-      setNotice(kind === "reviews" ? "Review deleted." : "Hero slide deleted.");
+      const result = await deleteAdminRecord(kind, record.id);
+      if (kind === "products") {
+        invalidateCatalogue();
+        const notes = ["Product permanently deleted from the catalogue."];
+        if (result.deletedMedia?.length) notes.push(`${result.deletedMedia.length} owned image${result.deletedMedia.length === 1 ? " was" : "s were"} removed from Netlify storage.`);
+        if (result.skippedSharedMedia?.length) notes.push(`${result.skippedSharedMedia.length} managed image${result.skippedSharedMedia.length === 1 ? " was" : "s were"} kept because another product still references it.`);
+        if (result.externalReferences) notes.push(`${result.externalReferences} legacy/external image reference${result.externalReferences === 1 ? " was" : "s were"} removed with the product record; external media itself was not deleted.`);
+        if (result.mediaCleanupSkipped) notes.push("Owned image cleanup was skipped because shared-reference safety could not be verified. The product record remains deleted.");
+        if (result.failedMedia?.length) notes.push(`${result.failedMedia.length} owned image${result.failedMedia.length === 1 ? " could" : "s could"} not be removed from storage. The product record remains deleted; retry storage cleanup later.`);
+        setNotice(notes.join(" "));
+      } else {
+        setNotice(kind === "reviews" ? "Review deleted." : "Hero slide deleted.");
+      }
+      if (editor?.id === record.id) {
+        setEditor(null);
+        setDirty(false);
+        setParams(nextListParams(), { replace: true });
+        requestAnimationFrame(() => addButtonArea.current?.querySelector("button")?.focus());
+      }
       setLoading(true); setPendingPage(undefined); setRevision(v => v + 1);
     } catch (error) { setError(adminError(error)); }
     finally { setSaving(false); }
@@ -220,7 +251,42 @@ export default function RecordManager({ kind }) {
     return status(record) === filter;
   }
 
-  const visible = records.filter(record => matchesFilter(record) && [record.name, record.title, record.headline, record.author, record.body, record.id, record.slug].some(value => String(value || "").toLowerCase().includes(search.toLowerCase())));
+  function searchableValues(record) {
+    const base = [record.name, record.title, record.headline, record.author, record.body, record.id, record.slug];
+    if (kind !== "products") return base;
+    return [
+      ...base,
+      ...(Array.isArray(record.category) ? record.category : [record.category]),
+      ...(Array.isArray(record.occasion) ? record.occasion : [record.occasion]),
+      ...(Array.isArray(record.style) ? record.style : [record.style]),
+      ...(Array.isArray(record.fabric) ? record.fabric : [record.fabric]),
+      ...(Array.isArray(record.colour) ? record.colour : [record.colour]),
+      ...Object.values(record.shopBy || {}).flat(),
+    ];
+  }
+
+  function timestampValue(value) {
+    if (typeof value?.toMillis === "function") return value.toMillis();
+    if (typeof value?.toDate === "function") return value.toDate().getTime();
+    const parsed = new Date(value || 0).getTime();
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function sortRecords(list) {
+    if (kind !== "products" || sortOrder === "loaded") return list;
+    const sorted = [...list];
+    if (sortOrder === "name-asc") return sorted.sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), undefined, { sensitivity: "base" }));
+    if (sortOrder === "name-desc") return sorted.sort((a, b) => String(b.name || "").localeCompare(String(a.name || ""), undefined, { sensitivity: "base" }));
+    if (sortOrder === "price-asc") return sorted.sort((a, b) => Number(a.price ?? Infinity) - Number(b.price ?? Infinity));
+    if (sortOrder === "price-desc") return sorted.sort((a, b) => Number(b.price ?? -Infinity) - Number(a.price ?? -Infinity));
+    if (sortOrder === "published-newest") return sorted.sort((a, b) => timestampValue(b.publishedAt ?? b.firstPublishedAt) - timestampValue(a.publishedAt ?? a.firstPublishedAt));
+    if (sortOrder === "published-oldest") return sorted.sort((a, b) => timestampValue(a.publishedAt ?? a.firstPublishedAt) - timestampValue(b.publishedAt ?? b.firstPublishedAt));
+    if (sortOrder === "updated-newest") return sorted.sort((a, b) => timestampValue(b.updatedAt) - timestampValue(a.updatedAt));
+    return sorted;
+  }
+
+  const queryText = search.trim().toLowerCase();
+  const visible = sortRecords(records.filter(record => matchesFilter(record) && searchableValues(record).some(value => String(value || "").toLowerCase().includes(queryText))));
   const editorReadiness = kind === "products" && editor ? productReadiness(editor, { allowGeneratedIdentity: !editor.id }) : null;
 
   function field(definition) {
@@ -246,7 +312,7 @@ export default function RecordManager({ kind }) {
       {type === "checkbox" ? <label className="choice" htmlFor={id}><input id={id} type="checkbox" checked={!!value} onChange={event => update(key, event.target.checked)} />{label}</label>
         : type === "select" ? <select {...props} value={value || options[0]} onChange={event => update(key, event.target.value)}>{options.map(option => <option key={option} value={option}>{option.replaceAll("-", " ")}</option>)}</select>
         : type === "shopBy" ? <div className="admin-shop-by-field admin-stack">
-          <div className="admin-shop-by-field__intro"><p>Choose where this product should appear in the homepage Shop By flow.</p><Button to="/admin/discovery" variant="secondary">Manage Shop By groups & choices</Button></div>
+          <div className="admin-shop-by-field__intro"><p>Choose where this product should appear in the customer Shop By / Discovery flow.</p><Button to="/admin/discovery" variant="secondary">Manage Shop By groups & choices</Button></div>
           {shopByGroups.map((group) => {
             const rawSelected = editor.shopBy?.[group.key] ?? editor[group.key] ?? [];
             const selected = Array.isArray(rawSelected) ? rawSelected.map(String) : String(rawSelected || "").split(",").map(entry => entry.trim()).filter(Boolean);
@@ -340,10 +406,15 @@ export default function RecordManager({ kind }) {
       <form onSubmit={save} className="admin-stack">{renderEditorFields()}
         <div className="admin-form-actions"><Button type="submit" disabled={uploading} isLoading={saving}>{saving ? "Saving…" : "Save " + schema.singular}</Button><Button variant="secondary" disabled={saving || uploading} onClick={cancel}>Cancel</Button><span className="field__hint">{uploading ? "Uploading photos…" : dirty ? "Unsaved changes" : "No unsaved changes"}</span></div>
       </form>
+      {kind === "products" && editor.id ? <aside className="admin-danger-zone" aria-labelledby="product-delete-title">
+        <div><p className="admin-eyebrow">Permanent action</p><h3 id="product-delete-title">Delete product</h3><p>Removes this live catalogue record permanently. Independent historical order, review and chat records are left intact.</p></div>
+        <div className="admin-stack"><Button variant="secondary" disabled={saving || uploading || dirty} onClick={() => remove(editor)}>Delete product permanently</Button>{dirty ? <span className="field__hint">Save or cancel unsaved changes before permanently deleting this product.</span> : null}</div>
+      </aside> : null}
     </section>}
     <section className="admin-panel admin-stack" aria-label={schema.title + " list"}>
       <div className="admin-list-tools"><div className="field"><label htmlFor="admin-search">Search loaded records</label><input id="admin-search" type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder={"Find a " + schema.singular} /></div>
       {kind !== "taxonomy" && <div className="field"><label htmlFor="admin-filter">{kind === "products" ? "Product view" : "Visibility"}</label><select id="admin-filter" value={filter} onChange={event => { const next = event.target.value; setFilter(next); if (kind === "products") { const nextParams = new URLSearchParams(params); if (next === "all") nextParams.delete("view"); else nextParams.set("view", next); nextParams.delete("edit"); setParams(nextParams, { replace: true }); } }}>{(kind === "products" ? ["all", "published", "draft", "archived", "needs-attention", "new-in"] : ["all", "draft", "published"]).map(option => <option key={option} value={option}>{option === "all" ? (kind === "products" ? "All products" : "All statuses") : option === "needs-attention" ? "Needs attention" : option === "new-in" ? "New In" : option.replaceAll("-", " ")}</option>)}</select></div>}
+      {kind === "products" && <div className="field"><label htmlFor="admin-sort">Sort loaded products</label><select id="admin-sort" value={sortOrder} onChange={event => setSortOrder(event.target.value)}><option value="loaded">Loaded order</option><option value="name-asc">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="price-asc">Price low–high</option><option value="price-desc">Price high–low</option><option value="published-newest">Newest publication</option><option value="published-oldest">Oldest publication</option><option value="updated-newest">Recently updated</option></select></div>}
       <Button variant="secondary" disabled={loading || saving || uploading} onClick={() => { setLoading(true); setError(""); setPendingPage(undefined); setRevision(v => v + 1); }}>Refresh</Button></div>
       <p className="field__hint">{records.length} loaded · {visible.length} shown. Load more to search additional records.</p>
       {loading && <p role="status">Loading records…</p>}
@@ -353,7 +424,8 @@ export default function RecordManager({ kind }) {
         const image = kind === "products" ? (record.primaryImage || (Array.isArray(record.images) ? record.images[0] : record.images)) : null;
         const imageUrl = typeof image === "string" ? image : image?.publicId ? getImageUrl(image.publicId, "c_fill,g_auto,w_160,h_200,q_auto,f_auto") : image?.url || image?.secureUrl || image?.secure_url || "";
         const publicHref = kind === "products" ? productAdminHref(record) : "";
-        return <tr key={record.id}><td><div className={kind === "products" ? "admin-product-summary" : undefined}>{kind === "products" && <div className="admin-product-thumb" aria-hidden="true">{imageUrl ? <img src={imageUrl} alt="" loading="lazy" /> : <span>UDC</span>}</div>}<div><strong>{record.name || record.title || record.headline || record.author || "Untitled"}</strong>{kind === "products" && <><small>{record.price == null ? "Main price not set" : `Main price: ${new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" }).format(Number(record.price))}${record.unitLabel || record.priceToken ? ` (${record.unitLabel || record.priceToken})` : ""}`}</small><small>{Array.isArray(record.category) ? record.category.join(" · ") : record.category || "Category not set"}</small></>}{kind === "reviews" && record.productId && <small>Product: {reviewProducts.find(product => product.id === record.productId)?.name || record.productId}</small>}</div></div></td><td><span className={"admin-status admin-status--" + status(record)}>{status(record)}</span></td>{kind === "products" && <><td><span className={"admin-status admin-status--" + readiness.state}>{readiness.label}</span>{readiness.blockers.length ? <small>{readiness.blockers.map((item) => item.label).join(" · ")}</small> : readiness.warnings.length ? <small>{readiness.warnings[0].label}</small> : null}</td><td>{record.isNewIn === true || record.newIn === true ? <span className="admin-status admin-status--new-in">New In</span> : <span className="field__hint">Standard catalogue</span>}</td></>}<td><div className="admin-actions"><Button variant="ghost" disabled={saving || uploading} onClick={() => { open(record); if (kind === "products") { const nextParams = new URLSearchParams(params); nextParams.set("edit", record.id); setParams(nextParams, { replace: true }); } }} aria-label={"Edit " + (record.name || record.title || record.headline || record.author || schema.singular)}>Edit</Button>{kind === "products" && readiness.ready && status(record) === "published" && publicHref ? <Button to={publicHref} target="_blank" rel="noopener noreferrer" variant="ghost">View in Shop</Button> : null}{["reviews", "heroSlides"].includes(kind) && <Button variant="ghost" disabled={saving || uploading} onClick={() => remove(record)} aria-label={`Delete ${record.author || record.headline || schema.singular}`}>Delete</Button>}</div></td></tr>;
+        const shopBySummary = kind === "products" ? [...new Set(Object.values(record.shopBy || {}).flat().map(String).filter(Boolean))].slice(0, 3).join(" · ") : "";
+        return <tr key={record.id}><td>{kind === "products" ? <button type="button" className="admin-product-open" disabled={saving || uploading} onClick={() => openFromList(record)} aria-label={`Open ${record.name || "product"} for editing`}><span className="admin-product-summary"><span className="admin-product-thumb" aria-hidden="true">{imageUrl ? <img src={imageUrl} alt="" loading="lazy" /> : <span>UDC</span>}</span><span><strong>{record.name || "Untitled"}</strong><small>{record.price == null ? "Main price not set" : `Main price: ${new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" }).format(Number(record.price))}${record.unitLabel || record.priceToken ? ` (${record.unitLabel || record.priceToken})` : ""}`}</small><small>{Array.isArray(record.category) ? record.category.join(" · ") : record.category || "Category not set"}</small>{shopBySummary ? <small>Shop By: {shopBySummary}</small> : null}</span></span></button> : <div><strong>{record.name || record.title || record.headline || record.author || "Untitled"}</strong>{kind === "reviews" && record.productId && <small>Product: {reviewProducts.find(product => product.id === record.productId)?.name || record.productId}</small>}</div>}</td><td><span className={"admin-status admin-status--" + status(record)}>{status(record)}</span></td>{kind === "products" && <><td><span className={"admin-status admin-status--" + readiness.state}>{readiness.label}</span>{readiness.blockers.length ? <small>{readiness.blockers.map((item) => item.label).join(" · ")}</small> : readiness.warnings.length ? <small>{readiness.warnings[0].label}</small> : null}</td><td>{record.isNewIn === true || record.newIn === true ? <span className="admin-status admin-status--new-in">New In</span> : <span className="field__hint">Standard catalogue</span>}</td></>}<td><div className="admin-actions"><Button variant="ghost" disabled={saving || uploading} onClick={() => openFromList(record)} aria-label={"Open " + (record.name || record.title || record.headline || record.author || schema.singular)}>Open</Button>{kind === "products" && readiness.ready && status(record) === "published" && publicHref ? <Button to={publicHref} target="_blank" rel="noopener noreferrer" variant="ghost">View in Shop</Button> : null}{["reviews", "heroSlides"].includes(kind) && <Button variant="ghost" disabled={saving || uploading} onClick={() => remove(record)} aria-label={`Delete ${record.author || record.headline || schema.singular}`}>Delete</Button>}</div></td></tr>;
       })}</tbody></table></div>}
       {more && <Button variant="secondary" disabled={loading} onClick={() => { setLoading(true); setError(""); setPendingPage(cursor); }}>Load more</Button>}
     </section>

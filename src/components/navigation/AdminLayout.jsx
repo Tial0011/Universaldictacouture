@@ -13,18 +13,20 @@ export default function AdminLayout() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const shopAdminPaths = ["/admin/shop", "/admin/products", "/admin/discovery", "/admin/taxonomy"];
+  const isShopAdminPath = shopAdminPaths.some((path) => pathname === path || pathname.startsWith(path + "/"));
   const [menuOpen, setMenuOpen] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const main = useRef(null);
-  const title = ADMIN_SECTIONS.find(section => section.path === pathname)?.label || (pathname === "/admin/settings" ? "Setup & access" : "Overview");
+  const title = isShopAdminPath ? "Shop" : ADMIN_SECTIONS.find(section => section.path === pathname)?.label || (pathname === "/admin/settings" ? "Setup & access" : "Overview");
   useEffect(() => { main.current?.focus(); }, [pathname]);
   async function logout() {
     setBusy(true); setError("");
     try { await signOutUser(); navigate("/", { replace: true }); } catch { setError("Unable to sign out. Please try again."); }
     finally { setBusy(false); }
   }
-  const navLink = (path, label) => <NavLink to={path} end onClick={() => setMenuOpen(false)} className={({ isActive }) => isActive ? "is-active" : ""}>{label}</NavLink>;
+  const navLink = (path, label) => <NavLink to={path} end onClick={() => setMenuOpen(false)} className={({ isActive }) => (isActive || (path === "/admin/shop" && isShopAdminPath)) ? "is-active" : ""}>{label}</NavLink>;
   return <div className="admin-layout">
     <a className="skip-link" href="#admin-main">Skip to admin content</a>
     <aside className="admin-layout__sidebar" aria-label="Admin navigation">

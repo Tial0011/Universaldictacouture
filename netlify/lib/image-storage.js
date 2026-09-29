@@ -2,7 +2,7 @@ import sharp from "sharp";
 import { randomUUID } from "node:crypto";
 export const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 const TYPES = { "image/jpeg": "jpeg", "image/png": "png", "image/webp": "webp" };
-const KEY = /^[a-f0-9-]{36}\.webp$/;
+export const STORAGE_KEY_PATTERN = /^[a-f0-9-]{36}\.webp$/;
 class HttpError extends Error {
   constructor(status, message) { super(message); this.status = status; }
 }
@@ -13,10 +13,10 @@ function json(body, status = 200) {
 // No service-account secret or privileged database bypass is needed.
 export async function requireAdmin(request, env = process.env, fetcher = fetch) {
   const token = request.headers.get("authorization")?.match(/^Bearer (\S+)$/)?.[1];
-  if (!token) throw new HttpError(401, "Sign in before uploading images.");
+  if (!token) throw new HttpError(401, "Sign in before managing images.");
   const apiKey = env.FIREBASE_WEB_API_KEY || env.VITE_FIREBASE_API_KEY;
   const project = env.FIREBASE_PROJECT_ID || env.VITE_FIREBASE_PROJECT_ID;
-  if (!apiKey || !project) throw new HttpError(503, "Image uploads need Firebase configuration in the Netlify Functions environment.");
+  if (!apiKey || !project) throw new HttpError(503, "Image management needs Firebase configuration in the Netlify Functions environment.");
   const accountResponse = await fetcher("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" + encodeURIComponent(apiKey), {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ idToken: token }), signal: AbortSignal.timeout(10000),
@@ -29,7 +29,7 @@ export async function requireAdmin(request, env = process.env, fetcher = fetch) 
   });
   if (membership.status >= 500 || membership.status === 429) throw new HttpError(503, "Admin access cannot be checked right now. Please try again.");
   if (!membership.ok || (await membership.json()).fields?.active?.booleanValue !== true) {
-    throw new HttpError(403, "An active admin account is required to upload images.");
+    throw new HttpError(403, "An active admin account is required to manage images.");
   }
   return account.localId;
 }
@@ -38,7 +38,7 @@ export function createImageHandler({ getStore, authorize = requireAdmin }) {
     try {
       if (request.method === "GET" || request.method === "HEAD") {
         const key = new URL(request.url).searchParams.get("key") || "";
-        if (!KEY.test(key)) return json({ error: "Image not found." }, 404);
+        if (!STORAGE_KEY_PATTERN.test(key)) return json({ error: "Image not found." }, 404);
         const result = await getStore().get(key, { type: "arrayBuffer", consistency: "strong" });
         if (!result) return json({ error: "Image not found." }, 404);
         return new Response(request.method === "HEAD" ? null : result, { headers: {
@@ -48,7 +48,17 @@ export function createImageHandler({ getStore, authorize = requireAdmin }) {
           "X-Content-Type-Options": "nosniff",
         } });
       }
-      if (request.method !== "POST") return new Response(null, { status: 405, headers: { Allow: "GET, HEAD, POST" } });
+      if (request.method === "DELETE") {
+        await authorize(request);
+        const key = new URL(request.url).searchParams.get("key") || "";
+        if (!STORAGE_KEY_PATTERN.test(key)) throw new HttpError(400, "Choose a valid managed image.");
+        const store = getStore();
+        const existing = await store.get(key, { type: "arrayBuffer", consistency: "strong" });
+        if (!existing) throw new HttpError(404, "Stored image was not found.");
+        await store.delete(key);
+        return json({ deleted: true, storageKey: key });
+      }
+      if (request.method !== "POST") return new Response(null, { status: 405, headers: { Allow: "GET, HEAD, POST, DELETE" } });
       const uid = await authorize(request);
       const type = request.headers.get("content-type")?.split(";")[0];
       if (!TYPES[type]) throw new HttpError(415, "Choose a JPEG, PNG or WebP image.");

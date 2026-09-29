@@ -8,6 +8,7 @@ function setup(authorize = async () => "admin-id") {
   const handler = createImageHandler({ authorize, getStore: () => ({
     set: async (key, data) => { blobs.set(key, data); },
     get: async key => blobs.get(key) || null,
+    delete: async key => { blobs.delete(key); },
   }) });
   return { handler, blobs };
 }
@@ -58,9 +59,31 @@ test("valid image is stored, served and readable immediately as WebP", async () 
   assert.equal(head.status, 200);
   assert.equal(await head.text(), "");
 });
+test("authenticated admin can delete an owned image while invalid keys are rejected", async () => {
+  const {handler, blobs} = setup();
+  const key = "00000000-0000-0000-0000-000000000000.webp";
+  blobs.set(key, Buffer.from("image"));
+  const invalid = await handler(new Request(url + "?key=../../other", { method: "DELETE", headers: { Authorization: "Bearer admin" } }));
+  assert.equal(invalid.status, 400);
+  assert.equal(blobs.size, 1);
+  const deleted = await handler(new Request(url + "?key=" + key, { method: "DELETE", headers: { Authorization: "Bearer admin" } }));
+  assert.equal(deleted.status, 200);
+  assert.equal(blobs.size, 0);
+  assert.equal((await deleted.json()).deleted, true);
+});
+test("image DELETE rejects unauthenticated or non-admin requests before touching storage", async () => {
+  const key = "00000000-0000-0000-0000-000000000000.webp";
+  const {handler, blobs} = setup(async () => { const error = new Error("No admin"); error.status = 403; throw error; });
+  blobs.set(key, Buffer.from("image"));
+  const response = await handler(new Request(url + "?key=" + key, { method: "DELETE" }));
+  assert.equal(response.status, 403);
+  assert.equal(blobs.size, 1);
+});
 test("unknown images and unsupported operations are handled safely", async () => {
   const {handler} = setup();
   assert.equal((await handler(new Request(url+"?key=../../other"))).status,404);
   assert.equal((await handler(new Request(url+"?key=00000000-0000-0000-0000-000000000000.webp"))).status,404);
-  assert.equal((await handler(new Request(url,{method:"DELETE"}))).status,405);
+  const unsupported = await handler(new Request(url,{method:"PATCH"}));
+  assert.equal(unsupported.status,405);
+  assert.match(unsupported.headers.get("allow") || "", /DELETE/);
 });

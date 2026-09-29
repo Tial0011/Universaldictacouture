@@ -13,12 +13,15 @@ const discovery = await readFile(new URL("../src/pages/admin/Discovery/Discovery
 const shopBy = await readFile(new URL("../src/services/shopBy.js", import.meta.url), "utf8");
 const rules = await readFile(new URL("../firestore.rules", import.meta.url), "utf8");
 
-test("Task 8A: protected admin routing exposes a dedicated Shop Control entry", () => {
+test("Task 8A/retroactive pass: protected admin routing exposes one global Shop workspace entry", () => {
   assert.match(app, /<AdminAccess>[\s\S]*<AdminLayout \/>/);
   assert.match(app, /path="shop" element=\{<AdminShop \/>\}/);
-  assert.match(sections, /Shop Control/);
+  assert.match(sections, /label: "Shop"/);
   assert.match(sections, /Shop operations/);
-  assert.match(layout, /Shop operations/);
+  assert.doesNotMatch(sections, /label: "Products"/);
+  assert.doesNotMatch(sections, /label: "Shop By"/);
+  assert.doesNotMatch(sections, /label: "Categories & attributes"/);
+  assert.match(layout, /shopAdminPaths/);
 });
 
 test("Task 8A: Shop Control maps customer Shop systems to clear admin destinations", () => {
