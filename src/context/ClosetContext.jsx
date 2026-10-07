@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { closetLineKey, priceForSelections, resolveSelections } from "../services/productModel";
-import { useAuth } from "./AuthContext";
+import { useCustomerSession } from "../hooks/useCustomerSession";
 import { revalidateProduct } from "../services/products";
 
 /**
@@ -43,7 +43,7 @@ function readSession(storageKey) {
 }
 
 export function ClosetProvider({ children }) {
-  const { user } = useAuth();
+  const { user } = useCustomerSession();
   return <ClosetSession key={user?.uid || "guest"} storageKey={STORAGE_KEY + ":" + (user?.uid || "guest")} >{children}</ClosetSession>;
 }
 

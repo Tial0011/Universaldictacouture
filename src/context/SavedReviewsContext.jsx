@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, useSyncExternalStore } 
 import { arrayRemove, arrayUnion, doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { createSavedReviewStore, reviewIds } from "../services/savedReviewStore";
-import { useAuth } from "./AuthContext";
+import { useCustomerSession } from "../hooks/useCustomerSession";
 
 const SavedReviewsContext = createContext({
   savedReviewIds: [],
@@ -44,7 +44,7 @@ function writeRecord(key, record) {
 }
 
 export function SavedReviewsProvider({ children }) {
-  const { user } = useAuth();
+  const { user } = useCustomerSession();
   if (!user?.uid) {
     return <SavedReviewsContext.Provider value={{
       savedReviewIds: [],

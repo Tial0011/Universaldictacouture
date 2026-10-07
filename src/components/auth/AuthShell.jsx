@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import Logo from "../brand/Logo";
 import ProductImage from "../product/ProductImage";
 import { DEFAULT_AUTH_APPEARANCE, fetchAuthAppearance } from "../../services/siteAppearance";
 import { safeReturnPath } from "../../services/authFlow";
 import "./AuthShell.css";
+import Header from "../navigation/Header";
 
 export default function AuthShell({ children, backTo = "/", compact = false }) {
   const location = useLocation();
@@ -19,11 +19,8 @@ export default function AuthShell({ children, backTo = "/", compact = false }) {
   }, [location.pathname]);
   return <section className={"auth-shell" + (compact ? " auth-shell--compact" : "")}>
     <a className="skip-link" href="#auth-content">Skip to account form</a>
-    <header className="auth-shell__brandbar">
-      <Link className="auth-shell__back" to={returnTo} state={location.state?.returnState} aria-label="Return to browsing">←</Link>
-      <Link to="/" aria-label="Universal Dicta Couture home"><Logo size="header" /></Link>
-      <span className="auth-shell__brandnote">THE CLIENT EXPERIENCE</span>
-    </header>
+    <Header />
+    <p className="auth-shell__return"><Link to={returnTo}>Return to browsing</Link></p>
     <div className="auth-shell__stage">
       <div className="auth-shell__hero" aria-hidden="true">
         <ProductImage image={appearance.image} alt="" className="auth-shell__hero-image" loading="eager" transformation="w_1400,h_1400,c_fill,g_auto,q_auto,f_auto" />

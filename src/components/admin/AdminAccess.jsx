@@ -15,7 +15,7 @@ import "../navigation/AdminLayout.css";
 import "./AdminVisual.css";
 
 export default function AdminAccess({ children }) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, sessionState } = useAuth();
   const framed = window.self !== window.top;
   const uid = user?.uid;
   const [access, setAccess] = useState({ uid: null, staff: null, checked: false });
@@ -51,16 +51,17 @@ export default function AdminAccess({ children }) {
   if (!isLoading && user && access.uid === user.uid && currentStaff(access.staff)) return <StaffContext.Provider
     key={user.uid + staffFingerprint(access.staff)} value={{ staff: access.staff, uid: user.uid }}>{children}</StaffContext.Provider>;
   const checking = isLoading || (user && (access.uid !== user.uid || !access.checked));
-  const entryState = checking ? "checking" : user ? access.state === "connection-problem" || access.state === "source-unavailable" ? access.state : access.state === "verified" && access.staff?.active === false ? "inactive" : access.state === "verified" && !access.staff ? "unresolved" : "restricted" : "sign-in";
+  const sessionUnavailable = ["unverifiable", "revoked"].includes(sessionState);
+  const entryState = checking ? "checking" : sessionUnavailable ? sessionState === "revoked" ? "restricted" : "connection-problem" : user ? access.state === "connection-problem" || access.state === "source-unavailable" ? access.state : access.state === "verified" && access.staff?.active === false ? "inactive" : access.state === "verified" && !access.staff ? "unresolved" : "restricted" : "sign-in";
   return <main className="admin-access" data-entry-state={entryState}>
     <aside className="admin-access__brand" aria-label="Universal Dicta Couture staff workspace"><Logo variant="white" /><div><p className="admin-eyebrow">Private staff environment</p><h2>Operational atelier</h2><p>Current staff access is checked before protected work opens.</p></div></aside>
     <div className="admin-access__workspace"><section className="admin-panel admin-access__card" aria-labelledby="admin-entry-title">
       <div className="admin-access__identity"><Logo /><p className="admin-eyebrow">Administration</p></div>
-      <h1 id="admin-entry-title">{checking ? "Checking your staff access" : user ? "Staff access unavailable" : "Staff sign-in"}</h1>
+      <h1 id="admin-entry-title">{checking ? "Checking your staff access" : user || sessionUnavailable ? "Staff access unavailable" : "Staff sign-in"}</h1>
       {!isFirebaseConfigured ? <p>Admin sign-in is not connected yet. Complete the Firebase setup in the admin setup guide to get started.</p>
         : checking ? <OperationalState state="checking" message="Please wait while we check your current session and Staff Access." />
-        : user ? <>
-          <OperationalState state={entryState} message={access.state === "connection-problem" ? runtimeStateMessage("connection-problem") : access.state === "source-unavailable" ? "Current staff authority source is unavailable. This is not an inactive-membership conclusion." : entryState === "inactive" ? "Current staff access is inactive. Protected work is unavailable." : entryState === "unresolved" ? "Current staff account context could not be established. No protected work has been opened." : "Current staff identity/access is restricted or inactive. Protected work is unavailable until current access is established."} />
+        : user || sessionUnavailable ? <>
+          <OperationalState state={entryState} message={sessionState === "revoked" ? "Current provider session authority was revoked. Staff authority cannot be established from this session." : entryState === "connection-problem" ? runtimeStateMessage("connection-problem") : access.state === "source-unavailable" ? "Current staff authority source is unavailable. This is not an inactive-membership conclusion." : entryState === "inactive" ? "Current staff access is inactive. Protected work is unavailable." : entryState === "unresolved" ? "Current staff account context could not be established. No protected work has been opened." : "Current staff identity/access is restricted or inactive. Protected work is unavailable until current access is established."} />
           <div className="admin-actions"><Button onClick={() => { setError(""); setAccess({ uid: null, staff: null, checked: false }); setAttempt(v => v + 1); }}>Check again</Button>
           <Button variant="secondary" isLoading={busy} onClick={logout}>Sign out</Button></div>
         </> : <>

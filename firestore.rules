@@ -217,8 +217,12 @@ service cloud.firestore {
       allow read, update, delete: if false;
     }
     match /customerProfiles/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow create, update: if request.auth != null
+      // Provider subject is not durable Account authority (Section 16 M1 F1).
+      // No trusted binding/lifecycle source currently exists in this codebase.
+      // Close legacy customer-only reads/writes until that source is integrated;
+      // never infer an ACTIVE Account from UID/email equality or client flags.
+      allow read: if false;
+      allow create, update: if false && request.auth != null
         && request.auth.uid == uid
         && request.resource.data.keys().hasOnly(['fullName', 'phoneNumber', 'email', 'createdAt', 'updatedAt'])
         && request.resource.data.fullName is string
@@ -232,7 +236,7 @@ service cloud.firestore {
     // One private conversation per customer. Messages and summaries commit together.
     match /conversations/{customerId} {
       function owner() {
-        return request.auth != null && request.auth.uid == customerId;
+        return false;
       }
       function participant() {
         return owner() || canStaff('chats.read', 'customer-service', customerId, resource.data.get('assignedStaffId', ''));
@@ -314,10 +318,10 @@ service cloud.firestore {
       }
     }
     match /savedPieces/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read, write: if false;
     }
     match /savedReviews/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read, write: if false;
     }
   }
 }

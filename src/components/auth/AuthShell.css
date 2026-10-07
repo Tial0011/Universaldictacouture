@@ -1,4 +1,6 @@
 .auth-shell {min-height:100dvh;background:var(--color-ivory);}
+.auth-shell__return {margin:0;padding:.5rem var(--content-padding-inline);font-size:var(--text-sm);}
+.auth-shell__return a {display:inline-flex;align-items:center;min-height:44px;}
 .auth-shell__brandbar {min-height:5rem;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem;padding:.45rem var(--content-padding-inline);background:var(--color-white);border-bottom:1px solid var(--color-border-luxury);}
 .auth-shell__brandbar > a:nth-child(2) {justify-self:center;}
 .auth-shell__back {display:grid;place-items:center;width:var(--touch-target);height:var(--touch-target);border:1px solid var(--color-border-luxury);color:var(--color-brand);font-size:1.5rem;text-decoration:none;}

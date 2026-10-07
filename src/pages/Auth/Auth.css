@@ -47,3 +47,11 @@
 @media(max-width:600px){.auth-flow__mark{display:none;}.auth-flow__rule{display:none;}.auth-flow{gap:1rem;}.auth-flow__intro{gap:.6rem;}.auth-flow h1{font-size:2.35rem;}}
 
 @media(min-width:600px){.auth-flow__form--signup {grid-template-columns:repeat(2,minmax(0,1fr));}.auth-flow__form--signup > * {grid-column:1/-1;}.auth-flow__form--signup > .auth-field:nth-child(1),.auth-flow__form--signup > .auth-field:nth-child(2),.auth-flow__form--signup > .auth-field:nth-child(4),.auth-flow__form--signup > .auth-field:nth-child(5){grid-column:auto;}}
+/* Native validation and shared error associations remain visible at reflow. */
+.auth-flow__status:empty {display:none;}
+.auth-flow {overflow-wrap:anywhere;}
+.auth-shell .account-card {max-width:100%;}
+.auth-shell .site-header__chat-launcher {display:none;}
+.auth-flow__form.auth-flow__form--signup {grid-template-columns:minmax(0,1fr);}
+.auth-flow__form--signup > * {grid-column:1 / -1;}
+.auth-flow a.btn--primary {color:var(--color-text-on-brand);}

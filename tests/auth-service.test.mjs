@@ -2,10 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
+import * as flow from '../src/services/authFlow.js';
+import * as authority from '../src/services/customerAccountAuthority.js';
+import { currentReadDeadline, protectedWriteDeadline } from '../src/services/operationalRuntime.js';
 
 // Evaluate the real auth service against an isolated Firebase adapter.
 // This checks callback ordering without creating accounts or sending email.
-async function loadAuthService({ failure = false } = {}) {
+async function loadAuthService({ failure = false, delayed = false } = {}) {
   const storage = new Map([["udc:auth:session-policy", JSON.stringify({ expiresAt: 1 })]]);
   const context = vm.createContext({
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value), removeItem: key => storage.delete(key) },
@@ -15,24 +18,29 @@ async function loadAuthService({ failure = false } = {}) {
   let expiredDuringCallback;
   const instance = {};
   const user = { uid: "test-user" };
+  let release;
+  const pending = delayed ? new Promise(resolve=>{release=resolve;}) : null;
   const authenticate = async () => {
     expiredDuringCallback = service.namespace.sessionPolicyExpired();
     if (failure) throw new Error("invalid credentials");
+    if (pending) await pending;
+    instance.currentUser = user;
     return { user };
   };
   const exports = {
-    browserLocalPersistence: "local", getAuth: () => instance,
+    browserLocalPersistence: "local", getAuth: () => instance, reload: async()=>{}, getIdToken: async()=> 'fixture-token',
     createUserWithEmailAndPassword: authenticate, signInWithEmailAndPassword: authenticate,
     setPersistence: async () => {}, onAuthStateChanged: () => () => {},
-    signOut: async () => {}, updateProfile: async (account, details) => Object.assign(account, details),
+    signOut: async () => {instance.currentUser=null;}, updateProfile: async (account, details) => Object.assign(account, details),
     verifyBeforeUpdateEmail: async () => {},
   };
   const sdk = new vm.SyntheticModule(Object.keys(exports), function () { for (const [key, value] of Object.entries(exports)) this.setExport(key, value); }, { context });
   const config = new vm.SyntheticModule(["default", "isFirebaseConfigured"], function () { this.setExport("default", {}); this.setExport("isFirebaseConfigured", true); }, { context });
   service = new vm.SourceTextModule(await readFile(new URL("../src/firebase/auth.js", import.meta.url), "utf8"), { context, initializeImportMeta(meta) { meta.env = {}; } });
-  await service.link(specifier => specifier === "firebase/auth" ? sdk : config);
+  const synthetic = entries => new vm.SyntheticModule(Object.keys(entries),function(){for(const [key,value] of Object.entries(entries))this.setExport(key,value);},{context});
+  await service.link(specifier => specifier === "firebase/auth" ? sdk : specifier.includes('authFlow') ? synthetic(flow) : specifier.includes('customerAccountAuthority') ? synthetic(authority) : specifier.includes('operationalRuntime') ? synthetic({currentReadDeadline,protectedWriteDeadline}) : config);
   await service.evaluate();
-  return { auth: service.namespace, storage, user, duringCallback: () => expiredDuringCallback };
+  return { auth: service.namespace, storage, user, instance, release, duringCallback: () => expiredDuringCallback };
 }
 
 test("sign-in renews an expired policy without the auth listener signing the customer out", async () => {
@@ -49,14 +57,17 @@ test("failed sign-in preserves expiry and releases the in-progress guard", async
   assert.equal(subject.auth.sessionPolicyExpired(), true);
 });
 
-test("registration creates the account before independently retryable name setup", async () => {
+test("registration stops before provider creation when trusted durable identity/bootstrap is unavailable", async () => {
   const subject = await loadAuthService();
-  const result = await subject.auth.signUp("test@example.com", "password", { keepSignedIn: true });
-  assert.equal(result.user, subject.user);
-  assert.equal(subject.duringCallback(), false);
-  await subject.auth.updateAccountName(result.user, "Test Customer");
-  assert.equal(subject.user.displayName, "Test Customer");
-  const policy = JSON.parse(subject.storage.get("udc:auth:session-policy"));
-  assert.equal(policy.keepSignedIn, true);
-  assert.ok(policy.expiresAt > Date.now() + 29 * 24 * 60 * 60 * 1000);
+  await assert.rejects(subject.auth.signUp("test@example.com", "a-long-test-password"), {code:'account-source-unavailable'});
+  assert.equal(subject.duringCallback(),undefined);
+  assert.equal(subject.auth.sessionPolicyExpired(),true);
+});
+test('competing sign-in is refused; a late response cannot revive a deliberately signed-out principal',async()=>{
+  const subject=await loadAuthService({delayed:true});
+  const first=subject.auth.signIn('test@example.test','fixture-password');
+  await assert.rejects(subject.auth.signIn('other@example.test','fixture-password'),{code:'auth/operation-pending'});
+  await subject.auth.signOutUser();subject.release();
+  await assert.rejects(first,{code:'auth/principal-changed'});
+  assert.equal(subject.instance.currentUser,null);
 });

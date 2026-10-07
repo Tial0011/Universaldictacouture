@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, useSyncExternalStore } 
 import { arrayRemove, arrayUnion, doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { createSavedItemsStore, mergeValidatedSavedIds, reviewIds as itemIds } from "../services/savedReviewStore";
-import { useAuth } from "./AuthContext";
+import { useCustomerSession } from "../hooks/useCustomerSession";
 import { validatePublishedProductIds } from "../services/products";
 
 const SavedPiecesContext = createContext({
@@ -62,7 +62,7 @@ function writeGuestRecord(record) {
   }
 }
 export function SavedPiecesProvider({ children }) {
-  const { user } = useAuth();
+  const { user } = useCustomerSession();
   return <SavedSession key={user?.uid || "guest"} uid={user?.uid}>{children}</SavedSession>;
 }
 function SavedSession({ uid, children }) {

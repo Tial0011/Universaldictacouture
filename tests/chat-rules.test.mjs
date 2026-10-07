@@ -17,6 +17,11 @@ beforeEach(async () => {
 });
 after(async () => { await env?.cleanup(); });
 const client = uid => env.authenticatedContext(uid, { email: uid + "@example.test" }).firestore();
+const seedLegacyConversation = productContext => env.withSecurityRulesDisabled(async context => {
+  const store = context.firestore();
+  await setDoc(doc(store, 'conversations/alice'), {customerId:'alice',customerName:'Customer',customerEmail:'alice@example.test',createdAt:serverTimestamp(),updatedAt:serverTimestamp(),lastMessageId:'legacy',lastMessage:'Historical customer message',lastSenderRole:'customer'});
+  await setDoc(doc(store, 'conversations/alice/messages/legacy'), {senderId:'alice',senderRole:'customer',body:'Historical customer message',createdAt:serverTimestamp(),...(productContext ? {productContext} : {})});
+});
 function send(store, customerId, senderId, { first = false, role = "customer", body = "Hello", productContext } = {}) {
   const parent = doc(store, "conversations", customerId);
   const message = doc(collection(parent, "messages"));
@@ -28,18 +33,20 @@ function send(store, customerId, senderId, { first = false, role = "customer", b
   else batch.update(parent, summary);
   return batch.commit();
 }
-test("customer starts a conversation and active admin replies; both read ordered messages", async () => {
+test("provider UID alone cannot start/read customer work; currently authorized staff retains legacy owner access", async () => {
   const customer = client("alice"), studio = client("studio");
-  await assertSucceeds(send(customer, "alice", "alice", { first: true }));
+  await assertFails(send(customer, "alice", "alice", { first: true }));
+  await seedLegacyConversation();
+  await assertFails(getDoc(doc(customer,'conversations/alice')));
   await assertSucceeds(send(studio, "alice", "studio", { role: "admin", body: "How can we help?" }));
-  for (const store of [customer, studio]) {
+  for (const store of [studio]) {
     const result = await assertSucceeds(getDocs(query(collection(store, "conversations/alice/messages"), orderBy("createdAt", "desc"), limit(30))));
     assert.equal(result.size, 2);
   }
   await assertSucceeds(getDocs(query(collection(studio, "conversations"), orderBy("updatedAt", "desc"), limit(20))));
 });
 test("other customers, signed-out visitors and disabled admins cannot read or reply", async () => {
-  await send(client("alice"), "alice", "alice", { first: true });
+  await seedLegacyConversation();
   for (const store of [client("bob"), client("disabled"), env.unauthenticatedContext().firestore()]) {
     await assertFails(getDoc(doc(store, "conversations/alice")));
     await assertFails(getDocs(query(collection(store, "conversations/alice/messages"), limit(30))));
@@ -57,16 +64,16 @@ test("messages require atomic summaries, valid body size and immutable ownership
   const store = client("alice");
   await assertFails(send(store, "alice", "alice", { first: true, body: "" }));
   await assertFails(send(store, "alice", "alice", { first: true, body: "x".repeat(2001) }));
-  await send(store, "alice", "alice", { first: true });
+  await seedLegacyConversation();
   await assertFails(setDoc(doc(store, "conversations/alice/messages/orphan"), { senderId: "alice", senderRole: "customer", body: "Hello", createdAt: serverTimestamp() }));
   await assertFails(updateDoc(doc(store, "conversations/alice"), { lastMessage: "Forged preview", updatedAt: serverTimestamp() }));
   await assertFails(updateDoc(doc(store, "conversations/alice"), { customerId: "bob" }));
-  const messages = await getDocs(query(collection(store, "conversations/alice/messages"), limit(30)));
+  const messages = await getDocs(query(collection(client('studio'), "conversations/alice/messages"), limit(30)));
   await assertFails(updateDoc(messages.docs[0].ref, { body: "Changed" }));
   await assertFails(deleteDoc(messages.docs[0].ref));
 });
 test("unbounded queries are denied and revoked admins lose chat access", async () => {
-  await send(client("alice"), "alice", "alice", { first: true });
+  await seedLegacyConversation();
   const studio = client("studio");
   await assertFails(getDocs(collection(studio, "conversations")));
   await assertFails(getDocs(query(collection(studio, "conversations/alice/messages"), limit(31))));
@@ -76,18 +83,19 @@ test("unbounded queries are denied and revoked admins lose chat access", async (
 });
 
 const productTag = { productId: "piece", name: "Wine Aso Oke", slug: "wine-set", imageUrl: "https://example.test/piece.jpg", imagePublicId: "", price: 50000, variable: false, reviewId: "review" };
-test("product tags persist above a message for its customer and admin only", async () => {
-  await assertSucceeds(send(client("alice"), "alice", "alice", { first: true, productContext: productTag }));
-  for (const store of [client("alice"), client("studio")]) {
+test("legacy product tag history stays intact for current staff; unresolved customer authority stays closed", async () => {
+  await assertFails(send(client("alice"), "alice", "alice", { first: true, productContext: productTag }));
+  await seedLegacyConversation(productTag);
+  for (const store of [client("studio")]) {
     const result = await assertSucceeds(getDocs(query(collection(store, "conversations/alice/messages"), limit(30))));
     assert.deepEqual(result.docs[0].data().productContext, productTag);
   }
   await assertFails(getDocs(query(collection(client("bob"), "conversations/alice/messages"), limit(30))));
 });
 test("staff reply audit preserves durable human attribution without disclosing it to customers", async () => {
-  await send(client("alice"), "alice", "alice", { first: true });
+  await seedLegacyConversation();
   await send(client("studio"), "alice", "studio", { role: "admin" });
-  const messages = await getDocs(query(collection(client("alice"), "conversations/alice/messages"), limit(30)));
+  const messages = await getDocs(query(collection(client("studio"), "conversations/alice/messages"), limit(30)));
   const reply = messages.docs.find(message => message.data().senderRole === "admin");
   const evidence = await assertSucceeds(getDoc(doc(client("studio"), "staffAudit", reply.id)));
   if (evidence.data().actorStaffId !== "staff-studio") throw new Error("Durable staff attribution missing");
@@ -98,5 +106,5 @@ test("malformed or oversized product tags cannot bypass chat validation", async 
   for (const tag of [null, {}, { ...productTag, name: "x".repeat(241) }, { ...productTag, price: -1 }, { ...productTag, imageUrl: "javascript:alert(1)" }, { ...productTag, extra: true }]) {
     await assertFails(send(client("alice"), "alice", "alice", { first: true, productContext: tag }));
   }
-  await assertSucceeds(send(client("alice"), "alice", "alice", { first: true, productContext: { ...productTag, price: null, imageUrl: "/.netlify/functions/image?id=a" } }));
+  await assertFails(send(client("alice"), "alice", "alice", { first: true, productContext: { ...productTag, price: null, imageUrl: "/.netlify/functions/image?id=a" } }));
 });

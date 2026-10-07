@@ -19,3 +19,6 @@
 .auth-gate__dialog::before {transform:none;bottom:0;height:4px;}
 .auth-gate__dialog::after {display:none;}
 .auth-gate__actions .btn {min-height:3rem;font-size:.8rem;}
+dialog.auth-gate { width:100%;height:100dvh;max-width:none;max-height:none;margin:0;border:0;color:var(--color-text-primary); }
+dialog.auth-gate:not([open]) {display:none;}
+@media (max-width:599px) {dialog.auth-gate {align-items:end;padding:0;} .auth-gate__dialog {width:100%;max-height:calc(100dvh - 1rem);border-radius:.5rem .5rem 0 0;}}

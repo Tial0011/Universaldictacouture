@@ -1,0 +1,10 @@
+import {connectAuthEmulator,signOut} from 'firebase/auth';
+import {connectFirestoreEmulator} from 'firebase/firestore';
+import {auth} from '../src/firebase/auth';
+import {db} from '../src/firebase/firestore';
+if(import.meta.env.MODE !== 'section12-test' || import.meta.env.VITE_FIREBASE_PROJECT_ID !== 'demo-udc-section12' || !['127.0.0.1','localhost'].includes(location.hostname))throw Error('Isolated emulator QA only');
+connectAuthEmulator(auth,'http://127.0.0.1:9099',{disableWarnings:true});connectFirestoreEmulator(db,'127.0.0.1',8089);
+await signOut(auth);sessionStorage.removeItem('udc:auth:had-session');localStorage.removeItem('udc:auth:session-policy');
+const target=new URL(location.href).searchParams.get('route') || '/signin';
+history.replaceState({},'',target);
+await import('../src/main.jsx');

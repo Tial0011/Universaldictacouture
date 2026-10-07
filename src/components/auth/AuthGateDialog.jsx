@@ -10,36 +10,27 @@ function LockMark() {
 export default function AuthGateDialog({ gate, onClose }) {
   const navigate = useNavigate();
   const closeRef = useRef(null);
+  const dialogRef = useRef(null);
   useEffect(() => {
     if (!gate) return undefined;
     const previous = document.body.style.overflow;
     const previousFocus = document.activeElement;
     document.body.style.overflow = "hidden";
+    if (!dialogRef.current.open) dialogRef.current.showModal();
     closeRef.current?.focus();
-    const keydown = (event) => {
-      if (event.key === "Escape") { onClose(); return; }
-      if (event.key !== "Tab") return;
-      const dialog = closeRef.current?.closest('[role="dialog"]');
-      const focusable = dialog?.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
-      if (!focusable?.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-    };
-    document.addEventListener("keydown", keydown);
-    return () => { document.body.style.overflow = previous; document.removeEventListener("keydown", keydown); if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true }); };
+    const dialog = dialogRef.current;
+    return () => { dialog.close(); document.body.style.overflow = previous; if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true }); };
   }, [gate, onClose]);
   if (!gate) return null;
 
   const openAccount = (destination) => {
-    const state = { returnTo: gate.returnTo, returnState: gate.returnState || null };
+    const state = gate.continuation || { returnTo: gate.returnTo };
     onClose();
     navigate(destination, { state });
   };
 
-  return <div className="auth-gate" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-    <section className="auth-gate__dialog" role="dialog" aria-modal="true" aria-labelledby="auth-gate-title" aria-describedby="auth-gate-copy">
+  return <dialog ref={dialogRef} className="auth-gate" aria-labelledby="auth-gate-title" aria-describedby="auth-gate-copy" onCancel={event => { event.preventDefault(); onClose(); }} onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+    <section className="auth-gate__dialog">
       <button ref={closeRef} className="auth-gate__close" type="button" aria-label="Close sign in prompt" onClick={onClose}>×</button>
       <div className="auth-gate__weave" aria-hidden="true" />
       <LockMark />
@@ -53,5 +44,5 @@ export default function AuthGateDialog({ gate, onClose }) {
       </div>
       <p className="auth-gate__return">We’ll bring you back to where you left off.</p>
     </section>
-  </div>;
+  </dialog>;
 }
