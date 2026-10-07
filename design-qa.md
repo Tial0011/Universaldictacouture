@@ -1,3 +1,43 @@
+# Section 11 Module 2 visual QA
+
+final result: blocked
+
+Scope: actual repository Module-2 delta, not a generated prototype. Existing design/runtime and written authority control.
+
+Source: `.tools.local/section11-part2-reference/image1.png` (R01, 2048×1365 composite); full twelve-image contact sheet `.tools.local/section11-part2-reference/contact.png`. All eight direct and four supporting images extracted from the supplied DOCX and inspected.
+
+Implementation: `.tools.local/section11-part2-overview-1440.png` and `...-390.png`, captured at 1440×1000 and 390×1000 CSS pixels, density 1. Matching area captures exist for all seven account areas at these two widths.
+
+Full-view comparison: `.tools.local/section11-part2-reference/comparison.png` (initial) and `comparison-final.png` (post-fix), combining the actual source and both runtime captures in a single image. Source board includes several device frames and authorized loaded demo content; actual app is in **source-unavailable** state. Composite panels resized proportionately for side-by-side review, not claimed as pixel-aligned identical viewport/state fidelity.
+
+Focused review: final rendered mobile navigation/primary actions and desktop rail/panels inspected in the combined image. No protected Customer Photo, records or imagery are fabricated from the source board. Native current header/logo assets and existing fonts remain.
+
+## Comparison history and findings
+
+- Initial P2: mobile account rail occupied excessive above-the-fold space; changed mobile navigation to one labelled native select, desktop rail hidden with `display:none` at the same breakpoint. Final screenshot and selector interaction pass.
+- Initial P2: inherited floating Chat launcher overlapped account actions. Suppressed it only on Profile, preserving global customer navigation and explicit Chat links. Final screenshot has reachable unoccluded actions.
+- Remaining P1/blocked owner dependency: loaded Profile/Photo, address editing, saved preferences/security/privacy/current projections are missing. Source and runtime are not the same authorized state. Implement trusted owner foundations and capture actual positive loaded/edit states before asserting fidelity PASS; do not populate mock records to conceal this.
+
+## Required fidelity surfaces
+
+- Typography: retained real Cormorant Garamond/Inter and token hierarchy; serif headings, operational sans-serif controls. Reference board labels are not copied as authority.
+- Spacing/layout: desktop leading rail and warm independent panels; tablet 12rem rail; compact mobile selector and stacked content. Eight widths, no horizontal overflow, 200% text reflow passed. Positive forms/dialog density cannot be judged yet.
+- Colors/tokens: existing wine/ivory/near-black; metallic borders decorative only; focus/control contrast uses wine/control tokens. No new palette or gold body text.
+- Image fidelity: official current logo retained; private Customer image/media not substituted with generated or fake assets. Missing loaded-state image fidelity is not labelled passed.
+- Copy/content: states explicitly distinguish unavailable from confirmed/empty; no private name/login/consent/default/tasks are fabricated. Required unavailable functionality remains visible as limitations, not working controls.
+
+## Runtime evidence
+
+`tests/section11-part2-browser.mjs`: 56 area/width checks; selected native mobile navigation, switching, sign-out, privacy withdrawal, persisted-history recheck, no false bottom-nav active state, 200% text reflow; 0 runtime exceptions. No in-app browser was available, so an isolated loopback emulator browser was used. No production data or user browser profile touched.
+
+## Next gate
+
+Connect the missing approved private Account/owner services; implement positive forms and consequential command/result handling; capture matching loaded/edit/conflict/outcome states and rerun reference comparison. This report intentionally withholds full visual completion.
+
+## Preserved earlier Section 12 QA
+
+The following pre-existing report is retained without changing its findings or claiming the present Module-2 work resolved them.
+
 # Section 12 visual-reference conformance QA
 
 final result: blocked

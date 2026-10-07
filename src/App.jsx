@@ -65,7 +65,8 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/our-story" element={<OurStory />} />
         <Route path="/policies" element={<Policies />} />
-        <Route path="/profile" element={<CustomerAccountBoundary><Profile /></CustomerAccountBoundary>} />
+        {/* Safe account navigation is not a private-data authorization grant. */}
+        <Route path="/profile" element={<Profile />} />
         <Route path="/saved-pieces" element={<Navigate to="/my-closet/my-pieces" replace />} />
         <Route path="/my-closet" element={<CustomerOrGuest><MyCloset /></CustomerOrGuest>} />
         <Route path="/my-closet/my-pieces" element={<CustomerOrGuest><SavedPieces /></CustomerOrGuest>} />

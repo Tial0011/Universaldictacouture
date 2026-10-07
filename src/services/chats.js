@@ -6,6 +6,7 @@ import { db } from "../firebase/firestore";
 import { normaliseProductContext, prepareMessage } from "./chatModel";
 import { beginStaffOperation, clearStaffOperation, pendingStaffOperation, staffOperationActor } from "./staffOperations";
 import { protectedWriteDeadline, currentReadDeadline } from "./operationalRuntime";
+import { requireCustomerAccountAuthority } from "./customerAccountAuthority";
 export const MESSAGE_PAGE_SIZE = 30;
 const unresolvedSends = new Map();
 function database() {
@@ -41,13 +42,19 @@ export function watchConversation(id, next, error) {
 }
 export async function sendMessage({ user, customerId, text, admin = false, productContext = null }) {
   if (!user) throw new Error("Please sign in to send a message.");
-  if (!admin && customerId !== user.uid) throw new Error("You can only message from your own account.");
+  if (auth.currentUser?.uid !== user.uid) throw Object.assign(new Error("Current message principal changed."), { code: "permission-denied" });
+  // Staff mode never creates Customer authority. Rules already deny the legacy
+  // Customer path; fail before reads rather than infer an Account from UID.
+  if (!admin) {
+    requireCustomerAccountAuthority();
+    throw Object.assign(new Error("The current customer Chat owner service is unavailable."), { code: "chat-source-unavailable" });
+  }
   const body = prepareMessage(text);
   const context = normaliseProductContext(productContext);
   const store = database();
   const conversation = doc(store, "conversations", customerId);
   const existing = await getDocFromServer(conversation);
-  if (admin && !existing.exists()) throw new Error("This conversation is no longer available.");
+  if (!existing.exists()) throw new Error("This conversation is no longer available.");
   let staffActorId = null;
   if (admin) {
     const staff = await readCurrentStaff();
@@ -60,6 +67,8 @@ export async function sendMessage({ user, customerId, text, admin = false, produ
   if (unresolvedSends.has(operationKey) || pendingStaffOperation(actor, sendKind(customerId))) throw Object.assign(new Error("A previous send needs reconciliation."), { code: "outcome-unknown" });
   if (admin) {
     const staff = await readCurrentStaff();
+    if (staff.principalUid !== user.uid || staff.staffId !== staffActorId
+      || !allows(staff, "chats.reply", { purpose: "customer-service", objectId: customerId, assignedStaffId: existing.data()?.assignedStaffId })) throw Object.assign(new Error("Current reply context changed."), { code: "permission-denied" });
     if (!allows(staff, "operations.reconcile", { purpose: "operation-result", objectId: message.id }) && !allows(staff, "audit.read", { purpose: "audit", objectId: message.id })) throw Object.assign(new Error("Current operation-result authority is required before replying."), { code: "permission-denied" });
   }
   if (unresolvedSends.has(operationKey) || pendingStaffOperation(actor, sendKind(customerId))) throw Object.assign(new Error("A previous send needs reconciliation."), { code: "outcome-unknown" });
@@ -68,8 +77,9 @@ export async function sendMessage({ user, customerId, text, admin = false, produ
   batch.set(message, { body, senderId: user.uid, senderRole: role, createdAt: serverTimestamp(), ...(context ? { productContext: context } : {}) });
   if (admin) batch.set(doc(store, "staffAudit", message.id), { actorUid: user.uid, actorStaffId: staffActorId, execution: "staff", targetCollection: "conversations", targetId: customerId, action: "reply", outcome: "committed", createdAt: serverTimestamp() });
   const summary = { lastMessageId: message.id, lastMessage: body, lastSenderRole: role, updatedAt: serverTimestamp() };
-  if (existing.exists()) batch.update(conversation, summary);
-  else batch.set(conversation, { ...summary, customerId, customerName: (user.displayName || "Customer").slice(0, 120), customerEmail: user.email || "", createdAt: serverTimestamp() });
+  // Existing Staff work never bootstraps a Customer conversation/Profile from
+  // mutable provider metadata. The Customer owner service must create it.
+  batch.update(conversation, summary);
   unresolvedSends.set(operationKey, { message, staffActorId });
   // Persist only the logical message handle before submitting. Reopening or
   // reloading cannot silently unlock another send after a lost response.

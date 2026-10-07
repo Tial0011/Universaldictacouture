@@ -1,10 +1,11 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../common/Button";
+import { AccountIcon } from "../account/AccountVisuals";
 import "./AuthGate.css";
 
 function LockMark() {
-  return <span className="auth-gate__lock" aria-hidden="true"><svg viewBox="0 0 32 32"><rect x="8" y="14" width="16" height="13" rx="3"/><path d="M11 14v-3.5a5 5 0 0 1 10 0V14"/></svg></span>;
+  return <span className="auth-gate__lock" aria-hidden="true"><AccountIcon name="lock" /></span>;
 }
 
 export default function AuthGateDialog({ gate, onClose }) {
@@ -19,7 +20,16 @@ export default function AuthGateDialog({ gate, onClose }) {
     if (!dialogRef.current.open) dialogRef.current.showModal();
     closeRef.current?.focus();
     const dialog = dialogRef.current;
-    return () => { dialog.close(); document.body.style.overflow = previous; if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true }); };
+    return () => {
+      if (dialog.open) dialog.close();
+      document.body.style.overflow = previous;
+      if (previousFocus?.isConnected && previousFocus.getClientRects().length
+        && !previousFocus.closest("[hidden], [inert], [aria-hidden='true']") && !previousFocus.disabled) previousFocus.focus({ preventScroll: true });
+      else {
+        const target = document.querySelector("main h1") || document.querySelector("main");
+        if (target) { target.setAttribute("tabindex", "-1"); target.focus({ preventScroll: true }); }
+      }
+    };
   }, [gate, onClose]);
   if (!gate) return null;
 
@@ -42,7 +52,7 @@ export default function AuthGateDialog({ gate, onClose }) {
         <Button variant="secondary" onClick={() => openAccount("/signup")}>CREATE AN ACCOUNT</Button>
         <Button variant="ghost" onClick={onClose}>KEEP BROWSING</Button>
       </div>
-      <p className="auth-gate__return">We’ll bring you back to where you left off.</p>
+      <p className="auth-gate__return">We’ll return you safely. Signing in won’t submit the action you started.</p>
     </section>
   </dialog>;
 }

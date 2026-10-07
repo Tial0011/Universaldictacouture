@@ -1,12 +1,28 @@
 import { collection, doc, documentId, getDocFromServer, getDocsFromServer, limit, orderBy, query, startAfter, where } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { auth } from "../firebase/auth";
-import { authorizationRoutes, currentStaff, DOMAIN_CONTRACTS, firestoreFields, safeOperationalId, normalizeStaffMembership } from "./staffAuthorization";
+import { authorizationRoutes, currentStaff, DOMAIN_CONTRACTS, firestoreFields, safeOperationalId, normalizeStaffMembership, staffFingerprint } from "./staffAuthorization";
 import { authorizeSummary, operationalSummary } from "./operationsModel";
 import { activityPlans, activityEvent } from "./operationalActivity";
 import { currentReadDeadline } from "./operationalRuntime";
 
 export const OPERATION_PAGE_SIZE = 20;
+function assertCurrentReadContext(start, current) {
+  // Discard the entire old response, including cursor/hasMore metadata. An
+  // A-origin read must not become B's result merely because B can read some
+  // of the same objects. Capability changes also invalidate the old query.
+  if (!start?.principalUid || start.principalUid !== current?.principalUid
+    || !currentStaff(current) || staffFingerprint(start) !== staffFingerprint(current)) {
+    throw Object.assign(new Error("Staff context changed while loading. Open the current view again."), { code: "permission-denied" });
+  }
+}
+function planIndex(cursor) {
+  const index = cursor?.planIndex ?? 0;
+  if (cursor != null && (typeof cursor !== "object" || Array.isArray(cursor)) || !Number.isInteger(index) || index < 0) {
+    throw Object.assign(new Error("Current page context could not be verified."), { code: "permission-denied" });
+  }
+  return index;
+}
 export async function readCurrentStaff() {
   const user = auth?.currentUser;
   if (!db || !user) throw Object.assign(new Error("Current staff access is unavailable."), { code: "permission-denied" });
@@ -20,7 +36,7 @@ function plansFor(staff, domain) {
   const routes = authorizationRoutes(staff, `${domain}.read`, contract.purpose);
   if (routes.some(route => route.family === "domainWide")) return [{}];
   const plans = [];
-  const ids = [...new Set(routes.filter(route => route.family === "selectedObject").flatMap(route => route.ids || []))];
+  const ids = [...new Set(routes.filter(route => route.family === "selectedObject").flatMap(route => Array.isArray(route.ids) ? route.ids : []))].filter(safeOperationalId);
   for (let i = 0; i < ids.length; i += OPERATION_PAGE_SIZE) plans.push({ ids: ids.slice(i, i + OPERATION_PAGE_SIZE) });
   if (domain === "chats" && routes.some(route => route.family === "assignmentDerived")) plans.push({ assignedStaffId: staff.staffId });
   return plans;
@@ -30,7 +46,7 @@ export async function loadScopedOwnerPage(domain, cursor = null) {
   if (!contract?.collection) throw Object.assign(new Error("The owner source is not available."), { code: "source-unavailable" });
   const staff = await readCurrentStaff();
   const plans = plansFor(staff, domain);
-  const index = cursor?.planIndex || 0;
+  const index = planIndex(cursor);
   if (!plans[index]) throw Object.assign(new Error("This scope is not available."), { code: "permission-denied" });
   const plan = plans[index];
   const scope = plan.ids ? [where(documentId(), "in", plan.ids)] : plan.assignedStaffId ? [where("assignedStaffId", "==", plan.assignedStaffId)] : [];
@@ -39,6 +55,7 @@ export async function loadScopedOwnerPage(domain, cursor = null) {
   // Rules filter retrieval; this independent check limits presentation if
   // membership changed during the request. Never use it as backend security.
   const latest = await readCurrentStaff();
+  assertCurrentReadContext(staff, latest);
   const records = page.docs.map(entry => ({ ...entry.data(), id: entry.id }));
   const permitted = records.filter(record => authorizeSummary(latest, domain, record));
   const next = page.size === OPERATION_PAGE_SIZE ? { planIndex: index, after: page.docs.at(-1) }
@@ -50,7 +67,7 @@ export async function loadOperationalPage(domain, cursor = null) {
   const contract = DOMAIN_CONTRACTS[domain];
   if (!contract?.collection) throw Object.assign(new Error("The owner source is not available."), { code: "source-unavailable" });
   const plans = plansFor(staff, domain);
-  const index = cursor?.planIndex || 0;
+  const index = planIndex(cursor);
   const plan = plans[index];
   if (!plan) throw Object.assign(new Error("Current source scope is unavailable."), { code: "permission-denied" });
   const { endpoint, root } = restSource();
@@ -63,6 +80,7 @@ export async function loadOperationalPage(domain, cursor = null) {
   const rows = await restRead(endpoint + ":runQuery", { method: "POST", body: JSON.stringify({ structuredQuery }) });
   const documents = rows.filter(row => row.document).map(row => row.document);
   const latest = await readCurrentStaff();
+  assertCurrentReadContext(staff, latest);
   const items = documents.map(record => ({ ...firestoreFields(record.fields), id: record.name.split("/").at(-1) }))
     .filter(record => authorizeSummary(latest, domain, record)).map(record => operationalSummary(domain, record));
   const next = documents.length === OPERATION_PAGE_SIZE ? { planIndex: index, after: documents.at(-1).name, ...(domain === "audit" ? { createdAt: documents.at(-1).fields.createdAt.timestampValue } : {}) }
@@ -73,19 +91,20 @@ export async function readOperationalRecord(domain, id) {
   if (!safeOperationalId(id)) throw Object.assign(new Error("Invalid reference."), { code: "permission-denied" });
   const contract = DOMAIN_CONTRACTS[domain];
   if (!contract?.collection) throw Object.assign(new Error("The owner source is not available."), { code: "source-unavailable" });
-  await readCurrentStaff();
+  const staff = await readCurrentStaff();
   const mask = SUMMARY_FIELDS[domain].map(field => "mask.fieldPaths=" + encodeURIComponent(field)).join("&");
   const raw = await restRead(restSource().endpoint + "/" + contract.collection + "/" + encodeURIComponent(id) + "?" + mask);
+  const current = await readCurrentStaff();
+  assertCurrentReadContext(staff, current);
   if (!raw) return null;
   const record = { ...firestoreFields(raw.fields), id };
-  const current = await readCurrentStaff();
   if (!authorizeSummary(current, domain, record)) throw Object.assign(new Error("Access is no longer available."), { code: "permission-denied" });
   return operationalSummary(domain, record);
 }
 export async function loadActivityPage(view = "mine", cursor = null) {
   const staff = await readCurrentStaff();
   const plans = activityPlans(staff, view);
-  const index = cursor?.planIndex || 0;
+  const index = planIndex(cursor);
   const plan = plans[index];
   if (!plan) throw Object.assign(new Error("Current event source is unavailable for this scope."), { code: "source-unavailable" });
   const { endpoint, root } = restSource();
@@ -99,6 +118,7 @@ export async function loadActivityPage(view = "mine", cursor = null) {
   const rows = await restRead(endpoint + ":runQuery", { method: "POST", body: JSON.stringify({ structuredQuery }) });
   const documents = rows.filter(row => row.document).map(row => row.document);
   const current = await readCurrentStaff();
+  assertCurrentReadContext(staff, current);
   const items = documents.map(record => activityEvent(current, { ...firestoreFields(record.fields), id: record.name.split("/").at(-1) })).filter(Boolean);
   const next = documents.length === OPERATION_PAGE_SIZE ? { planIndex: index, after: documents.at(-1).name, createdAt: documents.at(-1).fields.createdAt.timestampValue }
     : index + 1 < plans.length ? { planIndex: index + 1, after: null } : null;
@@ -121,10 +141,17 @@ async function restRead(url, options = {}) {
   if (!user) throw Object.assign(new Error("Current access is unavailable."), { code: "permission-denied" });
   let response;
   try {
-    response = await fetch(url, { ...options, cache: "no-store", headers: { "Content-Type": "application/json", Authorization: "Bearer " + await user.getIdToken() }, signal: AbortSignal.timeout(15000) });
-  } catch { throw Object.assign(new Error("The owner source could not be reached."), { code: "unavailable" }); }
+    const token = await user.getIdToken();
+    if (auth.currentUser?.uid !== user.uid) throw Object.assign(new Error("Account context changed."), { code: "permission-denied" });
+    response = await fetch(url, { ...options, cache: "no-store", headers: { "Content-Type": "application/json", Authorization: "Bearer " + token }, signal: AbortSignal.timeout(15000) });
+  } catch (error) {
+    if (error.code === "permission-denied") throw error;
+    throw Object.assign(new Error("The owner source could not be reached."), { code: "unavailable" });
+  }
   if (auth.currentUser?.uid !== user.uid) throw Object.assign(new Error("Account context changed."), { code: "permission-denied" });
   if (response.status === 404) return null;
   if (!response.ok) throw Object.assign(new Error("The owner source could not be verified."), { code: [401, 403].includes(response.status) ? "permission-denied" : "unavailable" });
-  return response.json();
+  const result = await response.json();
+  if (auth.currentUser?.uid !== user.uid) throw Object.assign(new Error("Account context changed."), { code: "permission-denied" });
+  return result;
 }

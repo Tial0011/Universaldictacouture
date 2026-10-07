@@ -6,6 +6,7 @@ import * as policy from "../src/services/staffAuthorization.js";
 import * as chatModel from "../src/services/chatModel.js";
 import { studioStaff } from "./staff-fixtures.mjs";
 import { protectedWriteDeadline, currentReadDeadline } from "../src/services/operationalRuntime.js";
+import * as accountAuthority from "../src/services/customerAccountAuthority.js";
 
 async function adapter({ storage = new Map(), records = new Map(), commit = "confirmed", readUnavailable = false } = {}) {
   const user = { uid: "principal" };
@@ -38,6 +39,7 @@ async function adapter({ storage = new Map(), records = new Map(), commit = "con
   const dependencies = { "firebase/firestore": synthetic(sdk), "./operations": synthetic({ readCurrentStaff: async () => staff, loadOperationalPage: async () => ({ items: [], hasMore: false }) }), "./staffAuthorization": synthetic({ allows: policy.allows }), "../firebase/auth": synthetic({ auth: { currentUser: user } }), "../firebase/firestore": synthetic({ db: {} }), "./chatModel": synthetic({ normaliseProductContext: chatModel.normaliseProductContext, prepareMessage: chatModel.prepareMessage }), "./staffOperations": operations };
   const module = new vm.SourceTextModule(await readFile(new URL("../src/services/chats.js", import.meta.url), "utf8"), { context });
   dependencies["./operationalRuntime"] = synthetic({ protectedWriteDeadline, currentReadDeadline });
+  dependencies["./customerAccountAuthority"] = synthetic(accountAuthority);
   await module.link(specifier => dependencies[specifier]); await module.evaluate();
   return { service: module.namespace, user, storage, records, writes: () => writes, markers: operations.namespace };
 }
@@ -85,4 +87,8 @@ test("two deliberate identical messages are not text-hash deduplicated", async (
   await send(subject); await send(subject);
   assert.equal(subject.writes(), 2);
   assert.ok(subject.records.has("staffAudit/message-1")); assert.ok(subject.records.has("staffAudit/message-2"));
+});
+test("Staff provider identity cannot impersonate Customer mode or send under another current principal",async()=>{
+  const subject=await adapter();await assert.rejects(subject.service.sendMessage({user:subject.user,customerId:subject.user.uid,text:'Customer mode',admin:false}),{code:'account-source-unavailable'});assert.equal(subject.writes(),0);
+  await assert.rejects(subject.service.sendMessage({user:{uid:'foreign'},customerId:'customer',text:'Wrong principal',admin:true}),{code:'permission-denied'});assert.equal(subject.writes(),0);
 });

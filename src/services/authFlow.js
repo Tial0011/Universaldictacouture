@@ -10,6 +10,10 @@ const SAFE_PREFIXES = [
   "/our-story",
   "/policies",
 ];
+// Keep only navigation concepts consumed by the current routes. Unknown query
+// payloads must not carry forms/proofs/private snapshots through auth/history.
+const SHOP_RETURN_KEYS = new Set(["q", "focus", "category", "occasion", "style", "fabric", "colour", "min", "max", "sort", "newin", "discovery", "shopby"]);
+const PROFILE_RETURN_AREAS = ["overview", "personal", "addresses", "security", "communications", "privacy", "experience"];
 
 export const AUTH_PREFERENCE_KEY = "udc:auth:keep-signed-in";
 function unsafeCharacters(value, includeSpace = false) {
@@ -28,7 +32,10 @@ export function safeReturnPath(value, fallback = "/profile") {
     return fallback;
   }
   const allowed = url.origin === "https://udc.local" && SAFE_PREFIXES.some((prefix) => prefix === "/" ? url.pathname === "/" : url.pathname === prefix || url.pathname.startsWith(prefix + "/"));
-  for (const key of [...url.searchParams.keys()]) if (/token|password|email|phone|address|oobcode|secret|credential|returnto|redirect/i.test(key)) url.searchParams.delete(key);
+  const keys = url.pathname === "/shop" || url.pathname.startsWith("/shop/") ? SHOP_RETURN_KEYS
+    : url.pathname === "/profile" ? new Set(["area"]) : url.pathname === "/reviews-feeds" ? new Set(["review"]) : new Set();
+  for (const key of [...url.searchParams.keys()]) if (!keys.has(key)) url.searchParams.delete(key);
+  if (url.pathname === "/profile" && !PROFILE_RETURN_AREAS.includes(url.searchParams.get("area"))) url.searchParams.delete("area");
   if (url.hash && !/^#[a-z0-9_-]{1,64}$/i.test(url.hash)) url.hash = "";
   return allowed ? `${url.pathname}${url.search}${url.hash}` : fallback;
 }
@@ -59,6 +66,7 @@ export function createAuthContinuation(returnTo, actor = "guest") {
 }
 export function continuationTarget(state, actor) {
   const stored = continuations.get(state?.authContinuation);
+  if (stored && stored.actor !== "guest" && stored.actor !== actor) return "";
   return stored && (stored.actor === "guest" || stored.actor === actor) ? stored.returnTo : typeof state?.returnTo === "string" ? safeReturnPath(state.returnTo) : "";
 }
 export function clearAuthContinuations() { continuations.clear(); }

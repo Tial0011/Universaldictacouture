@@ -1,0 +1,1196 @@
+{
+  "section": 11,
+  "verdict": "PARTIAL",
+  "lockCandidate": false,
+  "physicalMapping": "COMPLETED AGAINST CURRENT REPOSITORY; missing implementations located explicitly",
+  "baseline": "7cb18fa with inherited uncommitted Parts 2–3",
+  "architectureLocked": true,
+  "moduleImplementationClosed": false,
+  "part4Coverage": 6,
+  "module1Coverage": 10,
+  "module2Coverage": 8,
+  "module10Coverage": 13,
+  "totalCoverage": 31,
+  "coverageMeaning": "Disposition/mapping counts, not 31 completed business flows",
+  "modules": [
+    {
+      "id": 1,
+      "flowCount": 10,
+      "status": "PARTIAL"
+    },
+    {
+      "id": 2,
+      "flowCount": 8,
+      "status": "PARTIAL"
+    },
+    {
+      "id": 10,
+      "flowCount": 13,
+      "status": "PARTIAL / LOCK WITHHELD"
+    }
+  ],
+  "source": {
+    "path": "C:/Users/HP ENVY/Videos/1A1 IMPORTANT UDC PICTURES/✅ SECTION 11/SECTION 11 DOCUMENT 1 PART 4 .docx",
+    "bodyBlocks": 374,
+    "sha256": "D1330E56B6AFC890CB418BD5E4E4D9FD3B19F2801F4496C46511EC672A79B1C2"
+  },
+  "visualSource": {
+    "path": "C:/Users/HP ENVY/Videos/1A1 IMPORTANT UDC PICTURES/✅ SECTION 11/SECTION 11 VISUAL/UNIVERSAL_DICTA_COUTURE_SECTION_11_FINAL_VISUAL_REFERENCE_MASTER.docx",
+    "sha256": "80FB600E2DE1CC1DDE10968A5528811D41618085FF7F9EBA2D9335AB0C41B91A",
+    "canonicalCount": 15,
+    "newCanonicalCount": 0,
+    "missingSourceConcepts": 0
+  },
+  "flows": [
+    {
+      "id": "S11-M01-F01",
+      "module": 1,
+      "title": "Auth Gate",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Guest or current provider principal",
+      "target": "current principal + exact destination; navigation only",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "current principal + exact destination; navigation only",
+      "purpose": "Safe account entry/navigation/proof",
+      "dataOwner": "Section 11 entry semantics; protected destination/proof owner",
+      "currentState": "Provider state can be current; required Account/lifecycle/proof state unavailable",
+      "authoritativeResult": "Native gate and safe return work; private destination confirmation unavailable",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker C01",
+      "code": [
+        "src/components/auth/AuthGateDialog.jsx",
+        "src/context/AuthGateContext.jsx",
+        "src/services/authFlow.js"
+      ],
+      "tests": [
+        "tests/section11-part1.test.mjs",
+        "tests/section11-browser-check.mjs"
+      ],
+      "blocker": "C01",
+      "scope": "current principal + exact destination; navigation only"
+    },
+    {
+      "id": "S11-M01-F02",
+      "module": 1,
+      "title": "Sign In",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Guest or current provider principal",
+      "target": "email/password to provider; no private-object authority",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "email/password to provider; no private-object authority",
+      "purpose": "Safe account entry/navigation/proof",
+      "dataOwner": "Section 11 entry semantics; protected destination/proof owner",
+      "currentState": "Provider state can be current; required Account/lifecycle/proof state unavailable",
+      "authoritativeResult": "Firebase principal/sign-out work; trusted Account/lifecycle resolution unavailable",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker C01",
+      "code": [
+        "src/firebase/auth.js",
+        "src/context/AuthContext.jsx",
+        "src/pages/Auth/Auth.jsx"
+      ],
+      "tests": [
+        "tests/auth-service.test.mjs",
+        "tests/section11-browser-check.mjs"
+      ],
+      "blocker": "C01",
+      "scope": "email/password to provider; no private-object authority"
+    },
+    {
+      "id": "S11-M01-F03",
+      "module": 1,
+      "title": "Create Account",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Guest or current provider principal",
+      "target": "minimal credentials; reviewed unique durable identity/login mapping",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "minimal credentials; reviewed unique durable identity/login mapping",
+      "purpose": "Safe account entry/navigation/proof",
+      "dataOwner": "Section 11 entry semantics; protected destination/proof owner",
+      "currentState": "Provider state can be current; required Account/lifecycle/proof state unavailable",
+      "authoritativeResult": "Stopped before unbound provider creation; no durable bootstrap implemented",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker C02",
+      "code": [
+        "src/firebase/auth.js",
+        "src/services/customerAccountAuthority.js"
+      ],
+      "tests": [
+        "tests/auth-service.test.mjs"
+      ],
+      "blocker": "C02",
+      "scope": "minimal credentials; reviewed unique durable identity/login mapping"
+    },
+    {
+      "id": "S11-M01-F04",
+      "module": 1,
+      "title": "Verify Email",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Guest or current provider principal",
+      "target": "intended proof event/control channel; never generic authorization",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "intended proof event/control channel; never generic authorization",
+      "purpose": "Safe account entry/navigation/proof",
+      "dataOwner": "Section 11 entry semantics; protected destination/proof owner",
+      "currentState": "Provider state can be current; required Account/lifecycle/proof state unavailable",
+      "authoritativeResult": "Purpose read-only inspection; Account-aware consumption/supersession missing",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker C03",
+      "code": [
+        "src/firebase/accountActions.js",
+        "src/pages/Auth/Auth.jsx"
+      ],
+      "tests": [
+        "tests/section11-proof-service.test.mjs"
+      ],
+      "blocker": "C03",
+      "scope": "intended proof event/control channel; never generic authorization"
+    },
+    {
+      "id": "S11-M01-F05",
+      "module": 1,
+      "title": "Reset Password / Recovery",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Guest or current provider principal",
+      "target": "password capability only; lifecycle never restored by recovery",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "password capability only; lifecycle never restored by recovery",
+      "purpose": "Safe account entry/navigation/proof",
+      "dataOwner": "Section 11 entry semantics; protected destination/proof owner",
+      "currentState": "Provider state can be current; required Account/lifecycle/proof state unavailable",
+      "authoritativeResult": "Neutral intake and proof inspection; authorized password commit/reconciliation missing",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker C03",
+      "code": [
+        "src/firebase/accountActions.js",
+        "src/pages/Auth/Auth.jsx"
+      ],
+      "tests": [
+        "tests/section11-proof-service.test.mjs",
+        "tests/section11-part3-browser.mjs"
+      ],
+      "blocker": "C03",
+      "scope": "password capability only; lifecycle never restored by recovery"
+    },
+    {
+      "id": "S11-M01-F06",
+      "module": 1,
+      "title": "Return to Origin",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Guest or current provider principal",
+      "target": "bounded route pointer; independent destination ownership/current state",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "bounded route pointer; independent destination ownership/current state",
+      "purpose": "Safe account entry/navigation/proof",
+      "dataOwner": "Section 11 entry semantics; protected destination/proof owner",
+      "currentState": "Provider state can be current; required Account/lifecycle/proof state unavailable",
+      "authoritativeResult": "Allowlisted internal context and no action replay; positive protected target unresolved",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker C01",
+      "code": [
+        "src/services/authFlow.js",
+        "src/pages/Auth/Auth.jsx"
+      ],
+      "tests": [
+        "tests/section11-part1.test.mjs",
+        "tests/section11-part3.test.mjs"
+      ],
+      "blocker": "C01",
+      "scope": "bounded route pointer; independent destination ownership/current state"
+    },
+    {
+      "id": "S11-M01-F07",
+      "module": 1,
+      "title": "Already Signed In / Use Another Account",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Guest or current provider principal",
+      "target": "current provider principal; Customer A content cannot become B state",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "current provider principal; Customer A content cannot become B state",
+      "purpose": "Safe account entry/navigation/proof",
+      "dataOwner": "Section 11 entry semantics; protected destination/proof owner",
+      "currentState": "Provider state can be current; required Account/lifecycle/proof state unavailable",
+      "authoritativeResult": "Deliberate switching and stale response/cache withdrawal verified",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker C01",
+      "code": [
+        "src/pages/Auth/Auth.jsx",
+        "src/context/AuthContext.jsx"
+      ],
+      "tests": [
+        "tests/section11-browser-check.mjs",
+        "tests/section11-part3-session.test.mjs"
+      ],
+      "blocker": "C01",
+      "scope": "current provider principal; Customer A content cannot become B state"
+    },
+    {
+      "id": "S11-M01-F08",
+      "module": 1,
+      "title": "Session / Sign Out / Expiry",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Guest or current provider principal",
+      "target": "revocable session; current lifecycle/fresh-auth server enforcement",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "revocable session; current lifecycle/fresh-auth server enforcement",
+      "purpose": "Safe account entry/navigation/proof",
+      "dataOwner": "Section 11 entry semantics; protected destination/proof owner",
+      "currentState": "Provider state can be current; required Account/lifecycle/proof state unavailable",
+      "authoritativeResult": "Current provider revocation/expiry and BFCache shielding verified; owner registry missing",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker H02",
+      "code": [
+        "src/context/AuthContext.jsx",
+        "src/firebase/auth.js"
+      ],
+      "tests": [
+        "tests/section11-part3-session.test.mjs",
+        "tests/section11-part3-browser.mjs"
+      ],
+      "blocker": "H02",
+      "scope": "revocable session; current lifecycle/fresh-auth server enforcement"
+    },
+    {
+      "id": "S11-M01-F09",
+      "module": 1,
+      "title": "Protected / Invalid Private Links",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Guest or current provider principal",
+      "target": "exact own parent/child/object/action; possession is not permission",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "exact own parent/child/object/action; possession is not permission",
+      "purpose": "Safe account entry/navigation/proof",
+      "dataOwner": "Section 11 entry semantics; protected destination/proof owner",
+      "currentState": "Provider state can be current; required Account/lifecycle/proof state unavailable",
+      "authoritativeResult": "Foreign/unresolved paths denied; no positive own-object service",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker C01",
+      "code": [
+        "src/components/auth/CustomerAccountBoundary.jsx",
+        "firestore.rules"
+      ],
+      "tests": [
+        "tests/section11-part3-rules.test.mjs"
+      ],
+      "blocker": "C01",
+      "scope": "exact own parent/child/object/action; possession is not permission"
+    },
+    {
+      "id": "S11-M01-F10",
+      "module": 1,
+      "title": "Integration / Final QA",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Guest or current provider principal",
+      "target": "all Module-1 phases under current principal/lifecycle",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "all Module-1 phases under current principal/lifecycle",
+      "purpose": "Safe account entry/navigation/proof",
+      "dataOwner": "Section 11 entry semantics; protected destination/proof owner",
+      "currentState": "Provider state can be current; required Account/lifecycle/proof state unavailable",
+      "authoritativeResult": "Available provider/negative security paths tested; positive owner integration missing",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker C01",
+      "code": [
+        "src/App.jsx",
+        "src/services/customerAccountAuthority.js"
+      ],
+      "tests": [
+        "tests/section11-browser-check.mjs",
+        "tests/section11-proof-service.test.mjs"
+      ],
+      "blocker": "C01",
+      "scope": "all Module-1 phases under current principal/lifecycle"
+    },
+    {
+      "id": "S11-M02-F01",
+      "module": 2,
+      "title": "Profile Overview Home",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Customer with independently established own-Account authority (private source currently unavailable)",
+      "target": "own current Profile; cross-owner action-required projections only",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "own current Profile; cross-owner action-required projections only",
+      "purpose": "Own current self-service and minimum safe continuity",
+      "dataOwner": "Section 11 current data; linked business sources retain ownership",
+      "currentState": "Available shell; private owner states explicitly unavailable",
+      "authoritativeResult": "Usable shell and local failures; authoritative Profile/Attention/projections missing",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker H01",
+      "code": [
+        "src/pages/Profile/Profile.jsx",
+        "src/services/customerProfile.js"
+      ],
+      "tests": [
+        "tests/section11-part2-browser.mjs"
+      ],
+      "blocker": "H01",
+      "scope": "own current Profile; cross-owner action-required projections only"
+    },
+    {
+      "id": "S11-M02-F02",
+      "module": 2,
+      "title": "Personal Details",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Customer with independently established own-Account authority (private source currently unavailable)",
+      "target": "photo/fullName/preferredName/phone/publicDisplayName only; current not historical",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "photo/fullName/preferredName/phone/publicDisplayName only; current not historical",
+      "purpose": "Own current self-service and minimum safe continuity",
+      "dataOwner": "Section 11 current data; linked business sources retain ownership",
+      "currentState": "Available shell; private owner states explicitly unavailable",
+      "authoritativeResult": "Five-field allowlist and privacy contracts; no actual protected edit/photo pipeline",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker H01",
+      "code": [
+        "src/services/profileExperience.js",
+        "src/services/customerProfile.js",
+        "src/pages/Profile/Profile.jsx"
+      ],
+      "tests": [
+        "tests/section11-part2.test.mjs"
+      ],
+      "blocker": "H01",
+      "scope": "photo/fullName/preferredName/phone/publicDisplayName only; current not historical"
+    },
+    {
+      "id": "S11-M02-F03",
+      "module": 2,
+      "title": "Saved Addresses",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Customer with independently established own-Account authority (private source currently unavailable)",
+      "target": "own reusable book; one server default; never committed delivery snapshot",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "own reusable book; one server default; never committed delivery snapshot",
+      "purpose": "Own current self-service and minimum safe continuity",
+      "dataOwner": "Section 11 current data; linked business sources retain ownership",
+      "currentState": "Available shell; private owner states explicitly unavailable",
+      "authoritativeResult": "Unavailable area; no owner CRUD/default transaction",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker H01",
+      "code": [
+        "src/pages/Profile/Profile.jsx",
+        "firestore.rules"
+      ],
+      "tests": [
+        "tests/section11-part3-rules.test.mjs"
+      ],
+      "blocker": "H01",
+      "scope": "own reusable book; one server default; never committed delivery snapshot"
+    },
+    {
+      "id": "S11-M02-F04",
+      "module": 2,
+      "title": "Sign-in & Security",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Customer with independently established own-Account authority (private source currently unavailable)",
+      "target": "current login binding; fresh auth at exact sensitive commit; no credentials disclosed",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "current login binding; fresh auth at exact sensitive commit; no credentials disclosed",
+      "purpose": "Own current self-service and minimum safe continuity",
+      "dataOwner": "Section 11 current data; linked business sources retain ownership",
+      "currentState": "Available shell; private owner states explicitly unavailable",
+      "authoritativeResult": "Own current provider email/sign-out; sensitive security/device controls missing",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker H02",
+      "code": [
+        "src/pages/Profile/Profile.jsx",
+        "src/firebase/auth.js"
+      ],
+      "tests": [
+        "tests/section11-part3-browser.mjs"
+      ],
+      "blocker": "H02",
+      "scope": "current login binding; fresh auth at exact sensitive commit; no credentials disclosed"
+    },
+    {
+      "id": "S11-M02-F05",
+      "module": 2,
+      "title": "Communications",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Customer with independently established own-Account authority (private source currently unavailable)",
+      "target": "own optional preferences separate from essential messages and delivery",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "own optional preferences separate from essential messages and delivery",
+      "purpose": "Own current self-service and minimum safe continuity",
+      "dataOwner": "Section 11 current data; linked business sources retain ownership",
+      "currentState": "Available shell; private owner states explicitly unavailable",
+      "authoritativeResult": "One unset radio group, Email/in-site only; persistence not implemented",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker H03",
+      "code": [
+        "src/pages/Profile/Profile.jsx",
+        "src/services/profileExperience.js"
+      ],
+      "tests": [
+        "tests/section11-part2.test.mjs",
+        "tests/section11-part2-browser.mjs"
+      ],
+      "blocker": "H03",
+      "scope": "own optional preferences separate from essential messages and delivery"
+    },
+    {
+      "id": "S11-M02-F06",
+      "module": 2,
+      "title": "Privacy & Account",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Customer with independently established own-Account authority (private source currently unavailable)",
+      "target": "authorized source-by-source customer projection; protected destructive lifecycle",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "authorized source-by-source customer projection; protected destructive lifecycle",
+      "purpose": "Own current self-service and minimum safe continuity",
+      "dataOwner": "Section 11 current data; linked business sources retain ownership",
+      "currentState": "Available shell; private owner states explicitly unavailable",
+      "authoritativeResult": "Safe policy/management links; My Information/deletion/provenance missing",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker H03",
+      "code": [
+        "src/pages/Profile/Profile.jsx",
+        "src/context/AuthContext.jsx"
+      ],
+      "tests": [
+        "tests/section11-part3-browser.mjs"
+      ],
+      "blocker": "H03",
+      "scope": "authorized source-by-source customer projection; protected destructive lifecycle"
+    },
+    {
+      "id": "S11-M02-F07",
+      "module": 2,
+      "title": "Your Dicta Experience / My Closet Integration",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Customer with independently established own-Account authority (private source currently unavailable)",
+      "target": "pointer only; no full Profile/address/payment dossier; target reauthorizes",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "pointer only; no full Profile/address/payment dossier; target reauthorizes",
+      "purpose": "Own current self-service and minimum safe continuity",
+      "dataOwner": "Section 11 current data; linked business sources retain ownership",
+      "currentState": "Available shell; private owner states explicitly unavailable",
+      "authoritativeResult": "Existing exact saved-area links; protected owner destinations/resume missing",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker H04",
+      "code": [
+        "src/services/profileExperience.js",
+        "src/pages/Profile/Profile.jsx",
+        "src/App.jsx"
+      ],
+      "tests": [
+        "tests/section11-part2.test.mjs"
+      ],
+      "blocker": "H04",
+      "scope": "pointer only; no full Profile/address/payment dossier; target reauthorizes"
+    },
+    {
+      "id": "S11-M02-F08",
+      "module": 2,
+      "title": "Integration, States & QA",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Customer with independently established own-Account authority (private source currently unavailable)",
+      "target": "per-flow local/pending/current/unknown semantics; private scoped late responses",
+      "currentPrincipal": "Current Firebase principal is not the missing durable Customer principal",
+      "authorization": "per-flow local/pending/current/unknown semantics; private scoped late responses",
+      "purpose": "Own current self-service and minimum safe continuity",
+      "dataOwner": "Section 11 current data; linked business sources retain ownership",
+      "currentState": "Available shell; private owner states explicitly unavailable",
+      "authoritativeResult": "Available UI/identity guards tested; real private mutations/outcomes absent",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker H01",
+      "code": [
+        "src/services/profileExperience.js",
+        "src/context/AuthContext.jsx"
+      ],
+      "tests": [
+        "tests/section11-part2-browser.mjs",
+        "tests/section11-part3-session.test.mjs"
+      ],
+      "blocker": "H01",
+      "scope": "per-flow local/pending/current/unknown semantics; private scoped late responses"
+    },
+    {
+      "id": "S11-M10-F01",
+      "module": 10,
+      "title": "Authority / Coverage / Contradiction",
+      "disposition": "VALIDATION-ONLY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Engineer/QA audit; operational actors independently validated as Customer or Staff",
+      "target": "3 modules and approved source ownership; audit only",
+      "currentPrincipal": "Current domain-appropriate principal; no provider/Staff-to-Customer conversion",
+      "authorization": "3 modules and approved source ownership; audit only",
+      "purpose": "Conformance checking / exact operational handoff; never implicit business authority",
+      "dataOwner": "Owning Section per domain; Section 11 architecture and Section 16 enforcement",
+      "currentState": "Available current-scope code and actual test evidence; missing owner states recorded",
+      "authoritativeResult": "31 real mappings; no new modules or shadow owner; required code gaps documented",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker C01",
+      "code": [
+        "docs/section11-final-coverage.json",
+        "src/services/customerAccountAuthority.js"
+      ],
+      "tests": [
+        "tests/section11-final-contract.test.mjs"
+      ],
+      "blocker": "C01",
+      "scope": "3 modules and approved source ownership; audit only"
+    },
+    {
+      "id": "S11-M10-F02",
+      "module": 10,
+      "title": "Responsive & Cross-Device",
+      "disposition": "VALIDATION-ONLY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Engineer/QA audit; operational actors independently validated as Customer or Staff",
+      "target": "same authority/fields/states across viewport; Profile remains in Menu",
+      "currentPrincipal": "Current domain-appropriate principal; no provider/Staff-to-Customer conversion",
+      "authorization": "same authority/fields/states across viewport; Profile remains in Menu",
+      "purpose": "Conformance checking / exact operational handoff; never implicit business authority",
+      "dataOwner": "Owning Section per domain; Section 11 architecture and Section 16 enforcement",
+      "currentState": "Available current-scope code and actual test evidence; missing owner states recorded",
+      "authoritativeResult": "Eight-width available UI parity; positive forms absent",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker H01",
+      "code": [
+        "src/pages/Profile/Profile.css",
+        "src/pages/Profile/Profile.jsx",
+        "src/components/navigation/Header.jsx"
+      ],
+      "tests": [
+        "tests/section11-part2-browser.mjs",
+        "tests/section11-browser-check.mjs"
+      ],
+      "blocker": "H01",
+      "scope": "same authority/fields/states across viewport; Profile remains in Menu"
+    },
+    {
+      "id": "S11-M10-F03",
+      "module": 10,
+      "title": "Accessibility & Performance",
+      "disposition": "VALIDATION-ONLY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Engineer/QA audit; operational actors independently validated as Customer or Staff",
+      "target": "privacy withdrawal before exposure; no false values or formal WCAG claim",
+      "currentPrincipal": "Current domain-appropriate principal; no provider/Staff-to-Customer conversion",
+      "authorization": "privacy withdrawal before exposure; no false values or formal WCAG claim",
+      "purpose": "Conformance checking / exact operational handoff; never implicit business authority",
+      "dataOwner": "Owning Section per domain; Section 11 architecture and Section 16 enforcement",
+      "currentState": "Available current-scope code and actual test evidence; missing owner states recorded",
+      "authoritativeResult": "Real focus/AX/reflow/forced-color checks pass for available states",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker H01",
+      "code": [
+        "src/context/AuthContext.jsx",
+        "src/components/auth/AuthGateDialog.jsx",
+        "src/pages/Auth/Auth.jsx"
+      ],
+      "tests": [
+        "tests/section11-part3-browser.mjs"
+      ],
+      "blocker": "H01",
+      "scope": "privacy withdrawal before exposure; no false values or formal WCAG claim"
+    },
+    {
+      "id": "S11-M10-F04",
+      "module": 10,
+      "title": "Security, Privacy & Permission",
+      "disposition": "VALIDATION-ONLY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Engineer/QA audit; operational actors independently validated as Customer or Staff",
+      "target": "current principal/capability/purpose/exact object/fields; no role bypass",
+      "currentPrincipal": "Current domain-appropriate principal; no provider/Staff-to-Customer conversion",
+      "authorization": "current principal/capability/purpose/exact object/fields; no role bypass",
+      "purpose": "Conformance checking / exact operational handoff; never implicit business authority",
+      "dataOwner": "Owning Section per domain; Section 11 architecture and Section 16 enforcement",
+      "currentState": "Available current-scope code and actual test evidence; missing owner states recorded",
+      "authoritativeResult": "Deny/direct-write/role/scope boundaries tested; positive owner service missing",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker C01",
+      "code": [
+        "firestore.rules",
+        "src/services/customerAccountAuthority.js",
+        "src/services/operations.js"
+      ],
+      "tests": [
+        "tests/section11-part3-rules.test.mjs",
+        "tests/section11-part4-service.test.mjs"
+      ],
+      "blocker": "C01",
+      "scope": "current principal/capability/purpose/exact object/fields; no role bypass"
+    },
+    {
+      "id": "S11-M10-F05",
+      "module": 10,
+      "title": "Lifecycle / Deleted / Identity Conflict",
+      "disposition": "VALIDATION-ONLY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Engineer/QA audit; operational actors independently validated as Customer or Staff",
+      "target": "Active/Restricted/both Deleted/Restored; no automatic restore/merge/transfer",
+      "currentPrincipal": "Current domain-appropriate principal; no provider/Staff-to-Customer conversion",
+      "authorization": "Active/Restricted/both Deleted/Restored; no automatic restore/merge/transfer",
+      "purpose": "Conformance checking / exact operational handoff; never implicit business authority",
+      "dataOwner": "Owning Section per domain; Section 11 architecture and Section 16 enforcement",
+      "currentState": "Available current-scope code and actual test evidence; missing owner states recorded",
+      "authoritativeResult": "Semantic distinctions retained; actual reviewed lifecycle commands missing",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker C02",
+      "code": [
+        "src/services/customerAccountAuthority.js",
+        "src/pages/Profile/Profile.jsx"
+      ],
+      "tests": [
+        "tests/section11-part3.test.mjs"
+      ],
+      "blocker": "C02",
+      "scope": "Active/Restricted/both Deleted/Restored; no automatic restore/merge/transfer"
+    },
+    {
+      "id": "S11-M10-F06",
+      "module": 10,
+      "title": "Historical Integrity / Audit / Evidence",
+      "disposition": "VALIDATION-ONLY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Engineer/QA audit; operational actors independently validated as Customer or Staff",
+      "target": "current edits separate from captured history; Audit access never evidence grant",
+      "currentPrincipal": "Current domain-appropriate principal; no provider/Staff-to-Customer conversion",
+      "authorization": "current edits separate from captured history; Audit access never evidence grant",
+      "purpose": "Conformance checking / exact operational handoff; never implicit business authority",
+      "dataOwner": "Owning Section per domain; Section 11 architecture and Section 16 enforcement",
+      "currentState": "Available current-scope code and actual test evidence; missing owner states recorded",
+      "authoritativeResult": "Defensive immutability/evidence tests; positive owner chronology missing",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker H04",
+      "code": [
+        "firestore.rules",
+        "src/services/customerProfile.js"
+      ],
+      "tests": [
+        "tests/section11-part3-rules.test.mjs"
+      ],
+      "blocker": "H04",
+      "scope": "current edits separate from captured history; Audit access never evidence grant"
+    },
+    {
+      "id": "S11-M10-F07",
+      "module": 10,
+      "title": "Failure / Recovery / Concurrency",
+      "disposition": "VALIDATION-ONLY",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Engineer/QA audit; operational actors independently validated as Customer or Staff",
+      "target": "one intent/effect; unknown reconciles before repeat; current authority wins",
+      "currentPrincipal": "Current domain-appropriate principal; no provider/Staff-to-Customer conversion",
+      "authorization": "one intent/effect; unknown reconciles before repeat; current authority wins",
+      "purpose": "Conformance checking / exact operational handoff; never implicit business authority",
+      "dataOwner": "Owning Section per domain; Section 11 architecture and Section 16 enforcement",
+      "currentState": "Available current-scope code and actual test evidence; missing owner states recorded",
+      "authoritativeResult": "Controller/token/context/timeout safeguards; Customer command ledger missing",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker C03",
+      "code": [
+        "src/context/AuthContext.jsx",
+        "src/services/operationalRuntime.js",
+        "src/services/operations.js"
+      ],
+      "tests": [
+        "tests/section11-part3-session.test.mjs",
+        "tests/section11-part4-service.test.mjs"
+      ],
+      "blocker": "C03",
+      "scope": "one intent/effect; unknown reconciles before repeat; current authority wins"
+    },
+    {
+      "id": "S11-M10-F08",
+      "module": 10,
+      "title": "Customer ↔ Admin/Couturier Compatibility",
+      "disposition": "IMPLEMENTED / HARDENED IN THIS RUN",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Engineer/QA audit; operational actors independently validated as Customer or Staff",
+      "target": "Customer principal distinct from Staff/provider; no whole Profile by role/assignment",
+      "currentPrincipal": "Current domain-appropriate principal; no provider/Staff-to-Customer conversion",
+      "authorization": "Customer principal distinct from Staff/provider; no whole Profile by role/assignment",
+      "purpose": "Conformance checking / exact operational handoff; never implicit business authority",
+      "dataOwner": "Owning Section per domain; Section 11 architecture and Section 16 enforcement",
+      "currentState": "Available current-scope code and actual test evidence; missing owner states recorded",
+      "authoritativeResult": "Staff read/reply context pinned; Customer-mode guard and principal kind explicit",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker H04",
+      "code": [
+        "src/services/operations.js",
+        "src/services/chats.js",
+        "src/hooks/useCustomerSession.js",
+        "firestore.rules"
+      ],
+      "tests": [
+        "tests/section11-part4-service.test.mjs",
+        "tests/section12-part2-chat-service.test.mjs",
+        "tests/section11-part4-rules.test.mjs"
+      ],
+      "blocker": "H04",
+      "scope": "Customer principal distinct from Staff/provider; no whole Profile by role/assignment"
+    },
+    {
+      "id": "S11-M10-F09",
+      "module": 10,
+      "title": "Sections 12–16 Handoff Validation",
+      "disposition": "IMPLEMENTED / HARDENED IN THIS RUN",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Engineer/QA audit; operational actors independently validated as Customer or Staff",
+      "target": "owning sections resolve targets; no delegated source or mutation authority",
+      "currentPrincipal": "Current domain-appropriate principal; no provider/Staff-to-Customer conversion",
+      "authorization": "owning sections resolve targets; no delegated source or mutation authority",
+      "purpose": "Conformance checking / exact operational handoff; never implicit business authority",
+      "dataOwner": "Owning Section per domain; Section 11 architecture and Section 16 enforcement",
+      "currentState": "Available current-scope code and actual test evidence; missing owner states recorded",
+      "authoritativeResult": "Current owner boundaries/context/minimum summaries hardened; missing owners remain missing",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker H04",
+      "code": [
+        "src/services/operations.js",
+        "src/services/chats.js",
+        "src/services/customerAccountAuthority.js"
+      ],
+      "tests": [
+        "tests/section11-part4-service.test.mjs"
+      ],
+      "blocker": "H04",
+      "scope": "owning sections resolve targets; no delegated source or mutation authority"
+    },
+    {
+      "id": "S11-M10-F10",
+      "module": 10,
+      "title": "Implementation Contract",
+      "disposition": "IMPLEMENTED / HARDENED IN THIS RUN",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Engineer/QA audit; operational actors independently validated as Customer or Staff",
+      "target": "implementation choices do not change meaning; known gaps are not product ambiguity",
+      "currentPrincipal": "Current domain-appropriate principal; no provider/Staff-to-Customer conversion",
+      "authorization": "implementation choices do not change meaning; known gaps are not product ambiguity",
+      "purpose": "Conformance checking / exact operational handoff; never implicit business authority",
+      "dataOwner": "Owning Section per domain; Section 11 architecture and Section 16 enforcement",
+      "currentState": "Available current-scope code and actual test evidence; missing owner states recorded",
+      "authoritativeResult": "Physical mapping and actor/result/error contracts recorded; core commands not recoverable yet",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker C01",
+      "code": [
+        "docs/section11-final-coverage.json",
+        "scripts/section11-final-gate.mjs"
+      ],
+      "tests": [
+        "tests/section11-final-contract.test.mjs"
+      ],
+      "blocker": "C01",
+      "scope": "implementation choices do not change meaning; known gaps are not product ambiguity"
+    },
+    {
+      "id": "S11-M10-F11",
+      "module": 10,
+      "title": "Final Visual Completeness",
+      "disposition": "IMPLEMENTED / HARDENED IN THIS RUN",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Engineer/QA audit; operational actors independently validated as Customer or Staff",
+      "target": "11 direct + 4 supporting; source count is not rendered behavior completion",
+      "currentPrincipal": "Current domain-appropriate principal; no provider/Staff-to-Customer conversion",
+      "authorization": "11 direct + 4 supporting; source count is not rendered behavior completion",
+      "purpose": "Conformance checking / exact operational handoff; never implicit business authority",
+      "dataOwner": "Owning Section per domain; Section 11 architecture and Section 16 enforcement",
+      "currentState": "Available current-scope code and actual test evidence; missing owner states recorded",
+      "authoritativeResult": "15 actual sources accounted; fresh visible subset inspected; loaded workflows unavailable",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker H05",
+      "code": [
+        "src/pages/Auth/Auth.jsx",
+        "src/pages/Auth/Auth.css",
+        "docs/section11-final-visual-audit.md"
+      ],
+      "tests": [
+        "tests/section11-final-contract.test.mjs",
+        "tests/section11-part2-browser.mjs"
+      ],
+      "blocker": "H05",
+      "scope": "11 direct + 4 supporting; source count is not rendered behavior completion"
+    },
+    {
+      "id": "S11-M10-F12",
+      "module": 10,
+      "title": "Policy / Boundary / Do-Not-Restore",
+      "disposition": "IMPLEMENTED / HARDENED IN THIS RUN",
+      "status": "PARTIAL",
+      "completion": false,
+      "actor": "Engineer/QA audit; operational actors independently validated as Customer or Staff",
+      "target": "no old fields/lifecycle/identity/history/role/navigation/channel assumptions",
+      "currentPrincipal": "Current domain-appropriate principal; no provider/Staff-to-Customer conversion",
+      "authorization": "no old fields/lifecycle/identity/history/role/navigation/channel assumptions",
+      "purpose": "Conformance checking / exact operational handoff; never implicit business authority",
+      "dataOwner": "Owning Section per domain; Section 11 architecture and Section 16 enforcement",
+      "currentState": "Available current-scope code and actual test evidence; missing owner states recorded",
+      "authoritativeResult": "Obsolete dormant Rules/Chat shortcuts removed; raw logs removed; regression firewall",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Known trusted owner enforcement remains required; see blocker C01",
+      "code": [
+        "firestore.rules",
+        "src/services/chats.js",
+        "src/services/styleCircle.js",
+        "src/services/profileExperience.js"
+      ],
+      "tests": [
+        "tests/section11-final-contract.test.mjs",
+        "tests/section11-part4-rules.test.mjs"
+      ],
+      "blocker": "C01",
+      "scope": "no old fields/lifecycle/identity/history/role/navigation/channel assumptions"
+    },
+    {
+      "id": "S11-M10-F13",
+      "module": 10,
+      "title": "Final Readiness & Lock Gate",
+      "disposition": "IMPLEMENTED / HARDENED IN THIS RUN",
+      "status": "GATE IMPLEMENTED; LOCK WITHHELD",
+      "completion": true,
+      "actor": "Engineer/QA audit; operational actors independently validated as Customer or Staff",
+      "target": "PASS only with all behavior/validation/visual gates and no HIGH/CRITICAL defects",
+      "currentPrincipal": "Current domain-appropriate principal; no provider/Staff-to-Customer conversion",
+      "authorization": "PASS only with all behavior/validation/visual gates and no HIGH/CRITICAL defects",
+      "purpose": "Conformance checking / exact operational handoff; never implicit business authority",
+      "dataOwner": "Owning Section per domain; Section 11 architecture and Section 16 enforcement",
+      "currentState": "Available current-scope code and actual test evidence; missing owner states recorded",
+      "authoritativeResult": "Executable gate implemented; known blockers withhold final lock",
+      "failure": "Safe denial/unavailable/known failure; no fabricated zero or saved state",
+      "stale": "Current principal/context/scope/version must defeat stale UI; available guards tested",
+      "unknown": "No blind consequential replay; missing Customer result registry remains an obligation",
+      "section16Guarantee": "Gate checks code stub, incomplete flows, missing validation and unresolved HIGH/CRITICAL defects",
+      "code": [
+        "scripts/section11-final-gate.mjs",
+        "docs/section11-final-coverage.json"
+      ],
+      "tests": [
+        "tests/section11-final-contract.test.mjs"
+      ],
+      "blocker": null,
+      "scope": "PASS only with all behavior/validation/visual gates and no HIGH/CRITICAL defects"
+    }
+  ],
+  "visuals": [
+    {
+      "id": "S11-M10-F2-B1-V01/V02/V03 composite",
+      "kind": "direct",
+      "sourceImage": "image1.png",
+      "sourceAvailable": true,
+      "implementationValidated": false,
+      "status": "SOURCE INSPECTED; full rendered workflow conformance withheld",
+      "override": "Current written fields/navigation/lifecycle/privacy/security/ownership win over generated detail"
+    },
+    {
+      "id": "S11-M10-F2-B2-V01/V02/V03 composite",
+      "kind": "direct",
+      "sourceImage": "image2.png",
+      "sourceAvailable": true,
+      "implementationValidated": false,
+      "status": "SOURCE INSPECTED; full rendered workflow conformance withheld",
+      "override": "Current written fields/navigation/lifecycle/privacy/security/ownership win over generated detail"
+    },
+    {
+      "id": "S11-M10-F2-B3-V01/V02/V03 composite",
+      "kind": "direct",
+      "sourceImage": "image3.png",
+      "sourceAvailable": true,
+      "implementationValidated": false,
+      "status": "SOURCE INSPECTED; full rendered workflow conformance withheld",
+      "override": "Current written fields/navigation/lifecycle/privacy/security/ownership win over generated detail"
+    },
+    {
+      "id": "S11-M10-F11-R01",
+      "kind": "direct",
+      "sourceImage": "image4.png",
+      "sourceAvailable": true,
+      "implementationValidated": false,
+      "status": "SOURCE INSPECTED; full rendered workflow conformance withheld",
+      "override": "Current written fields/navigation/lifecycle/privacy/security/ownership win over generated detail"
+    },
+    {
+      "id": "S11-M10-F2-B5-V01/V02 composite",
+      "kind": "direct",
+      "sourceImage": "image5.png",
+      "sourceAvailable": true,
+      "implementationValidated": false,
+      "status": "SOURCE INSPECTED; full rendered workflow conformance withheld",
+      "override": "Current written fields/navigation/lifecycle/privacy/security/ownership win over generated detail"
+    },
+    {
+      "id": "S11-M10-F11-R02",
+      "kind": "direct",
+      "sourceImage": "image6.png",
+      "sourceAvailable": true,
+      "implementationValidated": false,
+      "status": "SOURCE INSPECTED; full rendered workflow conformance withheld",
+      "override": "Current written fields/navigation/lifecycle/privacy/security/ownership win over generated detail"
+    },
+    {
+      "id": "ARCH-S11-F2-B6-01",
+      "kind": "direct",
+      "sourceImage": "image7.png",
+      "sourceAvailable": true,
+      "implementationValidated": false,
+      "status": "SOURCE INSPECTED; full rendered workflow conformance withheld",
+      "override": "Current written fields/navigation/lifecycle/privacy/security/ownership win over generated detail"
+    },
+    {
+      "id": "S11-M10-F2-B7-V01",
+      "kind": "direct",
+      "sourceImage": "image8.png",
+      "sourceAvailable": true,
+      "implementationValidated": false,
+      "status": "SOURCE INSPECTED; full rendered workflow conformance withheld",
+      "override": "Current written fields/navigation/lifecycle/privacy/security/ownership win over generated detail"
+    },
+    {
+      "id": "S11-M10-F2-B7-V02",
+      "kind": "direct",
+      "sourceImage": "image9.png",
+      "sourceAvailable": true,
+      "implementationValidated": false,
+      "status": "SOURCE INSPECTED; full rendered workflow conformance withheld",
+      "override": "Current written fields/navigation/lifecycle/privacy/security/ownership win over generated detail"
+    },
+    {
+      "id": "S11-M10-F11-V01",
+      "kind": "direct",
+      "sourceImage": "image10.png",
+      "sourceAvailable": true,
+      "implementationValidated": false,
+      "status": "SOURCE INSPECTED; full rendered workflow conformance withheld",
+      "override": "Current written fields/navigation/lifecycle/privacy/security/ownership win over generated detail"
+    },
+    {
+      "id": "S11-M10-F11-R03",
+      "kind": "direct",
+      "sourceImage": "image11.png",
+      "sourceAvailable": true,
+      "implementationValidated": false,
+      "status": "SOURCE INSPECTED; full rendered workflow conformance withheld",
+      "override": "Current written fields/navigation/lifecycle/privacy/security/ownership win over generated detail"
+    },
+    {
+      "id": "ARCH-XSEC-MYCLOSET-01",
+      "kind": "supporting",
+      "sourceImage": "image12.png",
+      "sourceAvailable": true,
+      "implementationValidated": false,
+      "status": "SOURCE INSPECTED; full rendered workflow conformance withheld",
+      "override": "Current written fields/navigation/lifecycle/privacy/security/ownership win over generated detail"
+    },
+    {
+      "id": "ARCH-XSEC-CUSTOMSTYLE-01",
+      "kind": "supporting",
+      "sourceImage": "image13.png",
+      "sourceAvailable": true,
+      "implementationValidated": false,
+      "status": "SOURCE INSPECTED; full rendered workflow conformance withheld",
+      "override": "Current written fields/navigation/lifecycle/privacy/security/ownership win over generated detail"
+    },
+    {
+      "id": "ARCH-XSEC-CHAT-01",
+      "kind": "supporting",
+      "sourceImage": "image14.png",
+      "sourceAvailable": true,
+      "implementationValidated": false,
+      "status": "SOURCE INSPECTED; full rendered workflow conformance withheld",
+      "override": "Current written fields/navigation/lifecycle/privacy/security/ownership win over generated detail"
+    },
+    {
+      "id": "ARCH-XSEC-ORDERPAY-01",
+      "kind": "supporting",
+      "sourceImage": "image15.png",
+      "sourceAvailable": true,
+      "implementationValidated": false,
+      "status": "SOURCE INSPECTED; full rendered workflow conformance withheld",
+      "override": "Current written fields/navigation/lifecycle/privacy/security/ownership win over generated detail"
+    }
+  ],
+  "defects": [
+    {
+      "id": "C01",
+      "severity": "CRITICAL",
+      "resolved": false,
+      "type": "MISSING IMPLEMENTATION",
+      "location": "src/services/customerAccountAuthority.js",
+      "requirement": "Trusted durable Account/principal/login/lifecycle resolver; provider UID/email must not substitute",
+      "affected": "M01/M02/M10 private-authority completion"
+    },
+    {
+      "id": "C02",
+      "severity": "CRITICAL",
+      "resolved": false,
+      "type": "MISSING IMPLEMENTATION + controlled provisioning",
+      "location": "src/firebase/auth.js / absent trusted bootstrap/lifecycle services",
+      "requirement": "Unique idempotent registration, reviewed legacy/tombstone/login conflicts and Restore/Allow-New/Restrict/Rare-Merge",
+      "affected": "M01-F03, M10-F05/F08/F09"
+    },
+    {
+      "id": "C03",
+      "severity": "CRITICAL",
+      "resolved": false,
+      "type": "MISSING IMPLEMENTATION",
+      "location": "src/firebase/accountActions.js / absent proof/result services",
+      "requirement": "Lifecycle-aware proof commit/supersession and durable committed/not-committed/unresolved operation results",
+      "affected": "M01-F04/F05, M10-F07"
+    },
+    {
+      "id": "H01",
+      "severity": "HIGH",
+      "resolved": false,
+      "type": "MISSING IMPLEMENTATION",
+      "location": "src/services/customerProfile.js / Profile owner area",
+      "requirement": "Own current Profile/photo/address CRUD, version and one-default server invariant",
+      "affected": "M02-F01/F02/F03/F08"
+    },
+    {
+      "id": "H02",
+      "severity": "HIGH",
+      "resolved": false,
+      "type": "MISSING IMPLEMENTATION",
+      "location": "Profile Security / absent trusted session services",
+      "requirement": "Fresh auth, sensitive security commands, real device/session enumeration/revocation and security chronology",
+      "affected": "M01-F08, M02-F04"
+    },
+    {
+      "id": "H03",
+      "severity": "HIGH",
+      "resolved": false,
+      "type": "MISSING IMPLEMENTATION",
+      "location": "Profile Communications/Privacy / absent current owner services",
+      "requirement": "Preferences persistence, authorized My Information, deletion/current privacy permission/provenance",
+      "affected": "M02-F05/F06"
+    },
+    {
+      "id": "H04",
+      "severity": "HIGH",
+      "resolved": false,
+      "type": "MISSING OWNER IMPLEMENTATION / integration",
+      "location": "Section-12 Customer/Deleted Account owner ports; Section-16 private/evidence services",
+      "requirement": "Positive exact owner destinations, current field-purpose/private-media controls, lifecycle/merge/history evidence and authorized projections/resume",
+      "affected": "M02-F07, M10-F06/F08/F09"
+    },
+    {
+      "id": "H05",
+      "severity": "HIGH",
+      "resolved": false,
+      "type": "INCOMPLETE IMPLEMENTATION / visual conformance",
+      "location": "Loaded customer workflows in Profile/private owner surfaces",
+      "requirement": "Required loaded/edit/confirmed/unknown/conflict screens cannot match references until actual services exist",
+      "affected": "M10-F11"
+    }
+  ],
+  "validation": {
+    "testsPassed": true,
+    "buildPassed": true,
+    "browserPassed": true,
+    "actualNumbers": "Recorded in final verdict after rerun; counts are not a PASS proxy",
+    "testEnvironment": "Local synthetic demo Auth/Firestore; production not touched"
+  },
+  "formalJourneyRegister": false,
+  "noModule11": true,
+  "noFlow1014": true
+}

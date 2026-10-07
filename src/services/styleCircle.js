@@ -69,7 +69,7 @@ export async function subscribeToStyleCircle(rawEmail, user) {
     );
     return { status: "subscribed" };
   } catch (error) {
-    if (import.meta.env.DEV) console.error(error);
+    // Do not emit raw provider errors/forms/contact identifiers to broad logs.
     if (error?.code === "permission-denied") {
       // Duplicate writes and a configuration failure have the same code.
       // A public client cannot read subscriber records to distinguish them.

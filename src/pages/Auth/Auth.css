@@ -55,3 +55,12 @@
 .auth-flow__form.auth-flow__form--signup {grid-template-columns:minmax(0,1fr);}
 .auth-flow__form--signup > * {grid-column:1 / -1;}
 .auth-flow a.btn--primary {color:var(--color-text-on-brand);}
+.auth-icon {display:block;width:1.25rem;height:1.25rem;object-fit:contain;}
+.auth-flow__rule .auth-icon {width:1rem;height:1rem;}
+.auth-success .auth-flow__mark {background:var(--color-surface);color:var(--color-brand);}
+.auth-outcome .auth-flow__mark,.auth-success .auth-flow__mark {display:grid;width:3.6rem;height:3.6rem;box-shadow:none;background:var(--color-ivory-deep);}
+.auth-outcome .auth-flow__mark .auth-icon,.auth-success .auth-flow__mark .auth-icon {width:1.8rem;height:1.8rem;}
+.auth-flow__intro[data-icon="alert-circle"] .auth-flow__mark {background:var(--color-brand-tint);}
+.auth-flow__status[role="alert"] {border-left-color:var(--color-brand);background:var(--color-brand-tint-strong);}
+.auth-flow__status[role="status"] {border-left-color:var(--color-border-control);background:var(--color-bg);}
+@media(forced-colors:active){.auth-icon {background:white;forced-color-adjust:none;}.auth-flow__mark {border-color:CanvasText;}}

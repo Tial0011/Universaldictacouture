@@ -32,7 +32,7 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true
         && (legacyDevelopmentMembership(get(/databases/$(database)/documents/admins/$(request.auth.uid)).data)
           || (get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.get('staffId', '') is string
-            && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.get('staffId', '').size() > 0));
+            && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.get('staffId', '').trim().size() > 0));
     }
     function validRoute(route, purpose) {
       return route.get('active', false) == true && route.get('purpose', '') == purpose;
@@ -249,16 +249,9 @@ service cloud.firestore {
       // Close legacy customer-only reads/writes until that source is integrated;
       // never infer an ACTIVE Account from UID/email equality or client flags.
       allow read: if false;
-      allow create, update: if false && request.auth != null
-        && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['fullName', 'phoneNumber', 'email', 'createdAt', 'updatedAt'])
-        && request.resource.data.fullName is string
-        && request.resource.data.fullName.size() > 0
-        && request.resource.data.fullName.size() <= 120
-        && request.resource.data.phoneNumber is string
-        && request.resource.data.phoneNumber.size() <= 40
-        && request.resource.data.email == request.auth.token.email;
-      allow delete: if false;
+      // No dormant UID/email-based Personal Details contract to re-enable.
+      // The real durable-Account owner API must implement the locked fields.
+      allow write: if false;
     }
     // One private conversation per customer. Messages and summaries commit together.
     match /conversations/{customerId} {

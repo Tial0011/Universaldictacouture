@@ -8,6 +8,7 @@ import Header from "../navigation/Header";
 
 export default function AuthShell({ children, backTo = "/", compact = false }) {
   const location = useLocation();
+  const family = ["/signin", "/signup"].includes(location.pathname) ? "entry" : "response";
   const panelRef = useRef(null);
   const [appearance, setAppearance] = useState(DEFAULT_AUTH_APPEARANCE);
   const requestedReturn = safeReturnPath(location.state?.returnTo || new URLSearchParams(location.search).get("returnTo"), backTo);
@@ -17,7 +18,7 @@ export default function AuthShell({ children, backTo = "/", compact = false }) {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     panelRef.current?.focus({ preventScroll: true });
   }, [location.pathname]);
-  return <section className={"auth-shell" + (compact ? " auth-shell--compact" : "")}>
+  return <section className={"auth-shell" + (compact ? " auth-shell--compact" : "")} data-family={family}>
     <a className="skip-link" href="#auth-content">Skip to account form</a>
     <Header />
     <p className="auth-shell__return"><Link to={returnTo}>Return to browsing</Link></p>

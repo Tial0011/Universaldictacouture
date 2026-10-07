@@ -1,22 +1,15 @@
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
-import { db } from "../firebase/firestore";
 import { requireCustomerAccountAuthority } from "./customerAccountAuthority";
+import { personalDetailsPayload } from "./profileExperience";
 
-export async function saveCustomerProfile(user, details = {}) {
+export async function saveCustomerProfile(_user, details = {}) {
   requireCustomerAccountAuthority();
-  if (!db || !user?.uid) return;
-  const data = {
-    email: String(user.email || "").trim(),
-    updatedAt: serverTimestamp(),
-  };
-  if (details.fullName !== undefined) data.fullName = String(details.fullName || user.displayName || "").trim();
-  if (details.phoneNumber !== undefined) data.phoneNumber = String(details.phoneNumber || "").trim();
-  await setDoc(doc(db, "customerProfiles", user.uid), data, { merge: true });
+  personalDetailsPayload(details);
+  // Never re-enable the old provider-UID merge/upsert as a fallback. It has
+  // no durable binding, lifecycle, historical or stale-version enforcement.
+  throw Object.assign(new Error("The current Profile owner service is unavailable."), { code: "profile-source-unavailable" });
 }
 
-export async function fetchCustomerProfile(uid) {
+export async function fetchCustomerProfile(_uid) {
   requireCustomerAccountAuthority();
-  if (!db || !uid) return null;
-  const snapshot = await getDoc(doc(db, "customerProfiles", uid));
-  return snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null;
+  throw Object.assign(new Error("The current Profile owner service is unavailable."), { code: "profile-source-unavailable" });
 }

@@ -1,0 +1,26 @@
+.account-icon { display:block; width:1.35rem; height:1.35rem; flex-shrink:0; object-fit:contain; }
+.account-icon-tile { display:grid; place-items:center; width:2.8rem; height:2.8rem; flex-shrink:0; background:var(--color-ivory-deep); border-radius:var(--radius-md); }
+.account-panel-heading { display:flex; gap:.85rem; align-items:flex-start; }
+.account-panel-heading > div { flex:1; min-width:0; }
+.account-panel-heading h2 { margin:0; }
+.account-panel-heading p { margin:.35rem 0 0; color:var(--color-text-secondary); font-size:var(--text-sm); line-height:1.55; }
+.account-notice { display:flex; align-items:flex-start; gap:.7rem; padding:1rem; border:1px solid var(--color-border); border-left:3px solid var(--color-border-control); border-radius:var(--radius-md); background:var(--color-bg); font-size:var(--text-sm); min-width:0; overflow-wrap:anywhere; }
+.account-notice > .account-icon { margin-top:.15rem; }
+.account-notice > div { min-width:0; flex:1; }
+.account-notice__title { margin:0; font-weight:var(--weight-medium); color:var(--color-text-primary); }
+.account-notice__copy { margin-top:.3rem; color:var(--color-text-secondary); line-height:1.6; }
+.account-notice__copy p { margin:0; }
+.account-notice__actions { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.8rem; }
+.account-notice--pending { background:var(--color-ivory-deep); border-left-color:var(--color-brand); }
+.account-notice--confirmed { background:var(--color-surface); border-left-color:var(--color-brand); }
+.account-notice--failed { background:var(--color-brand-tint); border-left-color:var(--color-brand); }
+.account-access-page { padding-block:clamp(2rem,6vw,5rem); min-height:calc(100svh - 7rem); display:grid; align-items:start; }
+.account-access-state { width:min(100%,34rem); margin:auto; display:grid; justify-items:center; gap:1rem; padding:clamp(1.25rem,4vw,3rem); border:1px solid var(--color-border-luxury); border-radius:var(--radius-surface); background:var(--color-surface); text-align:center; overflow-wrap:anywhere; }
+.account-access-state__icon { display:grid; place-items:center; width:4.5rem; height:4.5rem; background:var(--color-ivory-deep); border-radius:50%; }
+.account-access-state__icon .account-icon { width:2.4rem; height:2.4rem; }
+.account-access-state h1 { font-size:var(--text-xl); color:var(--color-brand-deep); margin:0; }
+.account-access-state p { margin:0; }
+.account-access-state > p[role="status"] { color:var(--color-text-secondary); }
+.account-access-state__actions { display:grid; gap:.65rem; width:100%; margin-top:.5rem; }
+@media(max-width:599px) { .account-panel-heading { flex-wrap:wrap; } .account-panel-heading > .btn { width:100%; } .account-notice__actions { flex-direction:column; } }
+@media(forced-colors:active) { .account-icon { background:white; forced-color-adjust:none; } .account-notice,.account-access-state,.account-icon-tile { border:1px solid CanvasText; } }

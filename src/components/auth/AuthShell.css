@@ -30,3 +30,13 @@
  .auth-shell__content {display:flex;flex-direction:column;justify-content:center;padding:2.5rem clamp(1.5rem,4vw,4.5rem);}
 }
 @media(max-width:600px){.auth-shell__brandnote{display:none;}.auth-shell__brandbar{grid-template-columns:1fr auto 1fr;min-height:4.5rem;}.auth-shell__hero{min-height:10.5rem;}.auth-shell__panel{padding:1.35rem 1.15rem;}}
+
+/* B1 focused mobile entry; B2/B3 retain a small editorial response banner. */
+@media(max-width:899px){
+ .auth-shell[data-family="entry"] .auth-shell__hero {display:none;}
+ .auth-shell[data-family="entry"] .auth-shell__content {padding-block:1.25rem 2rem;}
+ .auth-shell[data-family="response"] .auth-shell__hero {min-height:8rem;}
+ .auth-shell[data-family="response"] .auth-shell__hero-copy strong {font-size:1.7rem;}
+ .auth-shell[data-family="response"] .auth-shell__content {padding-top:1.25rem;}
+}
+@media(prefers-reduced-motion:reduce){.auth-shell * {scroll-behavior:auto;transition:none;}}
