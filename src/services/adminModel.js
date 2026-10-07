@@ -53,9 +53,12 @@ export function productReadiness(raw = {}, { allowGeneratedIdentity = false } = 
   } else if (lifecycle === "published") {
     state = "published";
     label = "Published";
+  } else if (lifecycle === "unpublished") {
+    state = "unpublished";
+    label = "Unpublished";
   } else {
     state = "ready";
-    label = "Ready to publish";
+    label = "Catalogue checks complete";
   }
 
   return {
@@ -103,7 +106,7 @@ export function prepareRecord(kind, raw) {
     });
     data.aliases = splitValues(data.aliases);
     data.keywords = splitValues(data.keywords);
-    if (!["draft", "published", "archived"].includes(data.status)) throw new Error("Choose a product status.");
+    if (!["draft", "published", "unpublished", "archived"].includes(data.status)) throw new Error("Choose a product status.");
     if (data.price !== "" && data.price != null) {
       data.price = Number(data.price);
       if (!Number.isFinite(data.price) || data.price < 0) throw new Error("Enter a valid price of zero or more.");

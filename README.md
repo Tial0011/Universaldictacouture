@@ -8,7 +8,7 @@ A React storefront and protected admin workspace for Universal Dicta Couture. Cu
 - Customer email/password registration at `/signup`, sign-in and password reset at `/signin`, and account details with email-verification controls at `/profile`.
 - My Closet → My Pieces stores saved products per signed-in customer in Firestore. Guest saves use browser session storage.
 - My Closet with selected products and quantities, stored for the browser session and separated by account. Guest selections are not automatically merged after sign-in.
-- The studio workspace is available at `/admin` to users with an active admin membership, not just a customer account. It is not linked from customer navigation.
+- The private workspace at `/admin` requires a verified durable Staff Identity and current Staff Access. Business data/actions require explicit capability/purpose/scope routes. Membership alone grants no business permission, and this workspace is not linked from customer navigation.
 - Admin screens for products, categories and attributes, homepage banners, discovery tiles, reviews and setup information.
 - Private customer messages at `/chats` and an admin inbox at `/admin/chats`, with live replies while a conversation is open.
 - Authenticated photo uploads to Netlify Blobs, with server-side validation and image optimisation.
@@ -77,10 +77,10 @@ Local environment values do not automatically reach Netlify. Configure both buil
 ## Admin and content workflow
 
 1. Create an account in Firebase Authentication and copy its UID.
-2. In the Firebase Console, create `admins/{UID}` with the boolean field `active: true`.
+2. Review the existing `admins/{UID}` binding, durable `staffId`, current access and explicit scoped grants using [the Section 12 access contract](docs/section12-access-contract.md). Do not infer capabilities from role labels or `active: true`.
 3. Sign in at `/admin`. Public registration never grants admin membership; browser clients cannot create or change membership documents.
-4. Add a product, upload photos and save a draft. Publish when ready or archive to hide it from customers.
-5. Manage homepage banners, discovery sections and genuine reviews from the corresponding admin screens.
+4. Save private Draft/Unpublished work with independently authorized field capabilities. Existing Published records remain read-only, and new Publish/Update Live is blocked pending the Section 13 protected Working/Live/readiness workflow. Permitted Unpublish/Archive/Restore retain identity and append Audit evidence.
+5. Open existing scoped content workspaces and read Review operational context. Legacy Review mutation is blocked pending its consent/version/eligibility-aware owner workflow.
 
 The categories and attributes screen is a spelling guide; renaming a label does not rewrite products. Storefront filters use published product attributes. Keep one active discovery section per placement (`home` or `shop`). Admin lists load 20 records at a time and search only loaded records.
 
@@ -171,7 +171,7 @@ Before launch, test real customer registration/sign-in, denied admin access for 
 
 ### Chat setup and tests
 
-Publish the updated `firestore.rules` before using chat on a deployed site. Customers must sign in; each customer owns one private conversation, and active admins can reply. Open threads subscribe to the latest 30 messages; earlier messages load on demand. The admin inbox loads 20 conversations per page and refreshes manually. Each sent message writes a message and its conversation summary, so chat adds Firestore reads and writes to the costs above.
+Customers must sign in; the existing general Chat remains customer-owned. Staff need separate current `chats.read` and `chats.reply` capabilities with `customer-service` purpose and legitimate scope; `active: true` alone grants no Chat access. Open threads subscribe to 30 messages; earlier messages load on demand. The staff inbox loads 20 conversations per page. See [the Section 12 access contract](docs/section12-access-contract.md) and [implementation verdict](docs/section12-implementation-verdict.md) for coordinated rules/client rollout and remaining owner dependencies. No production deployment has been performed.
 
 The rules tests use a local Firestore emulator, not production data. With Java 21+ installed:
 

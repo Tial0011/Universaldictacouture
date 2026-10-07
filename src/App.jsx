@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import SiteLayout from "./components/navigation/SiteLayout";
 import AdminLayout from "./components/navigation/AdminLayout";
 import AdminAccess from "./components/admin/AdminAccess";
+import StaffRoute from "./components/admin/StaffRoute";
 import RequireAuth from "./components/auth/RequireAuth";
 
 import PageBoundary from "./components/common/PageBoundary";
@@ -32,7 +33,12 @@ const AdminTaxonomy = lazy(() => import("./pages/admin/Taxonomy/Taxonomy"));
 const AdminDiscovery = lazy(() => import("./pages/admin/Discovery/Discovery"));
 const AdminHomepage = lazy(() => import("./pages/admin/Homepage/Homepage"));
 const AdminChats = lazy(() => import("./pages/admin/Chats/Chats"));
-const AdminReviews = lazy(() => import("./pages/admin/Reviews/Reviews"));
+const AdminReviews = lazy(() => import("./pages/admin/Operations/ReviewContext"));
+const AdminOperations = lazy(() => import("./pages/admin/Operations/Operations"));
+const GlobalSearch = lazy(() => import("./pages/admin/Operations/GlobalSearch"));
+const RecentActivity = lazy(() => import("./pages/admin/Operations/RecentActivity"));
+const OwnerUnavailable = lazy(() => import("./pages/admin/Operations/OwnerUnavailable"));
+const AuditHistory = lazy(() => import("./pages/admin/Operations/AuditHistory"));
 const AdminAppearance = lazy(() => import("./pages/admin/Appearance/Appearance"));
 
 function AuthRoute() {
@@ -77,14 +83,20 @@ export default function App() {
         }
       >
         <Route index element={<Dashboard />} />
-        <Route path="shop" element={<AdminShop />} />
-        <Route path="products" element={<AdminProducts />} />
-        <Route path="taxonomy" element={<AdminTaxonomy />} />
-        <Route path="discovery" element={<AdminDiscovery />} />
-        <Route path="homepage" element={<AdminHomepage />} />
-        <Route path="reviews" element={<AdminReviews />} />
-        <Route path="appearance" element={<AdminAppearance />} />
-        <Route path="chats" element={<AdminChats />} />
+        <Route path="attention" element={<AdminOperations />} />
+        <Route path="search" element={<GlobalSearch />} />
+        <Route path="activity" element={<RecentActivity />} />
+        <Route path="shop" element={<StaffRoute domain="products"><AdminShop /></StaffRoute>} />
+        <Route path="products" element={<StaffRoute domain="products"><AdminProducts /></StaffRoute>} />
+        <Route path="taxonomy" element={<StaffRoute domain="content"><AdminTaxonomy /></StaffRoute>} />
+        <Route path="discovery" element={<StaffRoute domain="content"><AdminDiscovery /></StaffRoute>} />
+        <Route path="homepage" element={<StaffRoute domain="content"><AdminHomepage /></StaffRoute>} />
+        <Route path="reviews" element={<StaffRoute domain="reviews"><AdminReviews /></StaffRoute>} />
+        <Route path="appearance" element={<StaffRoute domain="content"><AdminAppearance /></StaffRoute>} />
+        <Route path="chats" element={<StaffRoute domain="chats"><AdminChats /></StaffRoute>} />
+        <Route path="audit" element={<StaffRoute domain="audit"><AuditHistory /></StaffRoute>} />
+        {[['customers', 'customers'], ['orders', 'orders'], ['payments', 'payments'], ['custom-style', 'customStyle']].map(([path, domain]) =>
+          <Route key={path} path={path} element={<StaffRoute domain={domain}><OwnerUnavailable domain={domain} /></StaffRoute>} />)}
         <Route path="settings" element={<AdminSettings />} />
         <Route path="*" element={<NotFound />} />
       </Route>

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { deleteAdminRecord, deleteProductPermanently, loadAdminPage, saveAdminRecord, adminError } from "../../services/admin";
+import { deleteAdminRecord, reconcileAdminOperation, loadAdminRecord, loadAdminPage, saveAdminRecord, adminError } from "../../services/admin";
 import { SCHEMAS } from "./recordSchemas";
 import { invalidateCatalogue } from "../../hooks/useCatalogue";
 import ImageField from "./ImageField";
@@ -9,13 +9,18 @@ import { DEFAULT_SHOP_BY_GROUPS, fetchShopByGroups } from "../../services/shopBy
 import { fetchPublishedProducts } from "../../services/products";
 import { productAdminHref, productReadiness } from "../../services/adminModel";
 import { getImageUrl } from "../../cloudinary/cloudinary";
+import { useStaff } from "../../context/StaffContext";
+import { allows } from "../../services/staffAuthorization";
+import { pendingStaffOperation, staffOperationActor } from "../../services/staffOperations";
+import { useConfirmation } from "../../hooks/useConfirmation";
+import ConfirmationDialog from "./Confirmation";
 
 
 const PRODUCT_FILTER_DIMENSIONS = [
   ["category", "Category"],
   ["occasion", "Occasion"],
   ["style", "Style"],
-  ["fabric", "Fabric / Weave"],
+  ["fabric", "Fabric & Pattern"],
   ["colour", "Colour"],
 ];
 
@@ -31,7 +36,7 @@ function timestampMs(value) {
   return Number.isNaN(parsed.getTime()) ? 0 : parsed.getTime();
 }
 
-function ProductActionMenu({ record, readiness, publicHref, busy, onOpen, onDelete }) {
+function ProductActionMenu({ record, readiness, publicHref, busy, onOpen }) {
   const label = record.name || "product";
   const menuRef = useRef(null);
   useEffect(() => {
@@ -52,38 +57,19 @@ function ProductActionMenu({ record, readiness, publicHref, busy, onOpen, onDele
     if (!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.removeAttribute("open");
   }}>
     <summary aria-label={`Actions for ${label}`}><span aria-hidden="true">⋮</span><span className="visually-hidden">Actions for {label}</span></summary>
-    <div className="admin-action-menu__panel" role="menu" aria-label={`Actions for ${label}`}>
-      <Button variant="ghost" role="menuitem" disabled={busy} onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); onOpen(); }}>Open / Edit</Button>
+    <div className="admin-action-menu__panel" role="group" aria-label={`Actions for ${label}`}>
+      <Button variant="ghost" disabled={busy} onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); onOpen(); }}>Open / Edit</Button>
       {readiness.ready && record.status === "published" && publicHref ? <Button to={publicHref} target="_blank" rel="noopener noreferrer" variant="ghost" role="menuitem">View in Shop</Button> : null}
-      <Button variant="ghost" className="admin-delete-action" role="menuitem" disabled={busy} onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); onDelete(); }}>Delete Product</Button>
     </div>
   </details>;
 }
 
-function DeleteProductDialog({ record, busy, onCancel, onConfirm }) {
-  const ref = useRef(null);
-  const cancelRef = useRef(null);
-  useEffect(() => {
-    const dialog = ref.current;
-    if (!dialog || dialog.open) return;
-    dialog.showModal();
-    cancelRef.current?.focus();
-  }, []);
-  return <dialog ref={ref} className="admin-confirm-dialog" aria-labelledby="delete-product-title" onCancel={(event) => { event.preventDefault(); if (!busy) onCancel(); }}>
-    <div className="admin-stack">
-      <div><p className="admin-eyebrow">Permanent deletion</p><h2 id="delete-product-title">Delete “{record.name || "this product"}” permanently?</h2></div>
-      <p>This removes the product from the catalogue and cannot be undone. Historical orders, reviews and conversations are not deleted.</p>
-      <p className="field__hint">UDC-owned Netlify product photos are cleaned up after the catalogue record is deleted. External or legacy media cannot be physically deleted by this site.</p>
-      <div className="admin-actions admin-confirm-dialog__actions">
-        <button ref={cancelRef} type="button" className="btn btn--secondary" disabled={busy} onClick={onCancel}>Cancel</button>
-        <Button className="admin-delete-action" disabled={busy} isLoading={busy} onClick={onConfirm}>{busy ? "Deleting…" : "Delete permanently"}</Button>
-      </div>
-    </div>
-  </dialog>;
-}
-
 export default function RecordManager({ kind }) {
   const schema = SCHEMAS[kind];
+  const { staff, uid } = useStaff();
+  const { confirm, request: confirmationRequest, settle: settleConfirmation } = useConfirmation();
+  const [outcomeUnknown, setOutcomeUnknown] = useState(() => pendingStaffOperation(staffOperationActor(uid, staff.staffId), kind)?.operationId || false);
+  const canEdit = record => (kind !== "products" ? ["content.edit"] : !record?.id ? ["products.create"] : ["products.edit", "products.commercial", "products.media", "products.discovery", "products.unpublish", "products.archive", "products.restore"]).some(capability => allows(staff, capability, { purpose: kind === "products" ? "catalogue" : "content", objectId: record?.id }));
   const [params, setParams] = useSearchParams();
   const [records, setRecords] = useState([]);
   const [cursor, setCursor] = useState(null);
@@ -95,12 +81,10 @@ export default function RecordManager({ kind }) {
   const [filter, setFilter] = useState(() => {
     if (kind !== "products") return "all";
     const requested = params.get("view");
-    return ["draft", "published", "archived", "needs-attention", "new-in"].includes(requested) ? requested : "all";
+    return ["draft", "published", "unpublished", "archived", "needs-attention", "new-in"].includes(requested) ? requested : "all";
   });
   const [classificationFilter, setClassificationFilter] = useState("all");
   const [productSort, setProductSort] = useState("updated-desc");
-  const [deleteTarget, setDeleteTarget] = useState(null);
-  const [cleanupRetry, setCleanupRetry] = useState(null);
   const [editor, setEditor] = useState(() => params.get("new") === "1" ? { ...schema.initial } : null);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -114,6 +98,8 @@ export default function RecordManager({ kind }) {
   const editorHeading = useRef(null);
   const addButtonArea = useRef(null);
   const searchRef = useRef(null);
+  const savingRef = useRef(false);
+  const openCurrentRecord = useEffectEvent(record => open(record));
 
   useEffect(() => {
     let current = true;
@@ -129,7 +115,7 @@ export default function RecordManager({ kind }) {
   useEffect(() => {
     if (kind !== "products") return;
     const requested = params.get("view");
-    if (["draft", "published", "archived", "needs-attention", "new-in"].includes(requested)) setFilter(requested);
+    if (["draft", "published", "unpublished", "archived", "needs-attention", "new-in"].includes(requested)) setFilter(requested);
   }, [kind, params]);
 
   useEffect(() => {
@@ -137,11 +123,17 @@ export default function RecordManager({ kind }) {
   }, [kind, params, editor, loading]);
 
   useEffect(() => {
-    if (kind !== "products" || editor || loading) return;
+    if (kind !== "products" || loading) return;
     const editId = params.get("edit");
-    if (!editId) return;
-    const record = records.find((item) => item.id === editId);
-    if (record) open(record);
+    if (!editId || editor?.id === editId) return;
+    let current = true;
+    loadAdminRecord(kind, editId).then(record => {
+      if (current) {
+        if (record) openCurrentRecord(record);
+        else setError("No currently accessible Product record could be found.");
+      }
+    }).catch(error => { if (current) setError(adminError(error)); });
+    return () => { current = false; };
   }, [kind, editor, loading, params, records]);
 
   useEffect(() => {
@@ -181,7 +173,8 @@ export default function RecordManager({ kind }) {
   useEffect(() => { if (editingId) editorHeading.current?.focus(); }, [editingId]);
 
   function open(record) {
-    if (uploading || saving || (dirty && !window.confirm("Discard your unsaved changes?"))) return false;
+    if (uploading || saving || outcomeUnknown || (dirty && !window.confirm("Discard your unsaved changes?"))) return false;
+    if (!canEdit(record)) { setError("Current edit authority is unavailable for this record."); return false; }
     let next = record ? { ...record } : { ...schema.initial };
     if (kind === "products" && record) {
       const allPrices = [
@@ -226,13 +219,14 @@ export default function RecordManager({ kind }) {
   }
 
   function cancel() {
+    if (outcomeUnknown) { setError("Check the current owner record before starting another save."); return; }
     if (dirty && !window.confirm("Discard your unsaved changes?")) return;
     setEditor(null); setDirty(false); setReviewProductSearch("");
     setParams(nextListParams(), { replace: true });
     addButtonArea.current?.querySelector("button")?.focus();
   }
 
-  function update(key, value) { setEditor(previous => ({ ...previous, [key]: value })); setDirty(true); }
+  function update(key, value) { setEditor(previous => ({ ...previous, [key]: value, ...(kind === "products" && key === "images" ? { primaryImage: value?.[0] || null } : {}) })); setDirty(true); }
 
   function updateShopBy(group, nextValues) {
     setEditor((previous) => {
@@ -245,18 +239,19 @@ export default function RecordManager({ kind }) {
     setDirty(true);
   }
 
-  async function persist(rawRecord, successMessage = "Saved successfully.") {
+  async function persist(rawRecord, successMessage = "Saved successfully.", ownerAction = "save") {
+    if (savingRef.current || saving || outcomeUnknown || !canEdit(rawRecord)) return;
+    savingRef.current = true;
     setSaving(true); setError(""); setNotice("");
     try {
       const raw = { ...rawRecord };
-      if (kind === "products" && Object.hasOwn(raw, "images")) raw.primaryImage = raw.images?.[0] || null;
-      await saveAdminRecord(kind, raw);
+      await saveAdminRecord(kind, raw, { action: ownerAction });
       if (kind === "products") invalidateCatalogue();
       setNotice(successMessage); setEditor(null); setDirty(false); setReviewProductSearch("");
       setParams(nextListParams(), { replace: true }); setLoading(true); setPendingPage(undefined); setRevision(v => v + 1);
       addButtonArea.current?.querySelector("button")?.focus();
-    } catch (error) { setError(adminError(error)); }
-    finally { setSaving(false); }
+    } catch (error) { setError(adminError(error)); if (error.code === "outcome-unknown") setOutcomeUnknown(error.operationId); }
+    finally { savingRef.current = false; setSaving(false); }
   }
 
   async function save(event) {
@@ -265,24 +260,18 @@ export default function RecordManager({ kind }) {
   }
 
   async function saveProductLifecycle(nextStatus) {
+    if (nextStatus === "published") { setError("Publication requires the protected Working/Live and current-readiness owner workflow."); return; }
+    const capability = nextStatus === "archived" ? "products.archive" : editor?.status === "archived" ? "products.restore" : "products.unpublish";
+    if (!allows(staff, capability, { purpose: "catalogue", objectId: editor?.id })) { setError("Current lifecycle authority is unavailable."); return; }
     if (kind !== "products" || !editor || saving || uploading) return;
     const next = { ...editor, status: nextStatus };
-    if (nextStatus === "published") {
-      const readiness = productReadiness(next, { allowGeneratedIdentity: !next.id });
-      if (!readiness.ready) {
-        setError(`Cannot publish yet. Complete: ${readiness.blockers.map((item) => item.label).join(", ")}.`);
-        return;
-      }
-    }
-    if (nextStatus === "archived" && !window.confirm("Archive this product? It will leave the public Shop but its record and history will be retained.")) return;
-    const message = nextStatus === "published"
-      ? "Product published. You can now inspect it in the customer Shop."
-      : nextStatus === "archived"
+    if (nextStatus === "archived" && !await confirm("Archive this product? It will leave the public Shop but its record and history will be retained.")) return;
+    const message = nextStatus === "archived"
         ? "Product archived. Its record is retained but it is no longer public."
         : editor.status === "archived"
-          ? "Product restored to draft."
+          ? "Product restored to Unpublished. It has not been republished."
           : "Product unpublished. It is no longer eligible for the public Shop.";
-    await persist(next, message);
+    await persist(next, message, nextStatus === "archived" ? "archive" : editor.status === "archived" ? "restore" : "unpublish");
   }
 
   async function remove(record) {
@@ -297,60 +286,6 @@ export default function RecordManager({ kind }) {
       setLoading(true); setPendingPage(undefined); setRevision(v => v + 1);
     } catch (error) { setError(adminError(error)); }
     finally { setSaving(false); }
-  }
-
-  async function confirmProductDelete() {
-    if (kind !== "products" || !deleteTarget?.id || saving || uploading) return;
-    const target = deleteTarget;
-    setSaving(true); setError(""); setNotice(""); setCleanupRetry(null);
-    try {
-      const result = await deleteProductPermanently(target);
-      invalidateCatalogue();
-      setRecords((current) => current.filter((record) => record.id !== target.id));
-      if (editor?.id === target.id) setEditor(null);
-      setDeleteTarget(null);
-      setParams(nextListParams(), { replace: true });
-      if (result.mediaFailed.length || result.merchandisingCleanup?.failed) {
-        setCleanupRetry({ record: target, mediaFailed: result.mediaFailed.length, merchandisingFailed: Boolean(result.merchandisingCleanup?.failed) });
-        const parts = [];
-        if (result.mediaFailed.length) parts.push(`${result.mediaFailed.length} owned photo${result.mediaFailed.length === 1 ? "" : "s"} still need storage cleanup`);
-        if (result.merchandisingCleanup?.failed) parts.push("a Shop By cover reference could not be checked");
-        setNotice(`Product deleted from the catalogue. ${parts.join("; ")}.`);
-      } else {
-        setNotice(`Product deleted permanently.${result.mediaDeleted ? ` ${result.mediaDeleted} owned stored photo${result.mediaDeleted === 1 ? " was" : "s were"} also removed.` : ""}`);
-      }
-    } catch (deleteError) {
-      setError(adminError(deleteError));
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function retryImageCleanup() {
-    if (!cleanupRetry?.record || saving) return;
-    setSaving(true); setError("");
-    try {
-      const [{ cleanupOwnedProductImages }, { removeProductFromShopByFaces }] = await Promise.all([
-        import("../../services/imageStorage"),
-        import("../../services/shopBy"),
-      ]);
-      const imageResult = cleanupRetry.mediaFailed ? await cleanupOwnedProductImages(cleanupRetry.record) : { failed: [] };
-      let merchandisingFailed = false;
-      if (cleanupRetry.merchandisingFailed) {
-        try { await removeProductFromShopByFaces(cleanupRetry.record.id, cleanupRetry.record.slug); } catch { merchandisingFailed = true; }
-      }
-      if (imageResult.failed.length || merchandisingFailed) {
-        setCleanupRetry({ record: cleanupRetry.record, mediaFailed: imageResult.failed.length, merchandisingFailed });
-        setNotice("Product is deleted, but some cleanup still could not finish. Check the connection and retry.");
-      } else {
-        setCleanupRetry(null);
-        setNotice("Product is deleted and its remaining owned-media / Shop By cleanup is complete.");
-      }
-    } catch (cleanupError) {
-      setError(adminError(cleanupError));
-    } finally {
-      setSaving(false);
-    }
   }
 
   function status(record) {
@@ -427,10 +362,10 @@ export default function RecordManager({ kind }) {
 
     return <div className="field" key={key}>
       {type !== "checkbox" && <label className="field__label" id={complexLabel ? id + "-label" : undefined} htmlFor={complexLabel ? undefined : id}>{label}</label>}
-      {type === "checkbox" ? <label className="choice" htmlFor={id}><input id={id} type="checkbox" checked={!!value} onChange={event => update(key, event.target.checked)} />{label}</label>
+      {kind === "products" && key === "status" ? <output id={id} className="admin-status">{value}</output> : type === "checkbox" ? <label className="choice" htmlFor={id}><input id={id} type="checkbox" checked={!!value} onChange={event => update(key, event.target.checked)} />{label}</label>
         : type === "select" ? <select {...props} value={value || options[0]} onChange={event => update(key, event.target.value)}>{options.map(option => <option key={option} value={option}>{option.replaceAll("-", " ")}</option>)}</select>
         : type === "shopBy" ? <div className="admin-shop-by-field admin-stack">
-          <div className="admin-shop-by-field__intro"><p>Choose where this product should appear in the homepage Shop By flow.</p><Button to="/admin/discovery" variant="secondary">Manage Shop By groups & choices</Button></div>
+          <div className="admin-shop-by-field__intro"><p>Choose where this product should appear in the homepage Shop By flow.</p>{allows(staff, "content.read", { purpose: "content" }) && <Button to="/admin/discovery" variant="secondary">Manage Shop By groups & choices</Button>}</div>
           {shopByGroups.map((group) => {
             const rawSelected = editor.shopBy?.[group.key] ?? editor[group.key] ?? [];
             const selected = Array.isArray(rawSelected) ? rawSelected.map(String) : String(rawSelected || "").split(",").map(entry => entry.trim()).filter(Boolean);
@@ -481,17 +416,17 @@ export default function RecordManager({ kind }) {
     { key: "images", label: "Images", description: "Manage the cover image and supporting product photos." },
     { key: "classification", label: "Catalogue classification", description: "Connect the product to Shop filters and Shop By discovery." },
     { key: "merchandising", label: "Merchandising & search", description: "Curate New In and help customers find the piece with genuine search terms." },
-    { key: "publication", label: "Publication", description: "Choose whether this record is a draft, published or archived." },
+    { key: "publication", label: "Publication", description: "Lifecycle is Draft, Published, Unpublished or Archived. Use protected actions to change it." },
   ];
 
   function renderEditorFields() {
     if (kind !== "products") {
-      return <fieldset className="admin-form-fields" disabled={saving || uploading}>{schema.fields.map(field)}</fieldset>;
+      return <fieldset className="admin-form-fields" disabled={saving || uploading || Boolean(outcomeUnknown)}>{schema.fields.map(field)}</fieldset>;
     }
     return <div className="admin-product-form-sections">{productSections.map((section) => {
       const definitions = schema.fields.filter((definition) => definition.section === section.key);
       if (!definitions.length) return null;
-      return <fieldset className="admin-form-fields admin-form-section" disabled={saving || uploading} key={section.key}>
+      return <fieldset className="admin-form-fields admin-form-section" disabled={saving || uploading || Boolean(outcomeUnknown) || editor.status === "published" || !allows(staff, { pricing: "products.commercial", images: "products.media", classification: "products.discovery", basic: editor?.id ? "products.edit" : "products.create", merchandising: "products.edit", publication: "products.read" }[section.key], { purpose: "catalogue", objectId: editor?.id })} key={section.key}>
         <legend><span>{section.label}</span><small>{section.description}</small></legend>
         {definitions.map(field)}
       </fieldset>;
@@ -499,42 +434,43 @@ export default function RecordManager({ kind }) {
   }
 
   return <div className="admin-stack">
-    <header className="admin-page-heading"><div><p className="admin-eyebrow">Studio management</p><h1>{schema.title}</h1><p>{schema.description}</p></div><div ref={addButtonArea}><Button disabled={saving || uploading} onClick={() => open(null)}>Add {schema.singular}</Button></div></header>
-    {notice && <p role="status" className="admin-notice">{notice}</p>}
+    {confirmationRequest && <ConfirmationDialog message={confirmationRequest} onResult={settleConfirmation} />}
+    <header className="admin-page-heading"><div><p className="admin-eyebrow">Studio management</p><h1>{schema.title}</h1><p>{schema.description}</p></div><div ref={addButtonArea}><Button disabled={saving || uploading || Boolean(outcomeUnknown) || !canEdit(null)} onClick={() => open(null)} aria-disabled={!canEdit(null) || Boolean(outcomeUnknown)}>Add {schema.singular}</Button></div></header>
+    {outcomeUnknown && <div className="admin-notice" role="status"><p>A save is awaiting authoritative reconciliation. Another save is blocked.</p><Button variant="secondary" onClick={async () => { try { const result = await reconcileAdminOperation(outcomeUnknown); const current = result.state === "committed" ? await loadAdminRecord(result.kind, result.id) : null; if (current) { setEditor(current); setDirty(false); setOutcomeUnknown(false); setNotice("Current owner state loaded. Review it before any new action."); } else setError("The outcome remains unresolved. Do not submit a duplicate record."); } catch (error) { setError(adminError(error)); } }}>Check current owner state</Button></div>}
+      {notice && <p role="status" className="admin-notice">{notice}</p>}
+    {kind === "products" && editor?.id === params.get("edit") && params.get("issue") && <p className="admin-notice" role="status">{editorReadiness?.blockers.some(item => item.key === params.get("issue")) ? "The linked catalogue issue remains current. Any correction uses this protected Product owner workflow." : "Status changed since this issue link was created. Current Product context is shown; no obsolete action is retained."}</p>}
     {error && <div role="alert" className="admin-notice"><p>{error}</p>{!editor && <Button variant="secondary" onClick={() => { setLoading(true); setError(""); setRevision(v => v + 1); }}>Try again</Button>}</div>}
-    {editor && <section className="admin-panel admin-stack" aria-labelledby="editor-title">
-      <div><h2 id="editor-title" tabIndex={-1} ref={editorHeading}>{editor.id ? "Edit" : "Add"} {schema.singular}</h2><p>Changes appear on the website only after you save a published record.</p></div>
+    {editor && (kind !== "products" || !params.get("edit") || editor.id === params.get("edit")) && <section className="admin-panel admin-stack" aria-labelledby="editor-title">
+      <div><h2 id="editor-title" tabIndex={-1} ref={editorHeading}>{editor.id ? "Edit" : "Add"} {schema.singular}</h2><p>Draft and Unpublished saves remain private. Existing Published records are read-only until their protected Working/Live owner workflow is integrated.</p></div>
       {kind === "products" && editorReadiness && <aside className="admin-readiness" aria-labelledby="product-readiness-title">
         <div className="admin-section-heading">
           <div><p className="admin-eyebrow">Publication readiness</p><h3 id="product-readiness-title">{editorReadiness.label}</h3></div>
           {editor.id && !dirty && editor.status === "published" && editorReadiness.ready && productAdminHref(editor) ? <Button to={productAdminHref(editor)} target="_blank" rel="noopener noreferrer" variant="secondary">View in Shop</Button> : null}
         </div>
         <ul className="admin-readiness__checks">{editorReadiness.checks.map((check) => <li key={check.key} className={check.complete ? "is-complete" : "is-missing"}><span aria-hidden="true">{check.complete ? "✓" : "!"}</span><span>{check.label}</span></li>)}</ul>
-        {editorReadiness.blockers.length ? <p id="product-readiness-blockers" className="field__error" role="status">Before publishing: {editorReadiness.blockers.map((item) => item.label).join(", ")}.</p> : <p className="admin-positive">All required publication information is ready.</p>}
+        {editorReadiness.blockers.length ? <p id="product-readiness-blockers" className="field__error" role="status">Before publishing: {editorReadiness.blockers.map((item) => item.label).join(", ")}.</p> : <p className="admin-positive">The existing catalogue checks are complete. Protected publication requires the owner’s complete current readiness checks.</p>}
         {editorReadiness.warnings.length ? <p className="field__hint">Suggested check: {editorReadiness.warnings.map((item) => item.label).join(", ")}.</p> : null}
         <div className="admin-actions admin-publication-actions" aria-label="Product publication actions">
-          {editor.status === "published"
-            ? <Button variant="secondary" disabled={saving || uploading} isLoading={saving} onClick={() => saveProductLifecycle("draft")}>Unpublish</Button>
-            : <Button disabled={saving || uploading || !editorReadiness.ready} aria-describedby={!editorReadiness.ready ? "product-readiness-blockers" : undefined} isLoading={saving} onClick={() => saveProductLifecycle("published")}>Publish</Button>}
+          {editor.status === "published" && <Button variant="secondary" disabled={saving || uploading || Boolean(outcomeUnknown)} isLoading={saving} onClick={() => saveProductLifecycle("unpublished")}>Unpublish</Button>}
+          {editor.status !== "published" && <p role="status">Publish and Update Live are unavailable until the protected Working/Live owner workflow is integrated.</p>}
           {editor.status === "archived"
-            ? <Button variant="secondary" disabled={saving || uploading} onClick={() => saveProductLifecycle("draft")}>Restore to draft</Button>
-            : <Button variant="ghost" disabled={saving || uploading} onClick={() => saveProductLifecycle("archived")}>Archive</Button>}
+            ? <Button variant="secondary" disabled={saving || uploading || Boolean(outcomeUnknown)} onClick={() => saveProductLifecycle("unpublished")}>Restore to Unpublished</Button>
+            : <Button variant="ghost" disabled={saving || uploading || Boolean(outcomeUnknown) || !editor.id} onClick={() => saveProductLifecycle("archived")}>Archive</Button>}
         </div>
       </aside>}
       <form onSubmit={save} className="admin-stack">{renderEditorFields()}
-        <div className="admin-form-actions"><Button type="submit" disabled={uploading} isLoading={saving}>{saving ? "Saving…" : "Save " + schema.singular}</Button><Button variant="secondary" disabled={saving || uploading} onClick={cancel}>Cancel</Button><span className="field__hint">{uploading ? "Uploading photos…" : dirty ? "Unsaved changes" : "No unsaved changes"}</span></div>
+        <div className="admin-form-actions"><Button type="submit" disabled={uploading || Boolean(outcomeUnknown) || (kind === "products" && editor.status === "published")} isLoading={saving}>{saving ? "Saving…" : "Save " + schema.singular}</Button><Button variant="secondary" disabled={saving || uploading || Boolean(outcomeUnknown)} onClick={cancel}>Cancel</Button><span className="field__hint">{uploading ? "Uploading photos…" : dirty ? "Unsaved changes" : "No unsaved changes"}</span></div>
       </form>
     </section>}
     <section className="admin-panel admin-stack" aria-label={schema.title + " list"}>
       <div className="admin-list-tools">
         <div className="field"><label htmlFor="admin-search">Search loaded records</label><input ref={searchRef} id="admin-search" type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder={kind === "products" ? "Find by product name, ID or slug" : "Find a " + schema.singular} /></div>
-        {kind !== "taxonomy" && <div className="field"><label htmlFor="admin-filter">{kind === "products" ? "Product view" : "Visibility"}</label><select id="admin-filter" value={filter} onChange={event => { const next = event.target.value; setFilter(next); if (kind === "products") { const nextParams = new URLSearchParams(params); if (next === "all") nextParams.delete("view"); else nextParams.set("view", next); nextParams.delete("edit"); setParams(nextParams, { replace: true }); } }}>{(kind === "products" ? ["all", "published", "draft", "archived", "needs-attention", "new-in"] : ["all", "draft", "published"]).map(option => <option key={option} value={option}>{option === "all" ? (kind === "products" ? "All products" : "All statuses") : option === "needs-attention" ? "Needs attention" : option === "new-in" ? "New In" : option.replaceAll("-", " ")}</option>)}</select></div>}
+        {kind !== "taxonomy" && <div className="field"><label htmlFor="admin-filter">{kind === "products" ? "Product view" : "Visibility"}</label><select id="admin-filter" value={filter} onChange={event => { const next = event.target.value; setFilter(next); if (kind === "products") { const nextParams = new URLSearchParams(params); if (next === "all") nextParams.delete("view"); else nextParams.set("view", next); nextParams.delete("edit"); setParams(nextParams, { replace: true }); } }}>{(kind === "products" ? ["all", "published", "draft", "unpublished", "archived", "needs-attention", "new-in"] : ["all", "draft", "published"]).map(option => <option key={option} value={option}>{option === "all" ? (kind === "products" ? "All products" : "All statuses") : option === "needs-attention" ? "Needs attention" : option === "new-in" ? "New In" : option.replaceAll("-", " ")}</option>)}</select></div>}
         {kind === "products" && <div className="field"><label htmlFor="admin-classification-filter">Classification</label><select id="admin-classification-filter" value={classificationFilter} onChange={event => setClassificationFilter(event.target.value)}><option value="all">All classifications</option>{classificationOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></div>}
         {kind === "products" && <div className="field"><label htmlFor="admin-product-sort">Sort loaded products</label><select id="admin-product-sort" value={productSort} onChange={event => setProductSort(event.target.value)}><option value="updated-desc">Recently updated</option><option value="name-asc">Product name A–Z</option><option value="name-desc">Product name Z–A</option><option value="price-asc">Price low–high</option><option value="price-desc">Price high–low</option><option value="published-desc">Newest publication</option><option value="published-asc">Oldest publication</option></select></div>}
         <Button variant="secondary" disabled={loading || saving || uploading} onClick={() => { setLoading(true); setError(""); setPendingPage(undefined); setRevision(v => v + 1); }}>Refresh</Button>
       </div>
       <p className="field__hint">{records.length} loaded · {visible.length} shown. Load more to search additional records.</p>
-      {cleanupRetry && <div className="admin-notice" role="status"><p>Catalogue deletion succeeded, but image storage cleanup is incomplete.</p><Button variant="secondary" disabled={saving} isLoading={saving} onClick={retryImageCleanup}>Retry image cleanup</Button></div>}
       {loading && <p role="status">Loading records…</p>}
       {!loading && !error && !visible.length && <div className="admin-empty"><h2>{records.length ? "No matching records" : "A fresh start"}</h2><p>{records.length ? "Try a different search, status or classification filter." : "Add your first " + schema.singular + " using the button above."}</p></div>}
       {!!visible.length && <div className="admin-table-wrap"><table className="admin-table admin-product-table"><caption className="visually-hidden">{schema.title}</caption><thead><tr><th scope="col">Name</th><th scope="col">{kind === "taxonomy" ? "Type" : "Visibility"}</th>{kind === "products" && <><th scope="col">Readiness</th><th scope="col">Merchandising</th></>}<th scope="col">Action</th></tr></thead><tbody>{visible.map(record => {
@@ -549,10 +485,9 @@ export default function RecordManager({ kind }) {
           ...listValues(record.fabric).slice(0, 1),
           ...listValues(record.colour).slice(0, 1),
         ].filter(Boolean).join(" · ") : "";
-        return <tr key={record.id}><td>{kind === "products" ? <button type="button" className="admin-product-open" disabled={saving || uploading} onClick={() => openManagedRecord(record)} aria-label={`Open ${record.name || "product"} for editing`}><span className="admin-product-summary"><span className="admin-product-thumb" aria-hidden="true">{imageUrl ? <img src={imageUrl} alt="" loading="lazy" /> : <span>UDC</span>}</span><span><strong>{record.name || "Untitled"}</strong><small>{record.price == null ? "Main price not set" : `Main price: ${new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" }).format(Number(record.price))}${record.unitLabel || record.priceToken ? ` (${record.unitLabel || record.priceToken})` : ""}`}</small><small>{classification || "Classification not set"}</small></span></span></button> : <div><strong>{record.name || record.title || record.headline || record.author || "Untitled"}</strong>{kind === "reviews" && record.productId && <small>Product: {reviewProducts.find(product => product.id === record.productId)?.name || record.productId}</small>}</div>}</td><td><span className={"admin-status admin-status--" + status(record)}>{status(record)}</span></td>{kind === "products" && <><td><span className={"admin-status admin-status--" + readiness.state}>{readiness.label}</span>{readiness.blockers.length ? <small>{readiness.blockers.map((item) => item.label).join(" · ")}</small> : readiness.warnings.length ? <small>{readiness.warnings[0].label}</small> : null}</td><td>{record.isNewIn === true || record.newIn === true ? <span className="admin-status admin-status--new-in">New In</span> : <span className="field__hint">Standard catalogue</span>}</td></>}<td>{kind === "products" ? <ProductActionMenu record={record} readiness={readiness} publicHref={publicHref} busy={saving || uploading} onOpen={() => openManagedRecord(record)} onDelete={() => setDeleteTarget(record)} /> : <div className="admin-actions"><Button variant="ghost" disabled={saving || uploading} onClick={() => open(record)} aria-label={"Edit " + (record.name || record.title || record.headline || record.author || schema.singular)}>Edit</Button>{["reviews", "heroSlides"].includes(kind) && <Button variant="ghost" disabled={saving || uploading} onClick={() => remove(record)} aria-label={`Delete ${record.author || record.headline || schema.singular}`}>Delete</Button>}</div>}</td></tr>;
+        return <tr key={record.id}><td data-label="Name">{kind === "products" ? <button type="button" className="admin-product-open" disabled={saving || uploading || Boolean(outcomeUnknown)} onClick={() => openManagedRecord(record)} aria-label={`Open ${record.name || "product"} for editing`}><span className="admin-product-summary"><span className="admin-product-thumb" aria-hidden="true">{imageUrl ? <img src={imageUrl} alt="" loading="lazy" /> : <span>UDC</span>}</span><span><strong>{record.name || "Untitled"}</strong><small>{record.price == null ? "Main price not set" : `Main price: ${new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" }).format(Number(record.price))}${record.unitLabel || record.priceToken ? ` (${record.unitLabel || record.priceToken})` : ""}`}</small><small>{classification || "Classification not set"}</small></span></span></button> : <div><strong>{record.name || record.title || record.headline || record.author || "Untitled"}</strong>{kind === "reviews" && record.productId && <small>Product: {reviewProducts.find(product => product.id === record.productId)?.name || record.productId}</small>}</div>}</td><td data-label={kind === "taxonomy" ? "Type" : "Visibility"}><span className={"admin-status admin-status--" + status(record)}>{status(record)}</span></td>{kind === "products" && <><td data-label="Readiness"><span className={"admin-status admin-status--" + readiness.state}>{readiness.label}</span>{readiness.blockers.length ? <small>{readiness.blockers.map((item) => item.label).join(" · ")}</small> : readiness.warnings.length ? <small>{readiness.warnings[0].label}</small> : null}</td><td data-label="Merchandising">{record.isNewIn === true || record.newIn === true ? <span className="admin-status admin-status--new-in">New In</span> : <span className="field__hint">Standard catalogue</span>}</td></>}<td data-label="Action">{kind === "products" ? <ProductActionMenu record={record} readiness={readiness} publicHref={publicHref} busy={saving || uploading || Boolean(outcomeUnknown)} onOpen={() => openManagedRecord(record)} /> : <div className="admin-actions"><Button variant="ghost" disabled={saving || uploading || Boolean(outcomeUnknown)} onClick={() => open(record)} aria-label={"Edit " + (record.name || record.title || record.headline || record.author || schema.singular)}>Edit</Button>{["reviews", "heroSlides"].includes(kind) && <Button variant="ghost" disabled={saving || uploading || Boolean(outcomeUnknown)} onClick={() => remove(record)} aria-label={`Delete ${record.author || record.headline || schema.singular}`}>Delete</Button>}</div>}</td></tr>;
       })}</tbody></table></div>}
       {more && <Button variant="secondary" disabled={loading} onClick={() => { setLoading(true); setError(""); setPendingPage(cursor); }}>Load more</Button>}
     </section>
-    {deleteTarget && <DeleteProductDialog record={deleteTarget} busy={saving} onCancel={() => { if (!saving) setDeleteTarget(null); }} onConfirm={confirmProductDelete} />}
   </div>;
 }

@@ -1,0 +1,2235 @@
+{
+  "source": "SECTION 12 DOCUMENT 1 PART 1 .docx — complete 6 October 2026 master (7747 paragraphs)",
+  "baseline": "Universaldictacouture; source/test/config files compared to Universal-Dicta-Couture-Latest(20261004-195445).zip before edits",
+  "verdict": "PARTIAL",
+  "flowCount": 321,
+  "modules": [
+    {
+      "module": 1,
+      "title": "Section Foundation, Purpose & Ownership Boundaries",
+      "disposition": "VALIDATION-ONLY",
+      "evidence": [
+        "src/services/operationsModel.js",
+        "src/services/staffAuthorization.js",
+        "src/App.jsx",
+        "tests/section12-rules.test.mjs"
+      ],
+      "dependency": "Full historical-domain verification awaits owner transaction systems.",
+      "flows": [
+        {
+          "id": "S12-M01-F01",
+          "title": "Section 12 Purpose & Operating Model",
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Ownership and anti-shadow boundaries inspected against the master and repository; see module evidence and whole-section audit."
+        },
+        {
+          "id": "S12-M01-F02",
+          "title": "Section 12 Owned Capabilities",
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Ownership and anti-shadow boundaries inspected against the master and repository; see module evidence and whole-section audit."
+        },
+        {
+          "id": "S12-M01-F03",
+          "title": "Surface / Summarize / Route Boundary",
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Ownership and anti-shadow boundaries inspected against the master and repository; see module evidence and whole-section audit."
+        },
+        {
+          "id": "S12-M01-F04",
+          "title": "Cross-Section Ownership Contract",
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Ownership and anti-shadow boundaries inspected against the master and repository; see module evidence and whole-section audit."
+        },
+        {
+          "id": "S12-M01-F05",
+          "title": "Safe Action vs Owning-Workflow Decision",
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Ownership and anti-shadow boundaries inspected against the master and repository; see module evidence and whole-section audit."
+        },
+        {
+          "id": "S12-M01-F06",
+          "title": "Source-of-Truth & Anti-Duplication Rules",
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Ownership and anti-shadow boundaries inspected against the master and repository; see module evidence and whole-section audit."
+        },
+        {
+          "id": "S12-M01-F07",
+          "title": "Historical-Truth Boundary",
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Ownership and anti-shadow boundaries inspected against the master and repository; see module evidence and whole-section audit."
+        },
+        {
+          "id": "S12-M01-F08",
+          "title": "Non-Goals / Do-Not-Build",
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Ownership and anti-shadow boundaries inspected against the master and repository; see module evidence and whole-section audit."
+        },
+        {
+          "id": "S12-M01-F09",
+          "title": "Do-Not-Restore / Superseded-Rule Protection",
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Ownership and anti-shadow boundaries inspected against the master and repository; see module evidence and whole-section audit."
+        },
+        {
+          "id": "S12-M01-F10",
+          "title": "Foundation Validation & Module Handoff",
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Ownership and anti-shadow boundaries inspected against the master and repository; see module evidence and whole-section audit."
+        }
+      ]
+    },
+    {
+      "module": 2,
+      "title": "Staff Identity, Roles, Permissions & Governance",
+      "disposition": "PARTIALLY SATISFIED",
+      "evidence": [
+        "src/services/staffAuthorization.js",
+        "firestore.rules",
+        "src/components/admin/AdminAccess.jsx",
+        "tests/section12-rules.test.mjs",
+        "src/services/staffOperations.js"
+      ],
+      "dependency": "Section 16/governance: reviewed principal-to-staff bindings, one-human identity enforcement, maximum-two Super Admin transaction controls, eligibility/Couturier governance, fresh-security-proof and all six scope families need the privileged owner workflow. Unsupported retrieval scopes stay denied.",
+      "flows": [
+        {
+          "id": "S12-M02-F01",
+          "title": "Internal Staff Identity Model",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M02-F02",
+          "title": "Super Admin Authority & Protection",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16/governance: reviewed principal-to-staff bindings, one-human identity enforcement, maximum-two Super Admin transaction controls, eligibility/Couturier governance, fresh-security-proof and all six scope families need the privileged owner workflow. Unsupported retrieval scopes stay denied."
+        },
+        {
+          "id": "S12-M02-F03",
+          "title": "Admin Staff Account Model",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M02-F04",
+          "title": "Function as Couturier / Dicta Couturier Capability",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16/governance: reviewed principal-to-staff bindings, one-human identity enforcement, maximum-two Super Admin transaction controls, eligibility/Couturier governance, fresh-security-proof and all six scope families need the privileged owner workflow. Unsupported retrieval scopes stay denied."
+        },
+        {
+          "id": "S12-M02-F05",
+          "title": "Capability Families & Permission Matrix",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M02-F06",
+          "title": "Capability Scope vs Object / Assignment Scope",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M02-F07",
+          "title": "Least-Privilege & Deny-by-Default Rules",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M02-F08",
+          "title": "Staff Activation, Deactivation & Eligibility",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16/governance: reviewed principal-to-staff bindings, one-human identity enforcement, maximum-two Super Admin transaction controls, eligibility/Couturier governance, fresh-security-proof and all six scope families need the privileged owner workflow. Unsupported retrieval scopes stay denied."
+        },
+        {
+          "id": "S12-M02-F09",
+          "title": "Permission Grant, Revocation & Mid-Session Changes",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M02-F10",
+          "title": "Shared-Account Prevention & Staff Accountability",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16/governance: reviewed principal-to-staff bindings, one-human identity enforcement, maximum-two Super Admin transaction controls, eligibility/Couturier governance, fresh-security-proof and all six scope families need the privileged owner workflow. Unsupported retrieval scopes stay denied."
+        },
+        {
+          "id": "S12-M02-F11",
+          "title": "Protected Actions & Governance Controls",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16/governance: reviewed principal-to-staff bindings, one-human identity enforcement, maximum-two Super Admin transaction controls, eligibility/Couturier governance, fresh-security-proof and all six scope families need the privileged owner workflow. Unsupported retrieval scopes stay denied."
+        },
+        {
+          "id": "S12-M02-F12",
+          "title": "Roles / Permissions Validation & Module Handoff",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        }
+      ]
+    },
+    {
+      "module": 3,
+      "title": "Staff Access, Global Admin Shell & Navigation",
+      "disposition": "PARTIALLY SATISFIED",
+      "evidence": [
+        "src/components/admin/AdminAccess.jsx",
+        "src/components/navigation/AdminLayout.jsx",
+        "src/components/admin/StaffRoute.jsx",
+        "tests/section12-browser-check.mjs"
+      ],
+      "dependency": "Fresh high-impact reauthentication and identity-resolution mechanisms await Section 16. Current session, membership changes and account switching are enforced for available resources.",
+      "flows": [
+        {
+          "id": "S12-M03-F01",
+          "title": "Staff Sign-In Entry",
+          "disposition": "ALREADY SATISFIED",
+          "reason": "Existing Firebase email/password sign-in inherited; real emulator sign-in verified. Staff Access handoff separately repaired."
+        },
+        {
+          "id": "S12-M03-F02",
+          "title": "Protected Admin Access & Session Start",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M03-F03",
+          "title": "Global Admin Shell Structure",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M03-F04",
+          "title": "Responsive Desktop / Tablet / Mobile Admin Navigation",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M03-F05",
+          "title": "Account Menu & Staff Identity Context",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M03-F06",
+          "title": "Authority / Capability-Aware Navigation Visibility",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M03-F07",
+          "title": "Deep-Link & Direct-Route Access Handling",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M03-F08",
+          "title": "Session Expiry, Reauthentication & Safe Return",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M03-F09",
+          "title": "Account Switching / Staff Logout",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M03-F10",
+          "title": "Shell Failure / Offline / Recovery States",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M03-F11",
+          "title": "Global Shell Accessibility & Keyboard Navigation",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M03-F12",
+          "title": "Admin Shell Validation & Module Handoff",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        }
+      ]
+    },
+    {
+      "module": 4,
+      "title": "Dashboard Home",
+      "disposition": "PARTIALLY SATISFIED",
+      "evidence": [
+        "src/pages/admin/Dashboard/Dashboard.jsx",
+        "src/hooks/useOperations.js",
+        "tests/section12-browser-check.mjs"
+      ],
+      "dependency": "Dashboard uses checked loaded pages, not full-domain counts; missing owner projections prevent complete broad/narrow/Couturier homes.",
+      "flows": [
+        {
+          "id": "S12-M04-F01",
+          "title": "Purpose & Attention-First Hierarchy",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M04-F02",
+          "title": "Page Header & Staff Context",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M04-F03",
+          "title": "Freshness / Last-Updated Behaviour",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M04-F04",
+          "title": "Operational Alert Banner",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M04-F05",
+          "title": "Actionable Metric Strip",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M04-F06",
+          "title": "Authority-Aware Metric Selection",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M04-F07",
+          "title": "Attention Centre Preview",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M04-F08",
+          "title": "Quick Access Panel",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M04-F09",
+          "title": "Recent Activity Preview",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M04-F10",
+          "title": "Broad Admin Home Behaviour",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M04-F11",
+          "title": "Narrow Admin Home Behaviour",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M04-F12",
+          "title": "Dicta Couturier / My Work Home Behaviour",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M04-F13",
+          "title": "Single-Operator Home Behaviour",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M04-F14",
+          "title": "Multi-Staff Home Behaviour",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M04-F15",
+          "title": "Empty / Partial / Stale / Error Home States",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M04-F16",
+          "title": "Desktop",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M04-F17",
+          "title": "Mobile",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M04-F18",
+          "title": "Tablet",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M04-F19",
+          "title": "Smart / 2050 Enhancements",
+          "disposition": "NOT APPLICABLE TO CODE FOR A DOCUMENTED REASON",
+          "reason": "Future/2050 or optional enhancements are not activated as new V1 work; mandatory V1 behavior remains covered elsewhere."
+        },
+        {
+          "id": "S12-M04-F20",
+          "title": "Validation & Module Handoff",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        }
+      ]
+    },
+    {
+      "module": 5,
+      "title": "Attention Centre",
+      "disposition": "PARTIALLY SATISFIED",
+      "evidence": [
+        "src/pages/admin/Operations/Operations.jsx",
+        "src/services/operationsModel.js",
+        "src/services/operations.js",
+        "tests/section12-browser-check.mjs"
+      ],
+      "dependency": "Section 16 and domain owners must supply all categories, durable action-needed start time, priority, responsibility and delegated triage/claim workflows. Priority/age are explicitly unavailable.",
+      "flows": [
+        {
+          "id": "S12-M05-F01",
+          "title": "Attention Centre Purpose & Queue Model",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M05-F02",
+          "title": "Attention Item Structure / Schema",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M05-F03",
+          "title": "Source Eligibility & Creation Criteria",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M05-F04",
+          "title": "Attention Categories",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M05-F05",
+          "title": "All / My Work / Unassigned Views",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M05-F06",
+          "title": "Attention States",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M05-F07",
+          "title": "Priority Model",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16 and domain owners must supply all categories, durable action-needed start time, priority, responsibility and delegated triage/claim workflows. Priority/age are explicitly unavailable."
+        },
+        {
+          "id": "S12-M05-F08",
+          "title": "Age / Time-in-Attention",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16 and domain owners must supply all categories, durable action-needed start time, priority, responsibility and delegated triage/claim workflows. Priority/age are explicitly unavailable."
+        },
+        {
+          "id": "S12-M05-F09",
+          "title": "Responsibility / Assignment Display",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M05-F10",
+          "title": "Duplicate Signal Fusion",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M05-F11",
+          "title": "Filter Contract",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M05-F12",
+          "title": "Sorting & Queue Order",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M05-F13",
+          "title": "Attention Item Lifecycle",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M05-F14",
+          "title": "Resolved Elsewhere",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M05-F15",
+          "title": "Source Unavailable / Partial Failure",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M05-F16",
+          "title": "Exact Owner-Workflow Routing",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M05-F17",
+          "title": "Desktop Attention Experience",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M05-F18",
+          "title": "Tablet Attention Experience",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M05-F19",
+          "title": "Mobile Attention Experience",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M05-F20",
+          "title": "Attention Validation & Module Handoff",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        }
+      ]
+    },
+    {
+      "module": 6,
+      "title": "Global Search & Entity Findability",
+      "disposition": "PARTIALLY SATISFIED",
+      "evidence": [
+        "src/pages/admin/Operations/Operations.jsx",
+        "src/services/operations.js",
+        "tests/section12-browser-check.mjs"
+      ],
+      "dependency": "Section 16/domain owners: full permission-filtered multi-domain search/ranking/index and unsupported owner sources are absent. Loaded-page search and exact reference lookup are operational.",
+      "flows": [
+        {
+          "id": "S12-M06-F01",
+          "title": "Global Search",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M06-F02",
+          "title": "Search Entry Points",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M06-F03",
+          "title": "Query Interpretation",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M06-F04",
+          "title": "Searchable Entity Scope",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M06-F05",
+          "title": "Permission-Aware Candidate Filtering",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M06-F06",
+          "title": "Customer Results",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M06-F07",
+          "title": "Order / Extension Results",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M06-F08",
+          "title": "Payment Results",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M06-F09",
+          "title": "Chat Results",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M06-F10",
+          "title": "Product Results",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M06-F11",
+          "title": "Review / Custom Style Results",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M06-F12",
+          "title": "Safe Preview & Masking",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M06-F13",
+          "title": "Result Grouping / Ranking",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M06-F14",
+          "title": "Filters / Scope Refinement",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M06-F15",
+          "title": "Exact Reference Lookup",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M06-F16",
+          "title": "Open / Deep-Link Recheck",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M06-F17",
+          "title": "No Results / Hidden-Existence Protection",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M06-F18",
+          "title": "Search Unavailable / Error",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M06-F19",
+          "title": "Responsive Search Behaviour",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M06-F20",
+          "title": "Search Validation & Module Handoff",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        }
+      ]
+    },
+    {
+      "module": 7,
+      "title": "Customer Operational Context",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "evidence": [
+        "src/pages/admin/Operations/OwnerUnavailable.jsx",
+        "src/App.jsx",
+        "firestore.rules"
+      ],
+      "dependency": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only.",
+      "flows": [
+        {
+          "id": "S12-M07-F01",
+          "title": "Customer Operational Context Purpose & Ownership",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F02",
+          "title": "Customer Directory",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F03",
+          "title": "Customer Filtering / Findability",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F04",
+          "title": "Stable Customer Identity Context",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F05",
+          "title": "Current Profile / Contact Display",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F06",
+          "title": "Protected Contact Reveal",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F07",
+          "title": "Linked Main Orders",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F08",
+          "title": "Linked Extensions",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F09",
+          "title": "Payment Context",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F10",
+          "title": "Chat Context",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F11",
+          "title": "Custom Style Context",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F12",
+          "title": "Support Edit Eligibility",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F13",
+          "title": "Support Edit Save / Conflict Handling",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F14",
+          "title": "Account Lifecycle Context",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F15",
+          "title": "Deleted Accounts / Restore Context",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F16",
+          "title": "Identity-Conflict Operations",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F17",
+          "title": "Current vs Historical Transaction Context",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F18",
+          "title": "Partial Source Failure",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F19",
+          "title": "Responsive Customer Context",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        },
+        {
+          "id": "S12-M07-F20",
+          "title": "Customer Context Validation & Handoff",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 11/16: durable Account resolution, staff-safe customer summary/contact projections, lifecycle/identity-conflict/support-edit endpoints and historical links are absent. Private customerProfiles remain customer-only."
+        }
+      ]
+    },
+    {
+      "module": 8,
+      "title": "Order & Extension Visibility",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "evidence": [
+        "src/pages/admin/Operations/OwnerUnavailable.jsx",
+        "src/App.jsx",
+        "firestore.rules"
+      ],
+      "dependency": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline.",
+      "flows": [
+        {
+          "id": "S12-M08-F01",
+          "title": "Order Visibility Purpose & Ownership Boundary",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline."
+        },
+        {
+          "id": "S12-M08-F02",
+          "title": "Main Order Operational Summary",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline."
+        },
+        {
+          "id": "S12-M08-F03",
+          "title": "Current Edition Context",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline."
+        },
+        {
+          "id": "S12-M08-F04",
+          "title": "Customer-Awaiting / Staff-Awaiting State",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline."
+        },
+        {
+          "id": "S12-M08-F05",
+          "title": "Assignment Context",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline."
+        },
+        {
+          "id": "S12-M08-F06",
+          "title": "Blocked / Problem Visibility",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline."
+        },
+        {
+          "id": "S12-M08-F07",
+          "title": "Active Extension Visibility",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline."
+        },
+        {
+          "id": "S12-M08-F08",
+          "title": "Historical Extension Context",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline."
+        },
+        {
+          "id": "S12-M08-F09",
+          "title": "Payment Context Link",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline."
+        },
+        {
+          "id": "S12-M08-F10",
+          "title": "Dedicated Chat Link",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline."
+        },
+        {
+          "id": "S12-M08-F11",
+          "title": "Attention / Exact Routing",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline."
+        },
+        {
+          "id": "S12-M08-F12",
+          "title": "Completion / Closed Visibility",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline."
+        },
+        {
+          "id": "S12-M08-F13",
+          "title": "Stale / Concurrent Order View",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline."
+        },
+        {
+          "id": "S12-M08-F14",
+          "title": "Responsive Order Visibility",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline."
+        },
+        {
+          "id": "S12-M08-F15",
+          "title": "Order / Extension Visibility Validation",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: Main Order, Edition, Extension, assignment and protected owner routes/collections do not exist in the baseline."
+        }
+      ]
+    },
+    {
+      "module": 9,
+      "title": "Payment Visibility",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "evidence": [
+        "src/pages/admin/Operations/OwnerUnavailable.jsx",
+        "src/App.jsx",
+        "firestore.rules"
+      ],
+      "dependency": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline.",
+      "flows": [
+        {
+          "id": "S12-M09-F01",
+          "title": "Payment Visibility Purpose & Ownership",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F02",
+          "title": "Bank-Transfer-Only Context",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F03",
+          "title": "Amount Due Now Summary",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F04",
+          "title": "Payment Record Summary",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F05",
+          "title": "Proof Submitted / Under Review",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F06",
+          "title": "Verified",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F07",
+          "title": "Needs Attention",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F08",
+          "title": "Multiple Payments / Ledger Summary",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F09",
+          "title": "Total Paid / Outstanding Balance",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F10",
+          "title": "Main Order vs Extension Payment Context",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F11",
+          "title": "Payment Proof Protection",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F12",
+          "title": "Payment-Capable Staff Visibility",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F13",
+          "title": "Dicta Couturier Limited Payment Visibility",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F14",
+          "title": "Open Payment Review",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F15",
+          "title": "Correction / Reversal Boundary",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F16",
+          "title": "Payment Audit Evidence",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F17",
+          "title": "Payment Completed vs Order Completed",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F18",
+          "title": "Unknown Result / Retry Protection",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F19",
+          "title": "Responsive Payment Visibility",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        },
+        {
+          "id": "S12-M09-F20",
+          "title": "Payment Visibility Validation & Handoff",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Payment owner/Section 14/16: bank-transfer ledger, proof protection, Amount Due Now and review/reversal workflows do not exist in the baseline."
+        }
+      ]
+    },
+    {
+      "module": 10,
+      "title": "Chat & Customer-Service Operations Visibility",
+      "disposition": "PARTIALLY SATISFIED",
+      "evidence": [
+        "src/services/chats.js",
+        "src/pages/admin/Chats/Chats.jsx",
+        "src/components/chat/Conversation.jsx",
+        "firestore.rules",
+        "tests/chat-rules.test.mjs"
+      ],
+      "dependency": "Chat owner/Section 14/16: dedicated Main Order Chat identity, transaction pins, eligibility/Function-as-Couturier governance, authoritative assignment and full cross-session send recovery are absent. Existing General Chat is scoped; new staff replies append private immutable durable-human Audit evidence.",
+      "flows": [
+        {
+          "id": "S12-M10-F01",
+          "title": "Chat Operations Purpose & Ownership",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M10-F02",
+          "title": "Chat List / Findability",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M10-F03",
+          "title": "Unread / Waiting Signal",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M10-F04",
+          "title": "Assignment Context",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M10-F05",
+          "title": "Main Order Dedicated Chat",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Chat owner/Section 14/16: dedicated Main Order Chat identity, transaction pins, eligibility/Function-as-Couturier governance, authoritative assignment and full cross-session send recovery are absent. Existing General Chat is scoped; new staff replies append private immutable durable-human Audit evidence."
+        },
+        {
+          "id": "S12-M10-F06",
+          "title": "General / Free Chat Context",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M10-F07",
+          "title": "Context Cards / References",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M10-F08",
+          "title": "Current Transaction Pin / Context",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Chat owner/Section 14/16: dedicated Main Order Chat identity, transaction pins, eligibility/Function-as-Couturier governance, authoritative assignment and full cross-session send recovery are absent. Existing General Chat is scoped; new staff replies append private immutable durable-human Audit evidence."
+        },
+        {
+          "id": "S12-M10-F09",
+          "title": "Open Chat",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        }
+      ]
+    },
+    {
+      "module": 11,
+      "title": "Custom Style Operational Visibility",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "evidence": [
+        "src/pages/admin/Operations/OwnerUnavailable.jsx",
+        "src/App.jsx",
+        "firestore.rules"
+      ],
+      "dependency": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent.",
+      "flows": [
+        {
+          "id": "S12-M11-F01",
+          "title": "Custom Style Visibility Purpose",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent."
+        },
+        {
+          "id": "S12-M11-F02",
+          "title": "Submitted Request Visibility",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent."
+        },
+        {
+          "id": "S12-M11-F03",
+          "title": "Assignment / Responsibility",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent."
+        },
+        {
+          "id": "S12-M11-F04",
+          "title": "Customer-Awaiting / Staff-Awaiting",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent."
+        },
+        {
+          "id": "S12-M11-F05",
+          "title": "Request Summary",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent."
+        },
+        {
+          "id": "S12-M11-F06",
+          "title": "Measurements Privacy",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent."
+        },
+        {
+          "id": "S12-M11-F07",
+          "title": "Inspiration / Customer Media Privacy",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent."
+        },
+        {
+          "id": "S12-M11-F08",
+          "title": "Product / Inspiration Relationship",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent."
+        },
+        {
+          "id": "S12-M11-F09",
+          "title": "Chat with a Couturier Relationship",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent."
+        },
+        {
+          "id": "S12-M11-F10",
+          "title": "Pre-Order Context",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent."
+        },
+        {
+          "id": "S12-M11-F11",
+          "title": "Conversion to Main Order",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent."
+        },
+        {
+          "id": "S12-M11-F12",
+          "title": "Historical Provenance",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent."
+        },
+        {
+          "id": "S12-M11-F13",
+          "title": "Stale / Concurrent Request",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent."
+        },
+        {
+          "id": "S12-M11-F14",
+          "title": "Responsive Custom Style Visibility",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent."
+        },
+        {
+          "id": "S12-M11-F15",
+          "title": "Custom Style Validation",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Custom Style owner/Section 16: persisted requests, measurement/media access, pre-order/conversion provenance and exact owner routes are absent."
+        }
+      ]
+    },
+    {
+      "module": 12,
+      "title": "Product Operational Visibility",
+      "disposition": "PARTIALLY SATISFIED",
+      "evidence": [
+        "src/services/operations.js",
+        "src/services/admin.js",
+        "src/components/admin/RecordManager.jsx",
+        "src/pages/admin/Operations/ProductContext.jsx",
+        "tests/section12-browser-check.mjs",
+        "src/services/adminModel.js",
+        "src/components/admin/recordSchemas.js"
+      ],
+      "dependency": "Section 13/16: protected Working/Live revisions, full service/media/consent publication readiness, private Preview, historical-reference deletion eligibility and Review-derived draft provenance remain owner gaps. The four lifecycle states, independent field-family authorization, Unpublish/Archive/Restore-to-Unpublished are corrected. Generic live saves and new publication are closed rather than preserved as obsolete behavior.",
+      "flows": [
+        {
+          "id": "S12-M12-F01",
+          "title": "Product Visibility Purpose & Ownership",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M12-F02",
+          "title": "Product Search / Findability",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M12-F03",
+          "title": "Product Issue Attention",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M12-F04",
+          "title": "Publication-State Visibility",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M12-F05",
+          "title": "Product Media Issue Signal",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M12-F06",
+          "title": "Category / Occasion / Discovery Context",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M12-F07",
+          "title": "Price / Commercial Context",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M12-F08",
+          "title": "Review-to-Product-Draft Signal",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 13/16: protected Working/Live revisions, full service/media/consent publication readiness, private Preview, historical-reference deletion eligibility and Review-derived draft provenance remain owner gaps. The four lifecycle states, independent field-family authorization, Unpublish/Archive/Restore-to-Unpublished are corrected. Generic live saves and new publication are closed rather than preserved as obsolete behavior."
+        },
+        {
+          "id": "S12-M12-F09",
+          "title": "Open Product",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M12-F10",
+          "title": "No Inline Shadow Editing",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M12-F11",
+          "title": "Archived / Unpublished Product",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M12-F12",
+          "title": "Stale Product Projection",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M12-F13",
+          "title": "Responsive Product Visibility",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M12-F14",
+          "title": "Product Visibility Validation",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        }
+      ]
+    },
+    {
+      "module": 13,
+      "title": "Reviews, Customer Media, Content & Notification Boundary",
+      "disposition": "PARTIALLY SATISFIED",
+      "evidence": [
+        "src/pages/admin/Operations/ReviewContext.jsx",
+        "src/services/operations.js",
+        "firestore.rules",
+        "tests/section12-model.test.mjs"
+      ],
+      "dependency": "Review/Section 15/16: service-rating migration, consent/version/eligibility-aware moderation, independently protected private media and notification governance remain missing. Legacy Admin moderation writes are denied and unrouted; historical values are not relabelled.",
+      "flows": [
+        {
+          "id": "S12-M13-F01",
+          "title": "Reviews / Media / Content Boundary Purpose",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M13-F02",
+          "title": "Review Moderation Attention",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M13-F03",
+          "title": "Review State Visibility",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M13-F04",
+          "title": "Service Rating Terminology",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M13-F05",
+          "title": "Customer Media Visibility",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M13-F06",
+          "title": "Review Publication Consent",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Review/Section 15/16: service-rating migration, consent/version/eligibility-aware moderation, independently protected private media and notification governance remain missing. Legacy Admin moderation writes are denied and unrouted; historical values are not relabelled."
+        },
+        {
+          "id": "S12-M13-F07",
+          "title": "Promotional Reuse Consent",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Review/Section 15/16: service-rating migration, consent/version/eligibility-aware moderation, independently protected private media and notification governance remain missing. Legacy Admin moderation writes are denied and unrouted; historical values are not relabelled."
+        },
+        {
+          "id": "S12-M13-F08",
+          "title": "Product-Draft-from-Review Consent",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Review/Section 15/16: service-rating migration, consent/version/eligibility-aware moderation, independently protected private media and notification governance remain missing. Legacy Admin moderation writes are denied and unrouted; historical values are not relabelled."
+        },
+        {
+          "id": "S12-M13-F09",
+          "title": "Public / Private Lineage",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M13-F10",
+          "title": "Consent / Content Boundary",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M13-F11",
+          "title": "Notification Boundary",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Review/Section 15/16: service-rating migration, consent/version/eligibility-aware moderation, independently protected private media and notification governance remain missing. Legacy Admin moderation writes are denied and unrouted; historical values are not relabelled."
+        },
+        {
+          "id": "S12-M13-F12",
+          "title": "Private Media Protection",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Review/Section 15/16: service-rating migration, consent/version/eligibility-aware moderation, independently protected private media and notification governance remain missing. Legacy Admin moderation writes are denied and unrouted; historical values are not relabelled."
+        },
+        {
+          "id": "S12-M13-F13",
+          "title": "Review / Content Deep-Link Routing",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M13-F14",
+          "title": "Review / Content Deep Links",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M13-F15",
+          "title": "Privacy / Sensitive Media",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M13-F16",
+          "title": "Responsive Review / Content Visibility",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M13-F17",
+          "title": "Reviews / Media / Content Validation",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        }
+      ]
+    },
+    {
+      "module": 14,
+      "title": "Operational Metrics & Recent Activity",
+      "disposition": "PARTIALLY SATISFIED",
+      "evidence": [
+        "src/pages/admin/Dashboard/Dashboard.jsx",
+        "src/pages/admin/Operations/Operations.jsx",
+        "src/pages/admin/Operations/AuditHistory.jsx"
+      ],
+      "dependency": "Section 16/domain owners: authoritative event/actor/My-vs-Team activity feeds and full filtered counts remain absent. Recent source updates are explicitly labelled and not formal Audit.",
+      "flows": [
+        {
+          "id": "S12-M14-F01",
+          "title": "Operational Metrics Purpose",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M14-F02",
+          "title": "Authority-Aware Metric Selection",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M14-F03",
+          "title": "Metric Definition & Source",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M14-F04",
+          "title": "Metric Count Reconciliation",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M14-F05",
+          "title": "Metric Click-Through",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M14-F06",
+          "title": "Zero / Unavailable / Restricted Metric States",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M14-F07",
+          "title": "Metric Freshness",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M14-F08",
+          "title": "Recent Activity Purpose",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M14-F09",
+          "title": "Activity Eligibility",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16/domain owners: authoritative event/actor/My-vs-Team activity feeds and full filtered counts remain absent. Recent source updates are explicitly labelled and not formal Audit."
+        },
+        {
+          "id": "S12-M14-F10",
+          "title": "My Activity vs Team Activity",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16/domain owners: authoritative event/actor/My-vs-Team activity feeds and full filtered counts remain absent. Recent source updates are explicitly labelled and not formal Audit."
+        },
+        {
+          "id": "S12-M14-F11",
+          "title": "Actor Attribution",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16/domain owners: authoritative event/actor/My-vs-Team activity feeds and full filtered counts remain absent. Recent source updates are explicitly labelled and not formal Audit."
+        },
+        {
+          "id": "S12-M14-F12",
+          "title": "Exact Object Links",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        }
+      ]
+    },
+    {
+      "module": 15,
+      "title": "Quick Actions, Exact Deep Links, Assignment & Escalation",
+      "disposition": "PARTIALLY SATISFIED",
+      "evidence": [
+        "src/services/operations.js",
+        "src/services/operationsModel.js",
+        "src/services/admin.js",
+        "tests/section12-browser-check.mjs"
+      ],
+      "dependency": "Section 14/16: no owner-delegated Claim/Assign/Reassign/Escalate/Acknowledge endpoints exist. Navigation preflights current state; consequential owner shortcuts are not fabricated.",
+      "flows": [
+        {
+          "id": "S12-M15-F01",
+          "title": "Quick-Action Classification",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M15-F02",
+          "title": "Action Safety Manifest",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M15-F03",
+          "title": "Preflight Safety Check",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M15-F04",
+          "title": "Open / Route Action",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M15-F05",
+          "title": "Claim",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: no owner-delegated Claim/Assign/Reassign/Escalate/Acknowledge endpoints exist. Navigation preflights current state; consequential owner shortcuts are not fabricated."
+        },
+        {
+          "id": "S12-M15-F06",
+          "title": "Assign to Me",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: no owner-delegated Claim/Assign/Reassign/Escalate/Acknowledge endpoints exist. Navigation preflights current state; consequential owner shortcuts are not fabricated."
+        },
+        {
+          "id": "S12-M15-F07",
+          "title": "Assign",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: no owner-delegated Claim/Assign/Reassign/Escalate/Acknowledge endpoints exist. Navigation preflights current state; consequential owner shortcuts are not fabricated."
+        },
+        {
+          "id": "S12-M15-F08",
+          "title": "Reassign",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: no owner-delegated Claim/Assign/Reassign/Escalate/Acknowledge endpoints exist. Navigation preflights current state; consequential owner shortcuts are not fabricated."
+        },
+        {
+          "id": "S12-M15-F09",
+          "title": "Escalate",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: no owner-delegated Claim/Assign/Reassign/Escalate/Acknowledge endpoints exist. Navigation preflights current state; consequential owner shortcuts are not fabricated."
+        },
+        {
+          "id": "S12-M15-F10",
+          "title": "Acknowledge / Start Handling",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: no owner-delegated Claim/Assign/Reassign/Escalate/Acknowledge endpoints exist. Navigation preflights current state; consequential owner shortcuts are not fabricated."
+        },
+        {
+          "id": "S12-M15-F11",
+          "title": "Exact Deep-Link Contract",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M15-F12",
+          "title": "Context-Preserving Handoff",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M15-F13",
+          "title": "Resolved Elsewhere Handle",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M15-F14",
+          "title": "Safe Undo Boundary",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: no owner-delegated Claim/Assign/Reassign/Escalate/Acknowledge endpoints exist. Navigation preflights current state; consequential owner shortcuts are not fabricated."
+        },
+        {
+          "id": "S12-M15-F15",
+          "title": "Action Receipt",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M15-F16",
+          "title": "Single-Operator Assignment Simplification",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: no owner-delegated Claim/Assign/Reassign/Escalate/Acknowledge endpoints exist. Navigation preflights current state; consequential owner shortcuts are not fabricated."
+        },
+        {
+          "id": "S12-M15-F17",
+          "title": "Multi-Staff Assignment Scaling",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 14/16: no owner-delegated Claim/Assign/Reassign/Escalate/Acknowledge endpoints exist. Navigation preflights current state; consequential owner shortcuts are not fabricated."
+        }
+      ]
+    },
+    {
+      "module": 16,
+      "title": "Operational State, Concurrency, Failure, Recovery & Performance",
+      "disposition": "PARTIALLY SATISFIED",
+      "evidence": [
+        "src/hooks/useOperations.js",
+        "src/services/admin.js",
+        "src/services/chats.js",
+        "tests/section12-model.test.mjs",
+        "tests/section12-rules.test.mjs",
+        "src/services/staffOperations.js"
+      ],
+      "dependency": "Owner-specific claims, protected media recovery and a durable logical-operation/rejection registry remain owner dependencies. Product saves have exact-version/timestamp checks, current authorization and atomic Audit; actor-bound operation references survive reopening/reloading the browser session. Unknown results reconcile before any retry, and cases that cannot establish noncommitment remain safely unresolved.",
+      "flows": [
+        {
+          "id": "S12-M16-F01",
+          "title": "Canonical Operational State Model",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M16-F02",
+          "title": "Loading / Partial Loading",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M16-F03",
+          "title": "Empty / No Results",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M16-F04",
+          "title": "Restricted / Permission Denied",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M16-F05",
+          "title": "Stale",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M16-F06",
+          "title": "Resolved / Dormant / Archived",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M16-F07",
+          "title": "Connection Problem / Source Unavailable",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M16-F08",
+          "title": "Concurrent Change / Already Handled Elsewhere",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M16-F09",
+          "title": "First Valid Write / Claim",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M16-F10",
+          "title": "Permission Change During Use",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M16-F11",
+          "title": "Optimistic UI Boundary",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M16-F12",
+          "title": "Idempotency",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M16-F13",
+          "title": "Timeout / Response Lost / Checking Result",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M16-F14",
+          "title": "Duplicate Request / Event Reconciliation",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M16-F15",
+          "title": "Protected File Unavailable",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M16-F16",
+          "title": "Pagination / Lazy Media",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M16-F17",
+          "title": "Partial-System Survival",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M16-F18",
+          "title": "Low-Bandwidth / Performance",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M16-F19",
+          "title": "Operational Reliability Validation",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        }
+      ]
+    },
+    {
+      "module": 17,
+      "title": "Desktop, Tablet, Mobile & Luxury Admin Visual System",
+      "disposition": "PARTIALLY SATISFIED",
+      "evidence": [
+        "src/components/navigation/AdminLayout.jsx",
+        "src/components/navigation/AdminLayout.css",
+        "tests/section12-browser-check.mjs"
+      ],
+      "dependency": "Locked navigation and width transformations implemented; complete responsive QA for absent owner surfaces awaits those owners. Flow 4 visual asset is an archive gap; written navigation controls.",
+      "flows": [
+        {
+          "id": "S12-M17-F01",
+          "title": "Admin Visual System Purpose",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M17-F02",
+          "title": "Wide Desktop Composition",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M17-F03",
+          "title": "Compact Desktop / Laptop Composition",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M17-F04",
+          "title": "Tablet Landscape Composition",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M17-F05",
+          "title": "Tablet Portrait Composition",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M17-F06",
+          "title": "Mobile Global Header",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M17-F07",
+          "title": "Mobile Navigation Sheet",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M17-F08",
+          "title": "Responsive Navigation Taxonomy",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M17-F09",
+          "title": "Cards / Lists / Tables Transformation",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M17-F10",
+          "title": "Drawers / Sheets / Dialogs",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M17-F11",
+          "title": "State Presentation System",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M17-F12",
+          "title": "Brand / Workspace Density",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M17-F13",
+          "title": "Responsive Semantic Parity",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M17-F14",
+          "title": "Visual-System Validation",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        }
+      ]
+    },
+    {
+      "module": 18,
+      "title": "Accessibility, Privacy, Security, Audit & Historical Integrity",
+      "disposition": "PARTIALLY SATISFIED",
+      "evidence": [
+        "firestore.rules",
+        "src/services/staffAuthorization.js",
+        "src/services/operations.js",
+        "src/pages/admin/Operations/AuditHistory.jsx",
+        "netlify/lib/image-storage.js",
+        "tests/section12-rules.test.mjs",
+        "src/services/staffOperations.js"
+      ],
+      "dependency": "Section 16/media/governance: private/public media relationships, fine field/data-purpose separation in legacy mixed records, abuse quotas, governance/lifecycle audit, durable session revocation/fresh-proof and retained transaction evidence require owner work. Current trusted rules, minimal REST projections and private durable-human Audit for Product actions/staff replies are verified.",
+      "flows": [
+        {
+          "id": "S12-M18-F01",
+          "title": "Accessibility Target & Semantic Structure",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M18-F02",
+          "title": "Keyboard / Focus",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M18-F03",
+          "title": "Screen Reader / Material State Changes",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M18-F04",
+          "title": "Non-Colour Status Communication",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M18-F05",
+          "title": "Touch / Motion",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M18-F06",
+          "title": "Data Minimization / Masking",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M18-F07",
+          "title": "Protected Reveal",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16/media/governance: private/public media relationships, fine field/data-purpose separation in legacy mixed records, abuse quotas, governance/lifecycle audit, durable session revocation/fresh-proof and retained transaction evidence require owner work. Current trusted rules, minimal REST projections and private durable-human Audit for Product actions/staff replies are verified."
+        },
+        {
+          "id": "S12-M18-F08",
+          "title": "Payment Proof Privacy",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16/media/governance: private/public media relationships, fine field/data-purpose separation in legacy mixed records, abuse quotas, governance/lifecycle audit, durable session revocation/fresh-proof and retained transaction evidence require owner work. Current trusted rules, minimal REST projections and private durable-human Audit for Product actions/staff replies are verified."
+        },
+        {
+          "id": "S12-M18-F09",
+          "title": "Measurements / Private Custom Style Media",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16/media/governance: private/public media relationships, fine field/data-purpose separation in legacy mixed records, abuse quotas, governance/lifecycle audit, durable session revocation/fresh-proof and retained transaction evidence require owner work. Current trusted rules, minimal REST projections and private durable-human Audit for Product actions/staff replies are verified."
+        },
+        {
+          "id": "S12-M18-F10",
+          "title": "Staff Authentication / Session Security",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M18-F11",
+          "title": "Trusted-Boundary Authorization",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M18-F12",
+          "title": "Deep-Link Permission Recheck",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M18-F13",
+          "title": "Private Media / Upload Safety",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16/media/governance: private/public media relationships, fine field/data-purpose separation in legacy mixed records, abuse quotas, governance/lifecycle audit, durable session revocation/fresh-proof and retained transaction evidence require owner work. Current trusted rules, minimal REST projections and private durable-human Audit for Product actions/staff replies are verified."
+        },
+        {
+          "id": "S12-M18-F14",
+          "title": "Rate / Abuse Protection",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16/media/governance: private/public media relationships, fine field/data-purpose separation in legacy mixed records, abuse quotas, governance/lifecycle audit, durable session revocation/fresh-proof and retained transaction evidence require owner work. Current trusted rules, minimal REST projections and private durable-human Audit for Product actions/staff replies are verified."
+        },
+        {
+          "id": "S12-M18-F15",
+          "title": "Formal Audit & Actor Attribution",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M18-F16",
+          "title": "Staff / Permission / Lifecycle Audit",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16/media/governance: private/public media relationships, fine field/data-purpose separation in legacy mixed records, abuse quotas, governance/lifecycle audit, durable session revocation/fresh-proof and retained transaction evidence require owner work. Current trusted rules, minimal REST projections and private durable-human Audit for Product actions/staff replies are verified."
+        },
+        {
+          "id": "S12-M18-F17",
+          "title": "Payment / Assignment / Product / Moderation Audit",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M18-F18",
+          "title": "Current vs Historical Truth",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M18-F19",
+          "title": "Original Snapshot / Paid Edition / Consent History",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Section 16/media/governance: private/public media relationships, fine field/data-purpose separation in legacy mixed records, abuse quotas, governance/lifecycle audit, durable session revocation/fresh-proof and retained transaction evidence require owner work. Current trusted rules, minimal REST projections and private durable-human Audit for Product actions/staff replies are verified."
+        },
+        {
+          "id": "S12-M18-F20",
+          "title": "Security / Integrity Validation",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        }
+      ]
+    },
+    {
+      "module": 19,
+      "title": "Complete Surfaces, Reusable Components & Canonical Operational Journeys",
+      "disposition": "PARTIALLY SATISFIED",
+      "evidence": [
+        "src/App.jsx",
+        "src/components/admin/OperationalViews.jsx",
+        "src/pages/admin/Operations",
+        "tests/section12-browser-check.mjs"
+      ],
+      "dependency": "Supported surfaces and denied/resolved-elsewhere journeys are verified. Customer, transaction, Payment, structured Custom Style and urgent-priority journeys require missing owner workflows.",
+      "flows": [
+        {
+          "id": "S12-M19-F01",
+          "title": "Canonical Surface Register",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M19-F02",
+          "title": "Staff Sign-In Surface",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M19-F03",
+          "title": "Dashboard Home Surface",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M19-F04",
+          "title": "Attention Centre Surface",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M19-F05",
+          "title": "Global Search / Results Surface",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M19-F06",
+          "title": "Customer Directory / Summary Surfaces",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Supported surfaces and denied/resolved-elsewhere journeys are verified. Customer, transaction, Payment, structured Custom Style and urgent-priority journeys require missing owner workflows."
+        },
+        {
+          "id": "S12-M19-F07",
+          "title": "Support Edit / Account Lifecycle Surfaces",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Supported surfaces and denied/resolved-elsewhere journeys are verified. Customer, transaction, Payment, structured Custom Style and urgent-priority journeys require missing owner workflows."
+        },
+        {
+          "id": "S12-M19-F08",
+          "title": "Attention Context Drawer / Detail Surface",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M19-F09",
+          "title": "Recent Activity / Audit History Surfaces",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M19-F10",
+          "title": "Filters / Staff Menu / Mobile Menu Surfaces",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M19-F11",
+          "title": "Restricted / Permission-Denied Surface",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M19-F12",
+          "title": "Reusable Component Register",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M19-F13",
+          "title": "Canonical Journey — Highest-Priority Work",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M19-F14",
+          "title": "Canonical Journey — Assigned Couturier Work",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Supported surfaces and denied/resolved-elsewhere journeys are verified. Customer, transaction, Payment, structured Custom Style and urgent-priority journeys require missing owner workflows."
+        },
+        {
+          "id": "S12-M19-F15",
+          "title": "Canonical Journey — Payment Proof Submitted",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Supported surfaces and denied/resolved-elsewhere journeys are verified. Customer, transaction, Payment, structured Custom Style and urgent-priority journeys require missing owner workflows."
+        },
+        {
+          "id": "S12-M19-F16",
+          "title": "Canonical Journey — Customer Chat / Order Awaiting",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Supported surfaces and denied/resolved-elsewhere journeys are verified. Customer, transaction, Payment, structured Custom Style and urgent-priority journeys require missing owner workflows."
+        },
+        {
+          "id": "S12-M19-F17",
+          "title": "Canonical Journey — Customer Lookup",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Supported surfaces and denied/resolved-elsewhere journeys are verified. Customer, transaction, Payment, structured Custom Style and urgent-priority journeys require missing owner workflows."
+        },
+        {
+          "id": "S12-M19-F18",
+          "title": "Canonical Journey — Extension Requires Action",
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Supported surfaces and denied/resolved-elsewhere journeys are verified. Customer, transaction, Payment, structured Custom Style and urgent-priority journeys require missing owner workflows."
+        },
+        {
+          "id": "S12-M19-F19",
+          "title": "Canonical Journey — Product Requires Attention",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M19-F20",
+          "title": "Canonical Journey — Review Requires Moderation",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        }
+      ]
+    },
+    {
+      "module": 20,
+      "title": "V1 Scope, Terminology, Cross-Section Contracts & Final QA / Lock",
+      "disposition": "PARTIALLY SATISFIED",
+      "evidence": [
+        "docs/section12-coverage.json",
+        "docs/section12-implementation-verdict.md",
+        "docs/section12-checkpoint.md",
+        "tests/section12-model.test.mjs",
+        "tests/section12-rules.test.mjs",
+        "tests/section12-browser-check.mjs"
+      ],
+      "dependency": "Whole-section PASS/lock is withheld until all external owner dependencies are implemented and tested. The source architecture's lock is not a runtime implementation lock.",
+      "flows": [
+        {
+          "id": "S12-M20-F01",
+          "title": "V1 Required Scope",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M20-F02",
+          "title": "Useful If Low Complexity",
+          "disposition": "VALIDATION-ONLY",
+          "reason": "V1/optional/future scope classification audited; no future feature silently introduced."
+        },
+        {
+          "id": "S12-M20-F03",
+          "title": "Future Scope",
+          "disposition": "VALIDATION-ONLY",
+          "reason": "V1/optional/future scope classification audited; no future feature silently introduced."
+        },
+        {
+          "id": "S12-M20-F04",
+          "title": "Reject / Do Not Build",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M20-F05",
+          "title": "Terminology Dictionary",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M20-F06",
+          "title": "Section 11 Contract",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M20-F07",
+          "title": "Section 13 Contract",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M20-F08",
+          "title": "Section 14 Contract",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M20-F09",
+          "title": "Section 15 Contract",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M20-F10",
+          "title": "Section 16 Contract",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M20-F11",
+          "title": "Terminology / Supersession Reconciliation",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M20-F12",
+          "title": "Do-Not-Restore Register",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M20-F13",
+          "title": "Contradiction / Duplication Audit",
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Implemented for currently supported owner sources and surfaces; scope and external limitations are explicitly bounded by this module's dependency."
+        },
+        {
+          "id": "S12-M20-F14",
+          "title": "Final QA Audit",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        },
+        {
+          "id": "S12-M20-F15",
+          "title": "Section 12 Master Lock Record",
+          "disposition": "PARTIALLY SATISFIED",
+          "reason": "Available-source behavior is supported by the module evidence; the stated owner dependency prevents full Flow completion."
+        }
+      ]
+    }
+  ],
+  "supplementalJourneys": [
+    {
+      "name": "Restricted action",
+      "disposition": "IMPLEMENTED IN THIS RUN",
+      "evidence": "Emulator rules deny protected write; browser denied Chat deep link exposes no private content."
+    },
+    {
+      "name": "Task resolved elsewhere",
+      "disposition": "IMPLEMENTED IN THIS RUN",
+      "evidence": "Browser changed Chat owner state then opened stale Attention item; authoritative preflight reconciled it without a duplicate write."
+    },
+    {
+      "name": "Mobile urgent task",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "evidence": "Mobile navigation/access/current-state routing verified. Source priority and urgent consequential transaction workflow are absent, so the complete urgent journey is not claimed."
+    }
+  ]
+}

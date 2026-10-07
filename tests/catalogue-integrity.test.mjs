@@ -78,8 +78,8 @@ test("Size is not a public Shop filter dimension", () => {
 
 test("first-publication write path preserves existing publication chronology", async () => {
   const source = await readFile(new URL("../src/services/admin.js", import.meta.url), "utf8");
-  assert.match(source, /raw\.publishedAt \|\| raw\.firstPublishedAt/);
-  assert.match(source, /data\.publishedAt = existingPublishedAt/);
+  assert.match(source, /currentData\.publishedAt \|\| currentData\.firstPublishedAt/);
+  assert.match(source, /next\.publishedAt = currentData\.publishedAt/);
   assert.doesNotMatch(source, /publishedAt\s*=\s*.*updatedAt/);
 });
 

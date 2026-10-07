@@ -1,6 +1,7 @@
 import { before, beforeEach, after, test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { studioStaff } from "./staff-fixtures.mjs";
 import { initializeTestEnvironment, assertFails, assertSucceeds } from "@firebase/rules-unit-testing";
 import { collection, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, updateDoc, deleteDoc, writeBatch } from "firebase/firestore";
 let env;
@@ -10,8 +11,8 @@ before(async () => {
 beforeEach(async () => {
   await env.clearFirestore();
   await env.withSecurityRulesDisabled(async context => {
-    await setDoc(doc(context.firestore(), "admins", "studio"), { active: true });
-    await setDoc(doc(context.firestore(), "admins", "disabled"), { active: false });
+    await setDoc(doc(context.firestore(), "admins", "studio"), studioStaff());
+    await setDoc(doc(context.firestore(), "admins", "disabled"), studioStaff(false));
   });
 });
 after(async () => { await env?.cleanup(); });
@@ -21,6 +22,7 @@ function send(store, customerId, senderId, { first = false, role = "customer", b
   const message = doc(collection(parent, "messages"));
   const batch = writeBatch(store);
   batch.set(message, { senderId, senderRole: role, body, createdAt: serverTimestamp(), ...(productContext === undefined ? {} : { productContext }) });
+  if (role === "admin") batch.set(doc(store, "staffAudit", message.id), { actorUid: senderId, actorStaffId: "staff-studio", execution: "staff", targetCollection: "conversations", targetId: customerId, action: "reply", outcome: "committed", createdAt: serverTimestamp() });
   const summary = { lastMessageId: message.id, lastMessage: body, lastSenderRole: role, updatedAt: serverTimestamp() };
   if (first) batch.set(parent, { ...summary, customerId, customerName: "Customer", customerEmail: customerId + "@example.test", createdAt: serverTimestamp() });
   else batch.update(parent, summary);
@@ -68,7 +70,7 @@ test("unbounded queries are denied and revoked admins lose chat access", async (
   const studio = client("studio");
   await assertFails(getDocs(collection(studio, "conversations")));
   await assertFails(getDocs(query(collection(studio, "conversations/alice/messages"), limit(31))));
-  await env.withSecurityRulesDisabled(context => updateDoc(doc(context.firestore(), "admins/studio"), { active: false }));
+  await env.withSecurityRulesDisabled(context => updateDoc(doc(context.firestore(), "admins/studio"), studioStaff(false)));
   await assertFails(getDoc(doc(studio, "conversations/alice")));
   await assertFails(send(studio, "alice", "studio", { role: "admin" }));
 });
@@ -81,6 +83,16 @@ test("product tags persist above a message for its customer and admin only", asy
     assert.deepEqual(result.docs[0].data().productContext, productTag);
   }
   await assertFails(getDocs(query(collection(client("bob"), "conversations/alice/messages"), limit(30))));
+});
+test("staff reply audit preserves durable human attribution without disclosing it to customers", async () => {
+  await send(client("alice"), "alice", "alice", { first: true });
+  await send(client("studio"), "alice", "studio", { role: "admin" });
+  const messages = await getDocs(query(collection(client("alice"), "conversations/alice/messages"), limit(30)));
+  const reply = messages.docs.find(message => message.data().senderRole === "admin");
+  const evidence = await assertSucceeds(getDoc(doc(client("studio"), "staffAudit", reply.id)));
+  if (evidence.data().actorStaffId !== "staff-studio") throw new Error("Durable staff attribution missing");
+  await assertFails(getDoc(doc(client("alice"), "staffAudit", reply.id)));
+  await assertFails(updateDoc(evidence.ref, { actorStaffId: "other-human" }));
 });
 test("malformed or oversized product tags cannot bypass chat validation", async () => {
   for (const tag of [null, {}, { ...productTag, name: "x".repeat(241) }, { ...productTag, price: -1 }, { ...productTag, imageUrl: "javascript:alert(1)" }, { ...productTag, extra: true }]) {

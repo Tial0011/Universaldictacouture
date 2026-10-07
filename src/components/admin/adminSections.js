@@ -1,9 +1,13 @@
 export const ADMIN_SECTIONS = [
-  { path: "/admin/shop", label: "Shop", group: "Shop operations", description: "Manage products, merchandising, catalogue structure and Shop health from one workspace.", action: "Open Shop" },
-  { path: "/admin/homepage", label: "Homepage", group: "Website content", description: "Update, remove or delete homepage hero slides and their desktop/mobile images.", action: "Edit homepage" },
-  { path: "/admin/appearance", label: "Website Appearance", group: "Website content", description: "Update approved authentication imagery and other controlled website visuals.", action: "Edit appearance" },
-  { path: "/admin/reviews", label: "Customer reviews", group: "Website content", description: "Review customer feedback and choose what appears on the website.", action: "Manage reviews" },
-  { path: "/admin/chats", label: "Chats", group: "Customers", description: "Read customer messages and reply directly from your studio inbox.", action: "Open inbox" },
+  { path: "/admin/products", domain: "products", label: "Products", group: "Operations", description: "Open the authoritative Product workspace.", action: "Open Products" },
+  { path: "/admin/chats", domain: "chats", label: "Chats", group: "Operations", description: "Open currently accessible customer conversations.", action: "Open Chats" },
+  { path: "/admin/customers", domain: "customers", label: "Customers", group: "Operations", description: "Customer operational context from the Account owner.", action: "Open Customers" },
+  { path: "/admin/orders", domain: "orders", label: "Orders & Extensions", group: "Operations", description: "Order and Extension operational visibility.", action: "Open Orders" },
+  { path: "/admin/payments", domain: "payments", label: "Payments", group: "Operations", description: "Payment status and protected owner-workflow routing.", action: "Open Payments" },
+  { path: "/admin/custom-style", domain: "customStyle", label: "Custom Style", group: "Operations", description: "Custom Style operational context.", action: "Open Custom Style" },
+  { path: "/admin/homepage", domain: "content", label: "Homepage", group: "Website content", description: "Open the existing Homepage content workspace.", action: "Open Homepage" },
+  { path: "/admin/appearance", domain: "content", label: "Website Appearance", group: "Website content", description: "Open the existing controlled appearance workspace.", action: "Open Appearance" },
+  { path: "/admin/reviews", domain: "reviews", label: "Review & Feeds", group: "Website content", description: "Read permitted Review state and owner handoff context.", action: "Open Reviews" },
 ];
 
 export const SHOP_ADMIN_PATHS = ["/admin/shop", "/admin/products", "/admin/discovery", "/admin/taxonomy"];

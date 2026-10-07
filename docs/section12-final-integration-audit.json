@@ -1,0 +1,552 @@
+{
+  "verdict": "PARTIAL",
+  "lockCandidate": false,
+  "surfaceCount": 15,
+  "componentFamilyCount": 11,
+  "journeyCount": 12,
+  "surfaces": [
+    {
+      "number": 1,
+      "name": "Staff Sign-In",
+      "status": "PARTIAL",
+      "code": "src/components/admin/AdminAccess.jsx",
+      "reason": "Basic/current scoped entry verified; complete MFA/governance/provider/fresh-proof owner contract absent."
+    },
+    {
+      "number": 2,
+      "name": "Dashboard Home",
+      "status": "PARTIAL",
+      "code": "src/pages/admin/Dashboard/Dashboard.jsx",
+      "reason": "Backed attention-first metrics/event preview verified; urgent and full cross-domain sources missing."
+    },
+    {
+      "number": 3,
+      "name": "Attention Centre",
+      "status": "PARTIAL",
+      "code": "src/pages/admin/Operations/Operations.jsx",
+      "reason": "Current backed state/open/reconciliation verified; priority/age/durable triage/all-owner signals missing."
+    },
+    {
+      "number": 4,
+      "name": "Global Search",
+      "status": "PARTIAL",
+      "code": "src/pages/admin/Operations/GlobalSearch.jsx",
+      "reason": "Scoped loaded-page search/commands/current destination verified; complete indexes/owner reference sources missing."
+    },
+    {
+      "number": 5,
+      "name": "Search Results",
+      "status": "PARTIAL",
+      "code": "src/components/admin/OperationalViews.jsx",
+      "reason": "Grouped safe backed previews/current open verified; all-owner entity/reference coverage incomplete."
+    },
+    {
+      "number": 6,
+      "name": "Customer Directory",
+      "status": "EXTERNAL OWNER DEPENDENCY",
+      "code": "src/pages/admin/Operations/OwnerUnavailable.jsx",
+      "reason": "No trusted staff-safe current Account/Profile directory contract; unavailable is not empty."
+    },
+    {
+      "number": 7,
+      "name": "Customer Operational Summary",
+      "status": "EXTERNAL OWNER DEPENDENCY",
+      "code": "src/pages/admin/Operations/OwnerUnavailable.jsx",
+      "reason": "No durable Account/linked owner composition/private field/lifecycle source."
+    },
+    {
+      "number": 8,
+      "name": "Customer Support Edit",
+      "status": "EXTERNAL OWNER DEPENDENCY",
+      "code": "src/services/customerProfile.js",
+      "reason": "Existing self-only Profile writer is not an authorized staff support-edit workflow."
+    },
+    {
+      "number": 9,
+      "name": "Account Lifecycle Action",
+      "status": "EXTERNAL OWNER DEPENDENCY",
+      "code": "src/pages/admin/Operations/OwnerUnavailable.jsx",
+      "reason": "No dedicated restrict/delete/restore/recovery owner/fresh-proof/audit API."
+    },
+    {
+      "number": 10,
+      "name": "Attention Context Drawer",
+      "status": "VALIDATED BACKED",
+      "code": "src/components/admin/AttentionContext.jsx",
+      "reason": "Read-only current minimal context, desktop drawer/mobile sheet, current owner recheck/focus/deny/resolved states; unbacked domains remain unavailable."
+    },
+    {
+      "number": 11,
+      "name": "Recent Activity",
+      "status": "PARTIAL",
+      "code": "src/pages/admin/Operations/RecentActivity.jsx",
+      "reason": "Meaningful confirmed Product lifecycle subset; cross-domain/security/customer/system events missing."
+    },
+    {
+      "number": 12,
+      "name": "Audit History",
+      "status": "PARTIAL",
+      "code": "src/pages/admin/Operations/AuditHistory.jsx",
+      "reason": "Read-only current scoped Product/General Chat evidence; required other producers/history absent."
+    },
+    {
+      "number": 13,
+      "name": "Staff Menu",
+      "status": "VALIDATED BACKED",
+      "code": "src/components/navigation/AdminLayout.jsx",
+      "reason": "Current self identity/context/sign-out; no grant/role business override."
+    },
+    {
+      "number": 14,
+      "name": "Mobile Menu",
+      "status": "VALIDATED BACKED",
+      "code": "src/components/navigation/AdminLayout.jsx",
+      "reason": "Leading full-height native sheet, labelled navigation/focus/Escape; no persistent bottom bar."
+    },
+    {
+      "number": 15,
+      "name": "Restricted / Permission-Denied",
+      "status": "VALIDATED BACKED",
+      "code": "src/components/admin/StaffRoute.jsx",
+      "reason": "Current denial/read-only/unavailable distinction, no hidden record details, safe return and no unauthorized commit."
+    }
+  ],
+  "componentFamilies": [
+    {
+      "number": 1,
+      "name": "Filter Controls",
+      "status": "VALIDATED BACKED",
+      "code": "src/pages/admin/Operations/Operations.jsx",
+      "reason": "Labelled native controls/safe source/responsibility filters; no owner mutation."
+    },
+    {
+      "number": 2,
+      "name": "Navigation Item",
+      "status": "VALIDATED BACKED",
+      "code": "src/components/navigation/AdminLayout.jsx",
+      "reason": "Same capability-filtered NavLink family reused wide/rail/sheet."
+    },
+    {
+      "number": 3,
+      "name": "Metric Card",
+      "status": "VALIDATED BACKED",
+      "code": "src/components/admin/OperationalViews.jsx",
+      "reason": "Scoped source state/count/null/partial/current filtered destination."
+    },
+    {
+      "number": 4,
+      "name": "Attention Item",
+      "status": "VALIDATED BACKED",
+      "code": "src/components/admin/OperationalViews.jsx",
+      "reason": "Current owner minimal state/reason/open/preview; no guessed priority."
+    },
+    {
+      "number": 5,
+      "name": "Entity Row",
+      "status": "VALIDATED BACKED",
+      "code": "src/components/admin/OperationalViews.jsx",
+      "reason": "Shared safe record card/list projection, stable internal identity and no raw broad ID."
+    },
+    {
+      "number": 6,
+      "name": "Operational Table Row",
+      "status": "VALIDATED BACKED",
+      "code": "src/components/admin/RecordManager.jsx",
+      "reason": "Existing protected owner table transformed to labelled mobile rows/cards; native AX semantics checked."
+    },
+    {
+      "number": 7,
+      "name": "Customer Summary Header",
+      "status": "EXTERNAL OWNER DEPENDENCY",
+      "code": "src/pages/admin/Operations/OwnerUnavailable.jsx",
+      "reason": "Cannot render true identity/account/verification without owner source."
+    },
+    {
+      "number": 8,
+      "name": "Search Result",
+      "status": "VALIDATED BACKED",
+      "code": "src/components/admin/OperationalViews.jsx",
+      "reason": "Grouped safe minimum context + independently current exact open."
+    },
+    {
+      "number": 9,
+      "name": "Status / Priority Chip",
+      "status": "VALIDATED BACKED",
+      "code": "src/components/admin/StatusChip.jsx",
+      "reason": "Text-labelled state; optional priority only when owner supplies it; unknown not fabricated."
+    },
+    {
+      "number": 10,
+      "name": "Confirmation Component",
+      "status": "VALIDATED BACKED",
+      "code": "src/components/admin/Confirmation.jsx",
+      "reason": "Native labelled dialog, explicit cancellation/no-write and owner commit/result checks; not authority."
+    },
+    {
+      "number": 11,
+      "name": "Empty / Error / Stale State Component",
+      "status": "VALIDATED BACKED",
+      "code": "src/components/admin/OperationalState.jsx",
+      "reason": "Canonical privacy-safe state/retry/denial/unknown distinction across supported surfaces."
+    }
+  ],
+  "journeys": [
+    {
+      "number": 1,
+      "name": "Admin handles highest-priority work",
+      "status": "EXTERNAL OWNER DEPENDENCY",
+      "reason": "Authoritative priority/urgent/attention-start signal is absent. Routine updated work is not relabelled priority.",
+      "evidence": [
+        "tests/section12-browser-check.mjs",
+        "tests/section12-rules.test.mjs",
+        "src/pages/admin/Operations/OwnerUnavailable.jsx"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Dicta Couturier opens assigned work",
+      "status": "EXTERNAL OWNER DEPENDENCY",
+      "reason": "General Chat scoped assignment/revocation is verified, but transaction/Couturier eligibility/assigned owner-work relationship is absent.",
+      "evidence": [
+        "tests/section12-browser-check.mjs",
+        "tests/section12-rules.test.mjs",
+        "src/pages/admin/Operations/OwnerUnavailable.jsx"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Payment Proof submitted",
+      "status": "EXTERNAL OWNER DEPENDENCY",
+      "reason": "No Payment Record/private proof/review/current result owner pipeline.",
+      "evidence": [
+        "tests/section12-browser-check.mjs",
+        "tests/section12-rules.test.mjs",
+        "src/pages/admin/Operations/OwnerUnavailable.jsx"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Customer sends Order-Chat message",
+      "status": "EXTERNAL OWNER DEPENDENCY",
+      "reason": "General Chat logical send/receipt/history verified, but dedicated one-Main-Order Chat/lineage is absent.",
+      "evidence": [
+        "tests/section12-browser-check.mjs",
+        "tests/section12-rules.test.mjs",
+        "src/pages/admin/Operations/OwnerUnavailable.jsx"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Order becomes Staff-awaiting",
+      "status": "EXTERNAL OWNER DEPENDENCY",
+      "reason": "No authoritative Main Order/Extension operational state source.",
+      "evidence": [
+        "tests/section12-browser-check.mjs",
+        "tests/section12-rules.test.mjs",
+        "src/pages/admin/Operations/OwnerUnavailable.jsx"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Customer lookup",
+      "status": "EXTERNAL OWNER DEPENDENCY",
+      "reason": "No staff-safe Account/durable binding/directory/current historical composition source.",
+      "evidence": [
+        "tests/section12-browser-check.mjs",
+        "tests/section12-rules.test.mjs",
+        "src/pages/admin/Operations/OwnerUnavailable.jsx"
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Extension requires action",
+      "status": "EXTERNAL OWNER DEPENDENCY",
+      "reason": "No parent-linked Extension identity/owner/work source.",
+      "evidence": [
+        "tests/section12-browser-check.mjs",
+        "tests/section12-rules.test.mjs",
+        "src/pages/admin/Operations/OwnerUnavailable.jsx"
+      ]
+    },
+    {
+      "number": 8,
+      "name": "Product requires Attention",
+      "status": "VALIDATED BACKED",
+      "reason": "Actual missing-unit issue→metric→filtered Attention→current owner correction→exact immutable receipt→reconciled metric and stale-link check passed.",
+      "evidence": [
+        "tests/section12-browser-check.mjs",
+        "tests/section12-rules.test.mjs"
+      ]
+    },
+    {
+      "number": 9,
+      "name": "Review requires moderation",
+      "status": "EXTERNAL OWNER DEPENDENCY",
+      "reason": "Current Review state/closed operational context is backed, but canonical media/consent/version/moderation/result pipeline absent.",
+      "evidence": [
+        "tests/section12-browser-check.mjs",
+        "tests/section12-rules.test.mjs",
+        "src/pages/admin/Operations/OwnerUnavailable.jsx"
+      ]
+    },
+    {
+      "number": 10,
+      "name": "Restricted action attempt",
+      "status": "VALIDATED BACKED",
+      "reason": "Exact unauthorized Product context is denied without private fields; trusted raw mutation tests reject and no business write commits; safe return remains.",
+      "evidence": [
+        "tests/section12-browser-check.mjs",
+        "tests/section12-rules.test.mjs"
+      ]
+    },
+    {
+      "number": 11,
+      "name": "Task resolved by another Staff",
+      "status": "VALIDATED BACKED",
+      "reason": "Stale General Chat/Product source reread reconciles/removes obsolete Attention; no duplicate local action.",
+      "evidence": [
+        "tests/section12-browser-check.mjs",
+        "tests/section12-rules.test.mjs"
+      ]
+    },
+    {
+      "number": 12,
+      "name": "Mobile Staff handles urgent task",
+      "status": "EXTERNAL OWNER DEPENDENCY",
+      "reason": "Mobile shell/Attention/Product work supports current owner/reconciliation; no authoritative urgent/priority transaction signal exists to validate the named urgent journey.",
+      "evidence": [
+        "tests/section12-browser-check.mjs",
+        "tests/section12-rules.test.mjs",
+        "src/pages/admin/Operations/OwnerUnavailable.jsx"
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "C-01",
+      "severity": "CRITICAL",
+      "owner": "Section 16 staff governance/security + authentication provider",
+      "flows": [
+        "S12-M02-F01",
+        "S12-M02-F02",
+        "S12-M02-F06",
+        "S12-M02-F08",
+        "S12-M02-F09",
+        "S12-M02-F11",
+        "S12-M18-F15",
+        "S12-M18-F23",
+        "S12-M18-F24"
+      ],
+      "locations": [
+        "src/components/admin/AdminAccess.jsx",
+        "src/services/staffAuthorization.js",
+        "firestore.rules"
+      ],
+      "defect": "No complete verified unique-human provisioning/max-two Super Admin/complete six-scope/fresh-security-proof/MFA/governance lifecycle and security audit owner implementation.",
+      "correction": "Integrate the approved trusted staff identity/governance/factor/session provider contract; client membership writes remain closed. Configure/enroll/test required provider/fresh-proof paths without turning role labels into permission."
+    },
+    {
+      "id": "C-02",
+      "severity": "CRITICAL",
+      "owner": "Section 16 private data/media + Customer/Payment/Custom Style/Review owners",
+      "flows": [
+        "S12-M07-F10",
+        "S12-M09-F11",
+        "S12-M09-F12",
+        "S12-M11-F12",
+        "S12-M11-F13",
+        "S12-M13-F11",
+        "S12-M18-F11",
+        "S12-M18-F12",
+        "S12-M18-F13",
+        "S12-M18-F19",
+        "S12-M18-F20"
+      ],
+      "locations": [
+        "netlify/lib/image-storage.js",
+        "src/services/operations.js",
+        "firestore.rules"
+      ],
+      "defect": "Classified private storage/retrieval/field-purpose separation/revocation/relationship and consent pipeline absent. Existing image endpoint is public catalogue/content; summary field selection is not trusted field-level authorization.",
+      "correction": "Implement/integrate owner-approved private classifications and relationship-aware retrieval/withdrawal/retention; do not place private Customer/financial/tailoring bytes in public image storage or invent competing collections."
+    },
+    {
+      "id": "C-03",
+      "severity": "CRITICAL",
+      "owner": "Section 14 / Payment / transaction / Section 16",
+      "flows": [
+        "S12-M08-F02",
+        "S12-M08-F03",
+        "S12-M08-F11",
+        "S12-M09-F03",
+        "S12-M09-F11",
+        "S12-M09-F13",
+        "S12-M09-F15",
+        "S12-M18-F27",
+        "S12-M18-F28",
+        "S12-M18-F32",
+        "S12-M18-F33"
+      ],
+      "locations": [
+        "src/pages/admin/Operations/OwnerUnavailable.jsx",
+        "src/services/staffAuthorization.js",
+        "src/App.jsx"
+      ],
+      "defect": "Main Order/Entry/Original Snapshot/Edition/Extension, context-specific Payment obligation/private proof/ledger/review/correction and their owner history/destinations are not implemented.",
+      "correction": "Supply/integrate current owner services/reference/result/history contracts; preserve separate identities, immutable snapshots/Base-Extension ledgers and no Payment=fulfilment shortcut."
+    },
+    {
+      "id": "C-04",
+      "severity": "CRITICAL",
+      "owner": "Section 16 operation/recovery + consequential owners",
+      "flows": [
+        "S12-M16-F18",
+        "S12-M16-F22",
+        "S12-M15-F08",
+        "S12-M15-F09",
+        "S12-M15-F10",
+        "S12-M15-F11"
+      ],
+      "locations": [
+        "src/services/staffOperations.js",
+        "src/services/admin.js",
+        "src/services/chats.js",
+        "src/services/operationalActions.js"
+      ],
+      "defect": "Local exact handles/current immutable receipts are verified, but full durable cross-session/new-device operation/terminal rejection registry and owner Claim/assignment/conversion/escalation idempotency contracts are missing.",
+      "correction": "Integrate trusted durable intended-operation/result/rejection/reconciliation source and first-valid-owner writes; retain unresolved/no blind repeat where current receipt cannot establish noncommit."
+    },
+    {
+      "id": "H-01",
+      "severity": "HIGH",
+      "owner": "Section 11 / Section 16",
+      "flows": [
+        "S12-M07-F02",
+        "S12-M07-F05",
+        "S12-M07-F07",
+        "S12-M07-F17",
+        "S12-M07-F18",
+        "S12-M07-F19",
+        "S12-M19-F07",
+        "S12-M19-F08",
+        "S12-M19-F09",
+        "S12-M19-F10"
+      ],
+      "locations": [
+        "src/services/customerProfile.js",
+        "src/pages/admin/Operations/OwnerUnavailable.jsx",
+        "firestore.rules"
+      ],
+      "defect": "No staff-safe current Account/Profile/durable identity/lifecycle/directory/summary/support edit/recovery owner integration; self-only Profile fields cannot substitute.",
+      "correction": "Integrate exact existing owner identity/field-purpose/lifecycle/read/edit/audit contracts; do not infer Profile from transactions or use mutable display data as durable identity."
+    },
+    {
+      "id": "H-02",
+      "severity": "HIGH",
+      "owner": "Section 14 assignment + Custom Style/Chat + Section 16",
+      "flows": [
+        "S12-M11-F05",
+        "S12-M11-F07",
+        "S12-M11-F16",
+        "S12-M10-F12",
+        "S12-M10-F15",
+        "S12-M15-F09",
+        "S12-M15-F10",
+        "S12-M15-F31",
+        "S12-M19-F29"
+      ],
+      "locations": [
+        "src/services/operationalActions.js",
+        "src/services/chats.js",
+        "src/pages/admin/Operations/OwnerUnavailable.jsx"
+      ],
+      "defect": "No structured Custom Style request/conversion/provenance, eligible candidate/current assignment/claim/transfer/escalation or dedicated transaction Chat owner system.",
+      "correction": "Integrate explicit owner state/eligibility/version/history/result; no sole-eligible automatic assignment, Chat clone/relabel or privilege through escalation."
+    },
+    {
+      "id": "H-03",
+      "severity": "HIGH",
+      "owner": "Section 13 / Section 16 / Review-media provenance",
+      "flows": [
+        "S12-M12-F07",
+        "S12-M12-F08",
+        "S12-M12-F17",
+        "S12-M12-F19",
+        "S12-M20-F10"
+      ],
+      "locations": [
+        "src/components/admin/RecordManager.jsx",
+        "src/services/admin.js",
+        "firestore.rules"
+      ],
+      "defect": "Complete private Working/Live/revision/readiness/Preview/Publish/media/retention and consent-aware Review-derived Product Draft owner pipeline missing; legacy publication/purge remains safely blocked.",
+      "correction": "Integrate complete owner revisions/media/consent/readiness and revision-pinned protected publication; validate history/deletion eligibility before reopening blocked paths."
+    },
+    {
+      "id": "H-04",
+      "severity": "HIGH",
+      "owner": "Review-media / Section 15 / Section 16",
+      "flows": [
+        "S12-M13-F04",
+        "S12-M13-F05",
+        "S12-M13-F12",
+        "S12-M13-F22",
+        "S12-M18-F30",
+        "S12-M18-F34",
+        "S12-M19-F36"
+      ],
+      "locations": [
+        "src/pages/admin/Operations/ReviewContext.jsx",
+        "src/services/admin.js",
+        "firestore.rules"
+      ],
+      "defect": "Canonical consent/version/private media/report/moderation/handoff/history/notification-content issue sources missing. Legacy Review writes are closed; existing policy notices are not positive consent implementation.",
+      "correction": "Integrate four independently purpose-bound rights/current version/audit/private retrieval and idempotent Product handoff; no automatic publication/commercialization."
+    },
+    {
+      "id": "H-05",
+      "severity": "HIGH",
+      "owner": "Section 16 projections/indexes + operational owners",
+      "flows": [
+        "S12-M05-F07",
+        "S12-M05-F08",
+        "S12-M05-F12",
+        "S12-M06-F17",
+        "S12-M14-F06",
+        "S12-M14-F16",
+        "S12-M16-F32",
+        "S12-M19-F28",
+        "S12-M19-F39"
+      ],
+      "locations": [
+        "src/services/operationsModel.js",
+        "src/services/operationalSearch.js",
+        "src/services/operationalActivity.js"
+      ],
+      "defect": "Full human-readable references/permission-filtered indexes/aggregate counts/urgent priority/Attention start/unread and cross-domain meaningful events are absent; bounded loaded-page/receipt subset is explicit.",
+      "correction": "Integrate trusted owner projections/reference resolvers and reconcile sources before count/autocomplete; no fake urgency/age/unread/zero or noisy updatedAt feed."
+    },
+    {
+      "id": "H-06",
+      "severity": "HIGH",
+      "owner": "Section 16 reliability/security + applicable owners",
+      "flows": [
+        "S12-M18-F21",
+        "S12-M18-F25",
+        "S12-M18-F26",
+        "S12-M18-F27",
+        "S12-M18-F28",
+        "S12-M18-F30",
+        "S12-M18-F35"
+      ],
+      "locations": [
+        "netlify/lib/image-storage.js",
+        "firestore.rules",
+        "src/pages/admin/Operations/AuditHistory.jsx"
+      ],
+      "defect": "Distributed rate/abuse controls and complete authentication/governance/lifecycle/financial/assignment/moderation audit/retention/recovery producers are not implemented.",
+      "correction": "Integrate trusted abuse budgets and protected minimized owner audit/history; recent activity/logs/client debounce do not substitute."
+    }
+  ],
+  "validationBoundary": "Local synthetic emulator/browser code checked. Cloud headers/indexes/rules/grants/provider configuration not deployed or claimed verified."
+}

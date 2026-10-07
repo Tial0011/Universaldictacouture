@@ -13,11 +13,11 @@ const discovery = await readFile(new URL("../src/pages/admin/Discovery/Discovery
 const shopBy = await readFile(new URL("../src/services/shopBy.js", import.meta.url), "utf8");
 const rules = await readFile(new URL("../firestore.rules", import.meta.url), "utf8");
 
-test("Task 8A/retroactive refinement: protected admin routing exposes one consolidated Shop entry", () => {
+test("Protected Product owner routing retains the existing workspace", () => {
   assert.match(app, /<AdminAccess>[\s\S]*<AdminLayout \/>/);
-  assert.match(app, /path="shop" element=\{<AdminShop \/>\}/);
-  assert.match(sections, /label: "Shop"/);
-  assert.match(sections, /Shop operations/);
+  assert.match(app, /path="shop" element=\{<StaffRoute domain="products"><AdminShop \/>/);
+  assert.match(sections, /label: "Products"/);
+  assert.match(sections, /domain: "products"/);
   assert.match(layout, /isShopAdminPath/);
   assert.match(layout, /ShopWorkspaceNav/);
 });
@@ -39,8 +39,9 @@ test("Task 8A: Product Manager surfaces readiness, New In and safe public previe
   assert.match(manager, /new-in/);
   assert.match(manager, /View in Shop/);
   assert.match(manager, /record\.status === "published"/);
-  assert.match(manager, /saveProductLifecycle\("published"\)/);
-  assert.match(manager, /saveProductLifecycle\("draft"\)/);
+  assert.match(manager, /Publish and Update Live are unavailable/);
+  assert.match(manager, /saveProductLifecycle\("unpublished"\)/);
+  assert.match(manager, /Restore to Unpublished/);
   assert.match(manager, /saveProductLifecycle\("archived"\)/);
 });
 
@@ -69,8 +70,8 @@ test("Task 8A: admin accessibility/responsiveness keeps focus and reduced-motion
 });
 
 test("Task 8A: Firestore keeps admin writes protected and excludes Size from Shop V1 taxonomy writes", () => {
-  assert.match(rules, /function isAdmin\(\)/);
-  assert.match(rules, /allow create, update: if isAdmin\(\)/);
+  assert.match(rules, /function canStaff\(/);
+  assert.match(rules, /allow create, update: if canStaff\(/);
   assert.match(rules, /dimension in \['category', 'occasion', 'style', 'fabric', 'colour'\]/);
   assert.match(rules, /request\.resource\.data\.unitLabel is string/);
   assert.doesNotMatch(rules, /dimension in \[[^\]]*'size'/);

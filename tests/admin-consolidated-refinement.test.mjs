@@ -10,7 +10,6 @@ const workspace = await readFile(new URL("../src/components/admin/ShopWorkspaceN
 const app = await readFile(new URL("../src/App.jsx", import.meta.url), "utf8");
 const manager = await readFile(new URL("../src/components/admin/RecordManager.jsx", import.meta.url), "utf8");
 const adminService = await readFile(new URL("../src/services/admin.js", import.meta.url), "utf8");
-const imageService = await readFile(new URL("../src/services/imageStorage.js", import.meta.url), "utf8");
 const imageModel = await readFile(new URL("../src/services/imageStorageModel.js", import.meta.url), "utf8");
 const imageHandler = await readFile(new URL("../netlify/lib/image-storage.js", import.meta.url), "utf8");
 const rules = await readFile(new URL("../firestore.rules", import.meta.url), "utf8");
@@ -33,22 +32,22 @@ const product = {
   status: "draft",
 };
 
-test("consolidated admin renders one global Shop entry and keeps Shop operations inside the workspace", () => {
-  const shopPathOccurrences = sections.match(/path: "\/admin\/shop"/g) || [];
+test("Admin exposes one Product owner entry and preserves the owner workspace", () => {
+  const shopPathOccurrences = sections.match(/path: "\/admin\/products"/g) || [];
   assert.equal(shopPathOccurrences.length, 1);
-  assert.doesNotMatch(sections, /label: "Products"/);
+  assert.match(sections, /label: "Products"/);
   assert.doesNotMatch(sections, /label: "Shop By"/);
   assert.doesNotMatch(sections, /label: "Categories & attributes"/);
   assert.match(layout, /isShopAdminPath/);
   assert.match(layout, /ShopWorkspaceNav/);
-  for (const label of ["Overview", "Products", "New In", "Shop By", "Catalogue Structure", "Search \/ Keywords", "Shop Health"]) assert.match(workspace, new RegExp(label));
+  for (const label of ["Overview", "Products", "New In", "Shop By", "Catalogue Structure", "Search / Keywords", "Shop Health"]) assert.match(workspace, new RegExp(label));
 });
 
 test("legacy Shop admin routes remain directly routable", () => {
-  assert.match(app, /path="shop" element=\{<AdminShop \/>\}/);
-  assert.match(app, /path="products" element=\{<AdminProducts \/>\}/);
-  assert.match(app, /path="discovery" element=\{<AdminDiscovery \/>\}/);
-  assert.match(app, /path="taxonomy" element=\{<AdminTaxonomy \/>\}/);
+  assert.match(app, /path="shop" element=\{<StaffRoute domain="products"><AdminShop \/>/);
+  assert.match(app, /path="products" element=\{<StaffRoute domain="products"><AdminProducts \/>/);
+  assert.match(app, /path="discovery" element=\{<StaffRoute domain="content"><AdminDiscovery \/>/);
+  assert.match(app, /path="taxonomy" element=\{<StaffRoute domain="content"><AdminTaxonomy \/>/);
 });
 
 test("product list opens a real existing record and provides practical loaded-record filtering and sorting", () => {
@@ -79,15 +78,9 @@ test("existing product reclassification and merchandising do not require recreat
   assert.match(manager, /Feature in New In|isNewIn/);
 });
 
-test("permanent product deletion is deliberate and uses the product deletion service", () => {
-  assert.match(manager, /Delete Product/);
-  assert.match(manager, /Delete “\{record\.name/);
-  assert.match(manager, /cannot be undone/);
-  assert.match(manager, /Delete permanently/);
-  assert.match(manager, /deleteProductPermanently/);
-  assert.match(adminService, /\["products", "reviews", "heroSlides"\]/);
-  assert.match(adminService, /await deleteAdminRecord\("products", record\.id\)/);
-  assert.match(adminService, /cleanupOwnedProductImages/);
+test("unverified historical Product deletion paths are removed", () => {
+  assert.doesNotMatch(manager, /Delete Product|Delete permanently|deleteProductPermanently/);
+  assert.match(adminService, /historical-reference and media-retention eligibility/);
 });
 
 test("owned media cleanup only targets Netlify-managed UUID WebP keys and ignores legacy/external media", () => {
@@ -105,13 +98,14 @@ test("owned media cleanup only targets Netlify-managed UUID WebP keys and ignore
   assert.match(imageHandler, /request\.method === "DELETE"/);
   assert.match(imageHandler, /KEY\.test\(key\)/);
   assert.match(imageHandler, /await authorize\(request\)/);
-  assert.match(imageHandler, /await getStore\(\)\.delete\(key\)/);
+  assert.match(imageHandler, /Physical deletion requires reference-aware media cleanup/);
 });
 
-test("Firestore permits product deletion only through the existing active-admin gate", () => {
+test("Firestore denies Product deletion until current owner eligibility exists", () => {
   const productBlock = rules.match(/match \/products\/\{productId\} \{[\s\S]*?\n    \}/)?.[0] || "";
-  assert.match(productBlock, /allow delete: if isAdmin\(\);/);
-  assert.match(rules, /function isAdmin\(\)/);
+  assert.match(productBlock, /allow delete: if false;/);
+  assert.match(rules, /function canStaff\(/);
+  assert.doesNotMatch(rules, /function isAdmin\(/);
   assert.doesNotMatch(productBlock, /allow delete: if true/);
 });
 
@@ -119,7 +113,8 @@ test("Task 8A/9A safeguards remain intact", () => {
   assert.equal(productReadiness({ ...product, unitLabel: "" }).ready, false);
   assert.doesNotMatch(manager, /Size filter/);
   assert.match(manager, /Publication readiness/);
-  assert.match(manager, /saveProductLifecycle\("published"\)/);
+  assert.match(manager, /Publish and Update Live are unavailable/);
+  assert.doesNotMatch(manager, /onClick=\{\(\) => saveProductLifecycle\("published"\)\}/);
   assert.match(manager, /saveProductLifecycle\("archived"\)/);
   assert.match(manager, /Manage Shop By groups & choices/);
 });
