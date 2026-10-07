@@ -26,8 +26,8 @@ export default function AdminAccess({ children }) {
   useDocumentMeta({ title: "Admin | Universal Dicta Couture", noindex: true });
   useEffect(() => {
     let current = true;
-    const stop = uid && !framed ? watchStaffAccess(uid, (staff, state = "verified") => {
-      if (current) { setError(""); setAccess({ uid, staff, state, checked: state !== "checking" }); }
+    const stop = uid && !framed ? watchStaffAccess(uid, (staff, state = "verified", membershipState) => {
+      if (current) { setError(""); setAccess({ uid, staff, state, membershipState, checked: state !== "checking" }); }
     }, error => {
       if (current) { setError(adminError(error)); setAccess({ uid, staff: null, state: runtimeErrorState(error), checked: true }); }
     }) : undefined;
@@ -61,7 +61,7 @@ export default function AdminAccess({ children }) {
       {!isFirebaseConfigured ? <p>Admin sign-in is not connected yet. Complete the Firebase setup in the admin setup guide to get started.</p>
         : checking ? <OperationalState state="checking" message="Please wait while we check your current session and Staff Access." />
         : user || sessionUnavailable ? <>
-          <OperationalState state={entryState} message={sessionState === "revoked" ? "Current provider session authority was revoked. Staff authority cannot be established from this session." : entryState === "connection-problem" ? runtimeStateMessage("connection-problem") : access.state === "source-unavailable" ? "Current staff authority source is unavailable. This is not an inactive-membership conclusion." : entryState === "inactive" ? "Current staff access is inactive. Protected work is unavailable." : entryState === "unresolved" ? "Current staff account context could not be established. No protected work has been opened." : "Current staff identity/access is restricted or inactive. Protected work is unavailable until current access is established."} />
+          <OperationalState state={entryState} message={sessionState === "revoked" ? "Current provider session authority was revoked. Staff authority cannot be established from this session." : entryState === "connection-problem" ? runtimeStateMessage("connection-problem") : access.state === "source-unavailable" ? "Current staff authority source is unavailable. This is not an inactive-membership conclusion." : access.membershipState === "awaiting-migration" ? "This admin membership is awaiting completion of Staff migration. Its partial canonical fields require review before access can be established." : access.membershipState === "no-membership" ? "No current admin membership is available for this account. No protected staff context has been opened." : entryState === "inactive" ? "Current staff access is inactive. Protected work is unavailable." : entryState === "unresolved" ? "Current staff account context could not be established. No protected work has been opened." : "Current staff membership could not establish access. No protected work has been opened."} />
           <div className="admin-actions"><Button onClick={() => { setError(""); setAccess({ uid: null, staff: null, checked: false }); setAttempt(v => v + 1); }}>Check again</Button>
           <Button variant="secondary" isLoading={busy} onClick={logout}>Sign out</Button></div>
         </> : <>

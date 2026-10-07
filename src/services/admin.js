@@ -1,5 +1,5 @@
 import { collection, deleteDoc, doc, getCountFromServer, getDocFromServer, getDocsFromServer, onSnapshot, query, orderBy, documentId, limit, startAfter, runTransaction, serverTimestamp, where } from "firebase/firestore";
-import { allows, currentStaff, safeOperationalId } from "./staffAuthorization";
+import { allows, currentStaff, safeOperationalId, normalizeStaffMembership, staffMembershipState } from "./staffAuthorization";
 import { ownsCommittedReceipt, protectedWriteDeadline, currentReadDeadline } from "./operationalRuntime";
 import { loadScopedOwnerPage, readCurrentStaff } from "./operations";
 import { milliseconds, reconcileUnknown } from "./operationsModel";
@@ -16,22 +16,26 @@ function target(kind) {
 export async function checkAdmin(uid) {
   if (!db) return false;
   const snapshot = await getDocFromServer(doc(db, "admins", uid));
-  return snapshot.exists() && currentStaff(snapshot.data());
+  return snapshot.exists() && currentStaff(normalizeStaffMembership(uid, snapshot.data()));
 }
 export function watchStaffAccess(uid, next, error) {
   if (!db) { next(null); return () => {}; }
   const reference = doc(db, "admins", uid);
   let live = true;
   let generation = 0;
+  const publishMembership = snapshot => {
+    const raw = snapshot.exists() ? snapshot.data() : null;
+    next(normalizeStaffMembership(uid, raw), "verified", staffMembershipState(uid, raw));
+  };
   const refresh = () => {
     const version = ++generation;
     return getDocFromServer(reference).then(snapshot => {
-      if (live && generation === version) next(snapshot.exists() ? snapshot.data() : null, "verified");
+      if (live && generation === version) publishMembership(snapshot);
     }).catch(reason => { if (live && generation === version) error(reason); });
   };
   const stop = onSnapshot(reference, { includeMetadataChanges: true }, snapshot => {
     // Cached membership is never a current authorization handoff.
-    if (live) { generation++; next(!snapshot.metadata.fromCache && snapshot.exists() ? snapshot.data() : null, snapshot.metadata.fromCache ? "checking" : "verified"); }
+    if (live) { generation++; if (snapshot.metadata.fromCache) next(null, "checking"); else publishMembership(snapshot); }
   }, error);
   const visibility = () => { if (document.visibilityState === "visible") { next(null, "checking"); void refresh(); } };
   const pageRestore = event => { if (event.persisted) visibility(); };
@@ -104,7 +108,8 @@ export async function saveAdminRecord(kind, raw, { action = "save" } = {}) {
       const membership = await transaction.get(doc(db, "admins", staff.principalUid));
       const current = await transaction.get(reference);
       const currentData = current.data() || {};
-      if (!authorized(membership.data())) throw Object.assign(new Error("Access changed."), { code: "permission-denied" });
+      const currentMembership = normalizeStaffMembership(staff.principalUid, membership.exists() ? membership.data() : null);
+      if (!authorized(currentMembership) || currentMembership.staffId !== staff.staffId) throw Object.assign(new Error("Access changed."), { code: "permission-denied" });
       if (raw.id && (!current.exists() || (raw._version || 0) !== (currentData._version || 0) || milliseconds(raw.updatedAt) !== milliseconds(currentData.updatedAt))) throw Object.assign(new Error("This record changed elsewhere. Refresh and review current state before saving."), { code: "aborted" });
       const next = { ...data, _version: (currentData._version || 0) + 1, _lastOperationId: receipt.id, updatedAt: serverTimestamp() };
       if (!current.exists()) next.createdAt = serverTimestamp();

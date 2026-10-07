@@ -1,4 +1,33 @@
 // Shared presentation/Netlify policy. Firestore independently enforces this contract.
+// TEMPORARY OWNER-AUTHORIZED DEVELOPMENT BRIDGE. Remove only after every
+// production admins/{uid} membership has reviewed canonical identity/grants.
+export const LEGACY_DEVELOPMENT_ADMIN_MODE = "legacy-development-admin";
+export const DEVELOPMENT_LEGACY_ADMIN_CAPABILITIES = Object.freeze(Object.fromEntries([
+  ...["read", "create", "edit", "commercial", "media", "discovery", "unpublish", "archive", "restore"].map(action => [`products.${action}`, "catalogue"]),
+  ...["read", "edit", "delete"].map(action => [`content.${action}`, "content"]),
+  ["reviews.read", "moderation"], ["chats.read", "customer-service"], ["chats.reply", "customer-service"],
+  ["media.upload", "public-media"], ["audit.read", "audit"], ["operations.reconcile", "operation-result"],
+  ["customers.read", "customer-support"], ["orders.read", "order-operations"], ["payments.read", "payment-operations"], ["customStyle.read", "custom-style"],
+].map(([capability, purpose]) => [capability, Object.freeze({ domainWide: Object.freeze({ active: true, purpose }) })])));
+
+function legacyDevelopmentMembership(raw) {
+  return raw?.active === true && !Object.hasOwn(raw, "staffId") && !Object.hasOwn(raw, "capabilities");
+}
+export function normalizeStaffMembership(uid, rawAdminRecord) {
+  if (!safeOperationalId(uid) || !rawAdminRecord || typeof rawAdminRecord !== "object" || Array.isArray(rawAdminRecord)) return null;
+  if (currentStaff(rawAdminRecord) || rawAdminRecord.active !== true) return rawAdminRecord;
+  if (!legacyDevelopmentMembership(rawAdminRecord)) return null;
+  // Session/audit alias for the same existing principal, NOT a persisted new
+  // Staff Identity. Never write this effective object back to admins/{uid}.
+  return { ...rawAdminRecord, staffId: `legacy-dev:${uid}`, capabilities: DEVELOPMENT_LEGACY_ADMIN_CAPABILITIES, compatibilityMode: LEGACY_DEVELOPMENT_ADMIN_MODE };
+}
+export function staffMembershipState(uid, raw) {
+  if (!raw) return "no-membership";
+  if (raw.active === false) return "inactive";
+  if (raw.active !== true) return "invalid-membership";
+  if (currentStaff(raw)) return "canonical";
+  return currentStaff(normalizeStaffMembership(uid, raw)) ? LEGACY_DEVELOPMENT_ADMIN_MODE : "awaiting-migration";
+}
 export const SCOPE_FAMILIES = ["domainWide", "assignmentDerived", "selectedObject", "queueSubset", "dataPurpose", "governance"];
 export const DOMAIN_CONTRACTS = {
   products: { label: "Products", purpose: "catalogue", collection: "products", path: "/admin/products" },
@@ -45,7 +74,7 @@ export function canDiscover(staff, domain) {
     || (domain === "chats" && route.family === "assignmentDerived")));
 }
 export function staffFingerprint(staff) {
-  return JSON.stringify([staff?.staffId, staff?.active, staff?.capabilities || {}]);
+  return JSON.stringify([staff?.staffId, staff?.active, staff?.capabilities || {}, staff?.compatibilityMode || null]);
 }
 export function firestoreFields(fields = {}) {
   return Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, decode(value)]));

@@ -2,7 +2,7 @@
 
 Open `/admin`. The admin uses the existing wine, ivory, gold, Cormorant Garamond and Inter design system.
 
-Section 12 now requires durable Staff Identity and explicit capability/purpose/scope grants. Read [the access contract](section12-access-contract.md) and [the implementation verdict](section12-implementation-verdict.md) before rollout. A legacy `active: true` membership alone grants no business authority. Production deployment and real membership changes were not performed during implementation.
+Section 12's final architecture requires durable Staff Identity and explicit capability/purpose/scope grants. The owner's temporary development decision now preserves existing active legacy `admins/{uid}` memberships through the central [development compatibility bridge](admin-development-compatibility.md). Only memberships with **both** `staffId` and `capabilities` absent qualify; canonical and partial-migration records never receive fallback grants. Firebase authentication and current server membership checks remain required. This is not customer access or a permanent Staff migration. Read [the access contract](section12-access-contract.md) before rollout. Production deployment and real membership changes were not performed during this repair.
 
 ## Firebase Spark
 
@@ -58,7 +58,7 @@ Rules and service integration need to be verified against your project before pr
 
 ## Customer and admin chat
 
-The existing general Chat is retained. Staff need independent current `chats.read` and `chats.reply` grants in `customer-service` purpose and applicable resource scope. Membership alone does not grant either. Dedicated Main Order Chats and owner assignment workflows remain external dependencies.
+The existing general Chat is retained. Canonical Staff need independent current `chats.read` and `chats.reply` grants in `customer-service` purpose and applicable resource scope. Eligible legacy development memberships receive those specific effective grants from the temporary central bridge. Dedicated Main Order Chats and owner assignment workflows remain external dependencies.
 
 1. Send a message as a customer and open that conversation in the admin inbox.
 2. Reply as an admin and confirm that the reply appears for the customer without reloading.

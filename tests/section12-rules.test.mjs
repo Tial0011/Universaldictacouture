@@ -22,9 +22,10 @@ beforeEach(async () => {
 });
 after(async () => { await env?.cleanup(); });
 const client = uid => env.authenticatedContext(uid, { email: uid + "@example.test" }).firestore();
-test("legacy active membership and governance title give no business access", async () => {
+test("owner-authorized legacy development membership reads existing Admin domains, not protected customer truth or governance writes", async () => {
   const store = client("legacy");
-  for (const path of ["products/p1", "conversations/c1", "conversations/c1/messages/m", "customerProfiles/other", "payments/p"]) await assertFails(getDoc(doc(store, path)));
+  for (const path of ["products/p1", "conversations/c1", "conversations/c1/messages/m"]) await assertSucceeds(getDoc(doc(store, path)));
+  for (const path of ["customerProfiles/other", "payments/p"]) await assertFails(getDoc(doc(store, path)));
   await assertFails(setDoc(doc(store, "admins/legacy"), studioStaff()));
 });
 test("selected object queries cannot widen into full-domain discovery", async () => {

@@ -1,7 +1,7 @@
 import { collection, doc, documentId, getDocFromServer, getDocsFromServer, limit, orderBy, query, startAfter, where } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { auth } from "../firebase/auth";
-import { authorizationRoutes, currentStaff, DOMAIN_CONTRACTS, firestoreFields, safeOperationalId } from "./staffAuthorization";
+import { authorizationRoutes, currentStaff, DOMAIN_CONTRACTS, firestoreFields, safeOperationalId, normalizeStaffMembership } from "./staffAuthorization";
 import { authorizeSummary, operationalSummary } from "./operationsModel";
 import { activityPlans, activityEvent } from "./operationalActivity";
 import { currentReadDeadline } from "./operationalRuntime";
@@ -11,7 +11,7 @@ export async function readCurrentStaff() {
   const user = auth?.currentUser;
   if (!db || !user) throw Object.assign(new Error("Current staff access is unavailable."), { code: "permission-denied" });
   const snapshot = await currentReadDeadline(getDocFromServer(doc(db, "admins", user.uid)));
-  const staff = snapshot.exists() ? snapshot.data() : null;
+  const staff = normalizeStaffMembership(user.uid, snapshot.exists() ? snapshot.data() : null);
   if (auth.currentUser?.uid !== user.uid || !currentStaff(staff)) throw Object.assign(new Error("Current staff access is unavailable."), { code: "permission-denied" });
   return { ...staff, principalUid: user.uid };
 }

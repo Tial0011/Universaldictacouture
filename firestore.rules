@@ -1,14 +1,38 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // OWNER-AUTHORIZED ACTIVE-DEVELOPMENT COMPATIBILITY ONLY.
+    // Remove with the JS adapter after every existing admin is canonically migrated.
+    // Canonical/partial records never receive legacy fallback grants.
+    function legacyDevelopmentMembership(staff) {
+      return staff.get('active', false) == true && !staff.keys().hasAny(['staffId', 'capabilities']);
+    }
+    function legacyDevelopmentCapability(capability, purpose) {
+      return (purpose == 'catalogue' && capability in ['products.read', 'products.create', 'products.edit', 'products.commercial', 'products.media', 'products.discovery', 'products.unpublish', 'products.archive', 'products.restore'])
+        || (purpose == 'content' && capability in ['content.read', 'content.edit', 'content.delete'])
+        || (purpose == 'customer-service' && capability in ['chats.read', 'chats.reply'])
+        || (purpose == 'moderation' && capability == 'reviews.read')
+        || (purpose == 'public-media' && capability == 'media.upload')
+        || (purpose == 'audit' && capability == 'audit.read')
+        || (purpose == 'operation-result' && capability == 'operations.reconcile')
+        || (purpose == 'customer-support' && capability == 'customers.read')
+        || (purpose == 'order-operations' && capability == 'orders.read')
+        || (purpose == 'payment-operations' && capability == 'payments.read')
+        || (purpose == 'custom-style' && capability == 'customStyle.read');
+    }
+    function effectiveStaffId() {
+      let staff = get(/databases/$(database)/documents/admins/$(request.auth.uid)).data;
+      return legacyDevelopmentMembership(staff) ? 'legacy-dev:' + request.auth.uid : staff.get('staffId', '');
+    }
     // Provider binding lives at the existing membership path; staffId is durable
     // UDC identity. Role labels never grant data or business authority.
     function isStaff() {
       return request.auth != null
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
         && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true
-        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.get('staffId', '') is string
-        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.get('staffId', '').size() > 0;
+        && (legacyDevelopmentMembership(get(/databases/$(database)/documents/admins/$(request.auth.uid)).data)
+          || (get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.get('staffId', '') is string
+            && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.get('staffId', '').size() > 0));
     }
     function validRoute(route, purpose) {
       return route.get('active', false) == true && route.get('purpose', '') == purpose;
@@ -21,9 +45,10 @@ service cloud.firestore {
       let selected = grant.get('selectedObject', {});
       let assigned = grant.get('assignmentDerived', {});
       return isStaff() && (
-        validRoute(broad, purpose)
+        (legacyDevelopmentMembership(staff) && legacyDevelopmentCapability(capability, purpose))
+        || validRoute(broad, purpose)
         || (validRoute(selected, purpose) && objectId in selected.get('ids', []))
-        || (validRoute(assigned, purpose) && assignedStaffId != '' && assignedStaffId == staff.staffId));
+        || (validRoute(assigned, purpose) && assignedStaffId != '' && assignedStaffId == effectiveStaffId()));
     }
     function validAudit(targetCollection, targetId) {
       let id = request.resource.data.get('_lastOperationId', '');
@@ -31,7 +56,7 @@ service cloud.firestore {
       let audit = getAfter(path).data;
       return id != '' && !exists(path)
         && audit.actorUid == request.auth.uid
-        && audit.actorStaffId == get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.staffId
+        && audit.actorStaffId == effectiveStaffId()
         && audit.targetCollection == targetCollection && audit.targetId == targetId
         && audit.createdAt == request.time && audit.outcome == 'committed';
     }
@@ -45,14 +70,14 @@ service cloud.firestore {
           && message.senderId == request.auth.uid && message.senderRole == 'admin' && message.createdAt == request.time;
       }
       allow get: if isStaff() && ((resource.data.actorUid == request.auth.uid
-        && resource.data.actorStaffId == get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.staffId
+        && resource.data.actorStaffId == effectiveStaffId()
         && canStaff('operations.reconcile', 'operation-result', eventId, '')) || canStaff('audit.read', 'audit', eventId, ''));
       allow list: if canStaff('audit.read', 'audit', eventId, '') && request.query.limit <= 20;
       allow create: if isStaff()
         && (canStaff('operations.reconcile', 'operation-result', eventId, '') || canStaff('audit.read', 'audit', eventId, ''))
         && request.resource.data.keys().hasOnly(['actorUid', 'actorStaffId', 'execution', 'targetCollection', 'targetId', 'action', 'outcome', 'createdAt'])
         && request.resource.data.actorUid == request.auth.uid
-        && request.resource.data.actorStaffId == get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.staffId
+        && request.resource.data.actorStaffId == effectiveStaffId()
         && request.resource.data.execution == 'staff'
         && request.resource.data.outcome == 'committed'
         && request.resource.data.createdAt == request.time
@@ -72,7 +97,9 @@ service cloud.firestore {
         let grant = grants.get(capability, {});
         let broad = grant.get('domainWide', {});
         let selected = grant.get('selectedObject', {});
-        return validRoute(broad, 'catalogue') || (validRoute(selected, 'catalogue') && productId in selected.get('ids', []));
+        let membership = get(/databases/$(database)/documents/admins/$(request.auth.uid)).data;
+        return (legacyDevelopmentMembership(membership) && legacyDevelopmentCapability(capability, 'catalogue'))
+          || validRoute(broad, 'catalogue') || (validRoute(selected, 'catalogue') && productId in selected.get('ids', []));
       }
       function productFieldsAuthorized(grants) {
         let current = request.method == 'create' ? {} : resource.data;
@@ -276,7 +303,7 @@ service cloud.firestore {
         function staffReplyAudited() {
           let evidence = getAfter(/databases/$(database)/documents/staffAudit/$(messageId)).data;
           return evidence.actorUid == request.auth.uid
-            && evidence.actorStaffId == get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.staffId
+            && evidence.actorStaffId == effectiveStaffId()
             && evidence.targetCollection == 'conversations' && evidence.targetId == customerId
             && evidence.action == 'reply' && evidence.createdAt == request.time;
         }

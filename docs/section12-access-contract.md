@@ -4,6 +4,8 @@ The current implementation retains Firebase Authentication, Firestore, the exist
 
 ## Current access shape
 
+Owner-authorized development exception (2026-10-07): existing active legacy `admins/{uid}` memberships lacking **both** canonical fields use the centralized `legacy-development-admin` adapter and matching Firestore bridge. See [the compatibility contract and rollout](admin-development-compatibility.md). No role string creates access, no membership is persisted by the adapter, and canonical/partially migrated records do not acquire fallback grants. The strict canonical contract below remains the final architecture, not a prerequisite that locks legitimate unmigrated development admins out during this bridge period.
+
 Final current evidence is `section12-final-implementation-verdict.md`, `section12-final-coverage.json`, `section12-final-integration-audit.json` and `section12-part4-coverage.json`: 20 modules/501 official dispositions with implementation lock withheld. Prior 321-flow accounting is historical; current product architecture is locked but missing positive owner/security/history behavior is not code PASS.
 
 `active` means current Staff Access. It does not grant business permission. `staffId` is the durable UDC human attribution identity; a provider UID is its login binding. A role/title, assignment, Function as Couturier, eligibility or availability does not independently authorize an action.

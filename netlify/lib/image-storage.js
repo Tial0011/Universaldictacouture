@@ -1,6 +1,6 @@
 import sharp from "sharp";
 import { randomUUID } from "node:crypto";
-import { allows, firestoreFields } from "../../src/services/staffAuthorization.js";
+import { allows, firestoreFields, normalizeStaffMembership } from "../../src/services/staffAuthorization.js";
 export const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 const TYPES = { "image/jpeg": "jpeg", "image/png": "png", "image/webp": "webp" };
 const KEY = /^[a-f0-9-]{36}\.webp$/;
@@ -29,7 +29,7 @@ export async function requireAdmin(request, env = process.env, fetcher = fetch) 
     headers: { Authorization: "Bearer " + token }, signal: AbortSignal.timeout(10000),
   });
   if (membership.status >= 500 || membership.status === 429) throw new HttpError(503, "Admin access cannot be checked right now. Please try again.");
-  const staff = membership.ok ? firestoreFields((await membership.json()).fields) : null;
+  const staff = normalizeStaffMembership(account.localId, membership.ok ? firestoreFields((await membership.json()).fields) : null);
   const capability = request.method === "DELETE" ? "media.delete" : "media.upload";
   if (!allows(staff, capability, { purpose: "public-media" })) {
     throw new HttpError(403, "Current public-media capability is required to manage these images.");
