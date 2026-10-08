@@ -15,7 +15,7 @@ export const FILTER_DIMENSIONS = [
   { key: "category", label: "Category" },
   { key: "occasion", label: "Occasion" },
   { key: "style", label: "Style" },
-  { key: "fabric", label: "Fabric / Weave" },
+  { key: "fabric", label: "Fabric & Pattern" },
   { key: "colour", label: "Colour" },
 ];
 

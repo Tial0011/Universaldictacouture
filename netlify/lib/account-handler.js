@@ -3,21 +3,28 @@ import { createAccountService } from "./account-service.js";
 import { createIdentityResolution } from "./identity-resolution.js";
 import { createAccountProofs } from "./account-proofs.js";
 import { createAccountSessions } from "./account-sessions.js";
+import { createPretransactionService } from "./pretransaction-service.js";
+import { createMediaService } from "./media-service.js";
 
-const readActions = new Set(["context", "registration-result", "profile", "addresses", "preferences", "my-information", "operation"]);
+const readActions = new Set(["context", "registration-result", "profile", "addresses", "preferences", "my-information", "operation", "catalogue", "public-media", "media-deliver", "staff-media-deliver", "saves", "save-state", "custom-style", "staff-custom-style", "cluster-operation"]);
+const publicReads = new Set(["catalogue", "public-media"]);
 const proofActions = new Set(["proof-inspect", "proof-consume", "proof-reconcile"]);
 const publicActions = new Set(["register", "recovery-request"]);
 export function createAccountHandler(runtime, options = {}) {
-  const service = createAccountService(runtime), identity = createIdentityResolution(service), proofs = createAccountProofs(service, { origin: runtime.origin, ...options });
+  let cluster;
+  const service = createAccountService({ ...runtime, guestIntentOwner: (tx, owner, intent) => cluster.importGuest(tx, owner, intent) }), identity = createIdentityResolution(service), proofs = createAccountProofs(service, { origin: runtime.origin, ...options });
+  let media;
+  cluster = createPretransactionService(service, { ...options, prepareProductMedia: (...args) => media.prepareProductReferences(...args) });
+  media = createMediaService(service, cluster, options);
   const sessions = createAccountSessions(service, { origin: runtime.origin });
   const json = (value, status = 200) => Response.json(value, { status, headers: { "Cache-Control": "no-store, private", "Referrer-Policy": "no-referrer", "X-Content-Type-Options": "nosniff", "X-Robots-Tag": "noindex, nofollow" } });
-  async function limitedBody(request) {
-    if (Number(request.headers.get("content-length")) > 65536) throw new AccountError("invalid-argument", 413);
+  async function limitedBody(request, maxBytes = 65536) {
+    if (Number(request.headers.get("content-length")) > maxBytes) throw new AccountError("invalid-argument", 413);
     if (!request.body) return "{}";
     const reader = request.body.getReader(), chunks = []; let size = 0;
     while (true) {
       const item = await reader.read(); if (item.done) break;
-      size += item.value.length; if (size > 65536) { await reader.cancel(); throw new AccountError("invalid-argument", 413); }
+      size += item.value.length; if (size > maxBytes) { await reader.cancel(); throw new AccountError("invalid-argument", 413); }
       chunks.push(Buffer.from(item.value));
     }
     return Buffer.concat(chunks).toString("utf8");
@@ -36,23 +43,38 @@ export function createAccountHandler(runtime, options = {}) {
     try {
       if (request.headers.get("origin") && request.headers.get("origin") !== runtime.origin) throw new AccountError("permission-denied");
       if (readActions.has(action) ? request.method !== "GET" : request.method !== "POST") return json({ error: "method-not-allowed" }, 405);
-      const bodyText = request.method === "POST" ? await limitedBody(request) : "{}";
-      if (Buffer.byteLength(bodyText) > 65536) return json({ error: "invalid-argument" }, 413);
+      const maxBytes = action.endsWith("media-stage") ? 6 * 1024 * 1024 : 65536;
+      const bodyText = request.method === "POST" ? await limitedBody(request, maxBytes) : "{}";
       let input; try { input = JSON.parse(bodyText); } catch { return json({ error: "invalid-argument" }, 400); }
       const token = request.headers.get("authorization")?.match(/^Bearer (\S+)$/)?.[1];
       let claims = null;
       if (token) { try { const verified = await runtime.auth.verifyIdToken(token, action !== "operation" && action !== "session-end"); claims = { uid: verified.uid, auth_time: verified.auth_time }; } catch { throw new AccountError("session-revoked", 401); } }
-      if (!publicActions.has(action) && !proofActions.has(action) && !claims) throw new AccountError("unauthenticated", 401);
+      if (!publicActions.has(action) && !publicReads.has(action) && !proofActions.has(action) && !claims) throw new AccountError("unauthenticated", 401);
       if (["session-start", "session-end"].includes(action)) {
         const result = action === "session-start" ? await sessions.start(request, claims, input) : await sessions.end(request, claims, input);
         const response = json(result.value); response.headers.set("Set-Cookie", result.cookie); return response;
       }
-      if (!publicActions.has(action) && !proofActions.has(action) && action !== "operation") {
+      if (!publicActions.has(action) && !publicReads.has(action) && !proofActions.has(action) && !["operation", "cluster-operation"].includes(action)) {
         const kind = action.startsWith("staff-") || action === "identity-resolve" ? "staff" : "customer";
         claims = await sessions.validate(request, claims, kind);
       }
       let result;
-      if (publicActions.has(action)) {
+      if (action === "catalogue") result = await cluster.catalogue(url.searchParams.get("productId"));
+      else if (["public-media", "media-deliver", "staff-media-deliver"].includes(action)) {
+        const bytes = await media.deliver(claims, url.searchParams.get("referenceId"), { publicOnly: action === "public-media", thumbnail: url.searchParams.get("thumbnail") === "1" });
+        return new Response(bytes, { headers: { "Content-Type": "image/webp", "Cache-Control": "no-store, private", "Netlify-CDN-Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" } });
+      }
+      else if (action === "staff-product-mutate") result = await cluster.mutateProduct(claims, input);
+      else if (action === "saves") result = await cluster.listSaves(claims, url.searchParams.get("kind"));
+      else if (action === "save-state") result = await cluster.saveState(claims, url.searchParams.get("kind"), url.searchParams.get("targetId"));
+      else if (action === "save-mutate") result = await cluster.mutateSave(claims, input);
+      else if (["custom-style", "staff-custom-style"].includes(action)) result = await cluster.readRequest(claims, url.searchParams.get("requestId"));
+      else if (["custom-style-save", "staff-custom-style-save"].includes(action)) result = await cluster.mutateRequest(claims, input);
+      else if (["custom-style-handoff", "staff-custom-style-handoff"].includes(action)) result = await cluster.handoff(claims, input);
+      else if (action === "cluster-operation") result = await cluster.reconcile(claims, url.searchParams.get("operationId"));
+      else if (["media-stage", "staff-media-stage"].includes(action)) result = await media.stage(claims, input);
+      else if (["media-attach", "staff-media-attach"].includes(action)) result = await media.attach(claims, input);
+      else if (publicActions.has(action)) {
         if (await rateAllowed(context.ip, action)) result = action === "register" ? await service.register(input) : await proofs.queueRecovery(input);
         result ||= { state: "accepted" };
       } else if (action === "context") result = await service.context(claims);

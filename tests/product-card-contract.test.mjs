@@ -27,7 +27,7 @@ test("image, name and CTA all use the same canonical product href", () => {
 test("heart is an independent pressed button and uses confirmed shared save state", () => {
   assert.match(cardSource, /aria-pressed=\{saved\}/);
   assert.match(cardSource, /toggleSavedConfirmed\(product\.id\)/);
-  assert.match(cardSource, /disabled=\{savePending\}/);
+  assert.match(cardSource, /disabled=\{savePending \|\| !saveReady\}/);
   assert.doesNotMatch(cardSource, /<Link[^>]*>[\s\S]*<article className=/);
 });
 

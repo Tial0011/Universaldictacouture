@@ -1,5 +1,8 @@
 {
   "indexes": [
+    { "collectionGroup": "customerContinuity", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "accountId", "order": "ASCENDING" }, { "fieldPath": "kind", "order": "ASCENDING" }] },
+    { "collectionGroup": "mediaReferences", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "domain", "order": "ASCENDING" }, { "fieldPath": "objectId", "order": "ASCENDING" }] },
+    { "collectionGroup": "taxonomy", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "dimension", "order": "ASCENDING" }, { "fieldPath": "name", "order": "ASCENDING" }] },
     {
       "collectionGroup": "staffAudit",
       "queryScope": "COLLECTION",

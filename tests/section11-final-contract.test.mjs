@@ -19,7 +19,7 @@ test('synthetic fully evidenced input can pass the evaluator; evaluator itself i
   const value=report();value.flows.forEach(flow=>flow.completion=true);value.visuals.forEach(visual=>visual.implementationValidated=true);value.defects.forEach(defect=>defect.resolved=true);assert.equal(evaluateSection11Gate(value).verdict,'PASS');assert.equal(evaluateSection11Gate(report(),{closedAccountStub:true}).verdict,'PARTIAL');
 });
 test('provider session tagged explicitly; Staff authority cannot become private Customer mode',()=>{
-  const hook=source('src/hooks/useCustomerSession.js');assert.match(hook,/principalKind: principal.user \? "provider" : "guest"/);assert.match(hook,/customerPrincipal: null/);assert.match(hook,/user: null/);
+  const hook=source('src/hooks/useCustomerSession.js');assert.match(hook,/resolveCustomerAccount/);assert.match(hook,/source\?\.value\?\.authorized/);assert.match(hook,/uid: value.accountId/);assert.match(hook,/auth.currentUser\?\.uid === uid/);
   const chat=source('src/services/chats.js');assert.match(chat,/if \(!admin\) \{\s*requireCustomerAccountAuthority\(\)/);assert.doesNotMatch(chat,/customerName: \(user.displayName|customerEmail: user.email/);
 });
 test('current policy rejects old Personal Details fields, dormant email Rules, stale terms, fake authority and raw diagnostic payloads',()=>{

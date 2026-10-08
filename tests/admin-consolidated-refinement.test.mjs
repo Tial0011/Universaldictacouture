@@ -113,8 +113,9 @@ test("Task 8A/9A safeguards remain intact", () => {
   assert.equal(productReadiness({ ...product, unitLabel: "" }).ready, false);
   assert.doesNotMatch(manager, /Size filter/);
   assert.match(manager, /Publication readiness/);
-  assert.match(manager, /Publish and Update Live are unavailable/);
-  assert.doesNotMatch(manager, /onClick=\{\(\) => saveProductLifecycle\("published"\)\}/);
+  assert.match(manager, /allows\(staff, "products.publish"/);
+  assert.match(manager, /dirty.*Boolean\(outcomeUnknown\).*editorReadiness.ready/);
+  assert.match(adminService, /accountRequest\("staff-product-mutate"/);
   assert.match(manager, /saveProductLifecycle\("archived"\)/);
   assert.match(manager, /Manage Shop By groups & choices/);
 });

@@ -109,6 +109,14 @@ service cloud.firestore {
     // these Rules; every Account API action performs current authorization.
     // Never grant ordinary clients direct control-plane reads/writes.
     match /accounts/{id} { allow read, write: if false; }
+    // M03-M06 owner mutations/disclosure run through the current-session API.
+    match /pretransactionOperations/{id} { allow read, write: if false; }
+    match /productHistory/{id} { allow read, write: if false; }
+    match /mediaAssets/{id} { allow read, write: if false; }
+    match /mediaReferences/{id} { allow read, write: if false; }
+    match /customerContinuity/{id} { allow read, write: if false; }
+    match /customStyleRequests/{id} { allow read, write: if false; }
+    match /customStyleHandoffs/{id} { allow read, write: if false; }
     match /accountBindings/{id} { allow read, write: if false; }
     match /accountLoginClaims/{id} { allow read, write: if false; }
     match /accountRegistrations/{id} { allow read, write: if false; }
@@ -207,8 +215,12 @@ service cloud.firestore {
             && data.images is list
             && data.images.size() > 0);
       }
-      allow read: if resource.data.status == 'published' || canStaff('products.read', 'catalogue', productId, '');
-      allow create, update: if isStaff() && productWriteAuthorized()
+      // Public catalogue consumers use the minimizing Product owner API.
+      // Firestore cannot redact private working/internal fields in a document.
+      allow read: if canStaff('products.read', 'catalogue', productId, '');
+      allow create, update: if request.resource.data.get('_ownerVersion', 0) != 2
+        && (request.method == 'create' || resource.data.get('_ownerVersion', 0) != 2)
+        && isStaff() && productWriteAuthorized()
         && validAudit('products', productId)
         && request.resource.data._version is int
         && request.resource.data._version == (request.method == 'create' ? 1 : resource.data.get('_version', 0) + 1)

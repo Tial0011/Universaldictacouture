@@ -93,11 +93,12 @@ test("saved product identities are normalized and deduplicated before merge", ()
   );
 });
 
-test("account-private My Closet storage remains UID scoped and Firestore ownership stays private", async () => {
+test("account-private My Closet uses trusted Account binding; legacy UID stores remain closed", async () => {
   const contextSource = await readFile(new URL("../src/context/SavedPiecesContext.jsx", import.meta.url), "utf8");
   const rules = await readFile(new URL("../firestore.rules", import.meta.url), "utf8");
-  assert.match(contextSource, /udc:saved-pieces:account:\$\{uid\}/);
-  assert.match(contextSource, /doc\(db, "savedPieces", uid\)/);
+  assert.match(contextSource, /key=\{user.uid \+ ':' \+ user.epoch\}/);
+  assert.match(contextSource, /useBoundSaves\(principalUid, "piece"\)/);
+  assert.doesNotMatch(contextSource, /doc\(db, "savedPieces"/);
   assert.match(rules, /match \/savedPieces\/\{uid\}/);
   assert.match(rules, /request\.auth != null && request\.auth\.uid == uid/);
 });
@@ -106,8 +107,8 @@ test("guest merge validates only saved product identities instead of downloading
   const productSource = await readFile(new URL("../src/services/products.js", import.meta.url), "utf8");
   const contextSource = await readFile(new URL("../src/context/SavedPiecesContext.jsx", import.meta.url), "utf8");
   assert.match(productSource, /validatePublishedProductIds/);
-  assert.match(productSource, /getDocFromServer\(doc\(db, PRODUCTS, productId\)\)/);
-  assert.match(contextSource, /validatePublishedProductIds\(guestMergeIds\)/);
+  assert.match(productSource, /accountRequest\("catalogue", \{ productId \}, \{ publicRequest: true \}\)/);
+  assert.match(contextSource, /accountRequest\("guest-import"/);
 });
 
 test("canonical Product Details URL is based on stable slug with document ID fallback", () => {
@@ -119,7 +120,10 @@ test("canonical Product Details URL is based on stable slug with document ID fal
 test("public Firestore query is constrained to published status and publish rules enforce completeness", async () => {
   const productSource = await readFile(new URL("../src/services/products.js", import.meta.url), "utf8");
   const rules = await readFile(new URL("../firestore.rules", import.meta.url), "utf8");
-  assert.match(productSource, /where\("status", "==", "published"\)/);
+  const owner = await readFile(new URL("../netlify/lib/pretransaction-service.js", import.meta.url), "utf8");
+  assert.match(owner, /where\("status", "==", "published"\)/);
+  assert.match(productSource, /accountRequest\("catalogue"/);
+  assert.match(rules, /allow read: if canStaff\('products.read'/);
   assert.match(rules, /request\.resource\.data\.price is number/);
   assert.match(rules, /request\.resource\.data\.category is list/);
   assert.match(rules, /unitLabel/);

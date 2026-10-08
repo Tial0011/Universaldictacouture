@@ -1,150 +1,23 @@
-/**
- * Product data access.
- *
- * Only published products ever leave this module — filtering happens
- * both in the Firestore query and again in normaliseProduct, so an
- * unpublished or incomplete document can never reach the public UI.
- *
- * The public Shop reads the published catalogue once per visit and
- * then searches, filters and sorts in memory. That keeps AND/OR filter
- * logic, price ranges and free-text search exact and instant, which a
- * Firestore composite query cannot do without an index per filter
- * combination. If the catalogue grows past a few thousand pieces, move
- * the first cut (category / New In) into the query and keep the rest
- * here.
- */
-
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocFromServer,
-  getDocs,
-  limit,
-  query,
-  where,
-} from "firebase/firestore";
-import { db } from "../firebase/firestore";
-import { isFirebaseConfigured } from "../firebase/config";
-import { normaliseProduct } from "./productModel";
-
-const PRODUCTS = "products";
-const CATALOGUE_READ_LIMIT = 1000;
-
+import { accountRequest } from "./accountApi";
 export class CatalogueUnavailableError extends Error {
-  constructor(message = "The collection could not be loaded.") {
-    super(message);
-    this.name = "CatalogueUnavailableError";
-  }
+  constructor(message = "The collection could not be loaded.") { super(message); this.name = "CatalogueUnavailableError"; }
 }
-
-/** Fetch every published product. Throws CatalogueUnavailableError on failure. */
+const hydrate = product => product ? { ...product, publishedAt: product.publishedAt ? new Date(product.publishedAt) : null } : null;
+// Minimized by the owner BEFORE disclosure: no working/internal authoring data.
 export async function fetchPublishedProducts() {
-  if (!isFirebaseConfigured) {
-    throw new CatalogueUnavailableError(
-      "The collection is not connected yet. Please try again later."
-    );
-  }
-
-  try {
-    const snapshot = await getDocs(
-      query(
-        collection(db, PRODUCTS),
-        where("status", "==", "published"),
-        limit(CATALOGUE_READ_LIMIT)
-      )
-    );
-
-    // Offline, Firestore resolves from its local cache instead of
-    // failing. An empty cached result means "we could not reach the
-    // catalogue", not "nothing is published" — saying the latter would
-    // be untrue during an outage.
-    if (snapshot.empty && snapshot.metadata.fromCache) {
-      throw new CatalogueUnavailableError();
-    }
-
-    return snapshot.docs
-      .map((entry) => normaliseProduct(entry.id, entry.data()))
-      .filter(Boolean);
-  } catch (error) {
-    if (error instanceof CatalogueUnavailableError) throw error;
-    // Never surface a raw Firebase error to a visitor.
-    if (import.meta.env.DEV) console.error(error);
-    throw new CatalogueUnavailableError();
-  }
+  try { return (await accountRequest("catalogue", {}, { publicRequest: true })).products.map(hydrate); }
+  catch { throw new CatalogueUnavailableError(); }
 }
-
-/**
- * New In is an explicit admin-managed merchandising context. The homepage
- * previews up to `max` eligible members, ordered by first-published date so
- * the presentation stays deterministic; Shop `?newin=1` uses the same
- * `isNewIn` membership flag. Editing an item never changes its chronology.
- */
-export function selectNewIn(products, max = 20) {
-  return sortByNewest(products.filter((product) => product.isNewIn)).slice(0, max);
-}
-
-export function sortByNewest(products) {
-  return [...products].sort((a, b) => {
-    const aTime = a.publishedAt ? a.publishedAt.getTime() : 0;
-    const bTime = b.publishedAt ? b.publishedAt.getTime() : 0;
-    return bTime - aTime;
-  });
-}
-
-/**
- * Re-read the authoritative product document before it enters a Closet
- * line, so a piece that was unpublished or repriced since the grid was
- * rendered cannot be added at a stale price.
- */
+export function selectNewIn(products, max = 20) { return sortByNewest(products.filter(product => product.isNewIn)).slice(0, max); }
+export function sortByNewest(products) { return [...products].sort((a, b) => (b.publishedAt?.getTime() || 0) - (a.publishedAt?.getTime() || 0)); }
 export async function revalidateProduct(productId) {
-  if (!isFirebaseConfigured) throw new CatalogueUnavailableError();
-
-  try {
-    const snapshot = await getDoc(doc(db, PRODUCTS, productId));
-    if (!snapshot.exists()) return null;
-    return normaliseProduct(snapshot.id, snapshot.data());
-  } catch (error) {
-    if (import.meta.env.DEV) console.error(error);
-    throw new CatalogueUnavailableError();
-  }
+  try { return hydrate((await accountRequest("catalogue", { productId }, { publicRequest: true })).product); }
+  catch { throw new CatalogueUnavailableError(); }
 }
-
-/**
- * Validate a small set of saved product identities against the authoritative
- * public catalogue. This is deliberately targeted per saved ID so signing in
- * does not download the full catalogue simply to merge My Closet.
- *
- * Permission-denied for an individual ID means it is not currently public
- * under the product rules (for example archived/unpublished). Network/service
- * failures abort the validation so guest state is retained for a later retry.
- */
 export async function validatePublishedProductIds(productIds = []) {
-  const ids = [...new Set(
-    (Array.isArray(productIds) ? productIds : [])
-      .filter((id) => typeof id === "string")
-      .map((id) => id.trim())
-      .filter(Boolean)
-  )];
-  if (!ids.length) return [];
-  if (!isFirebaseConfigured) throw new CatalogueUnavailableError();
-
-  const valid = [];
-  const concurrency = 6;
-  for (let start = 0; start < ids.length; start += concurrency) {
-    const batch = ids.slice(start, start + concurrency);
-    const results = await Promise.all(batch.map(async (productId) => {
-      try {
-        const snapshot = await getDocFromServer(doc(db, PRODUCTS, productId));
-        if (!snapshot.exists()) return null;
-        return normaliseProduct(snapshot.id, snapshot.data()) ? snapshot.id : null;
-      } catch (error) {
-        if (error?.code === "permission-denied") return null;
-        if (import.meta.env.DEV) console.error(error);
-        throw new CatalogueUnavailableError();
-      }
-    }));
-    valid.push(...results.filter(Boolean));
+  const ids = [...new Set(productIds.filter(id => typeof id === "string" && id))], valid = [];
+  for (let start = 0; start < ids.length; start += 6) {
+    valid.push(...(await Promise.all(ids.slice(start, start + 6).map(async id => (await revalidateProduct(id))?.id || null))).filter(Boolean));
   }
   return valid;
 }

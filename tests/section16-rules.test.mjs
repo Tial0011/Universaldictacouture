@@ -39,3 +39,15 @@ test('current security cutoff and shared-account rejection apply to Staff reads 
   await assertFails(getDoc(doc(db('legacy'),'products/private')));
   await env.withSecurityRulesDisabled(async c=>{assert.equal((await getDoc(doc(c.firestore(),'products/private'))).data().status,'draft');});
 });
+test('M03-M06 private owner records and working catalogue cannot be read or mutated through client bypasses',async()=>{
+  const namespaces=['pretransactionOperations','productHistory','mediaAssets','mediaReferences','customerContinuity','customStyleRequests','customStyleHandoffs'];
+  await env.withSecurityRulesDisabled(async c=>{
+    for(const name of namespaces) await setDoc(doc(c.firestore(),name,'hidden'),{private:'NEVER'});
+    await setDoc(doc(c.firestore(),'products/managed'),{name:'Working',status:'published',_ownerVersion:2,_version:2,publicRepresentation:{name:'Live'},internalNotes:'NEVER'});
+  });
+  for(const uid of ['A','canonical','legacy'])for(const name of namespaces){await assertFails(getDoc(doc(db(uid),name,'hidden')));await assertFails(getDocs(query(collection(db(uid),name),limit(5))));await assertFails(setDoc(doc(db(uid),name,'escalate'),{accountId:'durable-A'}));}
+  await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(),'products/managed')));
+  await assertFails(getDoc(doc(db('A'),'products/managed')));
+  await assertSucceeds(getDoc(doc(db('canonical'),'products/managed')));
+  await assertFails(updateDoc(doc(db('canonical'),'products/managed'),{_ownerVersion:0,name:'Downgrade'}));
+});

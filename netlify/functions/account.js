@@ -1,5 +1,6 @@
 import { accountRuntime } from "../lib/firebase-admin-runtime.js";
 import { createAccountHandler } from "../lib/account-handler.js";
+import { getStore } from "@netlify/blobs";
 
 let handler;
 export default async function account(request, context) {
@@ -18,7 +19,7 @@ export default async function account(request, context) {
         const response = await fetch(`${endpoint}/v1/accounts:signInWithPassword?key=${encodeURIComponent(key)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: provider.email, password, returnSecureToken: true }), signal: AbortSignal.timeout(10000) });
         return response.ok && (await response.json()).localId === provider.uid;
       };
-      handler = createAccountHandler(runtime, { deliverProof, passwordMatches });
+      handler = createAccountHandler(runtime, { deliverProof, passwordMatches, getPrivateStore: () => getStore({ name: "owner-private-media", consistency: "strong" }) });
     }
     return await handler(request, context);
   } catch { return Response.json({ error: "account-source-unavailable" }, { status: 503, headers: { "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" } }); }

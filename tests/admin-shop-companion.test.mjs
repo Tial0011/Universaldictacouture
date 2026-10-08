@@ -39,7 +39,7 @@ test("Task 8A: Product Manager surfaces readiness, New In and safe public previe
   assert.match(manager, /new-in/);
   assert.match(manager, /View in Shop/);
   assert.match(manager, /record\.status === "published"/);
-  assert.match(manager, /Publish and Update Live are unavailable/);
+  assert.match(manager, /allows\(staff, "products.publish"/);
   assert.match(manager, /saveProductLifecycle\("unpublished"\)/);
   assert.match(manager, /Restore to Unpublished/);
   assert.match(manager, /saveProductLifecycle\("archived"\)/);

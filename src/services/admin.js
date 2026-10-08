@@ -6,6 +6,8 @@ import { milliseconds, reconcileUnknown } from "./operationsModel";
 import { beginStaffOperation, clearStaffOperation, pendingStaffOperation, staffOperationActor } from "./staffOperations";
 import { db } from "../firebase/firestore";
 import { prepareRecord } from "./adminModel";
+import { accountRequest } from "./accountApi";
+const PRODUCT_OWNER_FIELDS = ["name", "slug", "description", "price", "unitLabel", "priceToken", "category", "occasion", "style", "fabric", "colour", "size", "shopBy", "primaryImage", "images", "options", "variants", "aliases", "keywords", "isNewIn"];
 const COLLECTIONS = new Set(["products", "heroSlides", "reviews", "discoveryModules", "taxonomy"]);
 export const PAGE_SIZE = 20;
 function target(kind) {
@@ -59,6 +61,11 @@ export async function loadAdminRecord(kind, id) {
 export async function reconcileAdminOperation(operationId) {
   const staff = await readCurrentStaff();
   if (!safeOperationalId(operationId)) return { state: "unresolved" };
+  const trusted = await accountRequest("cluster-operation", { operationId }, { principalUid: staff.principalUid });
+  if (trusted.state === "committed" && trusted.productId) {
+    clearStaffOperation(staffOperationActor(staff.principalUid, staff.staffId), "products", operationId);
+    return { state: "committed", kind: "products", id: trusted.productId };
+  }
   const receipt = await currentReadDeadline(getDocFromServer(doc(db, "staffAudit", operationId)));
   if (!receipt.exists()) return { state: "unresolved" };
   const result = receipt.data();
@@ -87,7 +94,22 @@ export async function loadProductStatusCounts() {
 
 export async function saveAdminRecord(kind, raw, { action = "save" } = {}) {
   if (kind === "reviews") throw new Error("Review mutations require the protected consent/version owner workflow.");
-  if (kind === "products" && raw.status === "published") throw new Error("Publish and Update Live require the protected Working/Live and current-readiness owner workflow. No live change has been made.");
+  if (kind === "products") {
+    const staff = await readCurrentStaff(), actorKey = staffOperationActor(staff.principalUid, staff.staffId);
+    const pending = pendingStaffOperation(actorKey, kind);
+    if (pending) throw Object.assign(new Error("Check the previous result before another save."), { code: "outcome-unknown", operationId: pending.operationId });
+    const operationId = crypto.randomUUID(), ownerAction = raw.id ? action : "create";
+    const prepared = ["save", "create"].includes(ownerAction) ? prepareRecord(kind, { ...raw, status: raw.status === "published" ? "draft" : raw.status }) : null;
+    const input = { operationId, action: ownerAction, ...(raw.id ? { productId: raw.id, expectedVersion: raw._version || 0 } : {}), ...(prepared ? { fields: Object.fromEntries(PRODUCT_OWNER_FIELDS.filter(key => Object.hasOwn(prepared, key)).map(key => [key, prepared[key]])) } : {}) };
+    beginStaffOperation(actorKey, kind, operationId);
+    try {
+      const result = await accountRequest("staff-product-mutate", input, { principalUid: staff.principalUid });
+      clearStaffOperation(actorKey, kind, operationId); return result.productId;
+    } catch (error) {
+      if (["auth/outcome-unknown", "outcome-unknown"].includes(error.code)) throw Object.assign(new Error("The Product result is unknown. Check it before another save."), { code: "outcome-unknown", operationId });
+      clearStaffOperation(actorKey, kind, operationId); throw error;
+    }
+  }
   const data = kind === "products" && action !== "save" ? { status: raw.status, archived: raw.status === "archived" } : prepareRecord(kind, raw);
   const reference = raw.id ? doc(target(kind), raw.id) : doc(target(kind));
   const staff = await readCurrentStaff();

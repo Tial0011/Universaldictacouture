@@ -102,7 +102,7 @@ export default function ProductCard({
   imageLoading = "lazy",
   imageFetchPriority = "auto",
 }) {
-  const { isSaved, toggleSavedConfirmed } = useSavedPieces();
+  const { isSaved, toggleSavedConfirmed, isReady: saveReady } = useSavedPieces();
   const { showToast } = useToast();
   const [savePending, setSavePending] = useState(false);
   const [navigationPending, setNavigationPending] = useState(false);
@@ -214,7 +214,7 @@ export default function ProductCard({
           aria-pressed={saved}
           aria-busy={savePending || undefined}
           aria-label={saved ? `Remove ${product.name} from My Closet` : `Add ${product.name} to My Closet`}
-          disabled={savePending}
+          disabled={savePending || !saveReady}
         >
           <HeartIcon filled={saved} />
         </button>

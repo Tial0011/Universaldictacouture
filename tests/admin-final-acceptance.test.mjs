@@ -36,7 +36,7 @@ test("Task 9A: commercial unit is a real publication requirement, not a cosmetic
 test("Task 9A: product lifecycle shortcuts use the same validated save path", () => {
   assert.match(manager, /async function persist\(/);
   assert.match(manager, /saveProductLifecycle/);
-  assert.match(manager, /Publish and Update Live are unavailable/);
+  assert.match(manager, /allows\(staff, "products.publish"/);
   assert.match(manager, /Archive this product\?/);
   assert.match(manager, /Product unpublished/);
   assert.match(manager, /Product archived/);

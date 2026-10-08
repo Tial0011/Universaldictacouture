@@ -4,6 +4,7 @@ import { deleteAdminRecord, reconcileAdminOperation, loadAdminRecord, loadAdminP
 import { SCHEMAS } from "./recordSchemas";
 import { invalidateCatalogue } from "../../hooks/useCatalogue";
 import ImageField from "./ImageField";
+import OwnerImageField from "./OwnerImageField";
 import Button from "../common/Button";
 import { DEFAULT_SHOP_BY_GROUPS, fetchShopByGroups } from "../../services/shopBy";
 import { fetchPublishedProducts } from "../../services/products";
@@ -69,7 +70,7 @@ export default function RecordManager({ kind }) {
   const { staff, uid } = useStaff();
   const { confirm, request: confirmationRequest, settle: settleConfirmation } = useConfirmation();
   const [outcomeUnknown, setOutcomeUnknown] = useState(() => pendingStaffOperation(staffOperationActor(uid, staff.staffId), kind)?.operationId || false);
-  const canEdit = record => (kind !== "products" ? ["content.edit"] : !record?.id ? ["products.create"] : ["products.edit", "products.commercial", "products.media", "products.discovery", "products.unpublish", "products.archive", "products.restore"]).some(capability => allows(staff, capability, { purpose: kind === "products" ? "catalogue" : "content", objectId: record?.id }));
+  const canEdit = record => (kind !== "products" ? ["content.edit"] : !record?.id ? ["products.create"] : ["products.edit", "products.commercial", "products.media", "products.discovery", "products.publish", "products.unpublish", "products.archive", "products.restore"]).some(capability => allows(staff, capability, { purpose: kind === "products" ? "catalogue" : "content", objectId: record?.id }));
   const [params, setParams] = useSearchParams();
   const [records, setRecords] = useState([]);
   const [cursor, setCursor] = useState(null);
@@ -260,18 +261,18 @@ export default function RecordManager({ kind }) {
   }
 
   async function saveProductLifecycle(nextStatus) {
-    if (nextStatus === "published") { setError("Publication requires the protected Working/Live and current-readiness owner workflow."); return; }
-    const capability = nextStatus === "archived" ? "products.archive" : editor?.status === "archived" ? "products.restore" : "products.unpublish";
+    if (nextStatus === "published" && dirty) { setError("Save your working changes, reopen the Product and review before publishing."); return; }
+    const capability = nextStatus === "published" ? "products.publish" : nextStatus === "archived" ? "products.archive" : editor?.status === "archived" ? "products.restore" : "products.unpublish";
     if (!allows(staff, capability, { purpose: "catalogue", objectId: editor?.id })) { setError("Current lifecycle authority is unavailable."); return; }
     if (kind !== "products" || !editor || saving || uploading) return;
     const next = { ...editor, status: nextStatus };
     if (nextStatus === "archived" && !await confirm("Archive this product? It will leave the public Shop but its record and history will be retained.")) return;
-    const message = nextStatus === "archived"
+    const message = nextStatus === "published" ? "Product publication confirmed." : nextStatus === "archived"
         ? "Product archived. Its record is retained but it is no longer public."
         : editor.status === "archived"
           ? "Product restored to Unpublished. It has not been republished."
           : "Product unpublished. It is no longer eligible for the public Shop.";
-    await persist(next, message, nextStatus === "archived" ? "archive" : editor.status === "archived" ? "restore" : "unpublish");
+    await persist(next, message, nextStatus === "published" ? "publish" : nextStatus === "archived" ? "archive" : editor.status === "archived" ? "restore" : "unpublish");
   }
 
   async function remove(record) {
@@ -397,6 +398,7 @@ export default function RecordManager({ kind }) {
           {!reviewProductsError && reviewProductSearch && !productOptions.length && <p className="field__hint">No published product matches that search.</p>}
         </div>
         : type === "textarea" ? <textarea {...props} value={value || ""} maxLength={4000} onChange={event => update(key, event.target.value)} />
+        : kind === "products" && type === "images" ? <OwnerImageField key={editor.id || "new"} id={id} product={editor} onChange={value => update(key, value)} setUploading={setUploading} />
         : type === "image" || type === "images" ? <ImageField id={id} value={value} multiple={type === "images"} maxImages={maxImages} onChange={value => update(key, value)} setUploading={setUploading} />
         : type === "tiles" ? <div className="admin-stack">{(value || []).map((tile, index) => <fieldset className="admin-panel admin-stack" key={index}>
           <legend>Tile {index + 1}</legend>
@@ -441,7 +443,7 @@ export default function RecordManager({ kind }) {
     {kind === "products" && editor?.id === params.get("edit") && params.get("issue") && <p className="admin-notice" role="status">{editorReadiness?.blockers.some(item => item.key === params.get("issue")) ? "The linked catalogue issue remains current. Any correction uses this protected Product owner workflow." : "Status changed since this issue link was created. Current Product context is shown; no obsolete action is retained."}</p>}
     {error && <div role="alert" className="admin-notice"><p>{error}</p>{!editor && <Button variant="secondary" onClick={() => { setLoading(true); setError(""); setRevision(v => v + 1); }}>Try again</Button>}</div>}
     {editor && (kind !== "products" || !params.get("edit") || editor.id === params.get("edit")) && <section className="admin-panel admin-stack" aria-labelledby="editor-title">
-      <div><h2 id="editor-title" tabIndex={-1} ref={editorHeading}>{editor.id ? "Edit" : "Add"} {schema.singular}</h2><p>Draft and Unpublished saves remain private. Existing Published records are read-only until their protected Working/Live owner workflow is integrated.</p></div>
+      <div><h2 id="editor-title" tabIndex={-1} ref={editorHeading}>{editor.id ? "Edit" : "Add"} {schema.singular}</h2><p>Working changes stay private until an authorized publication succeeds. Saving does not change the live storefront.</p></div>
       {kind === "products" && editorReadiness && <aside className="admin-readiness" aria-labelledby="product-readiness-title">
         <div className="admin-section-heading">
           <div><p className="admin-eyebrow">Publication readiness</p><h3 id="product-readiness-title">{editorReadiness.label}</h3></div>
@@ -452,14 +454,14 @@ export default function RecordManager({ kind }) {
         {editorReadiness.warnings.length ? <p className="field__hint">Suggested check: {editorReadiness.warnings.map((item) => item.label).join(", ")}.</p> : null}
         <div className="admin-actions admin-publication-actions" aria-label="Product publication actions">
           {editor.status === "published" && <Button variant="secondary" disabled={saving || uploading || Boolean(outcomeUnknown)} isLoading={saving} onClick={() => saveProductLifecycle("unpublished")}>Unpublish</Button>}
-          {editor.status !== "published" && <p role="status">Publish and Update Live are unavailable until the protected Working/Live owner workflow is integrated.</p>}
+          {editor.id && editor.status !== "archived" && allows(staff, "products.publish", { purpose: "catalogue", objectId: editor.id }) && <Button variant="secondary" disabled={saving || uploading || dirty || Boolean(outcomeUnknown) || !editorReadiness.ready} onClick={() => saveProductLifecycle("published")}>{editor.status === "published" ? "Update Live" : "Publish"}</Button>}
           {editor.status === "archived"
             ? <Button variant="secondary" disabled={saving || uploading || Boolean(outcomeUnknown)} onClick={() => saveProductLifecycle("unpublished")}>Restore to Unpublished</Button>
             : <Button variant="ghost" disabled={saving || uploading || Boolean(outcomeUnknown) || !editor.id} onClick={() => saveProductLifecycle("archived")}>Archive</Button>}
         </div>
       </aside>}
       <form onSubmit={save} className="admin-stack">{renderEditorFields()}
-        <div className="admin-form-actions"><Button type="submit" disabled={uploading || Boolean(outcomeUnknown) || (kind === "products" && editor.status === "published")} isLoading={saving}>{saving ? "Saving…" : "Save " + schema.singular}</Button><Button variant="secondary" disabled={saving || uploading || Boolean(outcomeUnknown)} onClick={cancel}>Cancel</Button><span className="field__hint">{uploading ? "Uploading photos…" : dirty ? "Unsaved changes" : "No unsaved changes"}</span></div>
+        <div className="admin-form-actions"><Button type="submit" disabled={uploading || Boolean(outcomeUnknown)} isLoading={saving}>{saving ? "Saving…" : "Save " + schema.singular}</Button><Button variant="secondary" disabled={saving || uploading || Boolean(outcomeUnknown)} onClick={cancel}>Cancel</Button><span className="field__hint">{uploading ? "Uploading photos…" : dirty ? "Unsaved changes" : "No unsaved changes"}</span></div>
       </form>
     </section>}
     <section className="admin-panel admin-stack" aria-label={schema.title + " list"}>

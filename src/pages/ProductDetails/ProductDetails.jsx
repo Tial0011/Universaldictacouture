@@ -148,7 +148,7 @@ function Piece({ product, backToShop, backState }) {
   const { user } = useAuth();
   const { requestAuth } = useAuthGate();
   const location = useLocation();
-  const { isSaved, toggleSavedConfirmed, error: savedError } = useSavedPieces();
+  const { isSaved, toggleSavedConfirmed, isReady: saveReady, error: savedError } = useSavedPieces();
   const images = [product.image, ...product.images].filter((image, index, entries) =>
     image && entries.findIndex(entry => entry && (entry.publicId || entry.url) === (image.publicId || image.url)) === index
   );
@@ -273,7 +273,7 @@ function Piece({ product, backToShop, backState }) {
                   onClick={handleSave}
                   aria-pressed={saved}
                   aria-busy={savePending || undefined}
-                  disabled={savePending}
+                  disabled={savePending || !saveReady}
                   aria-label={saved ? `Remove ${product.name} from My Closet` : `Save ${product.name} to My Closet`}
                 >
                   <HeartIcon filled={saved} />

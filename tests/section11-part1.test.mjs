@@ -49,7 +49,7 @@ test('proof link open is read-only and token-bearing URL is withdrawn before chi
 test('principal transition unmounts sensitive forms/caches/announcements and BFCache/offline rechecks have stale response guards',()=>{
   const context=source('src/context/AuthContext.jsx');assert.match(context,/Fragment key=\{user\?\.uid \|\| sessionState\}/);assert.match(context,/version !== generation/);assert.match(context,/event.persisted/);assert.match(context,/setSessionState\("unverifiable"\)/);
   assert.match(source('src/firebase/auth.js'),/generation !== transitionGeneration/);
-  assert.match(source('src/hooks/useCustomerSession.js'),/user: null/);
+  const hook=source('src/hooks/useCustomerSession.js');assert.match(hook,/source\?\.uid === uid/);assert.match(hook,/ticket === generation/);assert.match(hook,/pageshow/);
 });
 test('trusted legacy customer grants are closed, not merely hidden, while staff routes keep independently complete grants',()=>{
   const rules=source('firestore.rules');assert.match(rules,/match \/customerProfiles\/\{uid\}[\s\S]*?allow read: if false/);

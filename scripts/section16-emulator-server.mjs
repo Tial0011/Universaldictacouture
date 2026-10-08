@@ -3,10 +3,11 @@ import { createServer } from 'node:http';
 import { accountRuntime } from '../netlify/lib/firebase-admin-runtime.js';
 import { createAccountHandler } from '../netlify/lib/account-handler.js';
 process.env.FIREBASE_PROJECT_ID='demo-udc-section12';
+process.env.METADATA_SERVER_DETECTION='none'; // Local emulator: no external GCE credential probe.
 process.env.FIRESTORE_EMULATOR_HOST='127.0.0.1:8089';process.env.FIREBASE_AUTH_EMULATOR_HOST='127.0.0.1:9099';
 process.env.UDC_SITE_ORIGIN='http://127.0.0.1:5182';process.env.UDC_IDENTITY_HMAC_KEY='local-section16-qa-only-secret-not-production';
-const runtime=accountRuntime(), delivered=[];
-const handler=createAccountHandler(runtime,{minimumPublicMs:10,deliverProof:async message=>delivered.push(message)});
+const runtime=accountRuntime(), delivered=[], privateMedia=new Map();
+const handler=createAccountHandler(runtime,{minimumPublicMs:10,deliverProof:async message=>delivered.push(message),getPrivateStore:()=>({set:async(key,bytes)=>privateMedia.set(key,Buffer.from(bytes)),get:async key=>privateMedia.get(key),delete:async key=>privateMedia.delete(key)})});
 createServer(async(req,res)=>{
   try{
     const url=new URL(req.url,runtime.origin);
@@ -16,7 +17,7 @@ createServer(async(req,res)=>{
       res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(item?{url:item.url}:{}));return;
     }
     if(url.pathname!=='/.netlify/functions/account'){res.writeHead(404);res.end();return;}
-    let size=0;const parts=[];for await(const chunk of req){size+=chunk.length;if(size>65536){res.writeHead(413);res.end();return;}parts.push(chunk);}
+    let size=0;const maxBytes=url.searchParams.get('action')?.endsWith('media-stage')?6*1024*1024:65536;const parts=[];for await(const chunk of req){size+=chunk.length;if(size>maxBytes){res.writeHead(413);res.end();return;}parts.push(chunk);}
     const response=await handler(new Request(url,{method:req.method,headers:req.headers,...(['GET','HEAD'].includes(req.method)?{}:{body:Buffer.concat(parts)})}),{ip:req.socket.remoteAddress});
     res.writeHead(response.status,Object.fromEntries(response.headers));res.end(Buffer.from(await response.arrayBuffer()));
   }catch{res.writeHead(503,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:'local-qa-unavailable'}));}

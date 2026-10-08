@@ -1,6 +1,6 @@
 import { getAuth } from "firebase/auth";
 import app, { isFirebaseConfigured } from "../firebase/config";
-const reads = new Set(["context", "registration-result", "profile", "addresses", "preferences", "my-information", "operation"]);
+const reads = new Set(["context", "registration-result", "profile", "addresses", "preferences", "my-information", "operation", "catalogue", "saves", "save-state", "custom-style", "staff-custom-style", "cluster-operation"]);
 const marker = (uid, kind) => `udc:managed-session:${uid}:${kind}`;
 export async function accountRequest(action, input = {}, { publicRequest = false, optionalAuth = false, principalUid, sessionRetry = false } = {}) {
   if (!isFirebaseConfigured || !app) throw Object.assign(new Error("Current account access is unavailable."), { code: "account-source-unavailable" });
@@ -10,7 +10,7 @@ export async function accountRequest(action, input = {}, { publicRequest = false
   if (auth.currentUser?.uid !== uid && !(auth.currentUser == null && uid == null)) throw Object.assign(new Error("Current account access changed."), { code: "auth/principal-changed" });
   const url = new URL("/.netlify/functions/account", window.location.origin); url.searchParams.set("action", action);
   const read = reads.has(action);
-  if (["operation", "registration-result"].includes(action)) url.searchParams.set("operationId", input.operationId);
+  if (read) Object.entries(input).forEach(([key, value]) => { if (value != null) url.searchParams.set(key, String(value)); });
   let response;
   try {
     response = await fetch(url, { method: read ? "GET" : "POST", cache: "no-store", headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(read ? {} : { "Content-Type": "application/json" }) }, ...(read ? {} : { body: JSON.stringify(input) }), signal: AbortSignal.timeout(15000) });
