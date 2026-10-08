@@ -11,6 +11,7 @@ import { currentReadDeadline, protectedWriteDeadline } from '../src/services/ope
 async function loadAuthService({ failure = false, delayed = false } = {}) {
   const storage = new Map([["udc:auth:session-policy", JSON.stringify({ expiresAt: 1 })]]);
   const context = vm.createContext({
+    crypto: globalThis.crypto,
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value), removeItem: key => storage.delete(key) },
     sessionStorage: { setItem() {}, removeItem() {} },
   });
@@ -38,7 +39,8 @@ async function loadAuthService({ failure = false, delayed = false } = {}) {
   const config = new vm.SyntheticModule(["default", "isFirebaseConfigured"], function () { this.setExport("default", {}); this.setExport("isFirebaseConfigured", true); }, { context });
   service = new vm.SourceTextModule(await readFile(new URL("../src/firebase/auth.js", import.meta.url), "utf8"), { context, initializeImportMeta(meta) { meta.env = {}; } });
   const synthetic = entries => new vm.SyntheticModule(Object.keys(entries),function(){for(const [key,value] of Object.entries(entries))this.setExport(key,value);},{context});
-  await service.link(specifier => specifier === "firebase/auth" ? sdk : specifier.includes('authFlow') ? synthetic(flow) : specifier.includes('customerAccountAuthority') ? synthetic(authority) : specifier.includes('operationalRuntime') ? synthetic({currentReadDeadline,protectedWriteDeadline}) : config);
+  const unavailableAccountApi = { endManagedSessions:async()=>{}, registerCustomerAccount: async()=>{throw Object.assign(new Error('Unavailable backend fixture'),{code:'account-source-unavailable'});}, accountRequest: async()=>{throw Object.assign(new Error('Unavailable backend fixture'),{code:'account-source-unavailable'});} };
+  await service.link(specifier => specifier === "firebase/auth" ? sdk : specifier.includes('accountApi') ? synthetic(unavailableAccountApi) : specifier.includes('authFlow') ? synthetic(flow) : specifier.includes('customerAccountAuthority') ? synthetic(authority) : specifier.includes('operationalRuntime') ? synthetic({currentReadDeadline,protectedWriteDeadline}) : config);
   await service.evaluate();
   return { auth: service.namespace, storage, user, instance, release, duringCallback: () => expiredDuringCallback };
 }

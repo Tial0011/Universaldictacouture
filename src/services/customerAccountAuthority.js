@@ -1,6 +1,6 @@
-// Section 16 Flow 1 requires a trusted durable-Account binding. The current
-// repository has no such source. Provider UID/email must not be its substitute.
-// This explicit closed integration boundary creates no collection or endpoint.
+// Closed guard for owner adapters not yet mapped (e.g. later M05/M11 work).
+// M01 Account/Profile now use the server Account API. Do not turn this client
+// assertion into authority or re-enable old UID-based owner writers.
 export function requireCustomerAccountAuthority() {
   throw Object.assign(new Error("Current UDC Account source is unavailable."), { code: "account-source-unavailable" });
 }

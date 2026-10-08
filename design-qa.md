@@ -1,4 +1,53 @@
-# Section 11 Module 2 visual QA
+# Section 11 complete final visual pass — latest QA
+
+final result: blocked
+
+This is the current Section-11 visual implementation report. Earlier Section-11 and Section-12 findings below are preserved, not silently superseded or declared fixed.
+
+## Source and rendered evidence
+
+Source truth: `C:/Users/HP ENVY/Videos/1A1 IMPORTANT UDC PICTURES/✅ SECTION 11/SECTION 11 VISUAL/UNIVERSAL_DICTA_COUTURE_SECTION_11_FINAL_VISUAL_REFERENCE_MASTER.docx` and matching PDF. DOCX SHA256 `80FB600E2DE1CC1DDE10968A5528811D41618085FF7F9EBA2D9335AB0C41B91A`; PDF SHA256 `B22C5E74B3B653EEEB81BDC181AC314669DDBC716FBC765069D9A99D40E7DF39`. All 15 embedded images opened under `.tools.local/section11-final-reference/`. All 27 PDF pages rendered with Windows PDF; `.tools.local/section11-visual-pdf/contact.png` reviewed. The PDF contains repeated/overlapping archive headers/footers, so full-resolution DOCX images were used for detailed UI inspection rather than copying that document-layout defect.
+
+Architecture: previous complete Part-1/3/4 readings inherited and their hashes verified unchanged. The current `SECTION 11 DOCUMENT 1 PART 2 .docx` was reread, including tables; SHA256 `AE65DF36BFB10B29CD7F6AABDDE63352EA751577CA52F51B5C9D73DD8E38FCAB`. Written architecture remains controlling.
+
+Runtime: isolated Chrome CDP on loopback, synthetic Auth/Firestore emulator project only. Viewports 320,390,768,900,1024,1280,1440,1920 CSS px at density 1; captures are width×900 for authentication and width×1000 for Profile. Actual unavailability, guest entry, signed-in provider, unknown sign-out and shield states—not fabricated loaded customer records.
+
+Full-view combined comparisons: `.tools.local/section11-visual-comparisons/{entry-mobile,recovery-mobile,private-mobile,overview,details,security-mobile,communications-mobile,privacy,shield}.png`. Source is left, rendered implementation right, each aspect-contained in 650×900, combined 1320×900. Exact source crops are in `tests/section11-visual-compare.mjs`. These stylized source boards have no authoritative CSS density; frame/canvas excluded where practical. They are not asserted to be same-data/state pixel-equality comparisons. That prevents a full fidelity PASS.
+
+Focused evidence: labels, password visibility, field borders and actions are readable in the entry/details pairs; grouped controls and channel separation in security/communications; shield icon/title/actions in the shield pair. Full-resolution implementation captures are `.tools.local/section11-visual-{personal,communications,privacy}-1440.png` / `-390.png`, `...privacy-shield-1440.png` / `-390.png`, and `...unknown-signout-1440.png`. Full source boards were opened independently before cropping.
+
+## Findings and iteration history
+
+1. P1 initial: Profile was predominantly technical unavailable notices, without the R01/R02 account composition. Implemented compact icon rail, welcome/Attention columns, four-area Closet cards, exact labelled Details controls, security rows, communications groups and two-pane Privacy/My Information. Recaptured all seven areas at eight widths. Available runtime layouts pass their reflow checks; loaded-data fidelity remains blocked.
+2. P2 initial: auth mobile entry retained a large hero above the focused form. B1 entry now hides the decorative hero below 900px; B2/B3 keep a short editorial banner. Mobile entry/action fields captured after correction.
+3. P2 initial: change-photo action stretched across its text column. Set `.profile-photo-row .btn { justify-self:start; }`; post-fix Details comparison inspected.
+4. P2 comparison: private-destination heading unnecessarily long; shield used technical authority wording and brought footer into its focused viewport. Shortened the private title, restored lock artwork and Home fallback, used the R03 customer-readable unavailable title, and gave the shield a content-driven minimum viewport height. Regenerated and reopened private/shield comparisons after the changes.
+5. QA evidence defect: old auth route loop could capture the previous title under the next route's filename. Fixed title-specific waiting, regenerated the five-route/eight-width captures, and inspected actual Create Account/Reset Password images. Wrong captures are not evidence of those pages passing.
+6. Functional state defect: Profile sign-out error allowed a blind repeat. Unknown acknowledgement now disables both sign-out controls and offers the real session recheck. Injected one local provider rejection, confirmed exactly one attempt, and confirmed current-session reconciliation remounts legitimate navigation. Unknown is not represented as Saving or Saved.
+7. Remaining P1: real customer-bound Profile/Photo/address/security/preference/privacy/lifecycle/projection services remain absent. Blank disabled fields and unavailable groups are truthful, but are not the reference's populated/editable states. Address dialogs/defaults, private media, conflict/dirty-departure interaction and positive save/deletion outcomes cannot receive visual closure from notice components alone.
+8. Remaining P1 asset-fidelity limitation: the reference auth portrait/fabric scenes are not clean standalone repository assets. The current official UDC hero remains; no generated scene, cropped screenshot-as-background or fake customer photo substitutes for them. Current-brand asset reuse is documented, not claimed as exact source-image fidelity.
+
+## Required fidelity surfaces
+
+- Fonts/typography: existing Cormorant Garamond and Inter, serif hierarchy with operational sans-serif labels; no new type system. Long fields wrap, 200% text and 320px reflow checked. Stylized source type is not treated as a new font contract.
+- Spacing/layout: intentional leading desktop/tablet rail, two-to-one-column transformations, one native mobile selector, restrained cards and grouped rows. No horizontal overflow in available route checks. Positive address/form-dialog density remains unverified.
+- Colors/tokens: existing wine/ivory/ink and decorative gold hairlines; no gold body/focus text, parallel palette, blue shield palette invention or forced-color regression.
+- Image quality: official logo/hero and existing upstream Feather SVG artwork; actual text remains native text. All runtime icons resolve. No customer media, source counts, device history or product thumbnails invented. Auth source image discrepancy remains open.
+- Copy/content: technical Profile paragraphs replaced by customer-facing copy; unavailable is not empty, revoked is not deleted, preset unset is not consent, and pending is not confirmed. Private/public names and historical delivery remain separate.
+
+## Actual validation
+
+325 repository tests passed; lint exit 0 with 34 inherited warnings and no errors; production build passed. Auth browser suite, Profile 56 area/width suite, Part-3 focus/AX/history/forced-colors/reduced-motion suite and new visual 24 area/width/unknown-signout/shield suite passed with zero runtime exceptions. Unit rendering tests cover all ten shared notice states and safe serialized fields. Browser state/DOM and accessibility-tree checks are not manual screen-reader certification or full WCAG certification.
+
+No new canonical references. 11/11 direct and 4/4 supporting inspected and mapped, **not 15/15 implementation PASS**. Section-12 material was not used as Section-11 visual authority. No production changes, push or deployment.
+
+## Implementation checklist / next gate
+
+Connect the current trusted Account and private owner services; implement the missing consequential workflows, then capture genuine loaded/edit/conflict/confirmation states. Obtain the approved clean auth artwork or an explicit asset decision. Repeat same-state normalized comparisons before visual PASS. Do not conceal these dependencies with mock production data or relaxed security.
+
+---
+
+# Preserved earlier Section 11 Module 2 visual QA
 
 final result: blocked
 

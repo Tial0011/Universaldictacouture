@@ -6,12 +6,13 @@ import * as flow from '../src/services/authFlow.js';
 import * as authority from '../src/services/customerAccountAuthority.js';
 import {currentReadDeadline,protectedWriteDeadline} from '../src/services/operationalRuntime.js';
 async function proofService({operation='VERIFY_EMAIL',currentEmail=null,requestError=null}={}){
-  const context=vm.createContext({});let commits=0;
+  const context=vm.createContext({crypto:globalThis.crypto});let commits=0;
   const auth={currentUser:currentEmail?{email:currentEmail}:null};
   const sdk={applyActionCode:async()=>{commits++;},confirmPasswordReset:async()=>{commits++;},reload:async()=>{},sendEmailVerification:async()=>{commits++;},sendPasswordResetEmail:async()=>{if(requestError)throw requestError;},verifyPasswordResetCode:async()=> 'proof@example.test',checkActionCode:async()=>({operation,data:{email:'proof@example.test'}})};
   const synthetic=entries=>new vm.SyntheticModule(Object.keys(entries),function(){for(const[key,value]of Object.entries(entries))this.setExport(key,value);},{context});
   const module=new vm.SourceTextModule(await readFile(new URL('../src/firebase/accountActions.js',import.meta.url),'utf8'),{context});
-  await module.link(specifier=>specifier==='firebase/auth'?synthetic(sdk):specifier==='./auth'?synthetic({auth}):specifier.includes('authFlow')?synthetic(flow):specifier.includes('customerAccountAuthority')?synthetic(authority):synthetic({currentReadDeadline,protectedWriteDeadline}));await module.evaluate();return {service:module.namespace,commits:()=>commits};
+  const accountApi={accountRequest:async action=>{if(action==='recovery-request'){if(requestError && !['auth/user-not-found','auth/user-disabled','auth/too-many-requests','auth/quota-exceeded'].includes(requestError.code))throw requestError;return {state:'accepted'};}throw Object.assign(new Error('Owner unavailable fixture'),{code:'account-source-unavailable'});}};
+  await module.link(specifier=>specifier==='firebase/auth'?synthetic(sdk):specifier==='./auth'?synthetic({auth}):specifier.includes('accountApi')?synthetic(accountApi):specifier.includes('authFlow')?synthetic(flow):specifier.includes('customerAccountAuthority')?synthetic(authority):synthetic({currentReadDeadline,protectedWriteDeadline}));await module.evaluate();return {service:module.namespace,commits:()=>commits};
 }
 test('a verification proof cannot be used as reset/change-email proof or for another signed-in control channel',async()=>{
   for(const operation of ['PASSWORD_RESET','VERIFY_AND_CHANGE_EMAIL','RECOVER_EMAIL']){const subject=await proofService({operation});await assert.rejects(subject.service.inspectEmailVerificationCode('fixture-proof'),{code:'auth/wrong-purpose'});assert.equal(subject.commits(),0);}

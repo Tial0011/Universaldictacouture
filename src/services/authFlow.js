@@ -51,6 +51,16 @@ export function authFailureMessage(error) {
   if (["auth/network-request-failed", "auth/outcome-unknown", "outcome-unknown", "deadline-exceeded"].includes(error?.code)) return "The outcome could not be confirmed. Check the current session or result before repeating this request.";
   if (error?.code === "auth/expired-action-code") return "This secure link has expired. Request a current link.";
   if (error?.code === "auth/invalid-action-code") return "This link is invalid, consumed or superseded. Its precise state could not be established.";
+  const proofStates = {
+    "auth/proof-expired": "This secure link has expired. Request a current link.",
+    "auth/proof-consumed": "This secure link has already been used. No action will be repeated.",
+    "auth/proof-superseded": "A newer secure link is current. This older link cannot be used.",
+    "auth/proof-malformed": "This secure link is incomplete or invalid.",
+    "auth/proof-ineligible": "This secure link cannot complete the requested action. Account assistance may be needed.",
+    "auth/proof-temporarily-unverifiable": "This secure link cannot be checked right now. No success or failure has been confirmed.",
+    "auth/proof-identity-conflict": "This proof does not match the current account context. No change was made.",
+  };
+  if (proofStates[error?.code]) return proofStates[error.code];
   if (error?.code === "auth/wrong-purpose") return "This link cannot be used for this operation.";
   if (error?.code === "auth/wrong-account") return "This proof does not match the current account context. No change was made.";
   if (["auth/too-many-requests", "auth/quota-exceeded"].includes(error?.code)) return "This request cannot be completed right now. Please wait before continuing.";

@@ -1,6 +1,5 @@
 import {
   browserLocalPersistence,
-  createUserWithEmailAndPassword,
   getAuth,
   getIdToken,
   reload,
@@ -14,6 +13,7 @@ import {
 import app, { isFirebaseConfigured } from "./config";
 import { clearAuthContinuations } from "../services/authFlow";
 import { requireCustomerAccountAuthority } from "../services/customerAccountAuthority";
+import { registerCustomerAccount, accountRequest, endManagedSessions } from "../services/accountApi";
 import { currentReadDeadline, protectedWriteDeadline } from "../services/operationalRuntime";
 
 export const auth = isFirebaseConfigured ? getAuth(app) : null;
@@ -21,6 +21,8 @@ export const auth = isFirebaseConfigured ? getAuth(app) : null;
 let authenticationInProgress = false;
 let transitionGeneration = 0;
 let pendingSignIn = null;
+let registrationInProgress = false;
+export function isRegistrationInProgress() { return registrationInProgress; }
 
 const SESSION_POLICY_KEY = "udc:auth:session-policy";
 const DEFAULT_STANDARD_HOURS = 24;
@@ -82,10 +84,11 @@ export function subscribeToAuthChanges(callback) {
 }
 
 export function signIn(email, password, { keepSignedIn = false } = {}) {
-  if (pendingSignIn) return Promise.reject(Object.assign(new Error("Authentication is already pending."), { code: "auth/operation-pending" }));
+  if (pendingSignIn || authenticationInProgress) return Promise.reject(Object.assign(new Error("Authentication is already pending."), { code: "auth/operation-pending" }));
   const generation = ++transitionGeneration;
   authenticationInProgress = true;
   pendingSignIn = (async () => { try {
+    if (auth?.currentUser) await endManagedSessions(auth.currentUser);
     const instance = await applyPersistence();
     const operation = signInWithEmailAndPassword(instance, email, password);
     operation.then(credential => {
@@ -102,18 +105,35 @@ export function signIn(email, password, { keepSignedIn = false } = {}) {
   return pendingSignIn;
 }
 
-export async function signUp(email, password, { keepSignedIn = false } = {}) {
-  requireCustomerAccountAuthority();
+export async function signUp(email, password, { keepSignedIn = false, operationId = crypto.randomUUID() } = {}) {
+  if (authenticationInProgress || pendingSignIn) throw Object.assign(new Error("Authentication is already pending."), { code: "auth/operation-pending" });
+  if (auth?.currentUser) throw Object.assign(new Error("Use another account deliberately before creating an account."), { code: "auth/deliberate-switch-required" });
+  const generation = ++transitionGeneration;
   authenticationInProgress = true;
+  registrationInProgress = true;
   try {
+    // Trusted server reserves identity/login conflict before provider creation.
+    // It never stores the raw password, grants client roles or guesses restoration.
+    await registerCustomerAccount(email, password, operationId);
+    if (generation !== transitionGeneration) throw Object.assign(new Error("Authentication transition changed."), { code: "auth/principal-changed" });
     const instance = await applyPersistence();
-    const credential = await createUserWithEmailAndPassword(instance, email, password);
+    if (generation !== transitionGeneration) throw Object.assign(new Error("Authentication transition changed."), { code: "auth/principal-changed" });
+    const operation = signInWithEmailAndPassword(instance, email, password);
+    operation.then(credential => { if (generation !== transitionGeneration && instance.currentUser?.uid === credential.user.uid) void signOut(instance).catch(() => {}); }, () => {});
+    const credential = await protectedWriteDeadline(operation);
+    if (generation !== transitionGeneration) throw Object.assign(new Error("Authentication transition changed."), { code: "auth/principal-changed" });
+    const registration = await accountRequest("registration-result", { operationId }, { principalUid: credential.user.uid });
+    if (registration.state !== "committed") throw Object.assign(new Error("Account creation could not be confirmed. Use account entry or assistance."), { code: "auth/creation-unconfirmed" });
+    const account = await accountRequest("context", {}, { principalUid: credential.user.uid });
+    if (!account.authorized) throw Object.assign(new Error("Current account access is unavailable."), { code: "account-access-unavailable" });
     storeSessionPolicy(keepSignedIn);
+    if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("udc:account:registration-complete", { detail: { principalUid: credential.user.uid } }));
     return credential;
-  } finally { authenticationInProgress = false; }
+  } finally { authenticationInProgress = false; registrationInProgress = false; }
 }
 
-// Profile setup can be retried without creating a second account.
+// Legacy provider-profile writes remain closed. Current private names belong to
+// the versioned Profile owner API, not Firebase's public display-name metadata.
 export function updateAccountName(user, displayName) {
   requireCustomerAccountAuthority();
   return updateProfile(user, { displayName });
@@ -134,6 +154,7 @@ export async function signOutUser() {
   clearAuthContinuations();
   try { sessionStorage.setItem("udc:auth:intentional-signout", String(Date.now())); } catch { /* optional */ }
   try {
+    await endManagedSessions(auth?.currentUser);
     const result = await signOut(requireAuth());
     clearSessionPolicy();
     // A revoked provider may already be null, so Firebase emits no second

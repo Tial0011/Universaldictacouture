@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import * as profile from '../src/services/profileExperience.js';
-import * as authority from '../src/services/customerAccountAuthority.js';
 const source = file => readFileSync(new URL('../'+file,import.meta.url),'utf8');
 test('Personal Details has exactly five concepts; credentials, demographics and privilege fields are rejected',()=>{
   assert.deepEqual(profile.PERSONAL_DETAILS_FIELDS,['profilePhoto','fullName','preferredName','phoneNumber','publicDisplayName']);
@@ -37,16 +36,15 @@ test('continuity stays in My Closet; missing transaction routes are not silently
 });
 test('authenticated account navigation is not blanket blocked, but private data and consequential writes remain separately enforced',()=>{
   assert.match(source('src/App.jsx'),/path="\/profile" element=\{<Profile \/>\}/);
-  const jsx=source('src/pages/Profile/Profile.jsx');assert.match(jsx,/if \(!user\) return <Navigate/);assert.match(jsx,/\["unverifiable", "revoked"\]/);assert.match(jsx,/scope.current\(ticket\)/);
+  const jsx=source('src/pages/Profile/Profile.jsx');assert.match(jsx,/if \(!user\) return <Navigate/);assert.match(jsx,/\["unverifiable", "revoked"\]/);assert.match(source('src/hooks/useAccountProfile.js'),/scope.current\(ticket\)/);
   assert.doesNotMatch(jsx,/user.displayName|profile\?\.phoneNumber|sendAccountVerification|setPassword|deleteUser|setDoc|fetch\(/);
 });
 test('profile service cannot re-enable unsafe UID upserts or raw database dumps when the integration boundary changes',async()=>{
   const context=vm.createContext({Error});
   const synth=entries=>new vm.SyntheticModule(Object.keys(entries),function(){for(const[k,v]of Object.entries(entries))this.setExport(k,v);},{context});
-  for(const available of [false,true]){
+  for(const code of ['account-source-unavailable','profile-source-unavailable']){
     const module=new vm.SourceTextModule(source('src/services/customerProfile.js'),{context});
-    await module.link(name=>name.includes('customerAccountAuthority')?synth(available?{requireCustomerAccountAuthority:()=>({accountId:'bound'})}:authority):synth(profile));await module.evaluate();
-    const code=available?'profile-source-unavailable':'account-source-unavailable';
+    await module.link(name=>name.includes('accountApi')?synth({accountRequest:async()=>{throw Object.assign(new Error('Unavailable owner fixture'),{code});}}):synth(profile));await module.evaluate();
     await assert.rejects(module.namespace.fetchCustomerProfile('A'),{code});await assert.rejects(module.namespace.saveCustomerProfile({uid:'A'},{}),{code});
   }
   assert.doesNotMatch(source('src/services/customerProfile.js'),/setDoc|\.displayName|user\.email|getDoc/);

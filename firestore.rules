@@ -27,12 +27,24 @@ service cloud.firestore {
     // Provider binding lives at the existing membership path; staffId is durable
     // UDC identity. Role labels never grant data or business authority.
     function isStaff() {
+      let staff = request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/admins/$(request.auth.uid)).data : {};
       return request.auth != null
+        && (!exists(/databases/$(database)/documents/principalSecurity/$(request.auth.uid))
+          || request.auth.token.auth_time > get(/databases/$(database)/documents/principalSecurity/$(request.auth.uid)).data.validAfter)
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
-        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true
-        && (legacyDevelopmentMembership(get(/databases/$(database)/documents/admins/$(request.auth.uid)).data)
-          || (get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.get('staffId', '') is string
-            && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.get('staffId', '').trim().size() > 0));
+        && staff.get('sharedAccount', false) != true && staff.get('active', false) == true
+        && (legacyDevelopmentMembership(staff) || (staff.get('staffId', '') is string && staff.get('staffId', '').trim().size() > 0))
+        && registryCompatible(staff);
+    }
+    function registryCompatible(staff) {
+      let id = staff.get('staffId', '');
+      // Existing reviewed memberships retain the development inheritance bridge.
+      // Once provisioned, a mismatched/offboarded registry cannot be bypassed.
+      return legacyDevelopmentMembership(staff)
+        || !exists(/databases/$(database)/documents/staffIdentities/$(id))
+        || (get(/databases/$(database)/documents/staffIdentities/$(id)).data.active == true
+          && get(/databases/$(database)/documents/staffIdentities/$(id)).data.principalUid == request.auth.uid);
     }
     function validRoute(route, purpose) {
       return route.get('active', false) == true && route.get('purpose', '') == purpose;
@@ -48,7 +60,8 @@ service cloud.firestore {
         (legacyDevelopmentMembership(staff) && legacyDevelopmentCapability(capability, purpose))
         || validRoute(broad, purpose)
         || (validRoute(selected, purpose) && objectId in selected.get('ids', []))
-        || (validRoute(assigned, purpose) && assignedStaffId != '' && assignedStaffId == effectiveStaffId()));
+        || (validRoute(assigned, purpose) && staff.get('functionAsCouturier', false) == true && staff.get('eligible', false) == true
+          && assignedStaffId != '' && assignedStaffId == effectiveStaffId()));
     }
     function validAudit(targetCollection, targetId) {
       let id = request.resource.data.get('_lastOperationId', '');
@@ -89,6 +102,53 @@ service cloud.firestore {
       allow update, delete: if false;
     }
     match /admins/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list, write: if false;
+    }
+    // M01/M02 trusted server-owned control/evidence. The Admin SDK bypasses
+    // these Rules; every Account API action performs current authorization.
+    // Never grant ordinary clients direct control-plane reads/writes.
+    match /accounts/{id} { allow read, write: if false; }
+    match /accountBindings/{id} { allow read, write: if false; }
+    match /accountLoginClaims/{id} { allow read, write: if false; }
+    match /accountRegistrations/{id} { allow read, write: if false; }
+    match /accountOperations/{id} { allow read, write: if false; }
+    match /accountPreferences/{id} { allow read, write: if false; }
+    match /accountAddressBooks/{id}/{nested=**} { allow read, write: if false; }
+    match /accountAddressBooks/{id} { allow read, write: if false; }
+    match /accountTombstones/{id} { allow read, write: if false; }
+    match /accountProofs/{id} { allow read, write: if false; }
+    match /accountProofOperations/{id} { allow read, write: if false; }
+    match /accountRecoveryIntents/{id} { allow read, write: if false; }
+    match /accountRecoveryIntake/{id} { allow read, write: if false; }
+    match /accountEvidence/{id} { allow read, write: if false; }
+    match /accountConsentEvidence/{id} { allow read, write: if false; }
+    match /accountSecurityEvidence/{id} { allow read, write: if false; }
+    match /accountLifecycleEvents/{id} { allow read, write: if false; }
+    match /accountLifecycleProjection/{id} { allow read, write: if false; }
+    match /accountRateLimits/{id} { allow read, write: if false; }
+    match /accountSessions/{id} { allow read, write: if false; }
+    match /accountSessionAdmission/{id} { allow read, write: if false; }
+    match /sessionAccess/{id} {
+      allow get: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow list, write: if false;
+    }
+    match /identityConflicts/{id} { allow read, write: if false; }
+    match /identityLinkage/{id} { allow read, write: if false; }
+    match /identityAudit/{id} { allow read, write: if false; }
+    match /identityMigrationEvidence/{id} { allow read, write: if false; }
+    match /staffHumanBindings/{id} { allow read, write: if false; }
+    match /staffIdentities/{id} {
+      // Own minimal identity/access record supports principal resolution, not
+      // capability mutation or discovery of other humans. No secrets stored here.
+      allow get: if request.auth != null && resource.data.principalUid == request.auth.uid
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.get('staffId', '') == id;
+      allow list, write: if false;
+    }
+    match /principalSecurity/{id} { allow read, write: if false; }
+    match /customerAccess/{uid} {
+      // Minimal denial/revalidation signal only. This projection grants no
+      // private-object authority; Account API always re-reads the owner/binding.
       allow get: if request.auth != null && request.auth.uid == uid;
       allow list, write: if false;
     }
@@ -245,9 +305,9 @@ service cloud.firestore {
     }
     match /customerProfiles/{uid} {
       // Provider subject is not durable Account authority (Section 16 M1 F1).
-      // No trusted binding/lifecycle source currently exists in this codebase.
-      // Close legacy customer-only reads/writes until that source is integrated;
-      // never infer an ACTIVE Account from UID/email equality or client flags.
+      // M01 now enforces binding/lifecycle through the trusted Account API.
+      // Direct legacy UID reads/writes remain closed; no client flag supplies
+      // authority or a fallback around that owner boundary.
       allow read: if false;
       // No dormant UID/email-based Personal Details contract to re-enable.
       // The real durable-Account owner API must implement the locked fields.

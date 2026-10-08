@@ -25,6 +25,11 @@ export async function requireAdmin(request, env = process.env, fetcher = fetch) 
   if (!accountResponse.ok) throw new HttpError(accountResponse.status >= 500 ? 503 : 401, "Unable to verify your session. Please sign in again.");
   const account = (await accountResponse.json()).users?.[0];
   if (!account?.localId || account.disabled) throw new HttpError(401, "Please sign in with an active account.");
+  if (account.validSince) {
+    let authTime;
+    try { authTime = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString('utf8')).auth_time; } catch { /* the provider already checked signature; malformed claims remain denied */ }
+    if (!Number.isInteger(authTime) || authTime <= Number(account.validSince)) throw new HttpError(401, "Please establish a current session again.");
+  }
   const membership = await fetcher("https://firestore.googleapis.com/v1/projects/" + encodeURIComponent(project) + "/databases/(default)/documents/admins/" + encodeURIComponent(account.localId), {
     headers: { Authorization: "Bearer " + token }, signal: AbortSignal.timeout(10000),
   });
@@ -33,6 +38,16 @@ export async function requireAdmin(request, env = process.env, fetcher = fetch) 
   const capability = request.method === "DELETE" ? "media.delete" : "media.upload";
   if (!allows(staff, capability, { purpose: "public-media" })) {
     throw new HttpError(403, "Current public-media capability is required to manage these images.");
+  }
+  if (!staff.compatibilityMode) {
+    const response = await fetcher("https://firestore.googleapis.com/v1/projects/" + encodeURIComponent(project) + "/databases/(default)/documents/staffIdentities/" + encodeURIComponent(staff.staffId), { headers: { Authorization: "Bearer " + token }, signal: AbortSignal.timeout(10000) });
+    if (response.status !== 404) {
+      if (!response.ok) throw new HttpError(response.status >= 500 ? 503 : 403, "Current Staff access cannot be established.");
+      const identity = firestoreFields((await response.json()).fields);
+      if (identity.active !== true || identity.principalUid !== account.localId || identity.staffId !== staff.staffId) throw new HttpError(403, "Current Staff access cannot be established.");
+    }
+    // Reviewed legacy/canonical memberships remain compatible before the
+    // separately controlled registry cutover; never fabricate a new identity.
   }
   return staff.staffId;
 }

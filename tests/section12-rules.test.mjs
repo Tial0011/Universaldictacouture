@@ -12,7 +12,7 @@ beforeEach(async () => {
     const store = context.firestore();
     await setDoc(doc(store, "admins/studio"), studioStaff());
     await setDoc(doc(store, "admins/legacy"), { active: true, role: "Super Admin" });
-    await setDoc(doc(store, "admins/narrow"), { active: true, staffId: "s-narrow", capabilities: { "products.read": { selectedObject: { active: true, purpose: "catalogue", ids: ["p1"] } }, "chats.read": { assignmentDerived: { active: true, purpose: "customer-service" } } } });
+    await setDoc(doc(store, "admins/narrow"), { active: true, staffId: "s-narrow", functionAsCouturier: true, eligible: true, capabilities: { "products.read": { selectedObject: { active: true, purpose: "catalogue", ids: ["p1"] } }, "chats.read": { assignmentDerived: { active: true, purpose: "customer-service" } } } });
     for (const id of ["p1", "p2"]) await setDoc(doc(store, "products", id), { name: id, status: "draft", archived: false, _version: 1 });
     for (const [id, staffId] of [["c1", "s-narrow"], ["c2", "other"]]) {
       await setDoc(doc(store, "conversations", id), { customerId: id, assignedStaffId: staffId });

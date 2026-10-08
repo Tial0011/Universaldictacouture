@@ -1,0 +1,40 @@
+{
+  "section": 16,
+  "document": "01",
+  "part": 1,
+  "sourceSha256": "332C09A50D5ABCE905F04912FCA1967D561282999ECC2868A8994B350829A770",
+  "baseline": "9c8ab67020f72fb8561be88c78d19ecde7685dce",
+  "scope": [1, 2],
+  "finalModuleCount": 16,
+  "formalFlowCount": 13,
+  "formalFlowsOnlyInModule": 1,
+  "physicalMapping": "COMPLETED — current repository inspected; staged mapping, no production migration/deployment",
+  "verdict": "PARTIAL",
+  "productionValidated": false,
+  "flows": [
+    {"id":"S16-M01-F01","status":"PASS","meaning":"staged trusted binding/resolution boundary; production mappings not provisioned","code":["netlify/lib/account-contract.js","netlify/lib/account-service.js","netlify/lib/account-handler.js"],"tests":["tests/section16-account.test.mjs","tests/section16-contract.test.mjs"],"collections":["accounts","accountBindings","accountLoginClaims"]},
+    {"id":"S16-M01-F02","status":"PASS","meaning":"staged atomic bootstrap/reservations and client result confirmation; existing legacy identities need reviewed provisioning","code":["netlify/lib/account-service.js","src/firebase/auth.js"],"tests":["tests/section16-account.test.mjs","tests/section16-browser.mjs"],"collections":["accountRegistrations","accountEvidence","customerProfiles"]},
+    {"id":"S16-M01-F03","status":"PASS","meaning":"staged revocable managed Customer sessions/global revocation, freshness and principal isolation","code":["netlify/lib/account-sessions.js","netlify/lib/account-service.js","src/services/accountApi.js","src/hooks/useAccountProfile.js"],"tests":["tests/section16-account.test.mjs","tests/section16-browser.mjs"],"collections":["accountSessions","accountSessionAdmission","principalSecurity","sessionAccess","customerAccess"]},
+    {"id":"S16-M01-F04","status":"PARTIAL","meaning":"purpose-bound proofs, durable replay/supersession/unknown reconciliation implemented; production email adapter and continuous recovery-intake consumer remain unconnected","code":["netlify/lib/account-proofs.js","netlify/lib/account-secrets.js","src/firebase/accountActions.js"],"tests":["tests/section16-account.test.mjs","tests/section16-browser.mjs"],"collections":["accountProofs","accountProofOperations","accountRecoveryIntake","accountRecoveryIntents","accountSecurityEvidence"]},
+    {"id":"S16-M01-F05","status":"PARTIAL","meaning":"strict narrow positive-intent/idempotency interface; real M05 owner import not implemented in this Part","code":["netlify/lib/account-service.js","src/services/accountApi.js"],"tests":["tests/section16-account.test.mjs"],"collections":["accountOperations"]},
+    {"id":"S16-M01-F06","status":"PASS","meaning":"staged versioned Profile/address API and historical firewall; native Profile save/address UI and private-photo owner are not claimed complete","code":["netlify/lib/account-service.js","netlify/lib/account-contract.js","src/services/customerProfile.js"],"tests":["tests/section16-account.test.mjs","tests/section16-browser.mjs"],"collections":["customerProfiles","accountAddressBooks"]},
+    {"id":"S16-M01-F07","status":"PASS","meaning":"staged current preferences plus separate protected consent evidence; downstream delivery consumes eligibility helper","code":["netlify/lib/account-service.js"],"tests":["tests/section16-account.test.mjs"],"collections":["accountPreferences","accountConsentEvidence"]},
+    {"id":"S16-M01-F08","status":"PARTIAL","meaning":"real approved current groups, exclusion/partial failure/revalidation; Style/Order and other owner projections unavailable","code":["netlify/lib/account-service.js"],"tests":["tests/section16-account.test.mjs"],"collections":["customerProfiles","accountPreferences","accountAddressBooks"]},
+    {"id":"S16-M01-F09","status":"PASS","meaning":"staged exact Staff restriction authority and current-owner access denial","code":["netlify/lib/account-service.js","netlify/lib/staff-authority.js","src/hooks/useAccountProfile.js"],"tests":["tests/section16-account.test.mjs","tests/section16-rules.test.mjs"],"collections":["accounts","identityAudit","accountLifecycleEvents"]},
+    {"id":"S16-M01-F10","status":"PARTIAL","meaning":"atomic access withdrawal/minimal Tombstone/Profile removal and address cleanup port; production worker/private-media cleanup and Section12 archive UI integration pending","code":["netlify/lib/account-service.js"],"tests":["tests/section16-account.test.mjs"],"collections":["accounts","accountTombstones","customerProfiles","accountLifecycleEvents"]},
+    {"id":"S16-M01-F11","status":"PARTIAL","meaning":"protected email/binding conflict intake and safe denial; broader evidence intake and operational case surface pending","code":["netlify/lib/identity-resolution.js","netlify/lib/account-service.js"],"tests":["tests/section16-account.test.mjs"],"collections":["identityConflicts","accountLoginClaims"]},
+    {"id":"S16-M01-F12","status":"PARTIAL","meaning":"all four outcomes implemented/tested with exact review scope, current provider control and provenance; operational review/admission provisioning not yet connected","code":["netlify/lib/identity-resolution.js","netlify/lib/staff-authority.js"],"tests":["tests/section16-account.test.mjs"],"collections":["identityConflicts","identityLinkage","identityAudit","accounts","accountBindings"]},
+    {"id":"S16-M01-F13","status":"PARTIAL","meaning":"immediate safety, qualified events/current-epoch reconciliation and consumer interfaces; continuous M13/M15 propagation not started","code":["netlify/lib/account-service.js"],"tests":["tests/section16-account.test.mjs"],"collections":["accountLifecycleEvents","accountLifecycleProjection"]}
+  ],
+  "module2": {
+    "formalFlowIds": [],
+    "status": "PARTIAL",
+    "contracts": ["durable Staff identity","provider resolution","current access","capabilities","Function/availability/eligibility/assignment separation","six complete scopes","anti-privilege-splicing","current authority and freshness","revocation/reassignment enforcement","sensitive-data separation","Admin/Super Admin boundaries","system actor provenance","privacy-safe errors","protected evidence"],
+    "code": ["netlify/lib/staff-authority.js","src/services/staffAuthorization.js","firestore.rules","netlify/lib/image-storage.js","scripts/provision-section16.mjs"],
+    "tests": ["tests/section16-contract.test.mjs","tests/section16-account.test.mjs","tests/section16-rules.test.mjs","tests/admin-compatibility-browser.mjs"],
+    "limitations": ["production canonical/human registry review not run","explicit development bridge intentionally preserved","M14 Claim/assignment owner not implemented here","full per-device Staff-session cutover for legacy direct Firestore clients not performed"]
+  },
+  "noNewVisuals": true,
+  "noProductionMutation": true,
+  "noWholeSectionLock": true
+}

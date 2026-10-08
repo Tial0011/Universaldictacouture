@@ -41,7 +41,7 @@ export const DOMAIN_CONTRACTS = {
   audit: { label: "Audit History", purpose: "audit", collection: "staffAudit", path: "/admin/audit" },
 };
 export function currentStaff(staff) {
-  return staff?.active === true && typeof staff.staffId === "string" && staff.staffId.trim().length > 0;
+  return staff?.active === true && staff.sharedAccount !== true && typeof staff.staffId === "string" && staff.staffId.trim().length > 0;
 }
 export function safeOperationalId(id) {
   return typeof id === "string" && id.length > 0 && id.length <= 200 && !id.includes("/") && !id.includes("\\") && !Array.from(id).some(character => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127);
@@ -57,12 +57,14 @@ export function authorizationRoutes(staff, capability, purpose) {
 }
 export function allows(staff, capability, { purpose, objectId, assignedStaffId, queueId, dataClass, governanceArea } = {}) {
   return authorizationRoutes(staff, capability, purpose).some(route => {
+    if (dataClass && route.family !== "dataPurpose") return false;
+    if (governanceArea && route.family !== "governance") return false;
     if (route.family === "domainWide") return true;
     if (route.family === "selectedObject") return typeof objectId === "string" && Array.isArray(route.ids) && route.ids.includes(objectId);
-    if (route.family === "assignmentDerived") return Boolean(objectId) && assignedStaffId === staff.staffId;
+    if (route.family === "assignmentDerived") return Boolean(objectId) && staff.functionAsCouturier === true && staff.eligible === true && assignedStaffId === staff.staffId;
     if (route.family === "queueSubset") return Boolean(queueId) && Array.isArray(route.queueIds) && route.queueIds.includes(queueId);
     if (route.family === "dataPurpose") return Boolean(objectId && dataClass) && Array.isArray(route.ids) && route.ids.includes(objectId) && Array.isArray(route.dataClasses) && route.dataClasses.includes(dataClass);
-    if (route.family === "governance") return Boolean(governanceArea) && route.area === governanceArea;
+    if (route.family === "governance") return Boolean(governanceArea && objectId) && route.area === governanceArea && Array.isArray(route.ids) && route.ids.includes(objectId);
     return false;
   });
 }
@@ -71,10 +73,10 @@ export function canDiscover(staff, domain) {
   // Discovery is its own entitlement. Unsupported scope queries stay closed.
   return Boolean(contract && authorizationRoutes(staff, `${domain}.read`, contract.purpose).some(route =>
     route.family === "domainWide" || (route.family === "selectedObject" && Array.isArray(route.ids) && route.ids.length > 0)
-    || (domain === "chats" && route.family === "assignmentDerived")));
+    || (domain === "chats" && route.family === "assignmentDerived" && staff.functionAsCouturier === true && staff.eligible === true)));
 }
 export function staffFingerprint(staff) {
-  return JSON.stringify([staff?.staffId, staff?.active, staff?.capabilities || {}, staff?.compatibilityMode || null]);
+  return JSON.stringify([staff?.staffId, staff?.active, staff?.capabilities || {}, staff?.compatibilityMode || null, staff?.functionAsCouturier, staff?.eligible, staff?.sharedAccount, staff?.validAfter]);
 }
 export function firestoreFields(fields = {}) {
   return Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, decode(value)]));

@@ -4,7 +4,7 @@ import Button from "../../components/common/Button";
 import AuthShell from "../../components/auth/AuthShell";
 import { AccountIcon } from "../../components/account/AccountVisuals";
 import { useAuth } from "../../context/AuthContext";
-import { signIn, signOutUser, signUp } from "../../firebase/auth";
+import { auth, isRegistrationInProgress, signIn, signOutUser, signUp } from "../../firebase/auth";
 import {
   applyEmailVerificationCode,
   inspectEmailVerificationCode,
@@ -83,7 +83,7 @@ export default function Auth() {
   const returnState = null;
   const sessionExpired = sessionState === "expired" || location.state?.sessionReason === "expired";
   const [busy, setBusy] = useState(false);
-  const [credentialsPending, setCredentialsPending] = useState(false);
+  const [credentialsPending, setCredentialsPending] = useState(isRegistrationInProgress);
   const [error, setError] = useState(() => path === "/reset-password" && !params.get("oobCode") ? "This reset link is incomplete. Request a new link to continue." : "");
   const [notice, setNotice] = useState(location.state?.verificationNotice || "");
   const actionRequest = useRef(null);
@@ -99,6 +99,16 @@ export default function Auth() {
   const actionMode = params.get("mode");
   const actionCode = params.get("oobCode");
   const submitLock = useRef(false);
+  const registrationOperation = useRef(null);
+  useEffect(() => {
+    if (path !== "/signup") return undefined;
+    const complete = event => {
+      if (event.detail?.principalUid !== auth?.currentUser?.uid) return;
+      setCredentialsPending(false); navigate("/verify-email", { replace: true, state: { returnTo } });
+    };
+    window.addEventListener("udc:account:registration-complete", complete);
+    return () => window.removeEventListener("udc:account:registration-complete", complete);
+  }, [path, navigate, returnTo]);
 
   useDocumentMeta({ title: `${path === "/signup" ? "Create account" : path.includes("reset") || path === "/forgot-password" ? "Account recovery" : path === "/verify-email" ? "Verify email" : "Sign in"} | Universal Dicta Couture`, noindex: true });
 
@@ -186,9 +196,10 @@ export default function Auth() {
     submitLock.current = true;
     setBusy(true); setCredentialsPending(true); setError("");
     try {
-      await signUp(email, password);
+      registrationOperation.current ||= crypto.randomUUID();
+      await signUp(email, password, { operationId: registrationOperation.current });
       if (mounted.current) navigate("/verify-email", { replace: true, state: { returnTo } });
-    } catch (requestError) { setError(accountError(requestError)); }
+    } catch (requestError) { setError(accountError(requestError)); if (requestError.code === "auth/outcome-unknown") setOutcomeUnknown(true); }
     finally { submitLock.current = false; if (mounted.current) { setBusy(false); setCredentialsPending(false); } }
   }
 
@@ -205,7 +216,7 @@ export default function Auth() {
   async function resendVerification() {
     if (!user || busy || cooldown) return;
     setBusy(true); setError(""); setNotice("");
-    try { await sendAccountVerification(user, returnTo); startCooldown(); setNotice("Verification email sent. Check your inbox and spam folder."); }
+    try { await sendAccountVerification(user, returnTo); startCooldown(); setNotice("Verification request accepted. Check your inbox; delivery is not confirmed here."); }
     catch (requestError) { setError(accountError(requestError)); }
     finally { setBusy(false); }
   }
@@ -265,7 +276,7 @@ export default function Auth() {
   const signInCopy = sessionExpired ? "Please establish a current session again. Account lifecycle still applies." : sessionState === "signed-out" ? "Your current provider session has ended. You may deliberately sign in again." : sessionState === "session-ended" ? "This session ended. A lifecycle restriction or deletion is not inferred from this event." : "Continue your Universal Dicta Couture experience.";
   return <AuthShell><div className="auth-flow"><FlowIntro icon={creating ? "users" : sessionExpired ? "alert-circle" : "lock"} eyebrow={creating ? "JOIN THE HOUSE" : sessionExpired ? "SESSION ENDED" : "PRIVATE CLIENT ACCESS"} title={creating ? "Create your account" : signInTitle}>{creating ? "Start your Universal Dicta Couture experience." : signInCopy}</FlowIntro>
     {!isFirebaseConfigured && <p className="auth-flow__status" role="alert">Account access is temporarily unavailable. Please try again later.</p>}
-    {creating && <p className="auth-flow__status" role="status">Account creation is not available yet. No account will be created or linked by submitting this form.</p>}
+    {creating && <p className="auth-flow__fineprint">Account creation checks current identity and login eligibility. Matching email never restores or merges an account.</p>}
     <form className={"auth-flow__form" + (creating ? " auth-flow__form--signup" : "")} aria-busy={busy} onSubmit={creating ? submitSignUp : submitSignIn}>
       <div className="auth-field"><label htmlFor="auth-email">Email</label><input id="auth-email" name="email" type="email" required autoComplete={creating ? "email" : "username"} aria-describedby="auth-error" /></div>
       <PasswordField id="auth-password" name="password" label="Password" minLength={creating ? 15 : undefined} autoComplete={creating ? "new-password" : "current-password"}/>

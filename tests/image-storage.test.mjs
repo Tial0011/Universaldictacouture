@@ -23,6 +23,7 @@ test("Firebase membership check rejects non-admin and disabled accounts", async 
   const env = { FIREBASE_WEB_API_KEY: "test-key", FIREBASE_PROJECT_ID: "test-project" };
   for (const active of [false, true]) {
     const responses = [Response.json({ users: [{ localId: "user" }] }), Response.json({ fields: { active: { booleanValue: active }, staffId: { stringValue: "staff-user" }, capabilities: { mapValue: { fields: { "media.upload": { mapValue: { fields: { domainWide: { mapValue: { fields: { active: { booleanValue: true }, purpose: { stringValue: "public-media" } } } } } } } } } } } })];
+    responses.push(Response.json({},{status:404}));
     const check = requireAdmin(request, env, async () => responses.shift());
     if (active) assert.equal(await check, "staff-user");
     else await assert.rejects(check, error => error.status === 403);

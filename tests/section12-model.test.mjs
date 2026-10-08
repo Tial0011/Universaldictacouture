@@ -20,7 +20,7 @@ test("incomplete routes never splice purpose, scope or capability", () => {
   assert.equal(allows(staff, "chats.read", { purpose: "customer-service", objectId: "c", assignedStaffId: "s" }), false);
 });
 test("selected object and assignment routes are independently complete and current", () => {
-  const staff = { active: true, staffId: "s", capabilities: { "chats.read": { assignmentDerived: { active: true, purpose: "customer-service" } } } };
+  const staff = { active: true, staffId: "s", functionAsCouturier: true, eligible: true, capabilities: { "chats.read": { assignmentDerived: { active: true, purpose: "customer-service" } } } };
   assert.equal(allows(staff, "chats.read", { purpose: "customer-service", objectId: "c", assignedStaffId: "s" }), true);
   assert.equal(allows(staff, "chats.reply", { purpose: "customer-service", objectId: "c", assignedStaffId: "s" }), false);
   assert.equal(allows(staff, "chats.read", { purpose: "customer-service", objectId: "c", assignedStaffId: "other" }), false);
