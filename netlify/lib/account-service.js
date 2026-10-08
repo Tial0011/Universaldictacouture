@@ -1,6 +1,7 @@
 import { randomUUID, createHmac } from "node:crypto";
 import { activeAccount, addressFields, customerProjection, digest, emailKey, exactFields, fail, identifier, preferenceFields, profileFields, requireFresh, RESOLUTIONS } from "./account-contract.js";
 import { resolveStaff } from "./staff-authority.js";
+import { captureIntent } from "./downstream-intent.js";
 
 export function createAccountService({ db, auth, secret, now = Date.now, guestIntentOwner }) {
   const ref = path => db.doc(path);
@@ -8,6 +9,7 @@ export function createAccountService({ db, auth, secret, now = Date.now, guestIn
   const defaults = () => ({ preset: "Important Only", couturierAlerts: false, styleCircle: false });
   const profile = accountId => ({ accountId, version: 1, fields: { profilePhoto: null, fullName: "", preferredName: "", phoneNumber: "", publicDisplayName: "" } });
   const stamp = () => now();
+  const capture = (tx, event) => captureIntent(tx, { ref, keyed, now }, event);
   function publishAccess(tx, account, available = true) {
     tx.set(ref(`customerAccess/${account.principalUid}`), { accountId: account.accountId, epoch: account.epoch, lifecycle: account.lifecycle, available });
   }
@@ -31,6 +33,9 @@ export function createAccountService({ db, auth, secret, now = Date.now, guestIn
     tx.create(ref(`accountPreferences/${accountId}`), { accountId, version: 1, ...defaults() });
     tx.create(ref(`accountAddressBooks/${accountId}`), { accountId, version: 1, defaultId: null, epoch });
     tx.create(ref(`accountEvidence/${randomUUID()}`), { action: "bootstrap", accountId, actor: createdBy, executor: "system:account-bootstrap", createdAt: stamp() });
+    const bootstrapActor = createdBy.staffId ? { kind: "staff", staffId: createdBy.staffId }
+      : { kind: createdBy.kind, ...(createdBy.operationId ? { operationId: createdBy.operationId } : {}) };
+    capture(tx, { domain: "account-bootstrap", operationId: accountId, action: "bootstrap", target: accountId, actor: bootstrapActor, executor: "system:account-bootstrap" });
     return account;
   }
   async function register(input) {
@@ -100,7 +105,9 @@ export function createAccountService({ db, auth, secret, now = Date.now, guestIn
     if (prior.exists && (prior.data().fingerprint !== fingerprint || prior.data().actorUid !== claims.uid)) fail("operation-conflict", 409);
     return { prior: prior.exists ? prior.data() : null, commit(result) {
       const value = { operationId: id, action, target, accountId: account.accountId, actorUid: claims.uid, actorKind: "customer", fingerprint, result, state: "committed", createdAt: stamp() };
-      tx.create(receiptRef, value); return { state: "committed", ...result };
+      tx.create(receiptRef, value);
+      capture(tx, { domain: "account", operationId: id, action, target, actor: { kind: "customer", accountId: account.accountId }, executor: "system:account-api" });
+      return { state: "committed", ...result };
     } };
   }
   async function saveProfile(claims, input) {
@@ -261,6 +268,7 @@ export function createAccountService({ db, auth, secret, now = Date.now, guestIn
       tx.create(ref(`accountOperations/${operationId}`), { operationId, actorUid: claims.uid, actor, action: input.action, target: accountId, result, state: "committed", createdAt: stamp() });
       tx.create(ref(`accountLifecycleEvents/${operationId}`), { accountId, epoch, action: input.action, actor, createdAt: stamp(), reconciled: false });
       tx.create(ref(`identityAudit/${operationId}`), { actor, action: input.action, accountId, reason: input.reason.trim(), createdAt: stamp(), result: "committed" });
+      capture(tx, { domain: "account", operationId, action: input.action, target: accountId, actor: { kind: "staff", staffId: staff.staffId }, executor: "system:account-api" });
       return { state: "committed", ...result };
     });
   }
@@ -314,5 +322,5 @@ export function createAccountService({ db, auth, secret, now = Date.now, guestIn
       return { state: "reconciled", epoch: account.epoch };
     });
   }
-  return { register, registrationResult, context, readProfile, saveProfile, addresses, addressMutation, readPreferences, savePreferences, reconcile, myInformation, revokeSessions, staffCustomerInformation, staffDeletedAccount, deletion, lifecycle, optionalCommunicationEligible, importGuestIntent, cleanupDeletedAddresses, reconcileLifecycle, customer, initialize, publishAccess, ref, defaults, keyed, now, db, auth, secret, RESOLUTIONS };
+  return { register, registrationResult, context, readProfile, saveProfile, addresses, addressMutation, readPreferences, savePreferences, reconcile, myInformation, revokeSessions, staffCustomerInformation, staffDeletedAccount, deletion, lifecycle, optionalCommunicationEligible, importGuestIntent, cleanupDeletedAddresses, reconcileLifecycle, customer, initialize, publishAccess, capture, ref, defaults, keyed, now, db, auth, secret, RESOLUTIONS };
 }

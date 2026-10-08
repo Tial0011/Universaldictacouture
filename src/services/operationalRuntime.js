@@ -1,10 +1,10 @@
 export const OPERATIONAL_STATES = Object.freeze(["normal", "loading", "partial-loading", "empty", "success", "error", "retryable-error", "retry", "connection-problem", "source-unavailable", "partial-source-failure", "restricted", "permission-denied", "stale", "resolved", "resolved-elsewhere", "dormant", "no-results", "checking-result", "unknown-result", "archived", "closed", "temporarily-unavailable"]);
 export function runtimeErrorState(error) {
   const code = String(error?.code || "").replace(/^firestore\//, "");
-  if (["permission-denied", "unauthenticated"].includes(code)) return "restricted";
+  if (["permission-denied", "unauthenticated", "session-required", "session-revoked", "fresh-auth-required", "account-restricted", "account-deleted", "stale-authority", "auth/principal-changed"].includes(code)) return "restricted";
   if (["unavailable", "deadline-exceeded", "network-request-failed"].includes(code)) return "connection-problem";
-  if (code === "outcome-unknown") return "unknown-result";
-  if (code === "aborted") return "stale";
+  if (["outcome-unknown", "auth/outcome-unknown", "security-outcome-unknown"].includes(code)) return "unknown-result";
+  if (["aborted", "stale-conflict", "operation-conflict", "product-state-changed", "address-state-changed"].includes(code)) return "stale";
   return "source-unavailable";
 }
 export function runtimeStateMessage(state) {

@@ -1,13 +1,14 @@
 import sharp from "sharp";
-import { exactFields, fail, identifier } from "./account-contract.js";
+import { digest, exactFields, fail, identifier } from "./account-contract.js";
 import { resolveStaff } from "./staff-authority.js";
 import { MAX_IMAGE_BYTES } from "./image-storage.js";
 
 // This private store is deliberately different from legacy public catalogue
 // uploads. No object locator/derivative bypasses its owning relationship.
-export function createMediaService(account, cluster, { getPrivateStore } = {}) {
+export function createMediaService(account, cluster, { getPrivateStore, ownerContext, publicContext } = {}) {
   const { db, ref, now, keyed } = account;
   const path = id => ref(`mediaAssets/${identifier(id)}`);
+  const sameStageScope = (current,asset) => !asset.purgeState && current.version===asset.expectedVersion && (!current.identity.epoch||current.identity.epoch===asset.expectedEpoch) && (!asset.originalActor?.staffId||asset.originalActor.staffId===current.identity.staffId);
   async function context(tx, claims, input, action) {
     if (input.domain === "product") {
       const ownerRef = ref(`products/${identifier(input.objectId)}`), owner = (await tx.get(ownerRef)).data();
@@ -21,7 +22,8 @@ export function createMediaService(account, cluster, { getPrivateStore } = {}) {
       const actor = await cluster.requestAuthority(tx, claims, owner, action === "read" ? "read" : "edit", true);
       return { ownerRef, owner, version: owner.version, identity: actor };
     }
-    // Payment Proof/Chat/Review attachments require their dedicated owner port.
+    if (ownerContext) { const resolved = await ownerContext(tx, claims, input, action); if (resolved) return resolved; }
+    // Unsupported domains remain closed; no generic assignment fallback.
     // Generic assignment or Admin presence can never grant these data classes.
     fail("media-owner-unavailable", 503);
   }
@@ -50,11 +52,11 @@ export function createMediaService(account, cluster, { getPrivateStore } = {}) {
     const reserved = await db.runTransaction(async tx => {
       const current = await context(tx, claims, input, "upload"), previous = (await tx.get(path(assetId))).data();
       if (previous) {
-        if (previous.fingerprint !== fingerprint || previous.purgeState) fail("operation-conflict", 409);
+        if (previous.fingerprint !== fingerprint || !sameStageScope(current,previous)) fail("operation-conflict", 409);
         return previous;
       }
       if (current.version !== input.expectedVersion || current.identity.epoch && current.identity.epoch !== input.expectedEpoch) fail("stale-conflict", 409);
-      const value = { assetId, blobKey, fingerprint, actorUid: claims.uid, originalActor: current.identity, domain: input.domain, objectId: input.objectId, expectedVersion: input.expectedVersion, expectedEpoch: input.expectedEpoch ?? null, state: "upload-pending", everAttached: false, createdAt: now() };
+      const value = { assetId, blobKey, fingerprint, outputDigest: digest(output), actorUid: claims.uid, originalActor: current.identity, domain: input.domain, objectId: input.objectId, expectedVersion: input.expectedVersion, expectedEpoch: input.expectedEpoch ?? null, state: "upload-pending", everAttached: false, createdAt: now() };
       tx.create(path(assetId), value); return value;
     });
     if (reserved.state !== "validated") {
@@ -68,8 +70,38 @@ export function createMediaService(account, cluster, { getPrivateStore } = {}) {
     }
     return { state: "staged", assetId }; // Uploaded bytes are not a saved request.
   }
+  async function reconcileStage(claims, operationId) {
+    const assetId = keyed(`asset:${claims.uid}:${identifier(operationId)}`);
+    return db.runTransaction(async tx => {
+      const asset = (await tx.get(path(assetId))).data();
+      if (!asset || asset.actorUid !== claims.uid) return { state: "unknown" };
+      const current = await context(tx, claims, asset, "read");
+      if (asset.originalActor?.staffId && asset.originalActor.staffId !== current.identity.staffId) return { state: "unknown" };
+      if (asset.purgeState || current.version !== asset.expectedVersion || current.identity.epoch && current.identity.epoch !== asset.expectedEpoch) return { state: "stale" };
+      return asset.state === "validated" ? { state: "staged", assetId } : { state: "unknown" };
+    });
+  }
+  async function completeStage(claims, input) {
+    exactFields(input,["operationId"]);
+    const initial=await reconcileStage(claims,input.operationId);if(initial.state!=="unknown")return initial;
+    const assetId=keyed(`asset:${claims.uid}:${identifier(input.operationId)}`);
+    const asset=await db.runTransaction(async tx=>{const value=(await tx.get(path(assetId))).data();if(!value||value.actorUid!==claims.uid)return null;const current=await context(tx,claims,value,"read");return sameStageScope(current,value)?value:null;});
+    // No retry of blob creation. Missing original digest/evidence (including
+    // older reservations) remains unknown rather than guessing history.
+    if(!asset||asset.actorUid!==claims.uid||!asset.outputDigest||!getPrivateStore)return{state:"unknown"};
+    const bytes=await getPrivateStore().get(asset.blobKey,{type:"arrayBuffer"});
+    if(!bytes||digest(Buffer.from(bytes))!==asset.outputDigest)return{state:"unknown"};
+    return db.runTransaction(async tx=>{
+      const latest=(await tx.get(path(assetId))).data();if(!latest||latest.fingerprint!==asset.fingerprint||latest.purgeState)return{state:"unknown"};
+      const current=await context(tx,claims,latest,"read");
+      if(!sameStageScope(current,latest))return{state:"stale"};
+      if(latest.state!=="validated")tx.update(path(assetId),{state:"validated",reconciledAt:now()});
+      return{state:"staged",assetId}; // NOT attached, submitted, published or verified
+    });
+  }
   async function attach(claims, input) {
     exactFields(input, ["operationId", "domain", "objectId", "expectedVersion", "expectedEpoch", "assetIds"]);
+    if (!["product", "custom-style"].includes(input.domain)) fail("dedicated-owner-commit-required", 409);
     if (!Array.isArray(input.assetIds) || input.assetIds.length > 8 || new Set(input.assetIds).size !== input.assetIds.length) fail("invalid-argument", 400);
     return db.runTransaction(async tx => {
       const current = await context(tx, claims, input, "attach");
@@ -106,12 +138,17 @@ export function createMediaService(account, cluster, { getPrivateStore } = {}) {
       const current = (await tx.get(path(reference.assetId))).data();
       if (!current || current.purgeState) fail();
       if (publicOnly) {
-        if (reference.domain !== "product") fail();
-        const product = (await tx.get(ref(`products/${reference.objectId}`))).data();
-        if (product?.status !== "published" || product.archived === true || !product.publicRepresentation?.images?.some(image => image.referenceId === referenceId)) fail();
+        if(reference.domain==="product") {
+          const product = (await tx.get(ref(`products/${reference.objectId}`))).data();
+          if (product?.status !== "published" || product.archived === true || !product.publicRepresentation?.images?.some(image => image.referenceId === referenceId)) fail();
+        } else if(!publicContext||!await publicContext(tx,reference))fail();
       } else {
         if (!reference.active) fail();
         const owner = await context(tx, claims, reference, "read");
+        if (reference.domain === "order-origin" && !owner.owner.originalSnapshot?.mediaRefs?.includes(referenceId)) fail();
+        if (reference.domain === "review" && !owner.owner.mediaRefs?.includes(referenceId)) fail();
+        if (reference.domain === "payment-proof" && owner.owner.proofReferenceId !== referenceId) fail();
+        if (reference.domain === "chat") { const message = (await tx.get(ref(`accountConversations/${reference.objectId}/messages/${identifier(reference.messageId)}`))).data(); if (!message?.attachmentReferenceIds?.includes(referenceId)) fail(); }
         if (reference.domain === "custom-style" && !owner.owner.mediaRefs?.includes(referenceId)) fail();
         if (reference.domain === "product" && !owner.owner.images?.some(image => image.referenceId === referenceId)) fail();
       }
@@ -174,5 +211,5 @@ export function createMediaService(account, cluster, { getPrivateStore } = {}) {
       for (const old of previous.docs) if (old.data().active && !images.some(image => image.referenceId === old.id)) tx.update(old.ref, { active: false, detachedAt: now() });
     } };
   }
-  return { stage, attach, deliver, purgeStaged, prepareProductReferences };
+  return { stage, reconcileStage, completeStage, attach, deliver, purgeStaged, prepareProductReferences };
 }

@@ -101,6 +101,7 @@ export function createIdentityResolution(service) {
       tx.create(ref(`accountOperations/${operationId}`), { actorUid: claims.uid, action, target: caseId, fingerprint, state: "committed", result, createdAt: now() });
       tx.create(ref(`identityAudit/${operationId}`), { actor, action, caseId, sourceAccountId: original.accountId, operatingAccountId, reason: input.reason.trim(), result: "committed", createdAt: now() });
       tx.create(ref(`accountLifecycleEvents/${operationId}`), { accountId: operatingAccountId || original.accountId, epoch: original.epoch + 1, action, actor, reconciled: false, createdAt: now() });
+      service.capture(tx, { domain: "identity-resolution", operationId, action, target: caseId, actor: { kind: "staff", staffId: actor.staffId }, executor: "system:identity-api" });
       return { state: "committed", ...result };
     });
   }

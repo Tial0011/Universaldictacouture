@@ -16,6 +16,20 @@ beforeEach(async()=>{await env.clearFirestore();await env.withSecurityRulesDisab
 });});
 after(async()=>{await env?.cleanup();});
 const db=uid=>env.authenticatedContext(uid,{auth_time:100,email:uid+'@example.test'}).firestore();
+test('M13-M16 events/jobs/templates/notification renders/projections/Audit remain server-only',async()=>{
+  const paths=['ownerEvents/source','downstreamJobs/job','downstreamAttempts/attempt','notificationBindings/render','notificationDelivery/result','formalAudit/evidence','sharedConfiguration/bank-transfer','sharedConfiguration/bank-transfer/versions/1','configurationOperations/receipt','productReadModels/derived'];
+  await env.withSecurityRulesDisabled(async c=>{for(const path of paths)await setDoc(doc(c.firestore(),path),{private:'NO DISCLOSURE'});});
+  for(const uid of ['A','canonical','legacy'])for(const path of paths){await assertFails(getDoc(doc(db(uid),path)));await assertFails(updateDoc(doc(db(uid),path),{state:'applied'}));}
+  for(const namespace of ['ownerEvents','downstreamJobs','notificationBindings','formalAudit','sharedConfiguration','productReadModels'])await assertFails(getDocs(query(collection(env.unauthenticatedContext().firestore(),namespace),limit(10))));
+});
+test('M07-M12 new owner data, proof decisions, messages and consent cannot bypass managed API sessions',async()=>{
+  const paths=['orders/main','orders/main/work/base','orders/main/work/base/editions/1','payments/evidence','paymentIntents/reserved','paymentContributions/derived','paymentDecisions/verified','bankTransferEffects/identity','transactionOperations/result','transactionEvidence/audit','orderOperationalHistory/dispatch','dispatchSnapshots/captured','deliveryProviderEvidence/provider','accountConversations/order:main','accountConversations/order:main/messages/message','accountReviews/review','reviewConsentEvidence/grant','reviewHistory/publication'];
+  await env.withSecurityRulesDisabled(async c=>{for(const path of paths)await setDoc(doc(c.firestore(),path),{private:'NO DISCLOSURE'});await setDoc(doc(c.firestore(),'reviewPublicState/visible'),{publicAllowed:true,version:1});await setDoc(doc(c.firestore(),'reviewPublicState/hidden'),{publicAllowed:false,version:2});});
+  for(const uid of ['A','canonical','legacy'])for(const path of paths){await assertFails(getDoc(doc(db(uid),path)));await assertFails(updateDoc(doc(db(uid),path),{owner:'forged'}));}
+  await assertSucceeds(getDoc(doc(env.unauthenticatedContext().firestore(),'reviewPublicState/visible')));
+  await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(),'reviewPublicState/hidden')));
+  await assertFails(getDocs(query(collection(env.unauthenticatedContext().firestore(),'reviewPublicState'),limit(20))));
+});
 test('Customer, canonical Staff and legacy Admin cannot read/list/write trusted identity/evidence/control planes',async()=>{
   for(const uid of ['A','canonical','legacy'])for(const namespace of ['accounts','accountBindings','accountLoginClaims','accountOperations','accountPreferences','accountTombstones','accountProofs','identityConflicts','identityAudit','accountSessions']){
     await assertFails(getDoc(doc(db(uid),namespace,'hidden')));await assertFails(getDocs(query(collection(db(uid),namespace),limit(10))));await assertFails(setDoc(doc(db(uid),namespace,'escalate'),{active:true,role:'Super Admin'}));

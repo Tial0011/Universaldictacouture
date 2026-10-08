@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback,useEffect, useMemo, useState } from "react";
+import { useReviewPublicationGuard } from "../../hooks/useReviewPublicationGuard";
 import HeroCarousel from "../../components/home/HeroCarousel";
 import TrustStrip from "../../components/home/TrustStrip";
 import DiscoveryModule from "../../components/discovery/DiscoveryModule";
@@ -39,6 +40,8 @@ export default function Home() {
   const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
   const [reviewState, setReviewState] = useState({ entries: [], loading: true, error: "" });
   const [reviewAttempt, setReviewAttempt] = useState(0);
+  const withdrawReviews=useCallback(()=>setReviewState({entries:[],loading:false,error:"Current publication must be rechecked. Refresh customer stories."}),[]);
+  useReviewPublicationGuard(reviewState.entries,withdrawReviews);
   const [customStyleImage, setCustomStyleImage] = useState({
     url: heroReadyToWear,
     publicId: "",

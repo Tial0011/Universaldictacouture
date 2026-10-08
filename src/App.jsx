@@ -24,6 +24,8 @@ const Auth = lazy(() => import("./pages/Auth/Auth"));
 const SavedPieces = lazy(() => import("./pages/SavedPieces/SavedPieces"));
 const SavedReviews = lazy(() => import("./pages/SavedReviews/SavedReviews"));
 const MyCloset = lazy(() => import("./pages/MyCloset/MyCloset"));
+const Orders = lazy(() => import("./pages/MyCloset/Orders"));
+const OrderWorkspace = lazy(() => import("./pages/MyCloset/OrderWorkspace"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const AdminSettings = lazy(() => import("./pages/admin/Settings/Settings"));
@@ -69,6 +71,8 @@ export default function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/saved-pieces" element={<Navigate to="/my-closet/my-pieces" replace />} />
         <Route path="/my-closet" element={<CustomerOrGuest><MyCloset /></CustomerOrGuest>} />
+        <Route path="/my-closet/orders" element={<RequireAuth><CustomerAccountBoundary><Orders /></CustomerAccountBoundary></RequireAuth>} />
+        <Route path="/my-closet/orders/:orderId" element={<RequireAuth><CustomerAccountBoundary><OrderWorkspace /></CustomerAccountBoundary></RequireAuth>} />
         <Route path="/my-closet/my-pieces" element={<CustomerOrGuest><SavedPieces /></CustomerOrGuest>} />
         <Route path="/my-closet/saved-reviews" element={<RequireAuth><CustomerAccountBoundary><SavedReviews /></CustomerAccountBoundary></RequireAuth>} />
         <Route path="*" element={<NotFound />} />
@@ -96,6 +100,7 @@ export default function App() {
         <Route path="reviews" element={<StaffRoute domain="reviews"><AdminReviews /></StaffRoute>} />
         <Route path="appearance" element={<StaffRoute domain="content"><AdminAppearance /></StaffRoute>} />
         <Route path="chats" element={<StaffRoute domain="chats"><AdminChats /></StaffRoute>} />
+        <Route path="orders/:orderId" element={<StaffRoute domain="orders"><OrderWorkspace staff /></StaffRoute>} />
         <Route path="audit" element={<StaffRoute domain="audit"><AuditHistory /></StaffRoute>} />
         {[['customers', 'customers'], ['orders', 'orders'], ['payments', 'payments'], ['custom-style', 'customStyle']].map(([path, domain]) =>
           <Route key={path} path={path} element={<StaffRoute domain={domain}><OwnerUnavailable domain={domain} /></StaffRoute>} />)}

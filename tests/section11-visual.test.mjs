@@ -62,7 +62,7 @@ test('continuity links carry no private snapshot and missing commercial destinat
   const html = render(content.ClosetContinuity);
   assert.ok(html.includes('/my-closet/my-pieces')); assert.ok(html.includes('/my-closet/saved-reviews'));
   assert.ok(!html.includes('href="/orders')); assert.ok(!html.includes('href="/payments'));
-  assert.equal((html.match(/Not available yet/g) || []).length, 2);
+  assert.ok(html.includes('/my-closet/orders'));assert.equal((html.match(/Not available yet/g) || []).length, 1);
 });
 test('privacy groups distinguish unavailable from empty, and deletion never claims historical erasure', () => {
   const html = render(content.PrivacyAccount);

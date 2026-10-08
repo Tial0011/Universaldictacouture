@@ -5,17 +5,26 @@ import { createAccountProofs } from "./account-proofs.js";
 import { createAccountSessions } from "./account-sessions.js";
 import { createPretransactionService } from "./pretransaction-service.js";
 import { createMediaService } from "./media-service.js";
+import { createTransactionService } from "./transaction-service.js";
+import { createConversationReviewService } from "./transaction-conversation-review.js";
+import { createConfigurationService } from "./shared-configuration.js";
+import { createOwnerProjections } from "./owner-projections.js";
+import { createRuntimeIntegrity, safeObservation } from "./runtime-integrity.js";
 
 const readActions = new Set(["context", "registration-result", "profile", "addresses", "preferences", "my-information", "operation", "catalogue", "public-media", "media-deliver", "staff-media-deliver", "saves", "save-state", "custom-style", "staff-custom-style", "cluster-operation"]);
-const publicReads = new Set(["catalogue", "public-media"]);
+const transactionReads = new Set(["orders", "order", "staff-order", "edition", "staff-edition", "payment", "staff-payment", "transaction-operation", "messages", "staff-messages", "review-feed"]);
+const systemReads = new Set(["staff-configuration", "configuration-operation", "staff-audit", "public-search", "staff-order-search", "media-operation", "staff-media-operation"]);
+const publicReads = new Set(["catalogue", "public-media", "review-feed", "public-search"]);
 const proofActions = new Set(["proof-inspect", "proof-consume", "proof-reconcile"]);
 const publicActions = new Set(["register", "recovery-request"]);
 export function createAccountHandler(runtime, options = {}) {
   let cluster;
   const service = createAccountService({ ...runtime, guestIntentOwner: (tx, owner, intent) => cluster.importGuest(tx, owner, intent) }), identity = createIdentityResolution(service), proofs = createAccountProofs(service, { origin: runtime.origin, ...options });
+  const transactions = createTransactionService(service), communication = createConversationReviewService(transactions);
+  const configuration = createConfigurationService(service), projections = createOwnerProjections(service), integrity = createRuntimeIntegrity(service);
   let media;
-  cluster = createPretransactionService(service, { ...options, prepareProductMedia: (...args) => media.prepareProductReferences(...args) });
-  media = createMediaService(service, cluster, options);
+  cluster = createPretransactionService(service, { ...options, mainOrderOwner: options.mainOrderOwner || transactions.mainOrderOwner, prepareProductMedia: (...args) => media.prepareProductReferences(...args) });
+  media = createMediaService(service, cluster, { ...options, ownerContext: async (...args) => await transactions.mediaContext(...args) || await communication.mediaContext(...args), publicContext: communication.publicMedia });
   const sessions = createAccountSessions(service, { origin: runtime.origin });
   const json = (value, status = 200) => Response.json(value, { status, headers: { "Cache-Control": "no-store, private", "Referrer-Policy": "no-referrer", "X-Content-Type-Options": "nosniff", "X-Robots-Tag": "noindex, nofollow" } });
   async function limitedBody(request, maxBytes = 65536) {
@@ -42,7 +51,7 @@ export function createAccountHandler(runtime, options = {}) {
     const started = Date.now(), url = new URL(request.url), action = url.searchParams.get("action") || "";
     try {
       if (request.headers.get("origin") && request.headers.get("origin") !== runtime.origin) throw new AccountError("permission-denied");
-      if (readActions.has(action) ? request.method !== "GET" : request.method !== "POST") return json({ error: "method-not-allowed" }, 405);
+      if (readActions.has(action) || transactionReads.has(action) || systemReads.has(action) ? request.method !== "GET" : request.method !== "POST") return json({ error: "method-not-allowed" }, 405);
       const maxBytes = action.endsWith("media-stage") ? 6 * 1024 * 1024 : 65536;
       const bodyText = request.method === "POST" ? await limitedBody(request, maxBytes) : "{}";
       let input; try { input = JSON.parse(bodyText); } catch { return json({ error: "invalid-argument" }, 400); }
@@ -54,12 +63,39 @@ export function createAccountHandler(runtime, options = {}) {
         const result = action === "session-start" ? await sessions.start(request, claims, input) : await sessions.end(request, claims, input);
         const response = json(result.value); response.headers.set("Set-Cookie", result.cookie); return response;
       }
-      if (!publicActions.has(action) && !publicReads.has(action) && !proofActions.has(action) && !["operation", "cluster-operation"].includes(action)) {
+      if (!publicActions.has(action) && !publicReads.has(action) && !proofActions.has(action) && !["operation", "cluster-operation", "transaction-operation", "configuration-operation"].includes(action)) {
         const kind = action.startsWith("staff-") || action === "identity-resolve" ? "staff" : "customer";
         claims = await sessions.validate(request, claims, kind);
       }
       let result;
-      if (action === "catalogue") result = await cluster.catalogue(url.searchParams.get("productId"));
+      if (action === "staff-configuration") result = await configuration.read(claims, url.searchParams.get("configurationId"));
+      else if (action === "staff-configuration-mutate") result = await configuration.mutate(claims, input);
+      else if (action === "staff-template-preview") result = await configuration.preview(claims, input);
+      else if (action === "configuration-operation") result = await configuration.reconcile(claims, url.searchParams.get("operationId"));
+      else if (action === "staff-audit") result = await integrity.auditRead(claims, url.searchParams.get("auditId"));
+      else if (action === "public-search") result = await projections.publicSearch(url.searchParams.get("term") || "");
+      else if (action === "staff-order-search") result = await projections.staffOrders(claims, url.searchParams.get("term") || "");
+      else if (action === "orders") result = await transactions.listOrders(claims);
+      else if (action === "catalogue-order") result = await transactions.catalogueOrder(claims,input);
+      else if (["order", "staff-order"].includes(action)) result = await transactions.readOrder(claims, url.searchParams.get("orderId"), url.searchParams.get("componentId") || "base");
+      else if (["edition", "staff-edition"].includes(action)) result = await transactions.historicalEdition(claims,url.searchParams.get("orderId"),url.searchParams.get("componentId")||"base",Number(url.searchParams.get("number")));
+      else if (["commercial", "staff-commercial"].includes(action)) result = await transactions.commercial(claims, input);
+      else if (action === "payment-intent") result = await transactions.paymentIntent(claims, input);
+      else if (action === "payment-submit") result = await transactions.paymentSubmit(claims, input);
+      else if (action === "staff-payment-review") result = await transactions.paymentReview(claims, input);
+      else if (["payment", "staff-payment"].includes(action)) result = await transactions.paymentDetail(claims, url.searchParams.get("paymentId"));
+      else if (["extension", "staff-extension"].includes(action)) result = await transactions.extension(claims, input);
+      else if (["operations", "staff-operations"].includes(action)) result = await transactions.operational(claims, input);
+      else if (action === "transaction-operation") result = await transactions.reconcile(claims, url.searchParams.get("operationId"));
+      else if (action === "general-chat-start") result = await communication.generalChat(claims, input);
+      else if (["messages", "staff-messages"].includes(action)) result = await communication.messages(claims, url.searchParams.get("chatId"), url.searchParams.has("before") ? Number(url.searchParams.get("before")) : null);
+      else if (["message-send", "staff-message-send"].includes(action)) result = await communication.send(claims, input);
+      else if (action === "review-submit") result = await communication.submitReview(claims, input);
+      else if (action === "review-media-attach") result = await communication.attachReviewMedia(claims, input);
+      else if (["review-change", "staff-review-change"].includes(action)) result = await communication.changeReview(claims, input);
+      else if (action === "review-feed") result = await communication.feed();
+      else if (action === "staff-review-product-draft") result = await communication.reviewToDraft(claims, input);
+      else if (action === "catalogue") result = await cluster.catalogue(url.searchParams.get("productId"));
       else if (["public-media", "media-deliver", "staff-media-deliver"].includes(action)) {
         const bytes = await media.deliver(claims, url.searchParams.get("referenceId"), { publicOnly: action === "public-media", thumbnail: url.searchParams.get("thumbnail") === "1" });
         return new Response(bytes, { headers: { "Content-Type": "image/webp", "Cache-Control": "no-store, private", "Netlify-CDN-Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" } });
@@ -73,6 +109,8 @@ export function createAccountHandler(runtime, options = {}) {
       else if (["custom-style-handoff", "staff-custom-style-handoff"].includes(action)) result = await cluster.handoff(claims, input);
       else if (action === "cluster-operation") result = await cluster.reconcile(claims, url.searchParams.get("operationId"));
       else if (["media-stage", "staff-media-stage"].includes(action)) result = await media.stage(claims, input);
+      else if (["media-operation", "staff-media-operation"].includes(action)) result = await media.reconcileStage(claims, url.searchParams.get("operationId"));
+      else if (["media-stage-reconcile", "staff-media-stage-reconcile"].includes(action)) result = await media.completeStage(claims,input);
       else if (["media-attach", "staff-media-attach"].includes(action)) result = await media.attach(claims, input);
       else if (publicActions.has(action)) {
         if (await rateAllowed(context.ip, action)) result = action === "register" ? await service.register(input) : await proofs.queueRecovery(input);
@@ -103,6 +141,7 @@ export function createAccountHandler(runtime, options = {}) {
       if (publicActions.has(action)) await new Promise(resolve => setTimeout(resolve, Math.max(0, (options.minimumPublicMs ?? 500) - (Date.now() - started))));
       return json(result);
     } catch (error) {
+      try { options.observe?.(safeObservation(error)); } catch { /* diagnostics never replay/rollback owner truth */ }
       // No raw provider/Firestore diagnostics, credentials, private form values or
       // tokens reach logs or responses. Public denial never exposes identity existence.
       if (publicActions.has(action) && error.status !== 400 && error.status !== 503) return json({ state: "accepted" });

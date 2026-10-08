@@ -11,6 +11,8 @@ import { saveCustomStyle, readCustomStyle, reconcilePretransaction } from "../..
 import { auth } from "../../firebase/auth";
 import { useCustomerSession } from "../../hooks/useCustomerSession";
 import { AccountAccessState } from "../../components/account/AccountVisuals";
+import { usePrincipalFence } from "../../hooks/usePrincipalFence";
+import { ownerErrorCopy, ownerErrorState, readOperationMarker, writeOperationMarker, clearOperationMarker } from "../../services/ownerOperation";
 
 export default function CustomStyle() {
   const navigate = useNavigate();
@@ -18,10 +20,16 @@ export default function CustomStyle() {
   const { user } = useAuth();
   const resolved = useCustomerSession();
   const { requestAuth } = useAuthGate();
-  const [state, setState] = useState({ status: "local", message: "" });
+  const [sourceState, setState] = useState({ uid: user?.uid, status: "local", message: "" });
   const pending = useRef(null), saved = useRef(null);
+  const marker = `udc:custom-style-intent:${user?.uid}`;
+  const restored = user ? readOperationMarker(marker) : null;
   const prepared = location.state?.customStyle || {};
-  const [draft, setDraft] = useState(() => ({ idea: prepared.idea || "", fabric: prepared.fabric || "", occasion: prepared.occasion || "" }));
+  const [storedDraft, setStoredDraft] = useState(() => ({ uid: user?.uid || null, idea: prepared.idea || "", fabric: prepared.fabric || "", occasion: prepared.occasion || "" }));
+  const draft = storedDraft.uid && storedDraft.uid !== user?.uid ? { idea:"",fabric:"",occasion:"" } : storedDraft;
+  const state = restored&&(sourceState.uid!==user.uid||["local","unknown"].includes(sourceState.status)) ? {uid:user.uid,status:"unknown",message:"An earlier request outcome is unconfirmed. Check it before saving again."} : sourceState.uid === user?.uid ? sourceState : {status:"local",message:""};
+  const setDraft = update => setStoredDraft({...update(draft),uid:user?.uid||null});
+  const fence=usePrincipalFence(`custom-style:${user?.uid||"guest"}`,()=>{if(storedDraft.uid)setStoredDraft({uid:null,idea:"",fabric:"",occasion:""});setState({uid:user?.uid,status:"local",message:"Current request access must be checked before continuing."});});
   useDocumentMeta({ title: "Custom Style | Universal Dicta Couture", description: "Share your style, fabric and fit preferences with a Dicta Couturier and start your custom enquiry.", canonicalPath: "/custom-style" });
   async function prepareEnquiry(event) {
     event.preventDefault();
@@ -34,36 +42,39 @@ export default function CustomStyle() {
       requestAuth({ returnTo: "/custom-style", returnState: { customStyle: { idea, fabric, occasion } } });
       return;
     }
-    if (pending.current || state.status === "pending") return;
-    const uid = user.uid;
-    setState({ status: "pending", message: "Saving your request…" });
+    if (restored || pending.current?.uid===user.uid || state.status === "pending") return;
+    const uid = user.uid, ticket=fence.begin();
+    setStoredDraft({...draft,uid});
+    setState({ uid, status: "pending", message: "Saving your request…" });
     try {
       const account = await resolveCustomerAccount(user);
-      if (auth.currentUser?.uid !== uid || !account.authorized) throw Error("Access changed");
-      const input = { operationId: crypto.randomUUID(), expectedEpoch: account.epoch, expectedVersion: saved.current?.version || 0, ...(saved.current ? { requestId: saved.current.requestId } : {}), fields: { notes: idea, fabricPreferences: fabric, eventName: occasion } };
-      pending.current = { uid, input };
+      if (!fence.current(ticket) || !account.authorized) return;
+      const prior=saved.current?.uid===uid?saved.current.value:null;
+      const input = { operationId: crypto.randomUUID(), expectedEpoch: account.epoch, expectedVersion: prior?.version || 0, ...(prior ? { requestId: prior.requestId } : {}), fields: { notes: idea, fabricPreferences: fabric, eventName: occasion } };
+      writeOperationMarker(marker,{operationId:input.operationId});pending.current = { uid, input:{operationId:input.operationId} };
       const result = await saveCustomStyle(input);
-      if (auth.currentUser?.uid !== uid) return;
-      saved.current = result; pending.current = null;
-      setState({ status: "confirmed", message: "Your Custom Style request is saved. No Order or Payment has been created." });
+      if (!fence.current(ticket)) return;
+      saved.current = {uid,value:result}; pending.current = null;clearOperationMarker(marker);
+      setState({ uid, status: "confirmed", message: "Your Custom Style request is saved. No Order or Payment has been created." });
     } catch (error) {
-      if (auth.currentUser?.uid !== uid) return;
-      if (!["auth/outcome-unknown", "outcome-unknown"].includes(error.code)) pending.current = null;
-      setState({ status: pending.current ? "unknown" : "failed", message: pending.current ? "The result is not confirmed. Check the outcome before saving again." : "Your request could not be saved. Your local changes remain here." });
+      if (!fence.current(ticket)) return;
+      if (!["auth/outcome-unknown", "outcome-unknown"].includes(error.code)) {pending.current = null;clearOperationMarker(marker);}
+      setState({ uid, status: pending.current ? "unknown" : ownerErrorState(error), message: pending.current ? "The result is not confirmed. Check the outcome before saving again." : ownerErrorCopy(error,"Your request")+" Your current local changes remain here." });
     }
   }
   async function checkOutcome() {
-    const operation = pending.current; if (!operation || auth.currentUser?.uid !== operation.uid) return;
+    const operation = pending.current?.uid===user?.uid?pending.current:restored?{uid:user.uid,input:restored}:null; if (!operation || auth.currentUser?.uid !== operation.uid) return;const ticket=fence.begin();
     try {
       const result = await reconcilePretransaction(operation.input.operationId);
-      if (result.state !== "committed") return;
+      if (result.state !== "committed"){if(fence.current(ticket))setState({uid:operation.uid,status:"unknown",message:"The request is still unconfirmed. It has not been saved again."});return;}
       const current = await readCustomStyle(result.requestId);
-      if (auth.currentUser?.uid !== operation.uid) return;
-      saved.current = current; pending.current = null;
-      setState({ status: "confirmed", message: "Your saved request has been confirmed. No Order or Payment has been created." });
-    } catch { /* Still unknown: preserve the operation, never replay it. */ }
+      if (!fence.current(ticket)) return;
+      saved.current = {uid:operation.uid,value:current}; pending.current = null;clearOperationMarker(marker);
+      setState({ uid:operation.uid,status: "confirmed", message: "Your saved request has been confirmed. No Order or Payment has been created." });
+    } catch(error) {if(fence.current(ticket))setState({uid:operation.uid,status:"unknown",message:ownerErrorCopy(error,"The request outcome")});}
   }
-  if (user && !resolved.user) return <AccountAccessState state={resolved.accountState} onCheck={resolved.recheckCustomer} />;
+  if (user && (!resolved.user||auth.currentUser?.uid!==user.uid)||!user&&auth.currentUser) return <AccountAccessState state={resolved.accountState} onCheck={resolved.recheckCustomer} />;
+  if(state.status==="restricted")return <AccountAccessState state="unavailable" onCheck={()=>{setState({uid:user?.uid,status:"local",message:""});resolved.recheckCustomer();}}/>;
   return <>
     <PageIntro title="Custom Style" description="Discuss your preferred style, fabric and measurements with Dicta Couturier." />
     <div className="container editorial-content">
@@ -85,7 +96,7 @@ export default function CustomStyle() {
           </fieldset>
         </form>
         {state.status === "unknown" && <Button variant="secondary" onClick={checkOutcome}>Check outcome</Button>}
-        {state.status === "confirmed" && <Button variant="secondary" onClick={() => navigate("/chats", { state: { customStyleRequestId: saved.current?.requestId } })}>Discuss with a Couturier</Button>}
+        {state.status === "confirmed" && <Button variant="secondary" onClick={() => navigate("/chats", { state: { customStyleRequestId: saved.current?.uid===user?.uid?saved.current.value.requestId:null } })}>Discuss with a Couturier</Button>}
       </section>
       <div className="editorial-actions"><Button to="/chats" variant="secondary">Contact Dicta Couturier</Button><Button to="/shop" variant="ghost">Browse the shop</Button></div>
     </div>

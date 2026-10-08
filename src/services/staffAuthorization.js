@@ -55,8 +55,10 @@ export function authorizationRoutes(staff, capability, purpose) {
     return route?.active === true && route.purpose === purpose ? [{ ...route, family }] : [];
   });
 }
-export function allows(staff, capability, { purpose, objectId, assignedStaffId, queueId, dataClass, governanceArea } = {}) {
+export function allows(staff, capability, { purpose, objectId, assignedStaffId, queueId, dataClass, governanceArea, action, state } = {}) {
   return authorizationRoutes(staff, capability, purpose).some(route => {
+    if(route.actions&&(!Array.isArray(route.actions)||action&&!route.actions.includes(action)))return false;
+    if(route.states&&(!Array.isArray(route.states)||state&&!route.states.includes(state)))return false;
     if (dataClass && route.family !== "dataPurpose") return false;
     if (governanceArea && route.family !== "governance") return false;
     if (route.family === "domainWide") return true;

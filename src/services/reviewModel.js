@@ -32,6 +32,9 @@ export function reviewStatus(raw = {}) {
   if (["pending", "published", "hidden"].includes(candidate)) return candidate;
   return raw.published === true ? "published" : "pending";
 }
+export function reviewIsPublic(review) {
+  return review && reviewStatus(review) === "published" && review.published !== false && (review._ownerVersion !== 3 || review.permissions?.publication === true && review.moderation === "APPROVED");
+}
 
 function normaliseProductSnapshot(raw) {
   if (!raw || typeof raw !== "object") return null;
@@ -63,6 +66,7 @@ export function normaliseReviewRecord(id, raw = {}) {
 
   return {
     id: String(id || ""),
+    managed: raw.managed === true,
     author: String(raw.author || raw.customerName || "").trim(),
     body,
     status,

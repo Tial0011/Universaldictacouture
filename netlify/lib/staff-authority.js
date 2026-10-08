@@ -10,8 +10,8 @@ export function completeStaffRoute(staff, requirement, claims, now = Date.now())
   if (requirement.couturier && (staff.functionAsCouturier !== true || staff.eligible !== true)) return false;
   if (requirement.newWork && staff.available !== true) return false;
   return authorizationRoutes(staff, requirement.capability, requirement.purpose).some(route => {
-    if (route.actions && !route.actions.includes(requirement.action)) return false;
-    if (route.states && !route.states.includes(requirement.state)) return false;
+    if (route.actions && (!Array.isArray(route.actions) || !route.actions.includes(requirement.action))) return false;
+    if (route.states && (!Array.isArray(route.states) || !route.states.includes(requirement.state))) return false;
     // A sensitive field component always requires a complete data/purpose route.
     if (requirement.dataClass && route.family !== "dataPurpose") return false;
     if (route.family === "domainWide") return !requirement.governanceArea;
@@ -23,12 +23,12 @@ export function completeStaffRoute(staff, requirement, claims, now = Date.now())
     return false;
   });
 }
-export async function resolveStaff(transaction, db, claims, requirement, now) {
+export async function resolveStaffIdentity(transaction, db, claims, now) {
   const raw = (await transaction.get(db.doc(`admins/${claims.uid}`))).data();
   const security = (await transaction.get(db.doc(`principalSecurity/${claims.uid}`))).data();
   if (security && claims.auth_time <= security.validAfter) fail("session-revoked", 401);
   const staff = normalizeStaffMembership(claims.uid, raw);
-  if (!staff || staff.sharedAccount === true) fail();
+  if (!staff || staff.active !== true || staff.sharedAccount === true || !Number.isInteger(claims.auth_time) || claims.auth_time <= (staff.validAfter || 0)) fail();
   if (claims._session) {
     const session = (await transaction.get(db.doc(`accountSessions/${claims._session.id}`))).data();
     if (!session || session.kind !== "staff" || session.uid !== claims.uid || session.staffId !== staff.staffId || !session.active || session.expiresAt <= (typeof now === "function" ? now() : now || Date.now())) fail("session-required", 401);
@@ -41,6 +41,10 @@ export async function resolveStaff(transaction, db, claims, requirement, now) {
     if (identity.active !== true) fail("staff-inactive");
     if (identity.principalUid !== claims.uid || identity.staffId !== staff.staffId || identity.principalUids?.length > 1) fail("staff-binding-ambiguous");
   }
-  if (!completeStaffRoute(staff, requirement, claims, now)) fail();
   return { ...staff, principalUid: claims.uid };
+}
+export async function resolveStaff(transaction, db, claims, requirement, now) {
+  const staff = await resolveStaffIdentity(transaction, db, claims, now);
+  if (!completeStaffRoute(staff, requirement, claims, now)) fail();
+  return staff;
 }

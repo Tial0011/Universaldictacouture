@@ -109,6 +109,18 @@ service cloud.firestore {
     // these Rules; every Account API action performs current authorization.
     // Never grant ordinary clients direct control-plane reads/writes.
     match /accounts/{id} { allow read, write: if false; }
+    // M13-M16: all execution/configuration/evidence and derived stores remain
+    // server-only. A projection or job never grants ordinary client authority.
+    match /ownerEvents/{id} { allow read, write: if false; }
+    match /downstreamJobs/{id} { allow read, write: if false; }
+    match /downstreamAttempts/{id} { allow read, write: if false; }
+    match /notificationBindings/{id} { allow read, write: if false; }
+    match /notificationDelivery/{id} { allow read, write: if false; }
+    match /formalAudit/{id} { allow read, write: if false; }
+    match /sharedConfiguration/{id} { allow read, write: if false; }
+    match /sharedConfiguration/{id}/{nested=**} { allow read, write: if false; }
+    match /configurationOperations/{id} { allow read, write: if false; }
+    match /productReadModels/{id} { allow read, write: if false; }
     // M03-M06 owner mutations/disclosure run through the current-session API.
     match /pretransactionOperations/{id} { allow read, write: if false; }
     match /productHistory/{id} { allow read, write: if false; }
@@ -117,6 +129,24 @@ service cloud.firestore {
     match /customerContinuity/{id} { allow read, write: if false; }
     match /customStyleRequests/{id} { allow read, write: if false; }
     match /customStyleHandoffs/{id} { allow read, write: if false; }
+    match /orders/{id}/{nested=**} { allow read, write: if false; }
+    match /orders/{id} { allow read, write: if false; }
+    match /payments/{id} { allow read, write: if false; }
+    match /paymentIntents/{id} { allow read, write: if false; }
+    match /paymentContributions/{id} { allow read, write: if false; }
+    match /paymentDecisions/{id} { allow read, write: if false; }
+    match /bankTransferEffects/{id} { allow read, write: if false; }
+    match /dispatchSnapshots/{id} { allow read, write: if false; }
+    match /deliveryProviderEvidence/{id} { allow read, write: if false; }
+    match /transactionOperations/{id} { allow read, write: if false; }
+    match /transactionEvidence/{id} { allow read, write: if false; }
+    match /accountConversations/{id}/{nested=**} { allow read, write: if false; }
+    match /accountConversations/{id} { allow read, write: if false; }
+    match /orderOperationalHistory/{id} { allow read, write: if false; }
+    match /reviewHistory/{id} { allow read, write: if false; }
+    match /reviewConsentEvidence/{id} { allow read, write: if false; }
+    match /accountReviews/{id} { allow read, write: if false; }
+    match /reviewPublicState/{id} { allow get: if resource.data.publicAllowed == true; allow list, write: if false; }
     match /accountBindings/{id} { allow read, write: if false; }
     match /accountLoginClaims/{id} { allow read, write: if false; }
     match /accountRegistrations/{id} { allow read, write: if false; }
@@ -283,7 +313,7 @@ service cloud.firestore {
       allow delete: if false;
     }
     match /reviews/{reviewId} {
-      allow read: if resource.data.published == true || canStaff('reviews.read', 'moderation', reviewId, '');
+      allow read: if canStaff('reviews.read', 'moderation', reviewId, '');
       // Consent/version/eligibility owner contract is not implemented in the
       // legacy writer. No general Admin permission substitutes for it.
       allow create, update: if false;

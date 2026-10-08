@@ -12,6 +12,7 @@ import { closetEnquiry } from "../../services/chatModel";
 import { fetchPublishedReviews } from "../../services/content";
 import "../Profile/Profile.css";
 import "./SavedReviewPreview.css";
+import CatalogueIntake from "./CatalogueIntake";
 
 export default function MyCloset() {
   useDocumentMeta({ title: "My Closet | Universal Dicta Couture", noindex: true });
@@ -41,6 +42,7 @@ export default function MyCloset() {
 
   return <section className="account-page container"><div className="account-card">
     <h1>My Closet</h1>
+    <Link to="/my-closet/orders">Your Orders</Link>
     <p>Keep track of pieces you love and customer stories you want to revisit. Adding a piece to your closet does not place an order or make a payment.</p>
 
     <section className="closet-section" aria-labelledby="closet-selected-heading">
@@ -50,6 +52,7 @@ export default function MyCloset() {
         <div><h3><Link to={`/shop/${encodeURIComponent(line.slug || line.productId)}`}>{line.name}</Link></h3><p>{formatNaira(line.price)} · Quantity: {line.quantity}</p><p>{Object.entries(line.selections || {}).map(([key, value]) => `${key}: ${value}`).join(" · ")}</p><Button variant="ghost" onClick={() => removeFromCloset(line.key)}>Remove {line.name}</Button></div>
       </li>)}</ul> : <p>No pieces added yet. Browse the shop to find one you love.</p>}
       {lines.length > 0 && <Button to="/chats" state={{ draft: closetEnquiry(lines) }} variant="secondary">Ask about these pieces</Button>}
+      {user&&<CatalogueIntake lines={lines}/>}
     </section>
 
     <section className="closet-section" aria-labelledby="closet-saved-reviews-heading">

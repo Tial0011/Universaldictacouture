@@ -15,6 +15,7 @@ import { isFirebaseConfigured } from "../firebase/config.js";
 import heroReadyToWear from "../assets/images/hero/hero-ready-to-wear.jpg";
 import { DEFAULT_SHOP_BY_GROUPS, shopByDestination } from "./shopBy.js";
 import { normaliseReviewRecord, selectLatestPublishedReviews, sortPublishedReviews } from "./reviewModel.js";
+import { accountRequest } from "./accountApi";
 
 
 
@@ -347,11 +348,9 @@ export async function fetchPublishedReviews(max = 20, strict = false) {
     // editing an older story must never make it "new" again. We sort the entire
     // published set before applying the homepage cap. A null max returns the
     // complete published feed for /reviews-feeds.
-    const snapshot = await getDocs(
-      query(collection(db, "reviews"), where("published", "==", true))
-    );
-    const reviews = snapshot.docs
-      .map((entry) => normaliseReviewRecord(entry.id, entry.data() ?? {}))
+    const response = await accountRequest("review-feed", {}, { publicRequest: true });
+    const reviews = response.records
+      .map((entry) => normaliseReviewRecord(entry.id, entry))
       .filter(Boolean);
     return max == null ? sortPublishedReviews(reviews) : selectLatestPublishedReviews(reviews, max);
   } catch (error) {

@@ -129,6 +129,7 @@ export function createAccountProofs(service, { deliverProof, origin, ttlSeconds 
       if (account?.proofEffects?.[proof.purpose] === proofId) tx.update(ref(`accounts/${proof.accountId}`), { proofEffects: { ...account.proofEffects, [proof.purpose]: null } });
       if (account && ["ACTIVE", "RESTORED"].includes(account.lifecycle) && !account.canonicalAccountId) service.publishAccess(tx, account, true);
       tx.create(ref(`accountSecurityEvidence/${input.operationId}`), { accountId: proof.accountId, uid: proof.uid, purpose: proof.purpose, createdAt: now(), effect: proof.purpose === "reset" ? "password-updated" : "email-verified" });
+      service.capture(tx, { domain: "account-proof", operationId: input.operationId, action: `proof.${proof.purpose}`, target: proof.accountId, actor: { kind: "proof-holder", accountId: proof.accountId }, executor: "system:account-proof" });
       return { state: "committed", effect: proof.purpose === "reset" ? "password-updated" : "email-verified", accountAccessAuthorized: false };
     });
   }

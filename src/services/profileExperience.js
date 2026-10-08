@@ -9,8 +9,9 @@ export const PERSONAL_DETAILS_FIELDS = Object.freeze(["profilePhoto", "fullName"
 export const COMMUNICATION_PRESETS = Object.freeze(["Important Only", "Balanced", "All Updates"]);
 export const CLOSET_LINKS = Object.freeze([
   { label: "Saved Pieces", to: "/my-closet/my-pieces" }, { label: "Saved Reviews", to: "/my-closet/saved-reviews" },
-  // No exact transaction destination exists yet; never retarget to saved pieces.
-  { label: "Orders", to: null }, { label: "Payments", to: null },
+  // Inherit the actual protected Order destination. No Payment-list destination
+  // exists: never invent one or retarget it to saved pieces.
+  { label: "Orders", to: "/my-closet/orders" }, { label: "Payments", to: null },
 ]);
 export function profileArea(value) { return PROFILE_AREAS.some(area => area.id === value) ? value : "overview"; }
 export function personalDetailsPayload(details) {

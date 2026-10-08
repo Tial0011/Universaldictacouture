@@ -2,7 +2,7 @@ import { exactFields, fail, identifier } from "./account-contract.js";
 import { resolveStaff } from "./staff-authority.js";
 import { normaliseProduct } from "../../src/services/productModel.js";
 import { productReadiness } from "../../src/services/adminModel.js";
-import { reviewStatus } from "../../src/services/reviewModel.js";
+import { reviewIsPublic } from "../../src/services/reviewModel.js";
 
 export const PRODUCT_FIELDS = ["name", "slug", "description", "price", "unitLabel", "priceToken", "category", "occasion", "style", "fabric", "colour", "size", "shopBy", "primaryImage", "images", "options", "variants", "aliases", "keywords", "isNewIn"];
 export const REQUEST_FIELDS = ["serviceType", "eventName", "dateNeeded", "stylePreferences", "fabricPreferences", "colourPreferences", "measurements", "deliveryLocation", "quantity", "matchingPieces", "notes"];
@@ -17,7 +17,8 @@ export function publicProduct(id, raw) {
   if (raw?.status !== "published" || raw.archived === true) return null;
   const representation = raw._ownerVersion === 2 ? raw.publicRepresentation : raw;
   if (!representation) return null;
-  return normaliseProduct(id, { ...pick(representation, PRODUCT_FIELDS), status: "published", publishedAt: raw.publishedAt || raw.firstPublishedAt });
+  const product = normaliseProduct(id, { ...pick(representation, PRODUCT_FIELDS), status: "published", publishedAt: raw.publishedAt || raw.firstPublishedAt });
+  return product ? { ...product, publicVersion: raw.publicVersion ?? raw._version ?? 0 } : null;
 }
 
 // M03/M05/M06 use the existing identity/session boundary. This module never
@@ -33,6 +34,7 @@ export function createPretransactionService(account, { mainOrderOwner, preparePr
     if (prior && (prior.actorUid !== claims.uid || prior.fingerprint !== fingerprint)) fail("operation-conflict", 409);
     return { prior, commit(result) {
       tx.create(path, { operationId, actorUid: claims.uid, actor, action, target, fingerprint, result, createdAt: now(), state: "committed" });
+      account.capture(tx, { domain: "pretransaction", operationId, action, target, actor, executor: "system:pretransaction-api" });
       return { state: "committed", ...result };
     } };
   }
@@ -119,8 +121,11 @@ export function createPretransactionService(account, { mainOrderOwner, preparePr
     if (kind !== "review") fail("invalid-argument", 400);
     // Only the current public Review eligibility is consumed. No Review edits,
     // private media or consent semantics are implemented by the save owner.
-    const review = (await tx.get(ref(`reviews/${identifier(id)}`))).data();
-    return review && reviewStatus(review) === "published" && review.published !== false ? { id } : null;
+    const modern = (await tx.get(ref(`accountReviews/${identifier(id)}`))).data(), legacy = (await tx.get(ref(`reviews/${id}`))).data();
+    if (modern && legacy) fail("review-source-ambiguous", 503);
+    const review = modern || legacy;
+    if(modern){const order=(await tx.get(ref(`orders/${modern.orderId}`))).data(),base=(await tx.get(ref(`orders/${modern.orderId}/work/base`))).data();if(order?.accountId!==modern.authorAccountId||!base?.completed||!order.reviewEnabled||order.activeExtensionId)return null;}
+    return reviewIsPublic(review) ? { id } : null;
   }
   async function listSaves(claims, kind) {
     if (!["piece", "review"].includes(kind)) fail("invalid-argument", 400);

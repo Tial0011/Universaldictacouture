@@ -32,7 +32,7 @@ test('presets are a single mutually exclusive unset group when current persisten
 });
 test('continuity stays in My Closet; missing transaction routes are not silently retargeted',()=>{
   assert.equal(profile.CLOSET_LINKS[0].to,'/my-closet/my-pieces');assert.equal(profile.CLOSET_LINKS[1].to,'/my-closet/saved-reviews');
-  assert.ok(profile.CLOSET_LINKS.slice(2).every(link=>link.to===null));assert.equal(profile.profileArea('//foreign'),'overview');
+  assert.equal(profile.CLOSET_LINKS[2].to,'/my-closet/orders');assert.equal(profile.CLOSET_LINKS[3].to,null);assert.equal(profile.profileArea('//foreign'),'overview');
 });
 test('authenticated account navigation is not blanket blocked, but private data and consequential writes remain separately enforced',()=>{
   assert.match(source('src/App.jsx'),/path="\/profile" element=\{<Profile \/>\}/);
