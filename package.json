@@ -5,21 +5,24 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run check:functions && vite build",
+    "check:functions": "node --no-experimental-require-module scripts/check-function-startup.mjs",
+    "test:accounts": "node --experimental-vm-modules --test --test-concurrency=1 tests/account-continuity-repair.test.mjs tests/account-session-client.test.mjs tests/account-owner-rules.test.mjs tests/function-startup.test.mjs tests/section11-visual.test.mjs",
     "lint": "oxlint",
     "preview": "vite preview"
   },
   "dependencies": {
     "@netlify/blobs": "^11.1.0",
     "firebase": "^12.19.0",
-    "firebase-admin": "^14.5.0",
+    "firebase-admin": "14.5.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.4",
     "sharp": "^0.35.4"
   },
   "overrides": {
-    "@grpc/grpc-js": "^1.13.6"
+    "@grpc/grpc-js": "^1.13.6",
+    "firebase-admin": { "jwks-rsa": "3.2.0" }
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.2",

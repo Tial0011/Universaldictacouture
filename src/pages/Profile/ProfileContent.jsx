@@ -21,7 +21,7 @@ export function ProfileOverview({ profileState, openArea, onRefresh }) {
   return <>
     <div className="profile-overview-lead">
       <AccountPanel className="profile-welcome" title="Welcome back" description="Your style journey continues." icon="users">
-        <Unavailable loading={profileState === "loading"}>{profileState === "loading" ? "Checking your current Profile…" : "We can’t load your Profile right now. You can still explore your account settings."}</Unavailable>
+        {profileState === "loaded" ? <p role="status">Your account is connected. Open Personal Details to view or update your current information.</p> : <Unavailable loading={profileState === "loading"}>{profileState === "loading" ? "Checking your current Profile…" : "We can’t load your Profile right now. You can still explore your account settings."}</Unavailable>}
         <div className="account-actions"><Button onClick={() => openArea("personal")}>Personal Details</Button><Button variant="ghost" onClick={onRefresh}>Check Profile again</Button></div>
       </AccountPanel>
       <AccountPanel title="Customer Attention" description="Anything that needs your action." icon="alert-circle"><Unavailable>We can’t check action-required items right now. No task or count has been assumed.</Unavailable><Button onClick={() => openArea("security")} variant="ghost">Sign-in & Security</Button></AccountPanel>

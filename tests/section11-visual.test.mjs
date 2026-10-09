@@ -38,6 +38,12 @@ test('privacy shield renders no child Profile or account data and keeps states d
     assert.ok(html.includes(state === 'revoked' ? 'Session revoked' : state === 'checking' ? 'Checking current access' : 'Your information is currently unavailable'));
   }
 });
+
+test('loaded Profile overview never claims that its working source is unavailable', () => {
+  const html=render(content.ProfileOverview,{profileState:'loaded',openArea(){},onRefresh(){}});
+  assert.ok(html.includes('Your account is connected'));
+  assert.ok(!html.includes('We can’t load your Profile right now'));
+});
 test('unavailable Personal Details has five concepts, associated native labels and no inferred credential/profile data', () => {
   const html = render(content.PersonalDetails, { profileState: 'unavailable', profile: { fullName: 'STALE-PRIVATE', email: 'secret@example.test' } });
   assert.equal((html.match(/<dt>/g) || []).length, 5); assert.equal((html.match(/<input/g) || []).length, 4);

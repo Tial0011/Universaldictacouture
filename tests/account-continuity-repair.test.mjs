@@ -1,0 +1,123 @@
+import test, { before, after } from 'node:test';
+import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
+import { initializeApp, deleteApp } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
+import { createExistingAccountRepair } from '../netlify/lib/existing-account-repair.js';
+import { createAccountService } from '../netlify/lib/account-service.js';
+import { createAccountHandler } from '../netlify/lib/account-handler.js';
+import { completeStaffRoute, resolveStaffIdentity } from '../netlify/lib/staff-authority.js';
+import { normalizeStaffMembership, allows } from '../src/services/staffAuthorization.js';
+import { emailKey } from '../netlify/lib/account-contract.js';
+import { SUPER_ADMIN_PROFILE } from '../src/services/superAdminPolicy.js';
+import { createStaffManagement } from '../netlify/lib/staff-management.js';
+
+const id = () => randomUUID(), origin = 'http://127.0.0.1:5182';
+let app, db, auth, runtime, repair, service;
+before(() => {
+  process.env.FIRESTORE_EMULATOR_HOST='127.0.0.1:8089';process.env.FIREBASE_AUTH_EMULATOR_HOST='127.0.0.1:9099';process.env.METADATA_SERVER_DETECTION='none';
+  app=initializeApp({projectId:'demo-udc-section12'},'account-repair-'+id());db=getFirestore(app);auth=getAuth(app);
+  runtime={db,auth,origin,secret:'local-account-repair-identity-secret-only'};
+  repair=createExistingAccountRepair(runtime);service=createAccountService(runtime);
+});
+after(async()=>{await db?.terminate();await deleteApp(app);});
+async function existing({ admin=false, disabled=false }={}) {
+  const uid=id(), email=`repair-${uid}@example.test`, password='Local-Repair-Fixture-Only!';
+  await auth.createUser({uid,email,password,emailVerified:true,disabled});
+  if(admin)await db.doc('admins/'+uid).set({active:true,role:'Admin'});
+  return {uid,email,password,auth_time:Math.floor(Date.now()/1000)};
+}
+test('legacy customer dry-run, concurrent repair and replays retain the exact provider, private profile and history',async()=>{
+  const person=await existing();
+  await db.doc('customerProfiles/'+person.uid).set({fullName:'Existing Customer',phoneNumber:'+234',staffNotes:'PRIVATE NOT PROFILE'});
+  const history=db.doc('orders/'+id());await history.set({customerId:person.uid,capturedName:'Historical name'});
+  assert.equal((await repair.customer(person.uid)).state,'would-bind');
+  assert.equal((await db.doc('accountBindings/'+person.uid).get()).exists,false);
+  const results=await Promise.all([repair.customer(person.uid,{commit:true}),repair.customer(person.uid,{commit:true})]);
+  assert.equal(results[0].accountId,results[1].accountId);assert.notEqual(results[0].accountId,person.uid);
+  const context=await service.context(person);assert.equal(context.authorized,true);assert.equal(context.emailVerification,'confirmed');
+  const profile=await service.readProfile(person);assert.equal(profile.fullName,'Existing Customer');assert.equal(profile.staffNotes,undefined);
+  assert.equal((await history.get()).data().capturedName,'Historical name');
+  assert.equal((await auth.getUser(person.uid)).uid,person.uid);
+  assert.equal((await repair.customer(person.uid,{commit:true})).state,'already-bound');
+});
+test('repair never restores restricted/deleted accounts, follows email to another identity, or converts customers to staff',async()=>{
+  const person=await existing();assert.equal((await repair.admin(person.uid,{commit:true})).state,'ineligible');
+  const result=await repair.customer(person.uid,{commit:true});
+  await db.doc('accounts/'+result.accountId).update({lifecycle:'RESTRICTED'});
+  await repair.customer(person.uid,{commit:true});assert.equal((await service.context(person)).lifecycle,'RESTRICTED');
+  const conflict=await existing();await db.doc('accountLoginClaims/'+emailKey(conflict.email,runtime.secret)).set({accountId:'protected-existing-account',state:'deleted'});
+  await assert.rejects(repair.customer(conflict.uid,{commit:true}),{code:'account-binding-ambiguous'});
+  assert.equal((await db.doc('accountBindings/'+conflict.uid).get()).exists,false);
+  const disabled=await existing({disabled:true});assert.equal((await repair.customer(disabled.uid,{commit:true})).state,'ineligible');
+});
+test('existing admins receive canonical independent identities and the explicit profile; role text and deactivation do not grant access',async()=>{
+  const a=await existing({admin:true}),b=await existing({admin:true});
+  assert.equal((await repair.admin(a.uid)).state,'would-promote');
+  const [one,two]=await Promise.all([repair.admin(a.uid,{commit:true,paymentReview:true}),repair.admin(b.uid,{commit:true})]);
+  assert.notEqual(one.staffId,two.staffId);
+  const staff=await db.runTransaction(tx=>resolveStaffIdentity(tx,db,a,Date.now()));
+  assert.equal(staff.accessProfile,SUPER_ADMIN_PROFILE);assert.equal(staff.role,'Super Admin');
+  assert.equal(allows(staff,'products.publish',{purpose:'catalogue',objectId:'product'}),true);
+  assert.equal(allows(staff,'settings.templates.edit',{purpose:'communication-settings',objectId:'template'}),true);
+  assert.equal(completeStaffRoute(staff,{capability:'payments.verify',purpose:'payment-evidence',objectId:'p',dataClass:'payment-proof',action:'verify',freshSeconds:300},a),true);
+  assert.equal(completeStaffRoute(staff,{capability:'settings.bank.edit',purpose:'financial-settings',objectId:'bank-transfer',governanceArea:'financial-settings',action:'edit'},a),true);
+  const second=normalizeStaffMembership(b.uid,(await db.doc('admins/'+b.uid).get()).data());
+  assert.equal(allows(second,'payments.verify',{purpose:'payment-evidence',objectId:'p',dataClass:'payment-proof'}),false);
+  assert.equal(allows({active:true,staffId:'fake',role:'Super Admin',capabilities:{}},'products.publish',{purpose:'catalogue',objectId:'p'}),false);
+  await db.doc('admins/'+a.uid).update({active:false});await assert.rejects(db.runTransaction(tx=>resolveStaffIdentity(tx,db,a,Date.now())));
+  assert.equal((await repair.admin(a.uid,{commit:true})).state,'ineligible');
+});
+test('canonical Staff ID and existing independent protected grants survive promotion; ambiguous identity is denied',async()=>{
+  const person=await existing({admin:true}),staffId=id();
+  const bank={governance:{active:true,purpose:'financial-settings',area:'financial-settings',ids:['bank-transfer']}};
+  await db.doc('admins/'+person.uid).update({staffId,capabilities:{'independent.review':bank}});
+  const result=await repair.admin(person.uid,{commit:true});assert.equal(result.staffId,staffId);
+  assert.deepEqual((await db.doc('admins/'+person.uid).get()).data().capabilities['independent.review'],bank);
+  assert.equal((await repair.admin(person.uid,{commit:true})).state,'already-promoted');
+  const other=await existing({admin:true});await db.doc('admins/'+other.uid).update({staffId});
+  await assert.rejects(repair.admin(other.uid,{commit:true}),{code:'staff-binding-ambiguous'});
+});
+test('repaired existing admin can use customer Profile and Staff workspace with separate real token/cookies; public catalogue needs neither',async()=>{
+  const person=await existing({admin:true});await repair.customer(person.uid,{commit:true});await repair.admin(person.uid,{commit:true});
+  const signed=await fetch('http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=local',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:person.email,password:person.password,returnSecureToken:true})});
+  const {idToken}=await signed.json();assert.ok(idToken);
+  const handler=createAccountHandler(runtime);
+  const call=(action,body,cookie)=>handler(new Request(origin+'/.netlify/functions/account?action='+action,{method:body?'POST':'GET',headers:{Origin:origin,...(action==='catalogue'?{}:{Authorization:'Bearer '+idToken}),...(cookie?{Cookie:cookie}:{}),...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{})}),{ip:'127.0.0.1'});
+  const customer=await call('session-start',{kind:'customer',keepSignedIn:false,label:'Local QA'});assert.equal(customer.status,200);
+  const customerCookie=customer.headers.get('set-cookie').split(';')[0];assert.equal((await call('context',null,customerCookie)).status,200);
+  assert.equal((await call('profile',null,customerCookie)).status,200);
+  const staff=await call('session-start',{kind:'staff',keepSignedIn:false,label:'Local QA'});assert.equal(staff.status,200);
+  const staffCookie=staff.headers.get('set-cookie').split(';')[0];assert.notEqual(staffCookie,customerCookie);
+  assert.equal((await call('staff-template-library',null,staffCookie)).status,200);
+  assert.equal((await call('profile',null,staffCookie)).status,401);
+  assert.equal((await call('catalogue')).status,200);
+});
+test('either owner independently changes another admin; no second approval, stale writes, replay or self-escalation',async()=>{
+  const a=await existing({admin:true}),b=await existing({admin:true}),target=await existing({admin:true});
+  await repair.admin(a.uid,{commit:true,owner:true,paymentReview:true});await repair.admin(b.uid,{commit:true,owner:true,paymentReview:true});await repair.admin(target.uid,{commit:true,paymentReview:true});
+  const management=createStaffManagement(service),all=await management.list(a);
+  assert.ok(Array.isArray(all.records));assert.ok(all.capabilities.includes('products.publish'));
+  await assert.rejects(management.list(target),{code:'permission-denied'});
+  const input={uid:target.uid,operationId:id(),expectedVersion:1,action:'capability',capability:'products.publish',enabled:false};
+  const first=await management.change(a,input);assert.equal(first.version,2);
+  assert.equal((await management.change(a,input)).version,2);
+  assert.equal((await management.reconcile(a,input.operationId)).state,'committed');
+  assert.equal((await management.reconcile(b,input.operationId)).state,'unknown');
+  let staff=normalizeStaffMembership(target.uid,(await db.doc('admins/'+target.uid).get()).data());
+  assert.equal(allows(staff,'products.publish',{purpose:'catalogue',objectId:'p'}),false);
+  assert.equal(allows(staff,'products.read',{purpose:'catalogue',objectId:'p'}),true);
+  await assert.rejects(management.change(b,{...input,operationId:id(),enabled:true}),{code:'stale-conflict'});
+  await management.change(b,{...input,operationId:id(),expectedVersion:2,enabled:true});
+  await assert.rejects(management.change(a,{...input,uid:b.uid,operationId:id()}),{code:'protected-owner'});
+  await assert.rejects(management.change(target,{...input,operationId:id()}),{code:'permission-denied'});
+  const race=await Promise.allSettled([a,b].map(owner=>management.change(owner,{uid:target.uid,operationId:id(),expectedVersion:3,action:'all',enabled:false})));
+  assert.equal(race.filter(result=>result.status==='fulfilled').length,1);
+  staff=normalizeStaffMembership(target.uid,(await db.doc('admins/'+target.uid).get()).data());assert.equal(Object.keys(staff.capabilities).length,0);
+  await management.change(a,{uid:target.uid,operationId:id(),expectedVersion:4,action:'active',enabled:false});
+  await assert.rejects(db.runTransaction(tx=>resolveStaffIdentity(tx,db,target,Date.now())));
+  await management.change(b,{uid:target.uid,operationId:id(),expectedVersion:5,action:'active',enabled:true});
+  await assert.rejects(db.runTransaction(tx=>resolveStaffIdentity(tx,db,target,Date.now()))); // old session remains revoked
+  await assert.rejects(management.change({...a,auth_time:a.auth_time-400},{...input,operationId:id(),expectedVersion:6}),{code:'fresh-auth-required'});
+});

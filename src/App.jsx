@@ -35,6 +35,7 @@ const CommunicationTemplates = lazy(() => import('./pages/admin/Notifications/No
 const CommunicationDeliveryIssues = lazy(() => import('./pages/admin/Notifications/Notifications').then(module=>({default:module.DeliveryIssues})));
 
 const AdminSettings = lazy(() => import("./pages/admin/Settings/Settings"));
+const AdminStaffAccess = lazy(() => import("./pages/admin/Settings/StaffAccess"));
 const AdminShop = lazy(() => import("./pages/admin/Shop/ShopControl"));
 const Dashboard = lazy(() => import("./pages/admin/Dashboard/Dashboard"));
 const AdminProducts = lazy(() => import("./pages/admin/Products/Products"));
@@ -117,6 +118,7 @@ export default function App() {
         {[['customers', 'customers'], ['payments', 'payments'], ['custom-style', 'customStyle']].map(([path, domain]) =>
           <Route key={path} path={path} element={<StaffRoute domain={domain}><OwnerUnavailable domain={domain} /></StaffRoute>} />)}
         <Route path="settings" element={<AdminSettings />} />
+        <Route path="settings/admins" element={<AdminStaffAccess />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

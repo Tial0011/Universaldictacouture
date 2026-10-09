@@ -304,7 +304,15 @@ export function createCommunicationService(account, configuration, { sourcePolic
   async function issueAccess(tx,claims,branchId,action) {return resolveStaff(tx,db,claims,{capability:`communications.delivery.${action}`,purpose:'communication-reliability',objectId:branchId,action,dataClass:'delivery-evidence'},now());}
   async function issues(claims) {
     return db.runTransaction(async tx=>{
-      const staff=await resolveStaffIdentity(tx,db,claims,now()),ids=new Set(authorizationRoutes(staff,'communications.delivery.read','communication-reliability').filter(route=>route.family==='dataPurpose'&&Array.isArray(route.ids)&&Array.isArray(route.dataClasses)&&route.dataClasses.includes('delivery-evidence')).flatMap(route=>route.ids)),records=[];
+      const staff=await resolveStaffIdentity(tx,db,claims,now());
+      const routes=authorizationRoutes(staff,'communications.delivery.read','communication-reliability').filter(route=>route.family==='dataPurpose'&&Array.isArray(route.dataClasses)&&route.dataClasses.includes('delivery-evidence'));
+      const ids=new Set(routes.flatMap(route=>Array.isArray(route.ids)?route.ids:[])),records=[];
+      // Explicit all-object data-purpose authority still uses a bounded query
+      // and the same current per-object authorization before disclosure.
+      if(routes.some(route=>route.allObjects===true)) {
+        const page=await tx.get(db.collection('communicationDeliveryIssues').limit(101));
+        for(const row of page.docs)ids.add(row.id);
+      }
       for(const id of ids){identifier(id);try{await issueAccess(tx,claims,id,'read');}catch(error){if(error.status===403)continue;throw error;}const issue=(await tx.get(ref(`communicationDeliveryIssues/${id}`))).data();if(issue)records.push({branchId:id,state:issue.state,domain:issue.domain,channel:issue.channel,reason:issue.reason,version:issue.version,humanActionRequired:issue.humanActionRequired});}
       return{records:records.slice(0,100),state:records.length>100?'PARTIALLY AVAILABLE':'READY'};
     });

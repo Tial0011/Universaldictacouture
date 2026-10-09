@@ -11,6 +11,7 @@ import { AccountAccessState, AccountIcon, AccountNotice } from "../../components
 import { ProfileOverview, PersonalDetails, SavedAddresses, SignInSecurity, Communications, PrivacyAccount, ContinueExploring, DictaExperience } from "./ProfileContent";
 import { AREA_ICONS, AREA_DESCRIPTIONS } from "./profileVisualContract";
 import "./Profile.css";
+import ProfileDetailsEditor from "./ProfileDetailsEditor";
 
 export default function Profile() {
   const { user, isLoading, sessionState, recheckSession } = useAuth();
@@ -55,7 +56,7 @@ export default function Profile() {
     <div className="profile-content"><header className="profile-heading"><p className="profile-eyebrow">Your Universal Dicta Couture account</p><h1 ref={heading} tabIndex={-1}>{title}</h1><p>{AREA_DESCRIPTIONS[area]}</p></header>
       {error && <AccountNotice state="unknown" title="Sign-out could not be confirmed" announce={false} actions={<Button onClick={recheckSession}>Check current session</Button>}><p role="alert">{error}</p></AccountNotice>}
       {area === "overview" && <ProfileOverview profileState={profileState} openArea={openArea} onRefresh={() => { setAttempt(value => value + 1); }} />}
-      {area === "personal" && <PersonalDetails profileState={profileState} profile={source.uid === uid ? source.profile : null} />}
+      {area === "personal" && (profileState === "loaded" ? <ProfileDetailsEditor key={`${uid}:${source.epoch}`} uid={uid} source={source} onRefresh={() => setAttempt(value => value + 1)} /> : <PersonalDetails profileState={profileState} profile={null} />)}
       {area === "addresses" && <SavedAddresses />}
       {area === "security" && <SignInSecurity user={user} busy={busy} logout={logout} logoutBlocked={signOutUnknown} />}
       {area === "communications" && <Communications />}

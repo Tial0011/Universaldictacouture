@@ -15,6 +15,7 @@ import { nativeCommunicationPolicies } from './communication-sources.js';
 import { createCommunicationTestSend } from './communication-test-send.js';
 import { createOrderWorkspace } from './order-workspace.js';
 import { createOrderGovernance } from './order-governance.js';
+import { createStaffManagement } from './staff-management.js';
 
 const readActions = new Set(["context", "registration-result", "profile", "addresses", "preferences", "my-information", "operation", "catalogue", "public-media", "media-deliver", "staff-media-deliver", "saves", "save-state", "custom-style", "staff-custom-style", "cluster-operation"]);
 const transactionReads = new Set(["orders", "order", "staff-order", "edition", "staff-edition", "payment", "staff-payment", "transaction-operation", "messages", "staff-messages", "review-feed"]);
@@ -26,6 +27,7 @@ systemReads.add('staff-delivery-issue');
 for (const action of ['staff-order-workspace','staff-order-queue','staff-order-original','staff-order-payments','staff-order-extensions','staff-order-activity']) systemReads.add(action);
 for (const action of ['staff-order-notes','staff-order-note-history','staff-order-escalations']) systemReads.add(action);
 systemReads.add('staff-order-summary');
+systemReads.add('staff-access-list'); systemReads.add('staff-access-operation');
 const publicReads = new Set(["catalogue", "public-media", "review-feed", "public-search"]);
 const proofActions = new Set(["proof-inspect", "proof-consume", "proof-reconcile"]);
 const publicActions = new Set(["register", "recovery-request"]);
@@ -35,6 +37,7 @@ export function createAccountHandler(runtime, options = {}) {
   const transactions = createTransactionService(service), communication = createConversationReviewService(transactions);
   const orderWorkspace = createOrderWorkspace(transactions);
   const orderGovernance = createOrderGovernance(transactions);
+  const staffManagement = createStaffManagement(service);
   const configuration = createConfigurationService(service), projections = createOwnerProjections(service), integrity = createRuntimeIntegrity(service);
   const notifications=createCommunicationService(service,configuration,{...options,origin:runtime.origin,sourcePolicies:nativeCommunicationPolicies(service)});
   const templateTests=createCommunicationTestSend(service,configuration,{provider:options.testEmailProvider,origin:runtime.origin});
@@ -84,7 +87,10 @@ export function createAccountHandler(runtime, options = {}) {
         claims = await sessions.validate(request, claims, kind);
       }
       let result;
-      if (action === 'staff-order-notes') result = await orderGovernance.noteList(claims,url.searchParams.get('orderId'),url.searchParams.get('componentId') || 'base');
+      if(action==='staff-access-list')result=await staffManagement.list(claims);
+      else if(action==='staff-access-change')result=await staffManagement.change(claims,input);
+      else if(action==='staff-access-operation')result=await staffManagement.reconcile(claims,url.searchParams.get('operationId'));
+      else if (action === 'staff-order-notes') result = await orderGovernance.noteList(claims,url.searchParams.get('orderId'),url.searchParams.get('componentId') || 'base');
       else if (action === 'staff-order-note-history') result = await orderGovernance.noteHistory(claims,url.searchParams.get('orderId'),url.searchParams.get('noteId'));
       else if (action === 'staff-order-note-change') result = await orderGovernance.noteChange(claims,input);
       else if (action === 'staff-order-escalations') result = await orderGovernance.escalationList(claims,url.searchParams.get('orderId'),url.searchParams.get('componentId') || 'base');

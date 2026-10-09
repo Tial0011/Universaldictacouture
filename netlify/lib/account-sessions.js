@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { exactFields, fail, requireFresh } from "./account-contract.js";
-import { normalizeStaffMembership, currentStaff } from "../../src/services/staffAuthorization.js";
+import { resolveStaffIdentity } from './staff-authority.js';
 
 export function createAccountSessions(service, { origin }) {
   const { db, ref, keyed, customer, now } = service;
@@ -22,12 +22,7 @@ export function createAccountSessions(service, { origin }) {
       let identity;
       if (kind === "customer") { const account = await customer(tx, claims); identity = { accountId: account.accountId, epoch: account.epoch }; }
       else {
-        const raw = (await tx.get(ref(`admins/${claims.uid}`))).data(), staff = normalizeStaffMembership(claims.uid, raw);
-        if (!currentStaff(staff)) fail();
-        if (!staff.compatibilityMode) {
-          const current = (await tx.get(ref(`staffIdentities/${staff.staffId}`))).data();
-          if (!current || current.active !== true || current.principalUid !== claims.uid) fail("staff-migration-required");
-        }
+        const staff = await resolveStaffIdentity(tx, db, claims, now());
         identity = { staffId: staff.staffId };
       }
       const admission = (await tx.get(ref(`accountSessionAdmission/${keyed(kind + ":" + claims.uid)}`))).data();

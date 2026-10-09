@@ -1,3 +1,4 @@
+import { SUPER_ADMIN_PROFILE, OWNER_PROFILE, effectiveAdminCapabilities } from './superAdminPolicy.js';
 // Shared presentation/Netlify policy. Firestore independently enforces this contract.
 // TEMPORARY OWNER-AUTHORIZED DEVELOPMENT BRIDGE. Remove only after every
 // production admins/{uid} membership has reviewed canonical identity/grants.
@@ -15,6 +16,9 @@ function legacyDevelopmentMembership(raw) {
 }
 export function normalizeStaffMembership(uid, rawAdminRecord) {
   if (!safeOperationalId(uid) || !rawAdminRecord || typeof rawAdminRecord !== "object" || Array.isArray(rawAdminRecord)) return null;
+  if (currentStaff(rawAdminRecord) && [SUPER_ADMIN_PROFILE, OWNER_PROFILE].includes(rawAdminRecord.accessProfile)) {
+    return { ...rawAdminRecord, capabilities: effectiveAdminCapabilities(rawAdminRecord) };
+  }
   if (currentStaff(rawAdminRecord) || rawAdminRecord.active !== true) return rawAdminRecord;
   if (!legacyDevelopmentMembership(rawAdminRecord)) return null;
   // Session/audit alias for the same existing principal, NOT a persisted new
@@ -66,8 +70,8 @@ export function allows(staff, capability, { purpose, objectId, assignedStaffId, 
     if (route.family === "selectedObject") return typeof objectId === "string" && Array.isArray(route.ids) && route.ids.includes(objectId);
     if (route.family === "assignmentDerived") return Boolean(objectId) && staff.functionAsCouturier === true && staff.eligible === true && assignedStaffId === staff.staffId;
     if (route.family === "queueSubset") return Boolean(queueId) && Array.isArray(route.queueIds) && route.queueIds.includes(queueId);
-    if (route.family === "dataPurpose") return Boolean(objectId && dataClass) && Array.isArray(route.ids) && route.ids.includes(objectId) && Array.isArray(route.dataClasses) && route.dataClasses.includes(dataClass);
-    if (route.family === "governance") return Boolean(governanceArea && objectId) && route.area === governanceArea && Array.isArray(route.ids) && route.ids.includes(objectId);
+    if (route.family === "dataPurpose") return Boolean(objectId && dataClass) && (route.allObjects === true || Array.isArray(route.ids) && route.ids.includes(objectId)) && Array.isArray(route.dataClasses) && route.dataClasses.includes(dataClass);
+    if (route.family === "governance") return Boolean(governanceArea && objectId) && route.area === governanceArea && (route.allObjects === true || Array.isArray(route.ids) && route.ids.includes(objectId));
     return false;
   });
 }
@@ -79,7 +83,7 @@ export function canDiscover(staff, domain) {
     || (["chats","orders"].includes(domain) && route.family === "assignmentDerived" && staff.functionAsCouturier === true && staff.eligible === true)));
 }
 export function staffFingerprint(staff) {
-  return JSON.stringify([staff?.staffId, staff?.active, staff?.capabilities || {}, staff?.compatibilityMode || null, staff?.functionAsCouturier, staff?.eligible, staff?.sharedAccount, staff?.validAfter]);
+  return JSON.stringify([staff?.staffId, staff?.active, staff?.capabilities || {}, staff?.compatibilityMode || null, staff?.functionAsCouturier, staff?.eligible, staff?.sharedAccount, staff?.validAfter, staff?.accessProfile, staff?.accessVersion]);
 }
 export function firestoreFields(fields = {}) {
   return Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, decode(value)]));

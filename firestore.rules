@@ -22,7 +22,9 @@ service cloud.firestore {
     }
     function effectiveStaffId() {
       let staff = get(/databases/$(database)/documents/admins/$(request.auth.uid)).data;
-      return legacyDevelopmentMembership(staff) ? 'legacy-dev:' + request.auth.uid : staff.get('staffId', '');
+      // isStaff/capability checks establish legitimacy; this helper only
+      // attributes the already-authorized actor. Avoid repeating scope checks.
+      return staff.get('staffId', 'legacy-dev:' + request.auth.uid);
     }
     // Provider binding lives at the existing membership path; staffId is durable
     // UDC identity. Role labels never grant data or business authority.
@@ -34,6 +36,7 @@ service cloud.firestore {
           || request.auth.token.auth_time > get(/databases/$(database)/documents/principalSecurity/$(request.auth.uid)).data.validAfter)
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
         && staff.get('sharedAccount', false) != true && staff.get('active', false) == true
+        && (staff.get('validAfter', 0) == 0 || request.auth.token.get('auth_time', 0) > staff.validAfter)
         && (legacyDevelopmentMembership(staff) || (staff.get('staffId', '') is string && staff.get('staffId', '').trim().size() > 0))
         && registryCompatible(staff);
     }

@@ -18,8 +18,8 @@ export function completeStaffRoute(staff, requirement, claims, now = Date.now())
     if (route.family === "selectedObject") return !requirement.governanceArea && Array.isArray(route.ids) && route.ids.includes(requirement.objectId);
     if (route.family === "assignmentDerived") return !requirement.governanceArea && staff.functionAsCouturier === true && staff.eligible === true && requirement.assignedStaffId === staff.staffId;
     if (route.family === "queueSubset") return !requirement.governanceArea && requirement.queueEligible === true && Array.isArray(route.queueIds) && route.queueIds.includes(requirement.queueId);
-    if (route.family === "dataPurpose") return Array.isArray(route.ids) && route.ids.includes(requirement.objectId) && Array.isArray(route.dataClasses) && route.dataClasses.includes(requirement.dataClass);
-    if (route.family === "governance") return route.area === requirement.governanceArea && Array.isArray(route.ids) && route.ids.includes(requirement.objectId);
+    if (route.family === "dataPurpose") return Boolean(requirement.objectId) && (route.allObjects === true || Array.isArray(route.ids) && route.ids.includes(requirement.objectId)) && Array.isArray(route.dataClasses) && route.dataClasses.includes(requirement.dataClass);
+    if (route.family === "governance") return Boolean(requirement.objectId) && route.area === requirement.governanceArea && (route.allObjects === true || Array.isArray(route.ids) && route.ids.includes(requirement.objectId));
     return false;
   });
 }
