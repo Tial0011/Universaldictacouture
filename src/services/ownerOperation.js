@@ -12,12 +12,14 @@ export function createPrincipalFence(principal, scope = () => "") {
   };
 }
 export function ownerErrorState(error) {
+  if(error?.code==='no-semantic-change')return 'validation';
   if(["invalid-argument","invalid-media"].includes(error?.code))return "validation";
   if(["payment-ineligible","payment-not-enabled","review-ineligible","publication-ineligible","approval-required"].includes(error?.code))return "stale";
   if(["operation-storage-unavailable","receipt-file-unavailable"].includes(error?.code))return "failed";
   return runtimeErrorState(error);
 }
 export function ownerErrorCopy(error, subject = "This action") {
+  if(error?.code==='no-semantic-change')return 'No semantic change is present. No new Edition was established; current approvals and history are unchanged.';
   const state = ownerErrorState(error);
   if(error?.code==="operation-storage-unavailable")return "We could not keep the information needed to confirm this action. It was not started.";
   if(state==="validation")return "These details were not accepted. Check the required fields before continuing.";

@@ -1,4 +1,82 @@
-# Section 11 complete final visual pass — latest QA
+# Section 14 Document 17 + Official Visual Ledger — current QA
+
+final result: blocked
+
+The current Section-14 result is a partial functional implementation, not a completed visual handoff. Previous Section-15/11/12 QA records below are preserved and not recertified by this report.
+
+## Source and runtime evidence
+
+Both supplied Section-14 visual documents were read completely as Word body/table/caption text: 7,045 and 903 non-empty paragraphs. The 27 unique main library images and all nine ledger contact sheets were opened. Non-current gallery material remains quarantined; no historical source image was regenerated. Exact source hashes and 42 documentation-reference records: `docs/section14-source-map.json`.
+
+Source visual truth paths: `.tools.local/section14-reference/library/image1.png` (workspace), `image7.png` (historical Edition), `image26.png` (corrected Escalation), `image27.png` (Notes). Workspace/Edition source canvases: 1672×941; Escalation/Notes: 1536×1024. These are multi-state/device-framed boards, not declared browser CSS viewports.
+
+Runtime: `.tools.local/section14-reference/runtime/{order-queue,workspace,edition-history,fulfilment-delivery,operational-notes,escalation}-{320,1440}.png`; native result `runtime/browser-result.json`. CSS viewports 320/390/768/1024/1440×1000, device density 1; CSS 200% zoom also checked. Desktop runtime captures are 1440×1000; narrow-mobile captures are 320×1000.
+
+Combined source-left/runtime-right inputs were generated and opened: `.tools.local/section14-reference/comparisons/{workspace,edition,notes,escalation}.png`, each 2000×750 with two aspect-contained 1000×750 panels. This is contextual hierarchy comparison, **not** equal-population/device-frame-normalized pixel fidelity. Source primary Escalation uses a Delivery Exception/Under Review scenario; captured native evidence uses work-issue/Resolved, so exact-state visual matching remains unclosed. A full-view comparison is insufficient to certify every fine control; no focused-region fidelity PASS is claimed.
+
+## Findings
+
+- [P1] Full 34-flow visual/state closure is incomplete. Historical Product-media anchors, authorized Customer/current-Profile comparison, complete Chat Glance/Activity, Customer Extension request/acceptance UX, advanced delivery/settlement and permission-shaped state families remain missing or partial. Fix by integrating their genuine owner sources and capturing matching states; never insert illustrative images or invented source values.
+- [P1] Historical photographs and rich provenance regions in the source have no implemented transaction-bound media reader/capture for every origin. Current Product imagery must not substitute for missing Ordered As evidence. Source asset fidelity therefore cannot pass.
+- [P2] The header's long native identity previously wrapped into four lines. Fixed by using the existing owner `publicReference` when present and removing the heading width restriction; identity remains the durable `orderId`. Post-fix `runtime/workspace-1440.png` was inspected. No human-reference numbering policy was invented.
+- [P2] Existing Admin header showed Dashboard on an Order leaf and did not highlight its owning destination. Fixed in the existing shell; current comparison shows Orders & Operations. No replacement shell was made.
+- [P2] Reference boards contain richer progressive-disclosure/comparison hierarchy than the current partial reader. Full fidelity iteration is blocked on missing source integrations and matching scenario coverage, rather than declared passed from reflow alone.
+
+## Required fidelity surfaces
+
+- Typography: inherited Cormorant Garamond/Inter and existing readable brand hierarchy, not generated microtext. Full source optical/density matching remains partial.
+- Spacing/layout: existing Admin shell and two-column-to-single-column workspace preserved. Tested reflow has no horizontal overflow at the listed widths. Reference population/region completeness remains partial.
+- Colors/tokens: inherited burgundy, cream and source-approved non-color labels. No arbitrary theme or replacement logo was introduced.
+- Image quality/assets: current brand and unmodified existing Feather icons retained. Missing historical media is stated honestly; no fake raster/logo/diagram was added.
+- Copy/content: exact work/Edition/source targets, truthful unknown outcomes, separate approval/payment/work gates, separate private Notes and governance state. Illustrative IDs/amounts and stale Prepared for Dispatch/Change Handler were not restored.
+
+## Functional interaction evidence
+
+`node tests/section14-browser.mjs` passed native Staff sign-in, existing Global Search→reauthorized current Order, My Work queue, real owner Working Change Save/Edition establishment, lost acknowledgement with one consequence/original-operation reread, historical read-only view, stale approval denial, Product withdrawal without historical rewrite, Note add/correct/redact, Escalation create/review/resolve with source still unresolved, offline shield/reconnect, capability loss and deactivation. Native Escape confirmation, keyboard Tab, AX-tree withdrawal, four mobile Staff destinations, reduced motion, 200% CSS zoom and 320/390/768/1024/1440 reflow were exercised; zero Runtime exceptions recorded. This is not every 34-flow state nor full screen-reader/email/provider acceptance.
+
+## Implementation checklist
+
+Complete the remaining owner integrations and visual scenarios listed in the Section-14 verdict; normalize same-state captures and inspect focused controls; then repeat QA before any release. No production deployment or visual-completion PASS is authorized by these functional tests.
+
+---
+
+# Section 15 Document 01 Part 1 — preserved QA
+
+final result: blocked
+
+This current Section-15 evidence does not replace or claim fresh closure of the preserved Section-11/12 reports below. Source inspection, functional implementation and full visual acceptance are different results.
+
+Source truth: `SECTION 15 DOCUMENT 1 PART 1 .docx`, SHA256 `7C72600754A05E06EBF43C7074A807A7CB142CB0A4E84D21BA78DAE8966EF00A`. All 27 boards opened under `.tools.local/section15-part1-reference/`; written overrides and current owning shells control. Full board mapping: `docs/section15-part1-visual-map.json`.
+
+Implementation evidence: owner-approved isolated headless Chrome, local Firebase Auth/Firestore and real trusted Account API; synthetic Customer/Staff accounts only. Current browser harness: `tests/section15-browser.mjs`; result: `.tools.local/section15-part1-reference/browser-result.json`. Screenshots: `runtime-{customer-centre,staff-centre,template-editor,delivery-issues}-{320,1440}.png`, `runtime-customer-latest-320.png`, `runtime-customer-unknown-result.png`, `runtime-staff-inactive.png`. The final native journey passed, including deactivation and reduced-motion checks; zero runtime exceptions recorded. This functional result does not close the full visual gate.
+
+Viewports: 320/390/768/1024/1440 CSS px ×1000, density 1; Customer latest 320×900. 200% CSS zoom/reflow also tested. Source boards are multi-panel/device-framed illustration canvases, not authoritative CSS-size screens. `comparison-{customer,staff,template,delivery,mobile}.png` and `comparison-final-*.png` put source and actual runtime together, aspect-contained in equal 800×1000 panels. They are **not** falsely described as same-population/device-frame-normalized pixel equality.
+
+## Findings and comparison history
+
+1. P2 initial: adding Bell to the narrow Header's existing three-column quick controls wrapped/crowded the tools. Adjusted only the Bell-present layout; at narrow widths existing Custom Style/Review destinations remain in the existing menu. Recaptured narrow runtime.
+2. P2 initial: notification read/archive controls expanded each row and the floating Chat launcher overlapped notification actions. Moved presentation actions into native keyboard-operable details and suppressed only the overlapping launcher on the owning notification centre. Chat remains separately accessible. Recaptured runtime.
+3. P2 initial: large heading/toolbar spacing and one-column desktop Template editor wasted space compared with the references. Reduced heading/toolbar density, retained 44px-height controls, compacted narrow filters, and added a desktop two-column editor. Current comparison captures show the changes.
+4. Functional defect: previous-filter results could arrive after a new filter selection. Filter is now part of the principal/presentation fence. Source and role remain independently enforced on the server.
+5. Test-harness defects, not production fixes: stale Vite optimized imports, clicking busy Undo, racing queued close/focus events, a deliberate Account-switch continuation, an invalid undefined Firestore fixture update and requiring literal zero instead of the existing reduced-motion near-zero token. Fixed harness synchronization/fixture setup without weakening application gates.
+6. Remaining P2/acceptance gap: full 27-board same-state/state-population comparison is not complete. Source example counts, dense history/timeline cases, all preview/disclosure states and production Email-client output are not represented by the current small synthetic source. No fabricated business/provider records were added to make a screenshot appear complete.
+7. Required dependency: real owner-specific source/reminder/Attention and live provider contracts must be integrated before missing operational states can receive full acceptance. Safe unavailable states are truthful but do not count as those complete journeys.
+
+## Required fidelity surfaces
+
+- Fonts/typography: existing Cormorant Garamond/Inter and current site tokens reused; no parallel font/brand system. Heading/row density refined, long content and enlarged text checked; exact all-board typographic match is not claimed.
+- Spacing/layout rhythm: existing owning shell retained, responsive full-screen Customer latest, native menus/group expansion, two-column desktop editor and compact mobile transformation. Reflow checks passed in tested states. Full source-density closure remains open.
+- Colors/tokens: current wine/ivory/ink and restrained borders; explicit text for current/read/unknown/issue states, not color alone. No source diagram rebuilt as product UI.
+- Image quality/asset fidelity: current official repository logo/brand assets and unmodified upstream Feather artwork, including Bell. Source phone frames/illustrative scenery/sample portraits were not copied into live UI or replaced by fake SVG/CSS artwork.
+- Copy/content: controlled Customer/Staff taxonomies, exact filter families, safe unavailable/unknown wording, minimum preview disclosure, current source labels, no stale navigation/60%/Stylist/unsupported-channel assumptions.
+
+Native functional checks include real UI read/archive/undo, one-write acknowledgement loss and readback, A→B isolation, exact Staff filters, four mobile destinations, Template save/preview/publish/history, current capability withdrawal, protected issue detail with unavailable provider and disabled safe retry, keyboard focus and accessibility-tree checks. No manual screen-reader/WCAG or production deliverability certification is implied.
+
+Implementation checklist: close owner/policy/provider dependencies, capture the remaining genuinely supported states at matching viewports, repeat full/focused comparisons and resolve remaining P0/P1/P2 acceptance gaps before changing this result to passed. No completed-prototype handoff is asserted while this gate remains blocked.
+
+---
+
+# Preserved Section 11 complete final visual pass — earlier QA
 
 final result: blocked
 

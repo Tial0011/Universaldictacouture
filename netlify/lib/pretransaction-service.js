@@ -248,7 +248,7 @@ export function createPretransactionService(account, { mainOrderOwner, preparePr
   }
   async function reconcile(claims, operationId) {
     const operation = (await ref(`pretransactionOperations/${identifier(operationId)}`).get()).data();
-    if (!operation || operation.actorUid !== claims.uid) return { state: "unknown" };
+    if (!operation || !await db.runTransaction(tx=>account.ownsResult(tx,claims,operation,operationId,"pretransaction"))) return { state: "unknown" };
     // Minimal owned result only. Private source payload and history never leak.
     if (operation.action === "custom-style.handoff") {
       if (!mainOrderOwner?.exists || !await mainOrderOwner.exists(operation.result.orderId)) return { state: "unknown" };

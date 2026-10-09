@@ -17,6 +17,7 @@ foreach($archive in @(@{Role='primary';Name='SECTION 16 VISUAL OFFICIAL .docx'},
         if(-not $records.Contains($id)){
           $condition=if($inline){$inline}else{$rows[$index+2]}
           $records[$id]=[ordered]@{sourceQualifiedId=$archive.Role+':'+$id;id=$id;module=$id.Substring(7,3);condition=$condition;paragraph=$index}
+          if($archive.Role -eq 'primary'){$records[$id].audience=$rows[$index+3];$records[$id].visualReference=$rows[$index+4];$records[$id].visualClass=$rows[$index+5]}
         }
       }
     }

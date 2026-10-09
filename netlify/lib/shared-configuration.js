@@ -1,5 +1,7 @@
 import { exactFields, fail, identifier } from "./account-contract.js";
 import { resolveStaff } from "./staff-authority.js";
+import { COMMUNICATION_TEMPLATES, validateCommunicationCopy, renderCommunication, syntheticContext, defaultCommunicationCopy } from './communication-contract.js';
+import { resolveStaffIdentity } from './staff-authority.js';
 
 export const TEMPLATE_CONTEXT = Object.freeze(["brandName", "actionLabel", "safePath"]);
 const controls = (text, singleLine = false) => Array.from(text).some(character => {
@@ -31,10 +33,12 @@ export function createConfigurationService(account) {
   const { db, ref, now, keyed } = account;
   function kind(id) {
     if (id === "bank-transfer") return "bank";
+    if (Object.hasOwn(COMMUNICATION_TEMPLATES, id)) return 'communication';
     if (/^template:(security|transactional|couturierAlerts|styleCircle)$/.test(id)) return "template";
     fail("configuration-not-supported", 400); // no generic settings/system-law store
   }
   function validate(id, value) {
+    if (kind(id) === 'communication') return validateCommunicationCopy(id, value);
     if (kind(id) === "template") return template(value);
     exactFields(value, ["bankName", "accountName", "accountNumber"]);
     for (const text of [value.bankName, value.accountName, value.accountNumber]) if (typeof text !== "string" || !text.trim() || text.length > 160 || controls(text, true)) fail("invalid-bank-instruction", 400);
@@ -61,7 +65,8 @@ export function createConfigurationService(account) {
     return db.runTransaction(async tx => {
       await authorize(tx, claims, id, "read");
       const current = (await tx.get(ref(`sharedConfiguration/${id}`))).data();
-      return { configurationId: id, version: current?.version || 0, proposedVersion: current?.proposedVersion || null, effective: await effective(tx, id) };
+      const draft = current?.proposedVersion ? (await tx.get(ref(`sharedConfiguration/${id}/versions/${current.proposedVersion}`))).data() : null;
+      return { configurationId: id, version: current?.version || 0, proposedVersion: current?.proposedVersion || null, draft: draft?.value || null, effective: await effective(tx, id) };
     });
   }
   async function mutate(claims, input) {
@@ -89,17 +94,47 @@ export function createConfigurationService(account) {
       const result = { configurationId: id, version, proposedVersion, effectiveVersion };
       tx.set(path, result);
       tx.create(receiptRef, { actorUid: claims.uid, fingerprint, result, state: "committed", createdAt: now() });
+      if (input.action==='activate'&&kind(id)==='communication') tx.create(ref(`sharedConfiguration/${id}/publicationEvidence/${operationId}`),{configurationId:id,publishedVersion:effectiveVersion,previousVersion:current?.effectiveVersion||null,actor,at:now()});
       account.capture(tx, { domain: "configuration", operationId, action: input.action, target: id, actor, executor: "system:configuration-api" });
       return { state: "committed", ...result };
     });
   }
   async function reconcile(claims, operationId) {
-    const receipt = (await ref(`configurationOperations/${identifier(operationId)}`).get()).data();
-    return receipt?.actorUid === claims.uid ? { state: "committed", ...receipt.result } : { state: "unknown" };
+    identifier(operationId);
+    return db.runTransaction(async tx=>{const receipt=(await tx.get(ref(`configurationOperations/${operationId}`))).data();
+      return await account.ownsResult(tx,claims,receipt,operationId,"configuration")?{state:"committed",...receipt.result}:{state:"unknown"};
+    });
   }
   async function preview(claims, input) {
+    if (Object.hasOwn(COMMUNICATION_TEMPLATES,input.configurationId)) {
+      exactFields(input, ['configurationId', 'value', 'preset']);
+      return db.runTransaction(async tx => { await authorize(tx, claims, input.configurationId, 'read'); return { state: 'preview', synthetic: true, ...renderCommunication(input.configurationId, input.value, syntheticContext(input.configurationId, input.preset)) }; });
+    }
     exactFields(input, ["configurationId", "value", "context"]);
     return db.runTransaction(async tx => { await authorize(tx, claims, input.configurationId, "read"); if (kind(input.configurationId) !== "template") fail(); return { state: "preview", ...renderTemplate(validate(input.configurationId, input.value), input.context) }; });
   }
-  return { read, mutate, reconcile, effective, preview };
+  async function library(claims) {
+    return db.runTransaction(async tx=>{
+      await resolveStaffIdentity(tx,db,claims,now());
+      const records=[];
+      for(const definition of Object.values(COMMUNICATION_TEMPLATES)) {
+        try {await authorize(tx,claims,definition.id,'read');} catch(error) {if(error.status===403)continue;throw error;}
+        const current=(await tx.get(ref(`sharedConfiguration/${definition.id}`))).data();
+        records.push({...definition,version:current?.version||0,effectiveVersion:current?.effectiveVersion||null,proposedVersion:current?.proposedVersion||null,defaultCopy:defaultCommunicationCopy(definition.id)});
+      }
+      return {records};
+    });
+  }
+  async function history(claims,id,before) {
+    identifier(id);if(!Object.hasOwn(COMMUNICATION_TEMPLATES,id))fail('template-not-supported',400);
+    if(before!=null&&(!Number.isSafeInteger(before)||before<1))fail('invalid-argument',400);
+    return db.runTransaction(async tx=>{
+      await authorize(tx,claims,id,'read');
+      const current=(await tx.get(ref(`sharedConfiguration/${id}`))).data(),versions=await tx.get(ref(`sharedConfiguration/${id}`).collection('versions').orderBy('version','desc').limit(101)),published=await tx.get(ref(`sharedConfiguration/${id}`).collection('publicationEvidence').limit(101));
+      const known=new Set(published.docs.map(row=>row.data().publishedVersion));
+      const eligible=versions.docs.filter(row=>before==null||row.data().version<before),page=eligible.slice(0,20);
+      return{configurationId:id,records:page.map(row=>({version:row.data().version,createdAt:row.data().createdAt,state:current?.effectiveVersion===row.data().version?'PUBLISHED CURRENT':known.has(row.data().version)?'SUPERSEDED':'DRAFT',value:row.data().value})),next:eligible.length>20?page.at(-1).data().version:null,partial:versions.size>100||published.size>100};
+    });
+  }
+  return { read, mutate, reconcile, effective, preview, authorize, library, history };
 }

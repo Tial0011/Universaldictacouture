@@ -15,11 +15,11 @@ export function completeStaffRoute(staff, requirement, claims, now = Date.now())
     // A sensitive field component always requires a complete data/purpose route.
     if (requirement.dataClass && route.family !== "dataPurpose") return false;
     if (route.family === "domainWide") return !requirement.governanceArea;
-    if (route.family === "selectedObject") return !requirement.governanceArea && route.ids?.includes(requirement.objectId);
+    if (route.family === "selectedObject") return !requirement.governanceArea && Array.isArray(route.ids) && route.ids.includes(requirement.objectId);
     if (route.family === "assignmentDerived") return !requirement.governanceArea && staff.functionAsCouturier === true && staff.eligible === true && requirement.assignedStaffId === staff.staffId;
-    if (route.family === "queueSubset") return !requirement.governanceArea && requirement.queueEligible === true && route.queueIds?.includes(requirement.queueId);
-    if (route.family === "dataPurpose") return route.ids?.includes(requirement.objectId) && route.dataClasses?.includes(requirement.dataClass);
-    if (route.family === "governance") return route.area === requirement.governanceArea && route.ids?.includes(requirement.objectId);
+    if (route.family === "queueSubset") return !requirement.governanceArea && requirement.queueEligible === true && Array.isArray(route.queueIds) && route.queueIds.includes(requirement.queueId);
+    if (route.family === "dataPurpose") return Array.isArray(route.ids) && route.ids.includes(requirement.objectId) && Array.isArray(route.dataClasses) && route.dataClasses.includes(requirement.dataClass);
+    if (route.family === "governance") return route.area === requirement.governanceArea && Array.isArray(route.ids) && route.ids.includes(requirement.objectId);
     return false;
   });
 }

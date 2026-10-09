@@ -1,6 +1,6 @@
 import { randomUUID, createHmac } from "node:crypto";
 import { activeAccount, addressFields, customerProjection, digest, emailKey, exactFields, fail, identifier, preferenceFields, profileFields, requireFresh, RESOLUTIONS } from "./account-contract.js";
-import { resolveStaff } from "./staff-authority.js";
+import { resolveStaff, resolveStaffIdentity } from "./staff-authority.js";
 import { captureIntent } from "./downstream-intent.js";
 
 export function createAccountService({ db, auth, secret, now = Date.now, guestIntentOwner }) {
@@ -172,11 +172,27 @@ export function createAccountService({ db, auth, secret, now = Date.now, guestIn
       return receipt.commit({ version: current.version + 1 });
     });
   }
+  async function ownsResult(tx,claims,value,operationId,domain) {
+    if(!value||value.actorUid!==claims.uid)return false;
+    let actor=value.actor;
+    if(!actor&&value.accountId)actor={kind:"customer",accountId:value.accountId};
+    if(!actor){const event=(await tx.get(ref(`ownerEvents/${keyed(`event:${domain}:${operationId}`)}`))).data();actor=event?.actor;}
+    if(!actor&&domain==="account")actor=(await tx.get(ref(`identityAudit/${operationId}`))).data()?.actor;
+    if(actor?.accountId){
+      const binding=(await tx.get(ref(`accountBindings/${claims.uid}`))).data();
+      const current=binding?.accountId?(await tx.get(ref(`accounts/${binding.accountId}`))).data():null;
+      // Deletion may still confirm its own minimal result. A different durable
+      // identity (Allow New/rebinding) cannot inherit the old result/IDs.
+      return binding?.uid===claims.uid&&binding.accountId===actor.accountId&&binding.epoch===current?.epoch&&current?.principalUid===claims.uid&&!current.canonicalAccountId;
+    }
+    if(actor?.staffId){try{return(await resolveStaffIdentity(tx,db,claims,now())).staffId===actor.staffId;}catch(error){if([401,403].includes(error.status))return false;throw error;}}
+    return false; // Missing provenance is not reconstructed from Email/title/UID.
+  }
   async function reconcile(claims, operationId) {
-    const value = (await ref(`accountOperations/${identifier(operationId)}`).get()).data();
-    // Result-only proof: no private payload, target or identity details returned.
-    if (!value || value.actorUid !== claims.uid) return { state: "unknown" };
-    return { state: value.state, ...value.result };
+    identifier(operationId);
+    return db.runTransaction(async tx=>{const value=(await tx.get(ref(`accountOperations/${operationId}`))).data();
+      return await ownsResult(tx,claims,value,operationId,"account")?{state:value.state,...value.result}:{state:"unknown"};
+    });
   }
   async function myInformation(claims) {
     const groups = await Promise.allSettled([readProfile(claims), readPreferences(claims), addresses(claims)]);
@@ -322,5 +338,5 @@ export function createAccountService({ db, auth, secret, now = Date.now, guestIn
       return { state: "reconciled", epoch: account.epoch };
     });
   }
-  return { register, registrationResult, context, readProfile, saveProfile, addresses, addressMutation, readPreferences, savePreferences, reconcile, myInformation, revokeSessions, staffCustomerInformation, staffDeletedAccount, deletion, lifecycle, optionalCommunicationEligible, importGuestIntent, cleanupDeletedAddresses, reconcileLifecycle, customer, initialize, publishAccess, capture, ref, defaults, keyed, now, db, auth, secret, RESOLUTIONS };
+  return { register, registrationResult, context, readProfile, saveProfile, addresses, addressMutation, readPreferences, savePreferences, reconcile, ownsResult, myInformation, revokeSessions, staffCustomerInformation, staffDeletedAccount, deletion, lifecycle, optionalCommunicationEligible, importGuestIntent, cleanupDeletedAddresses, reconcileLifecycle, customer, initialize, publishAccess, capture, ref, defaults, keyed, now, db, auth, secret, RESOLUTIONS };
 }

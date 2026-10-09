@@ -5,6 +5,7 @@ import { authorizationRoutes, currentStaff, DOMAIN_CONTRACTS, firestoreFields, s
 import { authorizeSummary, operationalSummary } from "./operationsModel";
 import { activityPlans, activityEvent } from "./operationalActivity";
 import { currentReadDeadline } from "./operationalRuntime";
+import { accountRequest } from './accountApi';
 
 export const OPERATION_PAGE_SIZE = 20;
 function assertCurrentReadContext(start, current) {
@@ -64,6 +65,12 @@ export async function loadScopedOwnerPage(domain, cursor = null) {
 }
 export async function loadOperationalPage(domain, cursor = null) {
   const staff = await readCurrentStaff();
+  if(domain==='orders'){
+    if(cursor)throw Object.assign(new Error('A new source check is required.'),{code:'source-unavailable'});
+    const page=await accountRequest('staff-order-queue',{}, {principalUid:staff.principalUid});
+    assertCurrentReadContext(staff,await readCurrentStaff());
+    return {items:page.records.map(record=>operationalSummary('orders',{...record,id:record.orderId})),cursor:null,hasMore:false,complete:false,refreshedAt:Date.now()};
+  }
   const contract = DOMAIN_CONTRACTS[domain];
   if (!contract?.collection) throw Object.assign(new Error("The owner source is not available."), { code: "source-unavailable" });
   const plans = plansFor(staff, domain);
@@ -89,6 +96,12 @@ export async function loadOperationalPage(domain, cursor = null) {
 }
 export async function readOperationalRecord(domain, id) {
   if (!safeOperationalId(id)) throw Object.assign(new Error("Invalid reference."), { code: "permission-denied" });
+  if(domain==='orders'){
+    const start=await readCurrentStaff();
+    const record=await accountRequest('staff-order-summary',{orderId:id},{principalUid:start.principalUid});
+    assertCurrentReadContext(start,await readCurrentStaff());
+    return operationalSummary('orders',{...record,id:record.orderId});
+  }
   const contract = DOMAIN_CONTRACTS[domain];
   if (!contract?.collection) throw Object.assign(new Error("The owner source is not available."), { code: "source-unavailable" });
   const staff = await readCurrentStaff();

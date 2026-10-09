@@ -34,8 +34,9 @@ export const DOMAIN_CONTRACTS = {
   reviews: { label: "Review & Feeds", purpose: "moderation", collection: "reviews", path: "/admin/reviews" },
   chats: { label: "Chats", purpose: "customer-service", collection: "conversations", path: "/admin/chats" },
   content: { label: "Website content", purpose: "content" },
+  notifications: { label: 'Notifications', purpose: 'personal-notifications', owner: 'Section 15' },
   customers: { label: "Customers", purpose: "customer-support", owner: "Section 11 / Section 16" },
-  orders: { label: "Orders & Extensions", purpose: "order-operations", owner: "Section 14 / Section 16" },
+  orders: { label: "Orders & Operations", purpose: "order-operations", owner: "Section 14 / Section 16" },
   payments: { label: "Payments", purpose: "payment-operations", owner: "Payment owner / Section 14 / Section 16" },
   customStyle: { label: "Custom Style", purpose: "custom-style", owner: "Custom Style owner / Section 16" },
   audit: { label: "Audit History", purpose: "audit", collection: "staffAudit", path: "/admin/audit" },
@@ -75,7 +76,7 @@ export function canDiscover(staff, domain) {
   // Discovery is its own entitlement. Unsupported scope queries stay closed.
   return Boolean(contract && authorizationRoutes(staff, `${domain}.read`, contract.purpose).some(route =>
     route.family === "domainWide" || (route.family === "selectedObject" && Array.isArray(route.ids) && route.ids.length > 0)
-    || (domain === "chats" && route.family === "assignmentDerived" && staff.functionAsCouturier === true && staff.eligible === true)));
+    || (["chats","orders"].includes(domain) && route.family === "assignmentDerived" && staff.functionAsCouturier === true && staff.eligible === true)));
 }
 export function staffFingerprint(staff) {
   return JSON.stringify([staff?.staffId, staff?.active, staff?.capabilities || {}, staff?.compatibilityMode || null, staff?.functionAsCouturier, staff?.eligible, staff?.sharedAccount, staff?.validAfter]);

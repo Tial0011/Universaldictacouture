@@ -12,6 +12,7 @@ export function ownerHref(domain, id) {
   if (!id || id.includes("/")) return "";
   if (domain === "products") return `/admin/products?edit=${encodeURIComponent(id)}`;
   if (domain === "chats") return `/admin/chats?conversation=${encodeURIComponent(id)}`;
+  if (domain === 'orders') return `/admin/orders/${encodeURIComponent(id)}`;
   // The safe operational detail is read-only until a compliant Review owner
   // action workflow exists; it never silently invokes the legacy editor.
   if (domain === "reviews") return `/admin/reviews?record=${encodeURIComponent(id)}`;
@@ -19,6 +20,9 @@ export function ownerHref(domain, id) {
 }
 export function operationalSummary(domain, record) {
   const id = record.id;
+  if(domain==='orders')return {id,domain,label:record.reference||id,reference:id,assignedStaffId:record.assignedStaffId,
+    state:`${record.currentWork==='base'?'Base':`Extension ${record.currentWork}`} · ${record.workCompleted?'Completed':record.workCancelled?'Cancelled':record.fulfilment}`,
+    ownerState:record.status,needsAction:false,updatedAt:0,href:ownerHref(domain,id)+`?work=${encodeURIComponent(record.currentWork)}`};
   if (domain === "audit") return { id, domain, label: `${record.action} · ${record.targetCollection}/${record.targetId}`,
     state: record.outcome, needsAction: false, actorStaffId: record.actorStaffId, execution: record.execution,
     updatedAt: milliseconds(record.createdAt), href: "" };

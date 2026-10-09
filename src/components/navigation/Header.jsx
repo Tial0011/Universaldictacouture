@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import CustomStyleIcon from "./icons/CustomStyleIcon";
 import ReviewsIcon from "./icons/ReviewsIcon";
 import "./Header.css";
+import NotificationBell from '../notifications/NotificationBell';
 
 const PRIMARY_LINKS = [
   { to: "/", label: "Home", end: true },
@@ -191,6 +192,7 @@ export default function Header() {
               </form>
               <NavLink className="site-header__account-link" to={user ? "/profile" : "/signin"}>{user ? "Account" : "Client login"}</NavLink>
               <NavLink className="site-header__tool" to="/my-closet" aria-label="My Closet" title="My Closet"><Icon name="closet" /></NavLink>
+              {user&&<NotificationBell/>}
             </div>
           </div>
         </div>
@@ -214,6 +216,7 @@ export default function Header() {
             </NavLink>
 
             <div className="site-header__mobile-actions">
+              {user&&<NotificationBell/>}
               <NavLink className="site-header__action" to="/shop?focus=search" aria-label="Search" title="Search">
                 <Icon name="search" size={20} />
                 <span>Search</span>
@@ -293,7 +296,7 @@ export default function Header() {
           <HeaderLink to="/my-closet" label="My Closet" icon="heart" />
         </nav>
 
-        {pathname !== "/chats" && !pathname.startsWith("/profile") && <NavLink className="site-header__chat-launcher" to="/chats" aria-label="Chat with Dicta Couturier">
+        {pathname !== "/chats" && !pathname.startsWith("/profile") && !pathname.startsWith('/notifications') && <NavLink className="site-header__chat-launcher" to="/chats" aria-label="Chat with Dicta Couturier">
           <Icon name="chat" size={19} />
           <span>CHAT WITH DICTA COUTURIER</span>
         </NavLink>}

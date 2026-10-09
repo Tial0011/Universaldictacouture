@@ -56,7 +56,7 @@ export function createDownstreamWorker(account, handlers = {}) {
               tx.update(path, { attempts: latest.attempts + 1 });
               tx.create(ref(`downstreamAttempts/${leaseId}`), { jobId, executor: "system:downstream-worker", startedAt: now() });
             });
-            const outcome = await handler.apply({ jobId, event, leaseId });
+            const outcome = await handler.apply({ jobId, event, leaseId, policy });
             if (!["applied", "suppressed", "unknown", "not-applied"].includes(outcome)) fail("effect-outcome-unknown", 503);
             state = outcome === "not-applied" ? "pending" : outcome;
           }

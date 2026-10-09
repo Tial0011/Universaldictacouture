@@ -9,7 +9,7 @@ export const ACTION_SAFETY_MANIFEST = Object.freeze({
   protectedOwnerAction: { risk: "highly-protected", mutation: true, ownerWorkflowOnly: true },
 });
 export function safeContextCapsule(item, { attention = false, issue = null } = {}) {
-  if (!["products", "reviews", "chats"].includes(item?.domain) || !safeOperationalId(item.id)) throw Object.assign(new Error("Cannot open this context."), { code: "permission-denied" });
+  if (!["products", "reviews", "chats", "orders"].includes(item?.domain) || !safeOperationalId(item.id)) throw Object.assign(new Error("Cannot open this context."), { code: "permission-denied" });
   return { domain: item.domain, id: item.id, attention: attention === true, ...(item.domain === "products" && ["name", "price", "image", "category", "identity", "unit"].includes(issue) ? { issue } : {}) };
 }
 export async function resolveOperationalOpen(capsule, read) {

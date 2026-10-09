@@ -15,9 +15,11 @@ export default async function maintenance(request) {
     const parts = []; let size = 0;
     while (true) { const item = await reader.read(); if (item.done) break; size += item.value.byteLength; if (size > 8192) { await reader.cancel(); return reply({ error: "invalid-argument" }, 400); } parts.push(Buffer.from(item.value)); }
     const input = JSON.parse(Buffer.concat(parts).toString()), policy = JSON.parse(process.env.UDC_WORKER_POLICY_JSON || "null");
-    if (Object.keys(input).some(key => key !== "eventIds") || !Array.isArray(input.eventIds) || input.eventIds.length > 20 || input.eventIds.some(id => !/^[a-f0-9]{64}$/.test(id))) return reply({ error: "invalid-argument" }, 400);
-    const system = createSystemMaintenance(createAccountService(accountRuntime())), results = [];
-    for (const eventId of [...new Set(input.eventIds)]) results.push(await system.processEvent(eventId, policy));
+    const eventIds=input.eventIds||[],jobIds=input.jobIds||[];
+    if (Object.keys(input).some(key => !['eventIds','jobIds'].includes(key)) || !Array.isArray(eventIds) || !Array.isArray(jobIds) || eventIds.length+jobIds.length > 20 || [...eventIds,...jobIds].some(id => !/^[a-f0-9]{64}$/.test(id))) return reply({ error: "invalid-argument" }, 400);
+    const runtime=accountRuntime(),system = createSystemMaintenance(createAccountService(runtime),{origin:runtime.origin}), results = [];
+    for (const eventId of [...new Set(eventIds)]) results.push(await system.processEvent(eventId, policy));
+    for (const jobId of [...new Set(jobIds)]) results.push({jobId,...await system.processJob(jobId,policy)});
     return reply({ results }, 200);
   } catch { return reply({ error: "maintenance-unavailable" }, 503); }
 }

@@ -116,6 +116,15 @@ service cloud.firestore {
     match /downstreamAttempts/{id} { allow read, write: if false; }
     match /notificationBindings/{id} { allow read, write: if false; }
     match /notificationDelivery/{id} { allow read, write: if false; }
+    // Section-15 communication/control planes are managed-session API only.
+    match /communicationPlans/{id} { allow read, write: if false; }
+    match /communicationIntents/{id} { allow read, write: if false; }
+    match /communicationOperations/{id} { allow read, write: if false; }
+    match /communicationDeliveryIssues/{id} { allow read, write: if false; }
+    match /communicationDeliveryIssues/{id}/{nested=**} { allow read, write: if false; }
+    match /communicationTestSends/{id} { allow read, write: if false; }
+    match /notificationStates/{id} { allow read, write: if false; }
+    match /staffCommunicationPreferences/{id} { allow read, write: if false; }
     match /formalAudit/{id} { allow read, write: if false; }
     match /sharedConfiguration/{id} { allow read, write: if false; }
     match /sharedConfiguration/{id}/{nested=**} { allow read, write: if false; }

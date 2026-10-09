@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import SiteLayout from "./components/navigation/SiteLayout";
-import AdminLayout from "./components/navigation/AdminLayout";
+import AdminLayout, { ContentEntry } from "./components/navigation/AdminLayout";
 import AdminAccess from "./components/admin/AdminAccess";
 import StaffRoute from "./components/admin/StaffRoute";
 import RequireAuth from "./components/auth/RequireAuth";
@@ -26,7 +26,13 @@ const SavedReviews = lazy(() => import("./pages/SavedReviews/SavedReviews"));
 const MyCloset = lazy(() => import("./pages/MyCloset/MyCloset"));
 const Orders = lazy(() => import("./pages/MyCloset/Orders"));
 const OrderWorkspace = lazy(() => import("./pages/MyCloset/OrderWorkspace"));
+const MainOrderWorkspace = lazy(() => import("./pages/admin/Operations/MainOrderWorkspace"));
+const OrderQueue = lazy(() => import("./pages/admin/Operations/OrderQueue"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const CustomerNotifications = lazy(() => import('./components/notifications/NotificationCentre'));
+const StaffNotifications = lazy(() => import('./pages/admin/Notifications/Notifications'));
+const CommunicationTemplates = lazy(() => import('./pages/admin/Notifications/Notifications').then(module=>({default:module.Templates})));
+const CommunicationDeliveryIssues = lazy(() => import('./pages/admin/Notifications/Notifications').then(module=>({default:module.DeliveryIssues})));
 
 const AdminSettings = lazy(() => import("./pages/admin/Settings/Settings"));
 const AdminShop = lazy(() => import("./pages/admin/Shop/ShopControl"));
@@ -69,6 +75,7 @@ export default function App() {
         <Route path="/policies" element={<Policies />} />
         {/* Safe account navigation is not a private-data authorization grant. */}
         <Route path="/profile" element={<Profile />} />
+        <Route path="/notifications" element={<RequireAuth><CustomerAccountBoundary><CustomerNotifications/></CustomerAccountBoundary></RequireAuth>} />
         <Route path="/saved-pieces" element={<Navigate to="/my-closet/my-pieces" replace />} />
         <Route path="/my-closet" element={<CustomerOrGuest><MyCloset /></CustomerOrGuest>} />
         <Route path="/my-closet/orders" element={<RequireAuth><CustomerAccountBoundary><Orders /></CustomerAccountBoundary></RequireAuth>} />
@@ -92,6 +99,10 @@ export default function App() {
         <Route path="attention" element={<AdminOperations />} />
         <Route path="search" element={<GlobalSearch />} />
         <Route path="activity" element={<RecentActivity />} />
+        <Route path="notifications" element={<StaffRoute domain="notifications"><StaffNotifications/></StaffRoute>} />
+        <Route path="notifications/templates" element={<CommunicationTemplates/>} />
+        <Route path="notifications/delivery-issues" element={<CommunicationDeliveryIssues/>} />
+        <Route path="content" element={<StaffRoute domain="content"><ContentEntry/></StaffRoute>} />
         <Route path="shop" element={<StaffRoute domain="products"><AdminShop /></StaffRoute>} />
         <Route path="products" element={<StaffRoute domain="products"><AdminProducts /></StaffRoute>} />
         <Route path="taxonomy" element={<StaffRoute domain="content"><AdminTaxonomy /></StaffRoute>} />
@@ -100,9 +111,10 @@ export default function App() {
         <Route path="reviews" element={<StaffRoute domain="reviews"><AdminReviews /></StaffRoute>} />
         <Route path="appearance" element={<StaffRoute domain="content"><AdminAppearance /></StaffRoute>} />
         <Route path="chats" element={<StaffRoute domain="chats"><AdminChats /></StaffRoute>} />
-        <Route path="orders/:orderId" element={<StaffRoute domain="orders"><OrderWorkspace staff /></StaffRoute>} />
+        <Route path="orders" element={<StaffRoute domain="orders"><OrderQueue /></StaffRoute>} />
+        <Route path="orders/:orderId" element={<StaffRoute domain="orders"><MainOrderWorkspace /></StaffRoute>} />
         <Route path="audit" element={<StaffRoute domain="audit"><AuditHistory /></StaffRoute>} />
-        {[['customers', 'customers'], ['orders', 'orders'], ['payments', 'payments'], ['custom-style', 'customStyle']].map(([path, domain]) =>
+        {[['customers', 'customers'], ['payments', 'payments'], ['custom-style', 'customStyle']].map(([path, domain]) =>
           <Route key={path} path={path} element={<StaffRoute domain={domain}><OwnerUnavailable domain={domain} /></StaffRoute>} />)}
         <Route path="settings" element={<AdminSettings />} />
         <Route path="*" element={<NotFound />} />

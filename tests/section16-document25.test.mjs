@@ -9,6 +9,7 @@ import sharp from "sharp";
 import { createAccountService } from "../netlify/lib/account-service.js";
 import { createPretransactionService } from "../netlify/lib/pretransaction-service.js";
 import { createMediaService } from "../netlify/lib/media-service.js";
+import { createTransactionService } from "../netlify/lib/transaction-service.js";
 import { createPrincipalFence, ownerErrorCopy, ownerErrorState, readOperationMarker, writeOperationMarker } from "../src/services/ownerOperation.js";
 import { completeStaffRoute } from "../netlify/lib/staff-authority.js";
 import { allows } from "../src/services/staffAuthorization.js";
@@ -64,6 +65,12 @@ before(async()=>{
 });
 after(async()=>{await db?.terminate();await deleteApp(app);});
 const stageInput=operationId=>({operationId,domain:"custom-style",objectId:request.requestId,expectedVersion:request.version,expectedEpoch:a.context.epoch,contentType:"image/png",base64:bytes.toString("base64")});
+test("M01/M07 a rebound provider UID cannot disclose another durable Account's old result",async()=>{
+  const transactions=createTransactionService(account),operationId=id(),path=db.doc("transactionOperations/"+operationId),binding=db.doc("accountBindings/"+a.claims.uid),original=(await binding.get()).data();
+  await path.set({actorUid:a.claims.uid,actor:{kind:"customer",accountId:a.context.accountId},state:"committed",result:{orderId:"PRIVATE-OLD-ORDER"}});
+  assert.equal((await transactions.reconcile(a.claims,operationId)).orderId,"PRIVATE-OLD-ORDER");
+  await binding.set({...original,accountId:b.context.accountId});assert.deepEqual(await transactions.reconcile(a.claims,operationId),{state:"unknown"});await binding.set(original);
+});
 test("M04 unknown blob write is repaired from original digest/context, without replay or domain attachment",async()=>{
   const operationId=id();await assert.rejects(media.stage(a.claims,stageInput(operationId)));assert.equal((await media.reconcileStage(a.claims,operationId)).state,"unknown");
   const result=await media.completeStage(a.claims,{operationId});assert.equal(result.state,"staged");assert.equal(writes,1);assert.equal((await media.completeStage(a.claims,{operationId})).assetId,result.assetId);assert.equal(writes,1);

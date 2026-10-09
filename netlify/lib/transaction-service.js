@@ -6,6 +6,11 @@ import { reviewIsPublic } from "../../src/services/reviewModel.js";
 import { createConfigurationService } from "./shared-configuration.js";
 
 const clone = value => structuredClone(value);
+const semanticTerms = value => {
+  const sorted = item => Array.isArray(item) ? item.map(sorted) : item && typeof item === 'object'
+    ? Object.fromEntries(Object.keys(item).sort().map(key => [key,sorted(item[key])])) : item;
+  return JSON.stringify(sorted(Object.fromEntries(['entries','totalMinor','amountDueNowMinor','currency','notes'].map(key=>[key,value[key]]))));
+};
 const money = value => { if (!Number.isSafeInteger(value) || value < 0) fail("invalid-argument", 400); return value; };
 export function createTransactionService(account) {
   const { db, ref, now, keyed, customer } = account;
@@ -39,6 +44,8 @@ export function createTransactionService(account) {
     } };
   }
   function current(order, work, input) {
+    if(order?.orderId!==input.orderId)fail();
+    if(!Number.isSafeInteger(order.version)||order.version<1||!Number.isSafeInteger(work?.version)||work.version<1||!Number.isSafeInteger(work.currentEdition)||work.currentEdition<0)fail('source-unavailable',503);
     if (!work || work.componentId !== (input.componentId || "base") || order.version !== input.expectedVersion || work.currentEdition !== input.expectedEdition) fail("stale-conflict", 409);
   }
   const emptyWork = componentId => ({ componentId, version: 1, currentEdition: 0, workingVersion: 0, working: null, businessApproval: null, customerApproval: null, paymentEnabled: null, fulfilment: "NOT STARTED", delivery: "NOT PREPARED", deliveryContextVersion: 0, deliveryContext: null, completed: false, cancelled: false, issues: {} });
@@ -168,6 +175,8 @@ export function createTransactionService(account) {
         if (["establish-edition", "establish-amendment"].includes(action)) {
           if (!work.working) fail("working-change-required", 409);
           if (Boolean(work.workingAmendment) !== amendment) fail("amendment-route-required", 409);
+          const previous = work.currentEdition ? (await tx.get(workPath.collection('editions').doc(String(work.currentEdition)))).data() : null;
+          if (previous && semanticTerms(previous) === semanticTerms(work.working)) fail('no-semantic-change',409);
           const number = work.currentEdition + 1;
           tx.create(workPath.collection("editions").doc(String(number)), { ...work.working, number, amendment, establishedBy: actor, establishedAt: now() });
           for (const entry of work.working.entries) tx.create(workPath.collection("entryVersions").doc(`${entry.rootId}:${number}`), { ...entry, edition: number });
@@ -303,7 +312,7 @@ export function createTransactionService(account) {
       const linkedReviews = privacyTransition ? await publicReviews(tx,order.orderId) : null;
       const baseForPrivacy = privacyTransition && work.componentId!=="base" ? (await tx.get(workRef(order.orderId))).data() : work;
       if (work.componentId !== "base" && order.activeExtensionId !== work.componentId) fail("inactive-work", 409);
-      const terminalAllowed = ["completion-correction", "enable-review", "claim", "transfer", "remove-assignment"];
+      const terminalAllowed = ["completion-correction", "enable-review", "claim", "transfer", "remove-assignment", "record-provider-event", "reconcile-delivery"];
       if ((work.completed || work.cancelled) && !terminalAllowed.includes(input.action)) fail("terminal-work", 409);
       if (input.action === "claim") {
         if (order.assignedStaffId || work.completed || work.cancelled || order.currentWork!==work.componentId) fail("already-assigned-or-unclaimable", 409);
@@ -327,11 +336,19 @@ export function createTransactionService(account) {
         if (["DISPATCHED", "DELIVERED"].includes(work.delivery) || work.deliveryContextVersion !== input.expectedDeliveryVersion) fail("stale-delivery-context", 409);
         exactFields(input.deliveryContext, ["recipientName", "phoneNumber", "address", "provider", "route"]);
         if (typeof input.deliveryContext.address !== "string" || !input.deliveryContext.address.trim()) fail("invalid-argument", 400);
+        for (const [field,value] of Object.entries(input.deliveryContext)) if(typeof value!=='string'||value.length>(field==='address'?1500:240))fail('invalid-argument',400);
+        const history=workPath.collection('deliveryContexts');
+        const priorContext=work.deliveryContextVersion?(await tx.get(history.doc(String(work.deliveryContextVersion)))).data():null;
+        if(work.deliveryContext&&work.deliveryContextVersion&&!priorContext)tx.create(history.doc(String(work.deliveryContextVersion)),{
+          revision:work.deliveryContextVersion,context:clone(work.deliveryContext),observedAt:now(),provenance:'known-current-before-update',originalActor:null,originalTime:null});
         workUpdate.deliveryContext = clone(input.deliveryContext); workUpdate.deliveryContextVersion = work.deliveryContextVersion + 1;
+        tx.create(history.doc(String(workUpdate.deliveryContextVersion)),{revision:workUpdate.deliveryContextVersion,context:clone(input.deliveryContext),actor,at:now(),provenance:'authoritative-context-update'});
+        if(work.delivery==='READY FOR DISPATCH')workUpdate.delivery='NOT PREPARED';
+        workUpdate.readyForDispatchContextVersion=null;workUpdate.readyForDispatchEdition=null;
       }
-      if (input.action === "ready-dispatch") { if (work.fulfilment !== "READY FOR DELIVERY PREPARATION" || !work.deliveryContext) fail("delivery-not-ready", 409); workUpdate.delivery = "READY FOR DISPATCH"; }
+      if (input.action === "ready-dispatch") { if (work.fulfilment !== "READY FOR DELIVERY PREPARATION" || !work.deliveryContext) fail("delivery-not-ready", 409); workUpdate.delivery = "READY FOR DISPATCH";workUpdate.readyForDispatchContextVersion=work.deliveryContextVersion;workUpdate.readyForDispatchEdition=work.currentEdition; }
       if (input.action === "dispatch") {
-        if (work.delivery !== "READY FOR DISPATCH" || work.deliveryContextVersion !== input.expectedDeliveryVersion || order.currentWork !== work.componentId) fail("dispatch-conflict", 409);
+        if (work.delivery !== "READY FOR DISPATCH" || work.deliveryContextVersion !== input.expectedDeliveryVersion || order.currentWork !== work.componentId||work.readyForDispatchContextVersion!==work.deliveryContextVersion||work.readyForDispatchEdition!==work.currentEdition) fail("dispatch-conflict", 409);
         workUpdate.delivery = "DISPATCHED"; workUpdate.dispatchId = input.operationId;
         tx.create(ref(`dispatchSnapshots/${input.operationId}`), { orderId: order.orderId, componentId: work.componentId, edition: work.currentEdition, deliveryContextVersion: work.deliveryContextVersion, context: work.deliveryContext, actor, at: now() });
       }
@@ -343,7 +360,7 @@ export function createTransactionService(account) {
         const event = (await tx.get(ref(`deliveryProviderEvidence/${identifier(input.providerEventId)}`))).data();
         if (!event || event.orderId !== order.orderId || event.componentId !== work.componentId || event.dispatchId !== work.dispatchId) fail();
         if (event.sequence > (work.providerSequence || -1)) workUpdate.providerSequence = event.sequence;
-        if (event.state === "DELIVERED" && work.delivery === "DISPATCHED") workUpdate.delivery = "DELIVERED";
+        if (event.state === "DELIVERED" && event.sequence >= (work.providerSequence ?? -1) && work.delivery === "DISPATCHED") workUpdate.delivery = "DELIVERED";
         // Lower/late evidence never regresses terminal Delivered.
       }
       if (input.action === "complete") {
@@ -398,8 +415,10 @@ export function createTransactionService(account) {
     });
   }
   async function reconcile(claims, operationId) {
-    const receipt = (await ref(`transactionOperations/${identifier(operationId)}`).get()).data();
-    return receipt?.actorUid === claims.uid ? { state: "committed", ...receipt.result } : { state: "unknown" };
+    identifier(operationId);
+    return db.runTransaction(async tx=>{const receipt=(await tx.get(ref(`transactionOperations/${operationId}`))).data();
+      return await account.ownsResult(tx,claims,receipt,operationId,"transaction")?{state:"committed",...receipt.result}:{state:"unknown"};
+    });
   }
   return { mainOrderOwner, catalogueOrder, readOrder, listOrders, historicalEdition, commercial, paymentIntent, paymentSubmit, paymentReview, paymentDetail, extension, operational, authority, operation, financial, mediaContext, reconcile, orderRef, workRef, isStaff, db, ref, now, keyed, customer };
 }

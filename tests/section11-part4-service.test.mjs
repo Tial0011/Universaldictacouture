@@ -7,7 +7,7 @@ import * as model from '../src/services/operationsModel.js';
 import * as activity from '../src/services/operationalActivity.js';
 import {currentReadDeadline} from '../src/services/operationalRuntime.js';
 import {studioStaff,route} from './staff-fixtures.mjs';
-async function reader({records=20,status=200,onRows,onToken,onJson}={}){
+async function reader({records=20,status=200,onRows,onToken,onJson,onNative}={}){
   const requests=[];let membership={...studioStaff(),staffId:'staff-A'},jsonReads=0;
   const user=uid=>({uid,getIdToken:async()=>{onToken?.(control);return 'synthetic-token';}});
   const auth={currentUser:user('A'),app:{options:{projectId:'fixture'}}};
@@ -20,6 +20,11 @@ async function reader({records=20,status=200,onRows,onToken,onJson}={}){
   const synthetic=entries=>new vm.SyntheticModule(Object.keys(entries),function(){for(const[k,v]of Object.entries(entries))this.setExport(k,v);},{context});
   const sdk={collection:(_db,name)=>name,doc:(_db,name,id)=>({name,id}),documentId:()=> '__name__',getDocFromServer:async()=>({exists:()=>true,data:()=>membership}),getDocsFromServer:async()=>{onRows?.(control);const docs=rows.map((row,i)=>({id:'p'+i,data:()=>({name:'Product',status:'draft'}),metadata:{}}));return {docs,size:docs.length};},limit:n=>({limit:n}),orderBy:value=>({orderBy:value}),query:(...args)=>args,startAfter:after=>({after}),where:(field,op,value)=>({field,op,value})};
   const dependencies={'firebase/firestore':synthetic(sdk),'../firebase/firestore':synthetic({db:{}}),'../firebase/auth':synthetic({auth}),'./staffAuthorization':synthetic(policy),'./operationsModel':synthetic(model),'./operationalActivity':synthetic(activity),'./operationalRuntime':synthetic({currentReadDeadline})};
+  dependencies['./accountApi']=synthetic({accountRequest:async(action,input)=>{
+    requests.push({url:'native:'+action,input});onNative?.(control);
+    const source={orderId:'native-owner',reference:'UDC-NATIVE',status:'OPEN',currentWork:'base',currentEdition:1,assignedStaffId:'staff-A',fulfilment:'NOT STARTED',delivery:'NOT PREPARED',workCompleted:false,workCancelled:false,privateNote:'DO NOT DISCLOSE',proofReferenceId:'PRIVATE PROOF'};
+    return action==='staff-order-summary'?source:{records:[source],complete:false};
+  }});
   const module=new vm.SourceTextModule(readFileSync(new URL('../src/services/operations.js',import.meta.url),'utf8'),{context,initializeImportMeta(meta){meta.env={DEV:false};}});await module.link(name=>dependencies[name]);await module.evaluate();
   return {service:module.namespace,requests,control,jsonReads:()=>jsonReads};
 }
@@ -50,4 +55,13 @@ test('malformed selected IDs cannot alter owner paths or create broad-query fall
 });
 test('malformed cached plan indices cannot access array prototypes or cause a broad-query fallback',async()=>{
   for(const cursor of [{planIndex:'__proto__'},{planIndex:-1},{planIndex:0.5},[],'wrong',0,false,'']){const subject=await reader();await assert.rejects(subject.service.loadOperationalPage('products',cursor),{code:'permission-denied'});assert.equal(subject.requests.length,0);}
+});
+test('native Order API responses retain the original principal fence and cannot transplant A data into B',async()=>{
+  const subject=await reader({onNative:control=>control.switchPrincipal('B')});
+  await assert.rejects(subject.service.loadOperationalPage('orders'),{code:'permission-denied'});
+});
+test('native Order Search uses trusted reads, excludes private fields and never turns a queue row into Attention',async()=>{
+  const subject=await reader();const page=await subject.service.loadOperationalPage('orders');
+  assert.equal(page.complete,false);assert.equal(page.items.length,1);assert.equal(page.items[0].needsAction,false);assert.ok(!JSON.stringify(page).includes('DO NOT DISCLOSE'));assert.ok(!JSON.stringify(page).includes('PRIVATE PROOF'));
+  const current=await subject.service.readOperationalRecord('orders','native-owner');assert.equal(current.href,'/admin/orders/native-owner?work=base');assert.equal(subject.requests[0].url,'native:staff-order-queue');
 });

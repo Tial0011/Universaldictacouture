@@ -1,5 +1,11 @@
 {
   "indexes": [
+    { "collectionGroup": "payments", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "orderId", "order": "ASCENDING" }, { "fieldPath": "componentId", "order": "ASCENDING" }] },
+    { "collectionGroup": "orderOperationalHistory", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "orderId", "order": "ASCENDING" }, { "fieldPath": "componentId", "order": "ASCENDING" }] },
+    { "collectionGroup": "notificationBindings", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "templateId", "order": "ASCENDING" }, { "fieldPath": "state", "order": "ASCENDING" }] },
+    { "collectionGroup": "notificationDelivery", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "branchId", "order": "ASCENDING" }, { "fieldPath": "observedAt", "order": "DESCENDING" }] },
+    { "collectionGroup": "downstreamAttempts", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "jobId", "order": "ASCENDING" }, { "fieldPath": "startedAt", "order": "DESCENDING" }] },
+    { "collectionGroup": "notificationBindings", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "recipientKey", "order": "ASCENDING" }, { "fieldPath": "channel", "order": "ASCENDING" }, { "fieldPath": "createdAt", "order": "DESCENDING" }] },
     { "collectionGroup": "accountReviews", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "orderId", "order": "ASCENDING" }, { "fieldPath": "published", "order": "ASCENDING" }] },
     { "collectionGroup": "payments", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "orderId", "order": "ASCENDING" }, { "fieldPath": "componentId", "order": "ASCENDING" }, { "fieldPath": "state", "order": "ASCENDING" }] },
     { "collectionGroup": "paymentContributions", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "orderId", "order": "ASCENDING" }, { "fieldPath": "componentId", "order": "ASCENDING" }] },

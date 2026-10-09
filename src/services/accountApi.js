@@ -3,6 +3,13 @@ import app, { isFirebaseConfigured } from "../firebase/config";
 const reads = new Set(["context", "registration-result", "profile", "addresses", "preferences", "my-information", "operation", "catalogue", "saves", "save-state", "custom-style", "staff-custom-style", "cluster-operation", "orders", "order", "staff-order", "edition", "staff-edition", "payment", "staff-payment", "transaction-operation", "messages", "staff-messages", "review-feed", "staff-configuration", "configuration-operation", "staff-audit", "public-search", "staff-order-search"]);
 const marker = (uid, kind) => `udc:managed-session:${uid}:${kind}`;
 reads.add("media-operation"); reads.add("staff-media-operation");
+for(const action of ['notifications','staff-notifications','notification-operation','staff-notification-operation','notification-open','staff-notification-open','staff-delivery-issues','staff-template-library']) reads.add(action);
+reads.add('staff-template-test-result');
+reads.add('staff-template-history');
+reads.add('staff-delivery-issue');
+for (const action of ['staff-order-workspace','staff-order-queue','staff-order-original','staff-order-payments','staff-order-extensions','staff-order-activity']) reads.add(action);
+for (const action of ['staff-order-notes','staff-order-note-history','staff-order-escalations']) reads.add(action);
+reads.add('staff-order-summary');
 export async function accountRequest(action, input = {}, { publicRequest = false, optionalAuth = false, principalUid, sessionRetry = false } = {}) {
   if (!isFirebaseConfigured || !app) throw Object.assign(new Error("Current account access is unavailable."), { code: "account-source-unavailable" });
   const auth = getAuth(app), user = auth.currentUser, uid = user?.uid || null;
