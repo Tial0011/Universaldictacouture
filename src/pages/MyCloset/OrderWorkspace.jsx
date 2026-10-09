@@ -55,6 +55,7 @@ export default function OrderWorkspace({ staff = false }) {
     {current&&current.orderId===orderId&&current.componentId===componentId&&<>
     {receiptNotice?.scope===scope&&<SourceStatus state="saved">{receiptNotice.text}</SourceStatus>}
     <p>One transaction · viewing {componentId === "base" ? "Base" : "Extension"} · Edition {current.currentEdition || "not yet established"}</p><p>{current.status} · {current.fulfilment} · {current.delivery}</p>
+    {!staff&&current.chatId&&<p><Link to={`/chats?chat=${encodeURIComponent(current.chatId)}&event=${encodeURIComponent(`${orderId}:${componentId}:edition:${current.currentEdition || 0}`)}`}>See this current work in Chat</Link></p>}
     {current.currentWork!==componentId&&<p>Current work is separate from this historical view. <Link to={`?work=${encodeURIComponent(current.currentWork)}`}>View current work</Link></p>}
     {current.edition?.entries.map(entry=><div className="surface surface--padded" key={entry.rootId}><h2>{entry.label}</h2><p>Quantity: {entry.quantity} · {formatNaira(entry.unitAmountMinor/100)}</p></div>)}
     <dl><dt>Amount Due Now</dt><dd>{current.amountDueNowMinor==null?"Not established":formatNaira(current.amountDueNowMinor/100)}</dd><dt>Verified paid</dt><dd>{formatNaira(current.totalPaidMinor/100)}</dd><dt>Outstanding</dt><dd>{current.outstandingMinor==null?"Not established":formatNaira(current.outstandingMinor/100)}</dd></dl>
@@ -63,7 +64,7 @@ export default function OrderWorkspace({ staff = false }) {
     <p>Bank Transfer only. Submitted evidence is not verified paid value. Payment does not complete this Order.</p>
     {!staff&&current.paymentEnabled&&!current.cancelled&&!current.completed&&current.amountDueNowMinor>0&&<ReceiptSubmission key={scope} order={current} onChanged={()=>{setReceiptNotice({scope,text:"Receipt Submitted. Verification is separate."});setAttempt(value=>value+1);}}/>}
     {!staff&&current.completed&&current.reviewEnabled&&current.currentWork==="base"&&<OrderReview key={scope} order={current}/>}
-    <TransactionConversation key={scope+current.chatId} chatId={current.chatId} staff={staff}/>
+    <TransactionConversation key={scope+current.chatId} chatId={current.chatId} staff={staff} embedded/>
     </>}
   </section>;
 }

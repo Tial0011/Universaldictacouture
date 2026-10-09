@@ -18,7 +18,7 @@ import { createOrderGovernance } from './order-governance.js';
 import { createStaffManagement } from './staff-management.js';
 
 const readActions = new Set(["context", "registration-result", "profile", "addresses", "preferences", "my-information", "operation", "catalogue", "public-media", "media-deliver", "staff-media-deliver", "saves", "save-state", "custom-style", "staff-custom-style", "cluster-operation"]);
-const transactionReads = new Set(["orders", "order", "staff-order", "edition", "staff-edition", "payment", "staff-payment", "transaction-operation", "messages", "staff-messages", "review-feed"]);
+const transactionReads = new Set(["orders", "order", "staff-order", "edition", "staff-edition", "payment", "staff-payment", "transaction-operation", "legacy-chat-history", "couturiers", "conversations", "staff-conversations", "conversation", "staff-conversation", "messages", "staff-messages", "chat-event", "staff-chat-event", "chat-search", "staff-chat-search", "chat-media", "staff-chat-media", "review-feed"]);
 const systemReads = new Set(["staff-configuration", "configuration-operation", "staff-audit", "public-search", "staff-order-search", "media-operation", "staff-media-operation"]);
 for (const action of ['notifications','staff-notifications','notification-operation','staff-notification-operation','notification-open','staff-notification-open','staff-delivery-issues','staff-template-library']) systemReads.add(action);
 systemReads.add('staff-template-test-result');
@@ -133,9 +133,18 @@ export function createAccountHandler(runtime, options = {}) {
       else if (["extension", "staff-extension"].includes(action)) result = await transactions.extension(claims, input);
       else if (["operations", "staff-operations"].includes(action)) result = await transactions.operational(claims, input);
       else if (action === "transaction-operation") result = await transactions.reconcile(claims, url.searchParams.get("operationId"));
+      else if (action === "couturiers") result = await communication.availableCouturiers(claims);
+      else if (action === "legacy-chat-history") result = await communication.legacyHistory(claims, url.searchParams.get("cursor"));
       else if (action === "general-chat-start") result = await communication.generalChat(claims, input);
+      else if (["conversations", "staff-conversations"].includes(action)) result = await communication.conversations(claims, url.searchParams.get("cursor"), url.searchParams.get("relationshipChatId"));
+      else if (["chat-event", "staff-chat-event"].includes(action)) result = await communication.exactMessage(claims, url.searchParams.get("chatId"), url.searchParams.get("messageId"));
+      else if (["conversation", "staff-conversation"].includes(action)) result = await communication.conversation(claims, url.searchParams.get("chatId"));
       else if (["messages", "staff-messages"].includes(action)) result = await communication.messages(claims, url.searchParams.get("chatId"), url.searchParams.has("before") ? Number(url.searchParams.get("before")) : null);
       else if (["message-send", "staff-message-send"].includes(action)) result = await communication.send(claims, input);
+      else if (["message-change", "staff-message-change"].includes(action)) result = await communication.changeMessage(claims, input);
+      else if (["chat-mark-read", "staff-chat-mark-read"].includes(action)) result = await communication.markRead(claims, input);
+      else if (["chat-event", "staff-chat-event", "chat-search", "staff-chat-search"].includes(action)) result = await communication.search(claims, url.searchParams.get("chatId"), url.searchParams.get("term") || "", url.searchParams.has("before") ? Number(url.searchParams.get("before")) : null);
+      else if (["chat-media", "staff-chat-media"].includes(action)) result = await communication.mediaHistory(claims, url.searchParams.get("chatId"), url.searchParams.has("before") ? Number(url.searchParams.get("before")) : null);
       else if (action === "review-submit") result = await communication.submitReview(claims, input);
       else if (action === "review-media-attach") result = await communication.attachReviewMedia(claims, input);
       else if (["review-change", "staff-review-change"].includes(action)) result = await communication.changeReview(claims, input);

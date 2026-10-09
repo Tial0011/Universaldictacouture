@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Button from "../../../components/common/Button";
 import Conversation from "../../../components/chat/Conversation";
+import ChatWorkspace from "../../../components/chat/ChatWorkspace";
 import { useAuth } from "../../../context/AuthContext";
 import { chatError, listConversations, watchConversation } from "../../../services/chats";
 import { useStaff } from "../../../context/StaffContext";
 import { allows } from "../../../services/staffAuthorization";
 
-function Inbox({ user }) {
+function LegacyInbox({ user }) {
   const { staff } = useStaff();
   const [params, setParams] = useSearchParams();
   const selectedId = params.get("conversation");
@@ -44,7 +45,7 @@ function Inbox({ user }) {
     } catch (error) { if (active.current) { setError(chatError(error)); setItems([]); if (error.code === "permission-denied") setSelected(null); } }
     finally { if (active.current) setLoading(false); }
   }
-  return <div className="admin-stack"><header className="admin-page-heading"><div><p className="admin-eyebrow">Customer care</p><h1>Chats</h1><p>General assistance only. This workspace does not grant transaction access or create a Main Order Chat. Open conversations use current server state; refresh the inbox for new work.</p></div></header>
+  return <div className="admin-stack chat-legacy-inbox"><header className="admin-page-heading"><div><p className="admin-eyebrow">Compatibility history</p><h2>Legacy Chat access</h2><p>Existing customer-ID-keyed conversations remain readable through their original guarded service while durable Chats transition forward. This does not create a second messaging product.</p></div></header>
     <div className={"admin-inbox" + (selected ? " admin-inbox--selected" : "")}>
       <aside className="admin-panel admin-inbox__sidebar" aria-label="Customer conversations"><h2>Inbox</h2>
         <div className="admin-inbox__controls"><Button variant="secondary" isLoading={loading} onClick={() => load()}>Refresh inbox</Button></div>
@@ -60,5 +61,5 @@ function Inbox({ user }) {
 }
 export default function AdminChats() {
   const { user } = useAuth();
-  return user ? <Inbox key={user.uid} user={user} /> : null;
+  return user ? <div className="admin-stack"><ChatWorkspace key={`current:${user.uid}`} staff /><details className="admin-panel chat-legacy-access"><summary>Legacy conversation history</summary><LegacyInbox key={`legacy:${user.uid}`} user={user} /></details></div> : null;
 }

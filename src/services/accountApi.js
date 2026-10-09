@@ -1,6 +1,6 @@
 import { getAuth } from "firebase/auth";
 import app, { isFirebaseConfigured } from "../firebase/config";
-const reads = new Set(["context", "registration-result", "profile", "addresses", "preferences", "my-information", "operation", "catalogue", "saves", "save-state", "custom-style", "staff-custom-style", "cluster-operation", "orders", "order", "staff-order", "edition", "staff-edition", "payment", "staff-payment", "transaction-operation", "messages", "staff-messages", "review-feed", "staff-configuration", "configuration-operation", "staff-audit", "public-search", "staff-order-search"]);
+const reads = new Set(["context", "registration-result", "profile", "addresses", "preferences", "my-information", "operation", "catalogue", "saves", "save-state", "custom-style", "staff-custom-style", "cluster-operation", "orders", "order", "staff-order", "edition", "staff-edition", "payment", "staff-payment", "transaction-operation", "legacy-chat-history", "couturiers", "conversations", "staff-conversations", "conversation", "staff-conversation", "messages", "staff-messages", "chat-event", "staff-chat-event", "chat-search", "staff-chat-search", "chat-media", "staff-chat-media", "review-feed", "staff-configuration", "configuration-operation", "staff-audit", "public-search", "staff-order-search"]);
 const marker = (uid, kind) => `udc:managed-session:${uid}:${kind}`;
 // A page can mount several owner hooks at once. They must share one session
 // admission; competing Set-Cookie responses must not revoke each other.

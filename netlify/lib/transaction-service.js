@@ -1,4 +1,5 @@
 import { exactFields, fail, identifier, requireFresh } from "./account-contract.js";
+import { prepareChatTransactionEvent } from "./chat-transaction-events.js";
 import { resolveStaff } from "./staff-authority.js";
 import { publicProduct } from "./pretransaction-service.js";
 import { resolveSelections } from "../../src/services/productModel.js";
@@ -36,7 +37,9 @@ export function createTransactionService(account) {
     const path = ref(`transactionOperations/${identifier(input.operationId)}`);
     const fingerprint = keyed(JSON.stringify({ uid: claims.uid, action, target, input })), prior = (await tx.get(path)).data();
     if (prior && (prior.actorUid !== claims.uid || prior.fingerprint !== fingerprint)) fail("operation-conflict", 409);
+    const chatEvent = prior ? null : await prepareChatTransactionEvent({ tx, ref, keyed, now, input, action, actor });
     return { prior, commit(result) {
+      chatEvent?.commit(result);
       tx.create(path, { actorUid: claims.uid, actor, action, target, fingerprint, state: "committed", result, createdAt: now() });
       tx.create(ref(`transactionEvidence/${input.operationId}`), { actor, executor: "system:transaction-api", action, target, createdAt: now(), result });
       account.capture(tx, { domain: "transaction", operationId: input.operationId, action, target, actor, executor: "system:transaction-api" });

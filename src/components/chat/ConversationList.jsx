@@ -43,7 +43,7 @@ export default function ConversationList({ threads, activeId, onSelect, search, 
                 </span>
                 <span className="chat-list__preview">{thread.lastMessage}</span>
               </span>
-              {thread.unread ? <span className="chat-list__unread" aria-label={`${thread.unread} unread messages`}>{thread.unread}</span> : null}
+              {thread.unread || thread.unreadComplete === false ? <span className="chat-list__unread" aria-label={thread.unreadComplete === false ? `Unread count is incomplete; at least ${thread.unread} unread messages` : `${thread.unread} unread messages`}>{thread.unreadComplete === false ? thread.unread ? `${Math.min(thread.unread, 99)}+` : '…' : thread.unread > 99 ? '99+' : thread.unread}</span> : null}
             </button>
           );
         }) : (
