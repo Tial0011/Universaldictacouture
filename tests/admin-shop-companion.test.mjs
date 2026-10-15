@@ -71,8 +71,8 @@ test("Task 8A: admin accessibility/responsiveness keeps focus and reduced-motion
 
 test("Task 8A: Firestore keeps admin writes protected and excludes Size from Shop V1 taxonomy writes", () => {
   assert.match(rules, /function canStaff\(/);
-  assert.match(rules, /allow create, update: if canStaff\(/);
-  assert.match(rules, /dimension in \['category', 'occasion', 'style', 'fabric', 'colour'\]/);
+  assert.match(rules, /allow create, update: if coherentContentWrite\(/);
+  assert.match(rules, /match \/taxonomy\/\{labelId\}[^]*?allow create, update: if false;/);
   assert.match(rules, /request\.resource\.data\.unitLabel is string/);
   assert.doesNotMatch(rules, /dimension in \[[^\]]*'size'/);
 });

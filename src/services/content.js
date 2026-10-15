@@ -327,7 +327,7 @@ export async function fetchTaxonomyLabels() {
       const data = entry.data() ?? {};
       const dimension = String(data.dimension ?? "").trim();
       const name = String(data.name ?? "").trim();
-      if (!grouped[dimension] || !name) return;
+      if (!grouped[dimension] || !name || data.active === false) return;
       const exists = grouped[dimension].some((label) => label.toLowerCase() === name.toLowerCase());
       if (!exists) grouped[dimension].push(name);
     });

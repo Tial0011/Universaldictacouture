@@ -4,7 +4,7 @@ import { publicProduct } from "./pretransaction-service.js";
 import { normaliseReviewRecord, reviewIsPublic } from "../../src/services/reviewModel.js";
 import { MESSAGE_LIMIT } from "../../src/services/chatModel.js";
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
-export function createConversationReviewService(transactions) {
+export function createConversationReviewService(transactions, { continuedReviewUse } = {}) {
   const { db, ref, now, keyed, customer, authority, operation, isStaff, orderRef } = transactions;
   const MESSAGE_EDIT_WINDOW_MS = 30 * 60 * 1000;
   // The old UID conversation schema has intentionally separate legacy access.
@@ -392,8 +392,19 @@ export function createConversationReviewService(transactions) {
       return { records }; // No Account IDs, staff notes or consent evidence.
     });
   }
+  async function currentUse(tx, review, purpose) {
+    const accountId = review?.authorAccountId;
+    if (!accountId) return review?._ownerVersion !== 3; // Legacy unbound-use audit remains an owner dependency.
+    const owner = (await tx.get(ref(`accounts/${identifier(accountId)}`))).data();
+    if (owner && ["ACTIVE", "RESTORED"].includes(owner.lifecycle) && !owner.canonicalAccountId) return true;
+    // Any independent continued-use basis must come from a trusted owner policy.
+    return typeof continuedReviewUse === "function" && await continuedReviewUse(tx, { review, owner, purpose, now: now() }) === true;
+  }
   async function currentlyPublic(tx,review){
-    if(!reviewIsPublic(review))return false;if(review._ownerVersion!==3)return true;
+    if(!reviewIsPublic(review) || !await currentUse(tx, review, "publication"))return false;if(review._ownerVersion!==3)return true;
+    return currentReviewSource(tx, review);
+  }
+  async function currentReviewSource(tx, review) {
     const order=(await tx.get(orderRef(review.orderId))).data(),base=(await tx.get(transactions.workRef(review.orderId))).data();
     return order?.accountId===review.authorAccountId&&base?.completed&&order.reviewEnabled&&!order.activeExtensionId;
   }
@@ -402,9 +413,13 @@ export function createConversationReviewService(transactions) {
     return db.runTransaction(async tx => {
       const review = (await tx.get(ref(`accountReviews/${identifier(input.reviewId)}`))).data(), actor = await reviewAuthority(tx, claims, review, "product-draft");
       const op = await operation(tx, claims, input, "review.product-draft", input.reviewId, actor); if (op.prior) return { state: "committed", ...op.prior.result };
-      if (review.version !== input.expectedVersion || !review.permissions.productReuse) fail("reuse-not-authorized", 409);
-      const productId = keyed(`review-draft:${review.reviewId}:${input.operationId}`);
+      if (review.version !== input.expectedVersion || !review.permissions.productReuse || review.moderation !== "APPROVED" || !await currentUse(tx, review, "product-draft") || !await currentReviewSource(tx, review)) fail("reuse-not-authorized", 409);
+      const existingDrafts = await tx.get(db.collection("products").where("originReviewId", "==", review.reviewId).limit(2));
+      if (existingDrafts.size > 1) fail("handoff-source-conflict", 409);
+      const productId = review.productDraftHandoff?.productId || existingDrafts.docs[0]?.id || keyed(`review-draft:${review.reviewId}:${input.operationId}`);
       await resolveStaff(tx, db, claims, { capability: "products.create", purpose: "catalogue", objectId: productId, action: "create", state: "draft" }, now());
+      if (review.productDraftHandoff || !existingDrafts.empty) return op.commit({ productId, existing: true });
+      tx.update(ref(`accountReviews/${review.reviewId}`), { productDraftHandoff: { productId, sourceVersion: review.version, operationId: input.operationId, actor, at: now() } });
       tx.create(ref(`products/${productId}`), { _ownerVersion: 2, _version: 1, status: "draft", archived: false, name: review.productSnapshot?.name || "", description: "", images: [], price: null, unitLabel: "", category: [], originReviewId: review.reviewId, originReviewVersion: review.version, permissionEvidenceAt: now(), createdAt: now() });
       return op.commit({ productId }); // No media reuse, Review rewrite or publish.
     });

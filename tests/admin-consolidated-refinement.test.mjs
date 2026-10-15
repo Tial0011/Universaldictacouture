@@ -47,7 +47,7 @@ test("legacy Shop admin routes remain directly routable", () => {
   assert.match(app, /path="shop" element=\{<StaffRoute domain="products"><AdminShop \/>/);
   assert.match(app, /path="products" element=\{<StaffRoute domain="products"><AdminProducts \/>/);
   assert.match(app, /path="discovery" element=\{<StaffRoute domain="content"><AdminDiscovery \/>/);
-  assert.match(app, /path="taxonomy" element=\{<StaffRoute domain="content"><AdminTaxonomy \/>/);
+  assert.match(app, /path="taxonomy" element=\{<StaffRoute domain="settings\.taxonomy"><AdminTaxonomy \/>/);
 });
 
 test("product list opens a real existing record and provides practical loaded-record filtering and sorting", () => {

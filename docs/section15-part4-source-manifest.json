@@ -1,0 +1,696 @@
+{
+  "repository": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture",
+  "baselineCommit": "8eab46577280a9d3a72f98a13424999f950d056f",
+  "modified": 28,
+  "created": 12,
+  "deleted": [],
+  "files": [
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/firestore.rules",
+      "relativePath": "firestore.rules",
+      "change": "modified",
+      "reason": "Trusted Content/Appearance version, identity, publication and audit guards; taxonomy client writes closed.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J3",
+        "J6",
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "section15-rules; section12-rules; affected 44"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/netlify/lib/account-handler.js",
+      "relativePath": "netlify/lib/account-handler.js",
+      "change": "modified",
+      "reason": "Current existing Account Function dispatch for taxonomy/history and continued-use owner option.",
+      "flows": [
+        "S15-M05-F02",
+        "S15-M05-F04",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J4",
+        "J6",
+        "J7",
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "HTTP and service tests; native HTTP denial"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/netlify/lib/pretransaction-service.js",
+      "relativePath": "netlify/lib/pretransaction-service.js",
+      "change": "modified",
+      "reason": "Current active taxonomy validation in all Product fields; preserve retained relationships.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F04",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J8"
+      ],
+      "testEvidence": "integrity and pretransaction emulator tests"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/netlify/lib/runtime-integrity.js",
+      "relativePath": "netlify/lib/runtime-integrity.js",
+      "change": "modified",
+      "reason": "Isolate collection/record dependency failures; unavailable counts remain absent.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J1",
+        "J2",
+        "J6"
+      ],
+      "testEvidence": "integrity failure-isolation test"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/netlify/lib/shared-configuration.js",
+      "relativePath": "netlify/lib/shared-configuration.js",
+      "change": "modified",
+      "reason": "Atomic Bank Save, independent read/edit/freshness, protected reconciliation and bounded history.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J3",
+        "J6",
+        "J7",
+        "J9"
+      ],
+      "testEvidence": "51 services; 125-version paging; native lost ACK"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/netlify/lib/staff-management.js",
+      "relativePath": "netlify/lib/staff-management.js",
+      "change": "modified",
+      "reason": "Explicit Bank re-grants; reactivation cannot restore permissions; durable formal-audit intent.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F04",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J7",
+        "J9"
+      ],
+      "testEvidence": "27 Account regressions"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/netlify/lib/transaction-conversation-review.js",
+      "relativePath": "netlify/lib/transaction-conversation-review.js",
+      "change": "modified",
+      "reason": "Current lifecycle/purpose/source checks; recover and deduplicate the source Product Draft opportunity.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F04",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J4"
+      ],
+      "testEvidence": "integrity Review/deletion/consent/handoff tests"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/netlify/lib/taxonomy-governance.js",
+      "relativePath": "netlify/lib/taxonomy-governance.js",
+      "change": "created",
+      "reason": "Typed stable-definition API, expected versions, label claims, immutable evidence and receipts.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F04",
+        "S15-M05-F05",
+        "S15-M05-F06"
+      ],
+      "journeys": [
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "integrity uniqueness/race/retirement/reorder tests; Rules; native"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/App.jsx",
+      "relativePath": "src/App.jsx",
+      "change": "modified",
+      "reason": "Bank/Taxonomy Settings routes and exact taxonomy route entitlement.",
+      "flows": [
+        "S15-M05-F02",
+        "S15-M05-F03",
+        "S15-M05-F04"
+      ],
+      "journeys": [
+        "J6",
+        "J7",
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "Admin route regression; native flows; build"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/components/admin/RecordManager.jsx",
+      "relativePath": "src/components/admin/RecordManager.jsx",
+      "change": "modified",
+      "reason": "Explain current publication permission and omit unsupported destructive Content deletion.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F04",
+        "S15-M05-F06"
+      ],
+      "journeys": [
+        "J3"
+      ],
+      "testEvidence": "Admin model/companion regression; build"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/components/common/SourceStatus.jsx",
+      "relativePath": "src/components/common/SourceStatus.jsx",
+      "change": "modified",
+      "reason": "Semantic state compatibility and valid status containers with live announcements.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F03"
+      ],
+      "journeys": [
+        "J1",
+        "J2",
+        "J3",
+        "J4",
+        "J5",
+        "J6",
+        "J7",
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "runtime and native AX/status checks"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/pages/admin/Appearance/Appearance.jsx",
+      "relativePath": "src/pages/admin/Appearance/Appearance.jsx",
+      "change": "modified",
+      "reason": "Audited Save/Reset, source-ready admission, unknown checking and duplicate-submission guard.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F03"
+      ],
+      "journeys": [
+        "J3"
+      ],
+      "testEvidence": "native Appearance Save/Reset/stale tests"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/pages/admin/Settings/BankSettings.jsx",
+      "relativePath": "src/pages/admin/Settings/BankSettings.jsx",
+      "change": "created",
+      "reason": "Masked protected fields, version-bound proposal, confirmation, history, permission withdrawal and result checking.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F03",
+        "S15-M05-F04",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J6",
+        "J7",
+        "J9"
+      ],
+      "testEvidence": "native Bank loss/reconciliation/revocation; 35 viewport checks"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/pages/admin/Settings/Settings.css",
+      "relativePath": "src/pages/admin/Settings/Settings.css",
+      "change": "created",
+      "reason": "Existing premium skin extended with stacked forms, wrapping, focus and reduced motion.",
+      "flows": [
+        "S15-M05-F03"
+      ],
+      "journeys": [
+        "J6",
+        "J7",
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "native viewport/zoom/focus checks; visual inspection"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/pages/admin/Settings/Settings.jsx",
+      "relativePath": "src/pages/admin/Settings/Settings.jsx",
+      "change": "modified",
+      "reason": "Canonical six-category Home and supported existing workspaces; incomplete categories disclosed.",
+      "flows": [
+        "S15-M05-F03",
+        "S15-M05-F04",
+        "S15-M05-F06"
+      ],
+      "journeys": [
+        "J6",
+        "J7",
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "native Settings Home; no-overflow checks"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/pages/admin/Settings/StaffAccess.jsx",
+      "relativePath": "src/pages/admin/Settings/StaffAccess.jsx",
+      "change": "modified",
+      "reason": "Reactivation wording reflects new permission grants rather than historical restoration.",
+      "flows": [
+        "S15-M05-F02",
+        "S15-M05-F03",
+        "S15-M05-F06"
+      ],
+      "journeys": [
+        "J9"
+      ],
+      "testEvidence": "Owner browser regression; Account tests; build"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/pages/admin/Taxonomy/Taxonomy.jsx",
+      "relativePath": "src/pages/admin/Taxonomy/Taxonomy.jsx",
+      "change": "modified",
+      "reason": "Current governed list/detail, focused mobile editor, rename/reorder/retirement, confirmation and recovery.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F03",
+        "S15-M05-F04",
+        "S15-M05-F05",
+        "S15-M05-F06"
+      ],
+      "journeys": [
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "native taxonomy/missing-ACK/reorder/focus; service tests"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/services/accountApi.js",
+      "relativePath": "src/services/accountApi.js",
+      "change": "modified",
+      "reason": "Classify new read-only actions correctly; reuse managed admission and no-store transport.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J6",
+        "J7",
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "HTTP/native and Account session regressions"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/services/admin.js",
+      "relativePath": "src/services/admin.js",
+      "change": "modified",
+      "reason": "Read disclosure admission, fixed-slot initial Appearance creation, closed unsafe deletion.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F05",
+        "S15-M05-F06"
+      ],
+      "journeys": [
+        "J3"
+      ],
+      "testEvidence": "native Appearance/stale tests; Admin model regressions"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/services/content.js",
+      "relativePath": "src/services/content.js",
+      "change": "modified",
+      "reason": "Inactive definitions are excluded from the current taxonomy-label read.",
+      "flows": [
+        "S15-M05-F04",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J8"
+      ],
+      "testEvidence": "assignment and catalogue regressions; build"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/services/operationalRuntime.js",
+      "relativePath": "src/services/operationalRuntime.js",
+      "change": "modified",
+      "reason": "Complete 21 semantic states and existing-state aliases; distinguish inactive authority.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F03"
+      ],
+      "journeys": [
+        "J1",
+        "J2",
+        "J3",
+        "J4",
+        "J5",
+        "J6",
+        "J7",
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "integrity vocabulary/timeout test; native announcements"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/services/ownerOperation.js",
+      "relativePath": "src/services/ownerOperation.js",
+      "change": "modified",
+      "reason": "Known invalid Bank fields use validation recovery copy.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F03"
+      ],
+      "journeys": [
+        "J7"
+      ],
+      "testEvidence": "services/build; existing owner-operation regressions"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/services/siteAppearance.js",
+      "relativePath": "src/services/siteAppearance.js",
+      "change": "modified",
+      "reason": "Authoritative admin read; existing audited writer; Reset is a new current version.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F04",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J3"
+      ],
+      "testEvidence": "native Appearance and Rules positive/stale/delete checks"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/services/staffAuthorization.js",
+      "relativePath": "src/services/staffAuthorization.js",
+      "change": "modified",
+      "reason": "Register exact taxonomy discovery contract within existing authorization model.",
+      "flows": [
+        "S15-M05-F02",
+        "S15-M05-F04",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "route/current capability tests; native revocation"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/src/services/superAdminPolicy.js",
+      "relativePath": "src/services/superAdminPolicy.js",
+      "change": "modified",
+      "reason": "Register Content publication/Taxonomy purposes; profile cannot supply absent Bank grants.",
+      "flows": [
+        "S15-M05-F02",
+        "S15-M05-F04",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J3",
+        "J7",
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "real-profile denial; explicit Owner grant regressions; native HTTP"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/tests/account-continuity-repair.test.mjs",
+      "relativePath": "tests/account-continuity-repair.test.mjs",
+      "change": "modified",
+      "reason": "Explicit Bank re-enablement, non-restoring reactivation and governance attribution regression.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F04",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J7",
+        "J9"
+      ],
+      "testEvidence": "npm run test:accounts: 27 passed"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/tests/admin-consolidated-refinement.test.mjs",
+      "relativePath": "tests/admin-consolidated-refinement.test.mjs",
+      "change": "modified",
+      "reason": "Legacy Taxonomy route now asserts exact new purpose guard.",
+      "flows": [
+        "S15-M05-F02",
+        "S15-M05-F04"
+      ],
+      "journeys": [
+        "J8"
+      ],
+      "testEvidence": "affected group: 44 passed"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/tests/admin-shop-companion.test.mjs",
+      "relativePath": "tests/admin-shop-companion.test.mjs",
+      "change": "modified",
+      "reason": "Structural boundary recognizes stronger trusted Content and taxonomy API enforcement.",
+      "flows": [
+        "S15-M05-F02",
+        "S15-M05-F04",
+        "S15-M05-F05",
+        "S15-M05-F06"
+      ],
+      "journeys": [
+        "J3",
+        "J8"
+      ],
+      "testEvidence": "affected group: 44 passed"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/tests/section15-rules.test.mjs",
+      "relativePath": "tests/section15-rules.test.mjs",
+      "change": "modified",
+      "reason": "Private operation/history denial; unaudited/stale/concurrent/publication/revocation/Appearance controls.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J3",
+        "J6",
+        "J7",
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "final Rules and affected groups passed"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/tests/section16-downstream.test.mjs",
+      "relativePath": "tests/section16-downstream.test.mjs",
+      "change": "modified",
+      "reason": "Separate authorized-but-expired Bank authentication from missing capability.",
+      "flows": [
+        "S15-M05-F02",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J7"
+      ],
+      "testEvidence": "51-service group passed"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/tests/section16-pretransaction.test.mjs",
+      "relativePath": "tests/section16-pretransaction.test.mjs",
+      "change": "modified",
+      "reason": "Retained retired relationships allowed; newly assigned inactive definitions rejected.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F04",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J8"
+      ],
+      "testEvidence": "51-service group passed"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/tests/section15-integrity.test.mjs",
+      "relativePath": "tests/section15-integrity.test.mjs",
+      "change": "created",
+      "reason": "Real emulator integrity, identity, concurrency, consent/deletion, handoff and failure-isolation behavior.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F04",
+        "S15-M05-F05",
+        "S15-M05-F06"
+      ],
+      "journeys": [
+        "J3",
+        "J4",
+        "J6",
+        "J7",
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "18 integrity cases included in 51-service group"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/tests/section15-integrity-browser.mjs",
+      "relativePath": "tests/section15-integrity-browser.mjs",
+      "change": "created",
+      "reason": "Actual masked Bank/Taxonomy interaction, ACK loss, current permissions, AX and reflow.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F03",
+        "S15-M05-F04",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J6",
+        "J7",
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "native delivery run passed"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/tests/section15-final-browser.mjs",
+      "relativePath": "tests/section15-final-browser.mjs",
+      "change": "created",
+      "reason": "Reproducible Appearance Save/Reset, focused taxonomy/reorder, real-profile HTTP denial.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F03",
+        "S15-M05-F04",
+        "S15-M05-F05"
+      ],
+      "journeys": [
+        "J3",
+        "J7",
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "packaged final native run passed"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/tests/section15-network-browser.mjs",
+      "relativePath": "tests/section15-network-browser.mjs",
+      "change": "created",
+      "reason": "Reproducible loopback bandwidth/offline/reconnect disclosure check.",
+      "flows": [
+        "S15-M05-F01",
+        "S15-M05-F02",
+        "S15-M05-F03"
+      ],
+      "journeys": [
+        "J6",
+        "J7",
+        "J9"
+      ],
+      "testEvidence": "400ms/16KiB network check passed"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/scripts/section15-part4-package.ps1",
+      "relativePath": "scripts/section15-part4-package.ps1",
+      "change": "created",
+      "reason": "Path-checked source snapshot and exclusions without secrets, build caches or dependencies.",
+      "flows": [
+        "S15-M05-F06"
+      ],
+      "journeys": [],
+      "testEvidence": "archive inspection and entry hash verification"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/docs/section15-part4-visual-register.json",
+      "relativePath": "docs/section15-part4-visual-register.json",
+      "change": "created",
+      "reason": "38 original embedded board IDs, dimensions and binary hashes; no runtime certification.",
+      "flows": [
+        "S15-M05-F06"
+      ],
+      "journeys": [],
+      "testEvidence": "38/38 presence and inspection"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/docs/section15-part4-evidence.json",
+      "relativePath": "docs/section15-part4-evidence.json",
+      "change": "created",
+      "reason": "Actual sources, test evidence and 28 official flow dispositions.",
+      "flows": [
+        "S15-M05-F06"
+      ],
+      "journeys": [
+        "J1",
+        "J2",
+        "J3",
+        "J4",
+        "J5",
+        "J6",
+        "J7",
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "source/log-derived evidence"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/docs/section15-part4-source-manifest.json",
+      "relativePath": "docs/section15-part4-source-manifest.json",
+      "change": "created",
+      "reason": "Exact absolute paths, reason, Flow/Journey and verification evidence.",
+      "flows": [
+        "S15-M05-F06"
+      ],
+      "journeys": [],
+      "testEvidence": "filesystem/Git inventory reconciliation"
+    },
+    {
+      "path": "C:/Users/HP ENVY/Desktop/UDC/Universaldictacouture/docs/section15-part4-implementation-verdict.md",
+      "relativePath": "docs/section15-part4-implementation-verdict.md",
+      "change": "created",
+      "reason": "Required A–Y report and three distinct verdicts with remaining gaps.",
+      "flows": [
+        "S15-M05-F06"
+      ],
+      "journeys": [
+        "J1",
+        "J2",
+        "J3",
+        "J4",
+        "J5",
+        "J6",
+        "J7",
+        "J8",
+        "J9"
+      ],
+      "testEvidence": "evidence-backed report review"
+    }
+  ],
+  "packagedOutput": "artifacts/UDC-Section15-Part4-PARTIAL.zip",
+  "functionEntriesChanged": [],
+  "functionEntryReused": "netlify/functions/account.js",
+  "rulesChanged": [
+    "firestore.rules"
+  ],
+  "indexesChanged": [],
+  "productionDeployment": false
+}

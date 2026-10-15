@@ -38,6 +38,7 @@ export const DOMAIN_CONTRACTS = {
   reviews: { label: "Review & Feeds", purpose: "moderation", collection: "reviews", path: "/admin/reviews" },
   chats: { label: "Chats", purpose: "customer-service", collection: "conversations", path: "/admin/chats" },
   content: { label: "Website content", purpose: "content" },
+  "settings.taxonomy": { label: "Discovery & Taxonomy", purpose: "taxonomy-settings", owner: "Section 15" },
   notifications: { label: 'Notifications', purpose: 'personal-notifications', owner: 'Section 15' },
   customers: { label: "Customers", purpose: "customer-support", owner: "Section 11 / Section 16" },
   orders: { label: "Orders & Operations", purpose: "order-operations", owner: "Section 14 / Section 16" },

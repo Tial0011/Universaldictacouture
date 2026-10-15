@@ -12,7 +12,7 @@ export function superAdminCapabilities({ paymentReview = false } = {}) {
     grants[capability] = { ...grants[capability], dataPurpose: { active: true, purpose, allObjects: true, dataClasses: [dataClass] } };
   };
   add('products', 'read create edit commercial media discovery publish unpublish archive restore delete', 'catalogue');
-  add('content', 'read edit delete', 'content');
+  add('content', 'read edit publish delete', 'content');
   add('reviews', 'read moderate publish unpublish product-draft', 'moderation');
   data('reviews.media-read', 'moderation', 'review-media');
   add('chats', 'read reply send', 'customer-service');
@@ -32,6 +32,7 @@ export function superAdminCapabilities({ paymentReview = false } = {}) {
   if (paymentReview) for (const action of ['proof-read','verify']) data(`payments.${action}`, 'payment-evidence', 'payment-proof');
   add('notifications', 'read edit', 'personal-notifications');
   add('settings.templates', 'read edit', 'communication-settings');
+  add('settings.taxonomy', 'read edit', 'taxonomy-settings');
   for (const action of ['read','edit']) data(`communications.delivery.${action}`, 'communication-reliability', 'delivery-evidence');
   // Newest owner decision explicitly includes financial administration.
   for (const action of ['read','edit']) grants[`settings.bank.${action}`] = { governance: { active:true, purpose:'financial-settings', area:'financial-settings', allObjects:true } };
@@ -43,7 +44,11 @@ export function superAdminCapabilities({ paymentReview = false } = {}) {
 }
 export function effectiveAdminCapabilities(record) {
   if(record.allCapabilitiesDisabled===true)return {};
-  const capabilities={...record.capabilities,...superAdminCapabilities({paymentReview:record.paymentReview===true})};
+  const profileGrants = superAdminCapabilities({paymentReview:record.paymentReview===true});
+  // Financial authority must be an explicit current stored grant, never inferred
+  // from a Super Admin/Owner profile. Existing reviewed Bank grants are retained.
+  delete profileGrants["settings.bank.read"]; delete profileGrants["settings.bank.edit"];
+  const capabilities={...record.capabilities,...profileGrants};
   for(const key of record.disabledCapabilities || []) delete capabilities[key];
   return capabilities;
 }

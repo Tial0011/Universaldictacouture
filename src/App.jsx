@@ -34,6 +34,7 @@ const StaffNotifications = lazy(() => import('./pages/admin/Notifications/Notifi
 const CommunicationTemplates = lazy(() => import('./pages/admin/Notifications/Notifications').then(module=>({default:module.Templates})));
 const CommunicationDeliveryIssues = lazy(() => import('./pages/admin/Notifications/Notifications').then(module=>({default:module.DeliveryIssues})));
 
+const BankSettings = lazy(() => import('./pages/admin/Settings/BankSettings'));
 const AdminSettings = lazy(() => import("./pages/admin/Settings/Settings"));
 const AdminStaffAccess = lazy(() => import("./pages/admin/Settings/StaffAccess"));
 const AdminShop = lazy(() => import("./pages/admin/Shop/ShopControl"));
@@ -106,7 +107,7 @@ export default function App() {
         <Route path="content" element={<StaffRoute domain="content"><ContentEntry/></StaffRoute>} />
         <Route path="shop" element={<StaffRoute domain="products"><AdminShop /></StaffRoute>} />
         <Route path="products" element={<StaffRoute domain="products"><AdminProducts /></StaffRoute>} />
-        <Route path="taxonomy" element={<StaffRoute domain="content"><AdminTaxonomy /></StaffRoute>} />
+        <Route path="taxonomy" element={<StaffRoute domain="settings.taxonomy"><AdminTaxonomy /></StaffRoute>} />
         <Route path="discovery" element={<StaffRoute domain="content"><AdminDiscovery /></StaffRoute>} />
         <Route path="homepage" element={<StaffRoute domain="content"><AdminHomepage /></StaffRoute>} />
         <Route path="reviews" element={<StaffRoute domain="reviews"><AdminReviews /></StaffRoute>} />
@@ -118,6 +119,8 @@ export default function App() {
         {[['customers', 'customers'], ['payments', 'payments'], ['custom-style', 'customStyle']].map(([path, domain]) =>
           <Route key={path} path={path} element={<StaffRoute domain={domain}><OwnerUnavailable domain={domain} /></StaffRoute>} />)}
         <Route path="settings" element={<AdminSettings />} />
+        <Route path="settings/bank" element={<BankSettings />} />
+        <Route path="settings/taxonomy" element={<StaffRoute domain="settings.taxonomy"><AdminTaxonomy /></StaffRoute>} />
         <Route path="settings/admins" element={<AdminStaffAccess />} />
         <Route path="*" element={<NotFound />} />
       </Route>

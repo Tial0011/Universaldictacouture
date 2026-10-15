@@ -16,6 +16,7 @@ import { createCommunicationTestSend } from './communication-test-send.js';
 import { createOrderWorkspace } from './order-workspace.js';
 import { createOrderGovernance } from './order-governance.js';
 import { createStaffManagement } from './staff-management.js';
+import { createTaxonomyGovernance } from './taxonomy-governance.js';
 
 const readActions = new Set(["context", "registration-result", "profile", "addresses", "preferences", "my-information", "operation", "catalogue", "public-media", "media-deliver", "staff-media-deliver", "saves", "save-state", "custom-style", "staff-custom-style", "cluster-operation"]);
 const transactionReads = new Set(["orders", "order", "staff-order", "edition", "staff-edition", "payment", "staff-payment", "transaction-operation", "legacy-chat-history", "couturiers", "conversations", "staff-conversations", "conversation", "staff-conversation", "messages", "staff-messages", "chat-event", "staff-chat-event", "chat-search", "staff-chat-search", "chat-media", "staff-chat-media", "review-feed"]);
@@ -23,6 +24,8 @@ const systemReads = new Set(["staff-configuration", "configuration-operation", "
 for (const action of ['notifications','staff-notifications','notification-operation','staff-notification-operation','notification-open','staff-notification-open','staff-delivery-issues','staff-template-library']) systemReads.add(action);
 systemReads.add('staff-template-test-result');
 systemReads.add('staff-template-history');
+systemReads.add('staff-configuration-history');
+for (const action of ['staff-taxonomy-list', 'staff-taxonomy', 'staff-taxonomy-operation']) systemReads.add(action);
 systemReads.add('staff-delivery-issue');
 for (const action of ['staff-order-workspace','staff-order-queue','staff-order-original','staff-order-payments','staff-order-extensions','staff-order-activity']) systemReads.add(action);
 for (const action of ['staff-order-notes','staff-order-note-history','staff-order-escalations']) systemReads.add(action);
@@ -34,10 +37,10 @@ const publicActions = new Set(["register", "recovery-request"]);
 export function createAccountHandler(runtime, options = {}) {
   let cluster;
   const service = createAccountService({ ...runtime, guestIntentOwner: (tx, owner, intent) => cluster.importGuest(tx, owner, intent) }), identity = createIdentityResolution(service), proofs = createAccountProofs(service, { origin: runtime.origin, ...options });
-  const transactions = createTransactionService(service), communication = createConversationReviewService(transactions);
+  const transactions = createTransactionService(service), communication = createConversationReviewService(transactions, options);
   const orderWorkspace = createOrderWorkspace(transactions);
   const orderGovernance = createOrderGovernance(transactions);
-  const staffManagement = createStaffManagement(service);
+  const staffManagement = createStaffManagement(service), taxonomy = createTaxonomyGovernance(service);
   const configuration = createConfigurationService(service), projections = createOwnerProjections(service), integrity = createRuntimeIntegrity(service);
   const notifications=createCommunicationService(service,configuration,{...options,origin:runtime.origin,sourcePolicies:nativeCommunicationPolicies(service)});
   const templateTests=createCommunicationTestSend(service,configuration,{provider:options.testEmailProvider,origin:runtime.origin});
@@ -87,7 +90,11 @@ export function createAccountHandler(runtime, options = {}) {
         claims = await sessions.validate(request, claims, kind);
       }
       let result;
-      if(action==='staff-access-list')result=await staffManagement.list(claims);
+      if (action === 'staff-taxonomy-list') result = await taxonomy.list(claims, url.searchParams.get('after'));
+      else if (action === 'staff-taxonomy') result = await taxonomy.read(claims, url.searchParams.get('id'));
+      else if (action === 'staff-taxonomy-change') result = await taxonomy.mutate(claims, input);
+      else if (action === 'staff-taxonomy-operation') result = await taxonomy.reconcile(claims, url.searchParams.get('operationId'));
+      else if(action==='staff-access-list')result=await staffManagement.list(claims);
       else if(action==='staff-access-change')result=await staffManagement.change(claims,input);
       else if(action==='staff-access-operation')result=await staffManagement.reconcile(claims,url.searchParams.get('operationId'));
       else if (action === 'staff-order-notes') result = await orderGovernance.noteList(claims,url.searchParams.get('orderId'),url.searchParams.get('componentId') || 'base');
@@ -114,6 +121,7 @@ export function createAccountHandler(runtime, options = {}) {
       else if (action==='staff-template-test-send') result=await templateTests.send(claims,input);
       else if (action==='staff-template-test-result') result=await templateTests.read(claims,url.searchParams.get('operationId'));
       else if (action==='staff-delivery-recover') result=await notifications.recover(claims,input);
+      else if (action === 'staff-configuration-history') result = await configuration.history(claims, url.searchParams.get('configurationId'), url.searchParams.has('before') ? Number(url.searchParams.get('before')) : null);
       else if (action === "staff-configuration") result = await configuration.read(claims, url.searchParams.get("configurationId"));
       else if (action === "staff-configuration-mutate") result = await configuration.mutate(claims, input);
       else if (action === "staff-template-preview") result = await configuration.preview(claims, input);

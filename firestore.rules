@@ -97,7 +97,7 @@ service cloud.firestore {
         && request.resource.data.execution == 'staff'
         && request.resource.data.outcome == 'committed'
         && request.resource.data.createdAt == request.time
-        && ((request.resource.data.targetCollection in ['products', 'heroSlides', 'discoveryModules', 'taxonomy']
+        && ((request.resource.data.targetCollection in ['products', 'heroSlides', 'discoveryModules', 'taxonomy', 'siteAppearance']
           && request.resource.data.action in ['save', 'unpublish', 'archive', 'restore']
           && getAfter(/databases/$(database)/documents/$(request.resource.data.targetCollection)/$(request.resource.data.targetId)).data._lastOperationId == eventId
           && getAfter(/databases/$(database)/documents/$(request.resource.data.targetCollection)/$(request.resource.data.targetId)).data.updatedAt == request.time)
@@ -291,18 +291,47 @@ service cloud.firestore {
       // owner; deny destructive deletion until that owner guarantee exists.
       allow delete: if false;
     }
+    function contentGrant(grants, capability, id, action, state, legacy) {
+      let grant = grants.get(capability, {});
+      let broad = grant.get('domainWide', {});
+      let selected = grant.get('selectedObject', {});
+      return (legacy && legacyDevelopmentCapability(capability, 'content'))
+        || (validRoute(broad, 'content') && action in broad.get('actions', [action]) && state in broad.get('states', [state]))
+        || (validRoute(selected, 'content') && id in selected.get('ids', []) && action in selected.get('actions', [action]) && state in selected.get('states', [state]));
+    }
+    function coherentContentWrite(kind, id, publicField) {
+      let current = request.method == 'create' ? {} : resource.data;
+      let next = request.resource.data;
+      let staff = request.auth != null ? get(/databases/$(database)/documents/admins/$(request.auth.uid)).data : {};
+      let grants = staff.get('capabilities', {});
+      let legacy = legacyDevelopmentMembership(staff);
+      let state = current.get(publicField, false) ? 'published' : 'draft';
+      return isStaff()
+        && (legacy || (exists(/databases/$(database)/documents/staffIdentities/$(staff.staffId))
+          && get(/databases/$(database)/documents/staffIdentities/$(staff.staffId)).data.active == true
+          && get(/databases/$(database)/documents/staffIdentities/$(staff.staffId)).data.principalUid == request.auth.uid))
+        && contentGrant(grants, 'content.read', id, 'read', state, legacy)
+        && contentGrant(grants, 'content.edit', id, 'edit', state, legacy)
+        && next.get('_version', 0) is int
+        && next._version == current.get('_version', 0) + 1
+        && next.updatedAt == request.time
+        && (request.method == 'create' ? next.createdAt == request.time : next.get('createdAt', null) == current.get('createdAt', null))
+        && validAudit(kind, id)
+        && getAfter(/databases/$(database)/documents/staffAudit/$(next._lastOperationId)).data.action == 'save'
+        && (!(kind == 'siteAppearance' || next.get(publicField, false) || current.get(publicField, false)) || contentGrant(grants, 'content.publish', id, 'publish', state, legacy));
+    }
     match /heroSlides/{slideId} {
       allow read: if resource.data.published == true || canStaff('content.read', 'content', slideId, '');
-      allow create, update: if canStaff('content.edit', 'content', slideId, '')
+      allow create, update: if coherentContentWrite('heroSlides', slideId, 'published')
         && request.resource.data.published is bool
         && request.resource.data.headline is string
         && request.resource.data.headline.size() > 0
         && request.resource.data.concept in ['ready-to-wear', 'aso-oke-fabric', 'custom-style', 'shop-by-occasion', 'bridal-event-dressing'];
-      allow delete: if canStaff('content.delete', 'content', slideId, '');
+      allow delete: if false; // Historical/dependency eligibility is not established by the legacy writer.
     }
     match /siteAppearance/{slotId} {
       allow read: if slotId == 'auth' || canStaff('content.read', 'content', slotId, '');
-      allow create, update: if canStaff('content.edit', 'content', slotId, '')
+      allow create, update: if coherentContentWrite('siteAppearance', slotId, 'published')
         && slotId == 'auth'
         && request.resource.data.eyebrow is string
         && request.resource.data.eyebrow.size() > 0
@@ -313,11 +342,11 @@ service cloud.firestore {
         && request.resource.data.supportingText is string
         && request.resource.data.supportingText.size() > 0
         && request.resource.data.supportingText.size() <= 260;
-      allow delete: if canStaff('content.delete', 'content', slotId, '');
+      allow delete: if false; // Reset creates a new governed version; it never deletes history.
     }
     match /discoveryModules/{moduleId} {
       allow read: if resource.data.active == true || canStaff('content.read', 'content', moduleId, '');
-      allow create, update: if canStaff('content.edit', 'content', moduleId, '')
+      allow create, update: if coherentContentWrite('discoveryModules', moduleId, 'active')
         && request.resource.data.active is bool
         && request.resource.data.placement in ['home', 'shop']
         && request.resource.data.items is list
@@ -337,10 +366,9 @@ service cloud.firestore {
       // with counts from published products, so an admin allocation
       // appears even before a product uses it (with a zero count).
       allow read: if true;
-      allow create, update: if canStaff('content.edit', 'content', labelId, '')
-        && request.resource.data.name is string
-        && request.resource.data.name.size() > 0
-        && request.resource.data.dimension in ['category', 'occasion', 'style', 'fabric', 'colour'];
+      // Version, normalized-label uniqueness, and active eligibility belong to
+      // the trusted taxonomy API. Direct client writes cannot bypass it.
+      allow create, update: if false;
       allow delete: if false;
     }
     match /homeSections/{sectionId} {

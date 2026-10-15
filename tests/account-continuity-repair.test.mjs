@@ -121,3 +121,31 @@ test('either owner independently changes another admin; no second approval, stal
   await assert.rejects(db.runTransaction(tx=>resolveStaffIdentity(tx,db,target,Date.now()))); // old session remains revoked
   await assert.rejects(management.change({...a,auth_time:a.auth_time-400},{...input,operationId:id(),expectedVersion:6}),{code:'fresh-auth-required'});
 });
+
+test('Bank profile authority stays separate; an explicit Owner grant re-enables only the intended capability', async () => {
+  const owner = await existing({admin:true}), target = await existing({admin:true});
+  await repair.admin(owner.uid,{commit:true,owner:true}); await repair.admin(target.uid,{commit:true});
+  const management = createStaffManagement(service);
+  const permission = (capability, enabled, expectedVersion) => management.change(owner,{uid:target.uid,operationId:id(),expectedVersion,action:'capability',capability,enabled});
+  await permission('settings.bank.read',false,1);
+  let member=normalizeStaffMembership(target.uid,(await db.doc('admins/'+target.uid).get()).data());
+  assert.equal(member.accessProfile,SUPER_ADMIN_PROFILE); assert.equal(member.capabilities['settings.bank.read'],undefined);
+  await permission('settings.bank.read',true,2);
+  member=normalizeStaffMembership(target.uid,(await db.doc('admins/'+target.uid).get()).data());
+  assert.equal(completeStaffRoute(member,{capability:'settings.bank.read',purpose:'financial-settings',objectId:'bank-transfer',governanceArea:'financial-settings',action:'read'},target),true);
+  await permission('settings.bank.edit',false,3);
+  member=normalizeStaffMembership(target.uid,(await db.doc('admins/'+target.uid).get()).data()); assert.equal(member.capabilities['settings.bank.edit'],undefined); assert.ok(member.capabilities['settings.bank.read']);
+  await permission('settings.bank.edit',true,4);
+  member=normalizeStaffMembership(target.uid,(await db.doc('admins/'+target.uid).get()).data());
+  assert.equal(completeStaffRoute(member,{capability:'settings.bank.edit',purpose:'financial-settings',objectId:'bank-transfer',governanceArea:'financial-settings',action:'edit'},target),true);
+});
+
+test('Staff reactivation preserves identity/history and cannot silently restore Bank or other revoked grants', async () => {
+  const owner=await existing({admin:true}),target=await existing({admin:true});await repair.admin(owner.uid,{commit:true,owner:true});await repair.admin(target.uid,{commit:true});
+  const management=createStaffManagement(service),operationId=id();await management.change(owner,{uid:target.uid,operationId,expectedVersion:1,action:'active',enabled:false});
+  const event=(await service.ref('ownerEvents/'+service.keyed('event:staff-governance:'+operationId)).get()).data();assert.equal(event.actor.staffId,normalizeStaffMembership(owner.uid,(await db.doc('admins/'+owner.uid).get()).data()).staffId);assert.equal(event.domain,'staff-governance');
+  await management.change(owner,{uid:target.uid,operationId:id(),expectedVersion:2,action:'active',enabled:true});
+  let member=normalizeStaffMembership(target.uid,(await db.doc('admins/'+target.uid).get()).data());assert.equal(member.active,true);assert.deepEqual(member.capabilities,{});
+  await management.change(owner,{uid:target.uid,operationId:id(),expectedVersion:3,action:'capability',capability:'settings.bank.read',enabled:true});
+  member=normalizeStaffMembership(target.uid,(await db.doc('admins/'+target.uid).get()).data());assert.ok(member.capabilities['settings.bank.read']);assert.equal(member.capabilities['settings.bank.edit'],undefined);assert.equal(member.capabilities['products.publish'],undefined);
+});

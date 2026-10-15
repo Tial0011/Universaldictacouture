@@ -9,6 +9,8 @@ reads.add("media-operation"); reads.add("staff-media-operation");
 for(const action of ['notifications','staff-notifications','notification-operation','staff-notification-operation','notification-open','staff-notification-open','staff-delivery-issues','staff-template-library']) reads.add(action);
 reads.add('staff-template-test-result');
 reads.add('staff-template-history');
+reads.add('staff-configuration-history');
+for (const action of ['staff-taxonomy-list', 'staff-taxonomy', 'staff-taxonomy-operation']) reads.add(action);
 reads.add('staff-delivery-issue');
 for (const action of ['staff-order-workspace','staff-order-queue','staff-order-original','staff-order-payments','staff-order-extensions','staff-order-activity']) reads.add(action);
 for (const action of ['staff-order-notes','staff-order-note-history','staff-order-escalations']) reads.add(action);

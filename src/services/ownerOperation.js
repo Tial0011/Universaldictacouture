@@ -13,7 +13,7 @@ export function createPrincipalFence(principal, scope = () => "") {
 }
 export function ownerErrorState(error) {
   if(error?.code==='no-semantic-change')return 'validation';
-  if(["invalid-argument","invalid-media"].includes(error?.code))return "validation";
+  if(["invalid-argument","invalid-media","invalid-bank-instruction"].includes(error?.code))return "validation";
   if(["payment-ineligible","payment-not-enabled","review-ineligible","publication-ineligible","approval-required"].includes(error?.code))return "stale";
   if(["operation-storage-unavailable","receipt-file-unavailable"].includes(error?.code))return "failed";
   return runtimeErrorState(error);

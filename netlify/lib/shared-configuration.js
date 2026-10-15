@@ -1,4 +1,4 @@
-import { exactFields, fail, identifier } from "./account-contract.js";
+import { exactFields, fail, identifier, requireFresh } from "./account-contract.js";
 import { resolveStaff } from "./staff-authority.js";
 import { COMMUNICATION_TEMPLATES, validateCommunicationCopy, renderCommunication, syntheticContext, defaultCommunicationCopy } from './communication-contract.js';
 import { resolveStaffIdentity } from './staff-authority.js';
@@ -46,11 +46,13 @@ export function createConfigurationService(account) {
   }
   async function authorize(tx, claims, id, action) {
     const bank = kind(id) === "bank";
-    return resolveStaff(tx, db, claims, {
+    const staff = await resolveStaff(tx, db, claims, {
       capability: bank ? `settings.bank.${action}` : `settings.templates.${action}`,
       purpose: bank ? "financial-settings" : "communication-settings", objectId: id, action,
-      ...(bank ? { governanceArea: "financial-settings", freshSeconds: 300 } : {}),
+      ...(bank ? { governanceArea: "financial-settings" } : {}),
     }, now());
+    if (bank) requireFresh(claims, 300, now());
+    return staff;
   }
   async function effective(tx, id) {
     kind(id);
@@ -72,10 +74,12 @@ export function createConfigurationService(account) {
   async function mutate(claims, input) {
     exactFields(input, ["configurationId", "operationId", "expectedVersion", "action", "value", "proposedVersion"]);
     const id = identifier(input.configurationId), operationId = identifier(input.operationId);
-    if (!["draft", "activate"].includes(input.action)) fail("invalid-argument", 400);
-    const value = input.action === "draft" ? validate(id, input.value) : null;
+    if (!["draft", "activate", "save"].includes(input.action) || input.action === "save" && kind(id) !== "bank") fail("invalid-argument", 400);
+    if (!Number.isSafeInteger(input.expectedVersion) || input.expectedVersion < 0) fail("invalid-argument", 400);
+    const value = input.action !== "activate" ? validate(id, input.value) : null;
     if (input.action === "activate" && Object.hasOwn(input, "value")) fail("invalid-argument", 400);
     return db.runTransaction(async tx => {
+      await authorize(tx, claims, id, "read"); // Write authority does not imply field disclosure.
       const staff = await authorize(tx, claims, id, "edit"), path = ref(`sharedConfiguration/${id}`);
       const current = (await tx.get(path)).data(), receiptRef = ref(`configurationOperations/${operationId}`);
       const receipt = (await tx.get(receiptRef)).data(), fingerprint = keyed(JSON.stringify({ uid: claims.uid, input }));
@@ -88,12 +92,13 @@ export function createConfigurationService(account) {
         if (!candidate) fail("configuration-draft-required", 409);
         validate(id, candidate.value); effectiveVersion = proposedVersion; proposedVersion = null;
       } else {
-        proposedVersion = version;
+        proposedVersion = input.action === "save" ? null : version;
+        if (input.action === "save") effectiveVersion = version;
         tx.create(ref(`sharedConfiguration/${id}/versions/${version}`), { configurationId: id, version, value, actor, createdAt: now() });
       }
       const result = { configurationId: id, version, proposedVersion, effectiveVersion };
       tx.set(path, result);
-      tx.create(receiptRef, { actorUid: claims.uid, fingerprint, result, state: "committed", createdAt: now() });
+      tx.create(receiptRef, { actorUid: claims.uid, actor, configurationId: id, fingerprint, result, state: "committed", createdAt: now() });
       if (input.action==='activate'&&kind(id)==='communication') tx.create(ref(`sharedConfiguration/${id}/publicationEvidence/${operationId}`),{configurationId:id,publishedVersion:effectiveVersion,previousVersion:current?.effectiveVersion||null,actor,at:now()});
       account.capture(tx, { domain: "configuration", operationId, action: input.action, target: id, actor, executor: "system:configuration-api" });
       return { state: "committed", ...result };
@@ -102,7 +107,9 @@ export function createConfigurationService(account) {
   async function reconcile(claims, operationId) {
     identifier(operationId);
     return db.runTransaction(async tx=>{const receipt=(await tx.get(ref(`configurationOperations/${operationId}`))).data();
-      return await account.ownsResult(tx,claims,receipt,operationId,"configuration")?{state:"committed",...receipt.result}:{state:"unknown"};
+      if (!await account.ownsResult(tx,claims,receipt,operationId,"configuration")) return { state: "unknown" };
+      await authorize(tx, claims, receipt.configurationId || receipt.result.configurationId, "read");
+      return { state: "committed", ...receipt.result };
     });
   }
   async function preview(claims, input) {
@@ -125,15 +132,26 @@ export function createConfigurationService(account) {
       return {records};
     });
   }
-  async function history(claims,id,before) {
-    identifier(id);if(!Object.hasOwn(COMMUNICATION_TEMPLATES,id))fail('template-not-supported',400);
-    if(before!=null&&(!Number.isSafeInteger(before)||before<1))fail('invalid-argument',400);
-    return db.runTransaction(async tx=>{
-      await authorize(tx,claims,id,'read');
-      const current=(await tx.get(ref(`sharedConfiguration/${id}`))).data(),versions=await tx.get(ref(`sharedConfiguration/${id}`).collection('versions').orderBy('version','desc').limit(101)),published=await tx.get(ref(`sharedConfiguration/${id}`).collection('publicationEvidence').limit(101));
-      const known=new Set(published.docs.map(row=>row.data().publishedVersion));
-      const eligible=versions.docs.filter(row=>before==null||row.data().version<before),page=eligible.slice(0,20);
-      return{configurationId:id,records:page.map(row=>({version:row.data().version,createdAt:row.data().createdAt,state:current?.effectiveVersion===row.data().version?'PUBLISHED CURRENT':known.has(row.data().version)?'SUPERSEDED':'DRAFT',value:row.data().value})),next:eligible.length>20?page.at(-1).data().version:null,partial:versions.size>100||published.size>100};
+  async function history(claims, id, before) {
+    identifier(id); kind(id);
+    if (before != null && (!Number.isSafeInteger(before) || before < 1)) fail('invalid-argument', 400);
+    return db.runTransaction(async tx => {
+      await authorize(tx, claims, id, 'read');
+      const base = ref(`sharedConfiguration/${id}`);
+      const current = (await tx.get(base)).data();
+      let query = base.collection('versions').orderBy('version', 'desc').limit(21);
+      if (before != null) query = query.where('version', '<', before);
+      const versions = await tx.get(query), page = versions.docs.slice(0, 20);
+      const published = kind(id) === 'communication' && page.length
+        ? await tx.get(base.collection('publicationEvidence').where('publishedVersion', 'in', page.map(row => row.data().version)).limit(21)) : null;
+      const known = new Set(published?.docs.map(row => row.data().publishedVersion) || []);
+      const bank = kind(id) === 'bank';
+      return { configurationId: id, records: page.map(row => ({
+        version: row.data().version, createdAt: row.data().createdAt,
+        state: current?.effectiveVersion === row.data().version ? 'PUBLISHED CURRENT' : known.has(row.data().version) ? 'SUPERSEDED' : bank ? 'HISTORY ONLY' : 'DRAFT',
+        // Bank history identifies the event/version; raw account values stay out of redisplay.
+        ...(bank ? {} : { value: row.data().value }),
+      })), next: versions.size > 20 ? page.at(-1).data().version : null, partial: false };
     });
   }
   return { read, mutate, reconcile, effective, preview, authorize, library, history };

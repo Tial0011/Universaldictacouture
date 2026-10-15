@@ -8,7 +8,7 @@ import { db } from "../firebase/firestore";
 import { prepareRecord } from "./adminModel";
 import { accountRequest } from "./accountApi";
 const PRODUCT_OWNER_FIELDS = ["name", "slug", "description", "price", "unitLabel", "priceToken", "category", "occasion", "style", "fabric", "colour", "size", "shopBy", "primaryImage", "images", "options", "variants", "aliases", "keywords", "isNewIn"];
-const COLLECTIONS = new Set(["products", "heroSlides", "reviews", "discoveryModules", "taxonomy"]);
+const COLLECTIONS = new Set(["products", "heroSlides", "reviews", "discoveryModules", "taxonomy", "siteAppearance"]);
 export const PAGE_SIZE = 20;
 function target(kind) {
   if (!db) throw new Error("Connect Firebase before managing content.");
@@ -120,7 +120,7 @@ export async function saveAdminRecord(kind, raw, { action = "save" } = {}) {
   const purpose = domain === "products" ? "catalogue" : "content";
   const required = kind !== "products" ? ["content.edit"] : action !== "save" ? [{ unpublish: "products.unpublish", archive: "products.archive", restore: "products.restore" }[action]]
     : !raw.id ? ["products.create"] : ["products.edit", "products.commercial", "products.media", "products.discovery"];
-  const authorized = current => required.some(capability => capability && allows(current, capability, { purpose, objectId: reference.id }));
+  const authorized = current => required.some(capability => capability && allows(current, capability, { purpose, objectId: reference.id })) && (domain !== "content" || allows(current, "content.read", { purpose, objectId: reference.id, action: "read" }));
   if (!authorized(staff)) throw Object.assign(new Error("Current action authority is unavailable."), { code: "permission-denied" });
   const receipt = doc(collection(db, "staffAudit"));
   if (!allows(staff, "operations.reconcile", { purpose: "operation-result", objectId: receipt.id }) && !allows(staff, "audit.read", { purpose: "audit", objectId: receipt.id })) throw Object.assign(new Error("Current operation-result authority is required before this save can start."), { code: "permission-denied" });
@@ -132,7 +132,8 @@ export async function saveAdminRecord(kind, raw, { action = "save" } = {}) {
       const currentData = current.data() || {};
       const currentMembership = normalizeStaffMembership(staff.principalUid, membership.exists() ? membership.data() : null);
       if (!authorized(currentMembership) || currentMembership.staffId !== staff.staffId) throw Object.assign(new Error("Access changed."), { code: "permission-denied" });
-      if (raw.id && (!current.exists() || (raw._version || 0) !== (currentData._version || 0) || milliseconds(raw.updatedAt) !== milliseconds(currentData.updatedAt))) throw Object.assign(new Error("This record changed elsewhere. Refresh and review current state before saving."), { code: "aborted" });
+      const fixedAppearanceCreate = kind === "siteAppearance" && reference.id === "auth" && !current.exists() && (raw._version || 0) === 0 && milliseconds(raw.updatedAt) === 0;
+      if (raw.id && !fixedAppearanceCreate && (!current.exists() || (raw._version || 0) !== (currentData._version || 0) || milliseconds(raw.updatedAt) !== milliseconds(currentData.updatedAt))) throw Object.assign(new Error("This record changed elsewhere. Refresh and review current state before saving."), { code: "aborted" });
       const next = { ...data, _version: (currentData._version || 0) + 1, _lastOperationId: receipt.id, updatedAt: serverTimestamp() };
       if (!current.exists()) next.createdAt = serverTimestamp();
       if (kind === "products") {
@@ -161,6 +162,7 @@ export async function saveAdminRecord(kind, raw, { action = "save" } = {}) {
 }
 
 export async function deleteAdminRecord(kind, id) {
+  if (kind === "heroSlides") throw new Error("Content deletion requires current historical and dependency eligibility. It is not available in this workspace.");
   if (!["products", "reviews", "heroSlides"].includes(kind)) throw new Error("Deletion is not available for this content section.");
   if (!id) throw new Error("Choose a record to delete.");
   await deleteDoc(doc(target(kind), id));

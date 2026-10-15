@@ -73,7 +73,7 @@ test("M13 expired lease, bounded technical attempts and missing policy fail safe
 });
 test("M14 bank capability/governance/freshness, draft/effective separation, stale edits and reconciliation", async () => {
   const input = { configurationId: "bank-transfer", action: "draft", expectedVersion: 0, operationId: id(), value: { bankName: "TEST BANK", accountName: "Fixture only", accountNumber: "0000000000" } };
-  await assert.rejects(config.mutate(a, input), { code: "permission-denied" }); await assert.rejects(config.mutate({ ...staff, auth_time: staff.auth_time - 600 }, input), { code: "permission-denied" });
+  await assert.rejects(config.mutate(a, input), { code: "permission-denied" }); await assert.rejects(config.mutate({ ...staff, auth_time: staff.auth_time - 600 }, input), { code: "fresh-auth-required" });
   const draft = await config.mutate(staff, input); assert.equal((await config.read(staff, "bank-transfer")).effective, null);
   const results = await Promise.allSettled([1, 2].map(() => config.mutate(staff, { configurationId: "bank-transfer", expectedVersion: draft.version, proposedVersion: draft.proposedVersion, action: "activate", operationId: id() }))); assert.equal(results.filter(result => result.status === "fulfilled").length, 1);
   assert.deepEqual(await config.mutate(staff, input), draft); assert.equal((await config.reconcile(staff, input.operationId)).version, draft.version); assert.equal((await config.reconcile(a, input.operationId)).state, "unknown");

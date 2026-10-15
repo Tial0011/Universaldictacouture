@@ -42,17 +42,24 @@ export function createStaffManagement(service) {
       const disabled=new Set(raw.disabledCapabilities||[]);
       if(input.action==='all'){for(const cap of Object.keys(catalog))input.enabled?disabled.delete(cap):disabled.add(cap);}
       if(input.action==='capability')input.enabled?disabled.delete(input.capability):disabled.add(input.capability);
+      if (input.action === "active" && !input.enabled) for (const cap of Object.keys(catalog)) disabled.add(cap);
       const updated={...raw,disabledCapabilities:[...disabled].sort(),accessVersion:raw.accessVersion+1};
+      if (input.action === "active" && !input.enabled) updated.allCapabilitiesDisabled = true;
       if(input.action==='all')updated.allCapabilitiesDisabled=!input.enabled;
       if(input.action==='capability')updated.allCapabilitiesDisabled=false;
       if(input.action==='active') {updated.active=input.enabled;updated.validAfter=Math.max(raw.validAfter||0,Math.floor(now()/1000));}
+      // Explicit owner governance can grant Bank access. Profile normalization
+      // alone cannot mint it or restore a disabled financial capability.
+      if (input.enabled && input.action === "capability" && input.capability.startsWith("settings.bank.")) updated.capabilities = { ...raw.capabilities, [input.capability]: catalog[input.capability] };
+      if (input.enabled && input.action === "all") updated.capabilities = { ...raw.capabilities, ...catalog };
       updated.capabilities=effectiveAdminCapabilities(updated);
       const result={state:'committed',uid,version:updated.accessVersion};
       tx.set(path,updated);
       if(input.action==='active')tx.update(identityRef,{active:input.enabled});
       tx.create(operationRef,{actorUid:claims.uid,actorStaffId:actor.staffId,fingerprint,result,createdAt:now(),
         targetUid:uid,action:input.action,enabled:input.enabled,...(input.capability?{capability:input.capability}:{})});
-      // This is Staff governance evidence, not a business-domain state change.
+      service.capture(tx, { domain: "staff-governance", operationId, action: "staff." + input.action, target: raw.staffId, actor: { kind: "staff", staffId: actor.staffId }, executor: "system:staff-governance-api" });
+      // Governance receipts and formal audit lineage do not become current authority.
       return result;
     });
   }

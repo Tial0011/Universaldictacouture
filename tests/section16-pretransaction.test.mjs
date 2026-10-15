@@ -66,7 +66,9 @@ test('M03 label validation and unknown result reconcile without second consequen
   const pattern = 'Woven Pattern ' + id(), taxonomy = db.doc('taxonomy/' + id()); await taxonomy.set({ dimension: 'fabric', name: pattern, active: true });
   version = (await mutation('save', { shopBy: { fabric: [pattern] } })).version;
   await taxonomy.update({ active: false });
-  await assert.rejects(mutation('save', { shopBy: { fabric: [pattern] } }), { code: 'taxonomy-unavailable' });
+  version = (await mutation('save', { shopBy: { fabric: [pattern] } })).version; // Retained assignment is historical continuity.
+  const other = await cluster.mutateProduct(staff, { action: 'create', fields: { name: 'New assignment target' }, expectedVersion: 0, operationId: id() });
+  await assert.rejects(cluster.mutateProduct(staff, { action: 'save', productId: other.productId, expectedVersion: other.version, fields: { fabric: [pattern] }, operationId: id() }), { code: 'taxonomy-unavailable' });
   const operationId = id(), input = { action: 'save', fields: { name: 'One Effect' }, productId, expectedVersion: version, operationId };
   const result = await cluster.mutateProduct(staff, input); version = result.version;
   assert.equal((await cluster.reconcile(staff, operationId)).version, version);

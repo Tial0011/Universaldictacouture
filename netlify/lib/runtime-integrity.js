@@ -28,12 +28,15 @@ export function createRuntimeIntegrity(account) {
     });
   }
   async function inspect() {
-    const issues = [], counts = {}, collections = ["accounts", "staffIdentities", "orders", "payments", "sharedConfiguration"];
+    const issues = [], counts = {}, availability = {}, collections = ["accounts", "staffIdentities", "orders", "payments", "sharedConfiguration"];
     let complete = true;
     for (const collection of collections) {
-      const rows = await db.collection(collection).limit(200).get(); counts[collection] = rows.size;
+      let rows;
+      try { rows = await db.collection(collection).limit(200).get(); counts[collection] = rows.size; availability[collection] = "available"; }
+      catch { complete = false; availability[collection] = "source-unavailable"; issues.push({ area: collection, code: "source-unavailable" }); continue; }
       if (rows.size === 200) complete = false;
       for (const row of rows.docs) {
+        try {
         const value = row.data();
         const issue = code => issues.push({ area: collection, targetId: row.id, code });
         if (collection === "accounts") {
@@ -61,9 +64,10 @@ export function createRuntimeIntegrity(account) {
           if (!decision || decision.paymentId !== row.id || decision.decision !== "VERIFIED" || decision.proofReferenceId !== value.proofReferenceId || decision.verifiedAmountMinor !== value.verifiedAmountMinor) issue("verified-payment-evidence-incoherent");
         }
         if (collection === "sharedConfiguration" && value.effectiveVersion && !(await ref(`sharedConfiguration/${row.id}/versions/${value.effectiveVersion}`).get()).exists) issue("effective-configuration-missing");
+        } catch { complete = false; issues.push({ area: collection, targetId: row.id, code: "dependency-unavailable" }); }
       }
     }
-    return { state: complete && !issues.length ? "coherent" : "unresolved", complete, issues, counts, checkedAt: now(), readOnly: true };
+    return { state: complete && !issues.length ? "coherent" : "unresolved", complete, issues, counts, availability, checkedAt: now(), readOnly: true };
   }
   return { inspect, auditRead };
 }

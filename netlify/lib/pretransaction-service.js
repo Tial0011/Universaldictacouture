@@ -2,6 +2,7 @@ import { exactFields, fail, identifier } from "./account-contract.js";
 import { resolveStaff } from "./staff-authority.js";
 import { normaliseProduct } from "../../src/services/productModel.js";
 import { productReadiness } from "../../src/services/adminModel.js";
+import { normalizeTaxonomyLabel } from './taxonomy-governance.js';
 import { reviewIsPublic } from "../../src/services/reviewModel.js";
 
 export const PRODUCT_FIELDS = ["name", "slug", "description", "price", "unitLabel", "priceToken", "category", "occasion", "style", "fabric", "colour", "size", "shopBy", "primaryImage", "images", "options", "variants", "aliases", "keywords", "isNewIn"];
@@ -89,15 +90,27 @@ export function createPretransactionService(account, { mainOrderOwner, preparePr
       if (Array.isArray(changes.images)) working.primaryImage = working.images[0] || null;
       // Current definition identities remain intact; inactive definitions cannot
       // be newly assigned. Never auto-Unpublish because a label was renamed.
-      const configured = Object.keys(changes.shopBy || {}).length ? (await tx.get(ref("discoveryModules/shop-by-config"))).data() : null;
-      const taxonomyReferences = [];
-      for (const [dimension, values] of Object.entries(changes.shopBy || {})) {
-        if (!Array.isArray(values)) fail("invalid-argument", 400);
-        for (const value of values) {
-          const definitions = await tx.get(db.collection("taxonomy").where("dimension", "==", dimension).where("name", "==", value).limit(2));
+      const configured = (Object.keys(changes.shopBy || {}).length || ["occasion", "style", "fabric"].some(dimension => Object.hasOwn(changes, dimension))) ? (await tx.get(ref("discoveryModules/shop-by-config"))).data() : null;
+      const taxonomyReferences = [...(prior?.taxonomyReferences || [])];
+      const assignments = { ...changes.shopBy };
+      for (const dimension of ['category', 'occasion', 'style', 'fabric', 'colour']) {
+        if (Object.hasOwn(changes, dimension)) assignments[dimension] = changes[dimension];
+      }
+      for (const [dimension, rawValues] of Object.entries(assignments)) {
+        const values = Array.isArray(rawValues) ? rawValues : typeof rawValues === 'string' ? [rawValues] : null;
+        if (!values || values.length > 100 || values.some(value => typeof value !== 'string' || !value.trim() || value.length > 160)) fail('invalid-argument', 400);
+        const oldValues = new Set([...(Array.isArray(prior?.[dimension]) ? prior[dimension] : prior?.[dimension] ? [prior[dimension]] : []), ...(prior?.shopBy?.[dimension] || [])].map(value => normalizeTaxonomyLabel(value)));
+        const added = values.filter(value => !oldValues.has(normalizeTaxonomyLabel(value)));
+        if (!added.length) continue; // Retained relationships stay valid after retirement.
+        const definitions = await tx.get(db.collection('taxonomy').where('dimension', '==', dimension).limit(201));
+        if (definitions.size > 200) fail('taxonomy-source-unavailable', 503);
+        for (const value of added) {
+          const name = normalizeTaxonomyLabel(value);
+          const matching = definitions.docs.filter(row => normalizeTaxonomyLabel(String(row.data().name || '')) === name);
           const group = configured?.groups?.find(group => (group.key || group.id) === dimension && group.active !== false && group.values?.includes(value));
-          if (definitions.size > 1 || definitions.size === 1 && definitions.docs[0].data().active === false || definitions.empty && !group) fail("taxonomy-unavailable", 409);
-          taxonomyReferences.push(definitions.size === 1 ? { dimension, definitionId: definitions.docs[0].id, capturedLabel: value } : { dimension, configId: "shop-by-config", groupId: group.id || group.key, capturedLabel: value });
+          if (matching.length > 1 || matching.length === 1 && matching[0].data().active === false || matching.length === 0 && (['occasion', 'style', 'fabric'].includes(dimension) || Object.hasOwn(changes.shopBy || {}, dimension)) && !group) fail('taxonomy-unavailable', 409);
+          if (matching.length) taxonomyReferences.push({ dimension, definitionId: matching[0].id, capturedLabel: value });
+          else if (group) taxonomyReferences.push({ dimension, configId: 'shop-by-config', groupId: group.id || group.key, capturedLabel: value });
         }
       }
       if (action === "publish" && (state === "archived" || !productReadiness({ ...working, id, status: "published" }).ready || !normaliseProduct(id, { ...working, status: "published" }))) fail("publication-not-ready", 409);
@@ -105,7 +118,7 @@ export function createPretransactionService(account, { mainOrderOwner, preparePr
       const nextState = { create: "draft", publish: "published", unpublish: "unpublished", archive: "archived", restore: "unpublished" }[action] || state;
       const version = (prior?._version || 0) + 1;
       const next = { ...working, status: nextState, archived: nextState === "archived", _ownerVersion: 2, _version: version, _lastOperationId: input.operationId, updatedAt: now(), createdAt: prior?.createdAt || now() };
-      if (changes.shopBy) next.taxonomyReferences = taxonomyReferences;
+      if (Object.keys(assignments).length) next.taxonomyReferences = taxonomyReferences;
       if (prior?.publishedAt || prior?.firstPublishedAt) next.publishedAt = prior.publishedAt || prior.firstPublishedAt;
       if (action === "publish") { next.publicRepresentation = pick(working, PRODUCT_FIELDS); next.publicVersion = version; next.publishedAt ||= now(); }
       else if (prior?.status === "published" || prior?.publicRepresentation) { next.publicRepresentation = prior.publicRepresentation || pick(prior, PRODUCT_FIELDS); next.publicVersion = prior.publicVersion || prior._version || 0; }
