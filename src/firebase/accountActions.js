@@ -1,21 +1,13 @@
 import {
   applyActionCode,
-<<<<<<< HEAD
-  confirmPasswordReset,
-  reload,
-  sendEmailVerification,
-  sendPasswordResetEmail,
-=======
   checkActionCode,
   confirmPasswordReset,
   reload,
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   verifyPasswordResetCode,
 } from "firebase/auth";
 import { auth } from "./auth";
 import { safeReturnPath } from "../services/authFlow";
-<<<<<<< HEAD
-=======
 import { requireCustomerAccountAuthority } from "../services/customerAccountAuthority";
 import { currentReadDeadline, protectedWriteDeadline } from "../services/operationalRuntime";
 import { accountRequest } from "../services/accountApi";
@@ -25,7 +17,7 @@ let proofGeneration = 0;
 if (typeof window !== "undefined") window.addEventListener("udc:auth:signed-out", () => { proofGeneration++; proofOperations.clear(); });
 export function proofOutcome(code) { return proofOperations.get(code)?.state || "not-started"; }
 function proofError(code) { return Object.assign(new Error("Current proof outcome is not confirmed."), { code }); }
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 
 function requireAccountAuth() {
   if (!auth) throw new Error("Account access is temporarily unavailable.");
@@ -44,26 +36,15 @@ export function actionCodeSettings(returnTo = "/profile") {
 }
 
 export async function requestPasswordReset(email, returnTo = "/profile") {
-<<<<<<< HEAD
-  const instance = requireAccountAuth();
-  try {
-    await sendPasswordResetEmail(instance, email.trim(), actionCodeSettings(returnTo));
-  } catch (error) {
-    if (error.code !== "auth/user-not-found") throw error;
-  }
-=======
   requireAccountAuth();
   return accountRequest("recovery-request", { email: email.trim(), returnTo: safeReturnPath(returnTo, "/profile"), operationId: crypto.randomUUID() }, { publicRequest: true });
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 }
 
 export async function sendAccountVerification(user, returnTo = "/profile") {
   if (!auth || !user) throw new Error("Please sign in to verify your email.");
-<<<<<<< HEAD
-  await sendEmailVerification(user, actionCodeSettings(returnTo));
-=======
   return accountRequest("verification-request", { returnTo: safeReturnPath(returnTo, "/profile") }, { principalUid: user.uid });
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 }
 
 export async function refreshAccountVerification(user) {
@@ -74,20 +55,6 @@ export async function refreshAccountVerification(user) {
 
 export async function applyEmailVerificationCode(code) {
   if (!code) throw new Error("This verification link is incomplete.");
-<<<<<<< HEAD
-  await applyActionCode(requireAccountAuth(), code);
-  if (auth.currentUser) await reload(auth.currentUser);
-}
-
-export function inspectPasswordResetCode(code) {
-  if (!code) throw new Error("This reset link is incomplete.");
-  return verifyPasswordResetCode(requireAccountAuth(), code);
-}
-
-export function setPasswordFromResetCode(code, password) {
-  if (!code) throw new Error("This reset link is incomplete.");
-  return confirmPasswordReset(requireAccountAuth(), code, password);
-=======
   if (code.startsWith("udc_")) return consumeTrustedProof(code, "verify");
   await inspectEmailVerificationCode(code);
   requireCustomerAccountAuthority();
@@ -153,5 +120,5 @@ export async function reconcileTrustedProof(token, password) {
   const result = await accountRequest("proof-reconcile", { token, purpose: pending.purpose, operationId: pending.operationId, ...(pending.purpose === "reset" ? { password } : {}) }, { optionalAuth: true });
   if (result.state === "committed") proofOperations.set(token, { ...pending, state: "confirmed" });
   return result;
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 }

@@ -1,9 +1,6 @@
 import {
   browserLocalPersistence,
-<<<<<<< HEAD
-  createUserWithEmailAndPassword,
-=======
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   getAuth,
   getIdToken,
   reload,
@@ -22,15 +19,13 @@ import { currentReadDeadline, protectedWriteDeadline } from "../services/operati
 
 export const auth = isFirebaseConfigured ? getAuth(app) : null;
 
-<<<<<<< HEAD
-=======
 let authenticationInProgress = false;
 let transitionGeneration = 0;
 let pendingSignIn = null;
 let registrationInProgress = false;
 export function isRegistrationInProgress() { return registrationInProgress; }
 
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 const SESSION_POLICY_KEY = "udc:auth:session-policy";
 const DEFAULT_STANDARD_HOURS = 24;
 const DEFAULT_EXTENDED_DAYS = 30;
@@ -55,10 +50,8 @@ function storeSessionPolicy(keepSignedIn) {
   try {
     localStorage.setItem(SESSION_POLICY_KEY, JSON.stringify({
       keepSignedIn: Boolean(keepSignedIn),
-<<<<<<< HEAD
-=======
       principalUid: auth?.currentUser?.uid || null,
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
       expiresAt: Date.now() + sessionDurationMs(keepSignedIn),
     }));
   } catch {
@@ -71,16 +64,11 @@ export function clearSessionPolicy() {
 }
 
 export function sessionPolicyExpired() {
-<<<<<<< HEAD
-  try {
-    const value = JSON.parse(localStorage.getItem(SESSION_POLICY_KEY) || "null");
-    return Boolean(value?.expiresAt && Number(value.expiresAt) <= Date.now());
-=======
   if (authenticationInProgress) return false;
   try {
     const value = JSON.parse(localStorage.getItem(SESSION_POLICY_KEY) || "null");
     return Boolean(value?.expiresAt && (!value.principalUid || value.principalUid === auth?.currentUser?.uid) && Number(value.expiresAt) <= Date.now());
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   } catch {
     return false;
   }
@@ -99,24 +87,6 @@ export function subscribeToAuthChanges(callback) {
   return onAuthStateChanged(auth, callback);
 }
 
-<<<<<<< HEAD
-export async function signIn(email, password, { keepSignedIn = false } = {}) {
-  const instance = await applyPersistence();
-  const credential = await signInWithEmailAndPassword(instance, email, password);
-  storeSessionPolicy(keepSignedIn);
-  return credential;
-}
-
-export async function signUp(email, password, displayName, { keepSignedIn = false } = {}) {
-  const instance = await applyPersistence();
-  const credential = await createUserWithEmailAndPassword(instance, email, password);
-  if (displayName) await updateProfile(credential.user, { displayName });
-  storeSessionPolicy(keepSignedIn);
-  return credential;
-}
-
-export function changePendingEmail(user, email, actionCodeSettings) {
-=======
 export function signIn(email, password, { keepSignedIn = false } = {}) {
   if (pendingSignIn || authenticationInProgress) return Promise.reject(Object.assign(new Error("Authentication is already pending."), { code: "auth/operation-pending" }));
   const generation = ++transitionGeneration;
@@ -175,7 +145,7 @@ export function updateAccountName(user, displayName) {
 
 export function changePendingEmail(user, email, actionCodeSettings) {
   requireCustomerAccountAuthority();
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   if (!user) throw new Error("Please sign in again before changing your email.");
   return verifyBeforeUpdateEmail(user, email, actionCodeSettings);
 }
@@ -185,12 +155,6 @@ export async function expireSession() {
 }
 
 export async function signOutUser() {
-<<<<<<< HEAD
-  try { sessionStorage.setItem("udc:auth:intentional-signout", String(Date.now())); } catch { /* optional */ }
-  try {
-    const result = await signOut(requireAuth());
-    clearSessionPolicy();
-=======
   transitionGeneration++;
   clearAuthContinuations();
   try { sessionStorage.setItem("udc:auth:intentional-signout", String(Date.now())); } catch { /* optional */ }
@@ -201,15 +165,13 @@ export async function signOutUser() {
     // A revoked provider may already be null, so Firebase emits no second
     // observer event. Publish explicit, confirmed local sign-out UX anyway.
     if (typeof window !== "undefined" && !auth.currentUser) window.dispatchEvent(new Event("udc:auth:signed-out"));
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     return result;
   } catch (error) {
     try { sessionStorage.removeItem("udc:auth:intentional-signout"); } catch { /* optional */ }
     throw error;
   }
 }
-<<<<<<< HEAD
-=======
 
 export async function revalidateFirebasePrincipal(user = auth?.currentUser) {
   if (!user) return null;
@@ -220,4 +182,3 @@ export async function revalidateFirebasePrincipal(user = auth?.currentUser) {
   if (auth.currentUser?.uid !== uid) throw Object.assign(new Error("Principal changed."), { code: "auth/principal-changed" });
   return auth.currentUser;
 }
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9

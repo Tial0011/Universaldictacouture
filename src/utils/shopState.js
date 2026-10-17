@@ -176,16 +176,6 @@ export function parseShopState(searchParams) {
 
   const sort = searchParams.get("sort");
   const shopBy = {};
-<<<<<<< HEAD
-  searchParams.getAll("shopby").forEach((entry) => {
-    const separator = entry.indexOf(":");
-    if (separator <= 0) return;
-    const group = entry.slice(0, separator).trim();
-    const value = entry.slice(separator + 1).trim();
-    if (!group || !value) return;
-    shopBy[group] = shopBy[group] || [];
-    if (!shopBy[group].includes(value)) shopBy[group].push(value);
-=======
   searchParams.getAll("shopby").slice(0, MAX_SHOP_BY_ENTRIES).forEach((entry) => {
     const separator = entry.indexOf(":");
     if (separator <= 0) return;
@@ -204,7 +194,7 @@ export function parseShopState(searchParams) {
       filters[group] = uniqueTextValues([...(filters[group] ?? []), ...(shopBy[group] ?? [])]);
       delete shopBy[group];
     }
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   });
 
   return {
@@ -418,11 +408,8 @@ export function buildFacets(products, state, taxonomyByDimension = null) {
     pool.forEach((product) => {
       (product[dimension.key] ?? []).forEach((value) => {
         const label = String(value).trim();
-<<<<<<< HEAD
-        if (!label) return;
-=======
         if (!label || (dimension.key === "style" && label.toLowerCase() === "custom style")) return;
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
         remember(label, 1);
       });
     });
@@ -434,11 +421,8 @@ export function buildFacets(products, state, taxonomyByDimension = null) {
       : [];
     taxonomyLabels.forEach((raw) => {
       const label = String(raw ?? "").trim();
-<<<<<<< HEAD
-      if (!label) return;
-=======
       if (!label || (dimension.key === "style" && label.toLowerCase() === "custom style")) return;
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
       const lower = label.toLowerCase();
       if (lowerToLabel.has(lower)) return;
       lowerToLabel.set(lower, label);
@@ -448,11 +432,8 @@ export function buildFacets(products, state, taxonomyByDimension = null) {
     const selected = state.filters?.[dimension.key] ?? [];
     selected.forEach((value) => {
       const trimmed = String(value ?? "").trim();
-<<<<<<< HEAD
-      if (!trimmed) return;
-=======
       if (!trimmed || (dimension.key === "style" && trimmed.toLowerCase() === "custom style")) return;
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
       const lower = trimmed.toLowerCase();
       if (lowerToLabel.has(lower)) return;
       lowerToLabel.set(lower, trimmed);
@@ -561,4 +542,3 @@ export function removeShopRefinement(state, chip) {
   }
   return copyShopState(state);
 }
-

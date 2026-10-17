@@ -13,14 +13,10 @@ import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import { db } from "../firebase/firestore.js";
 import { isFirebaseConfigured } from "../firebase/config.js";
 import heroReadyToWear from "../assets/images/hero/hero-ready-to-wear.jpg";
-<<<<<<< HEAD
-import { DEFAULT_SHOP_BY_GROUPS } from "./shopBy";
-import { normaliseReviewRecord, selectLatestPublishedReviews, sortPublishedReviews } from "./reviewModel";
-=======
 import { DEFAULT_SHOP_BY_GROUPS, shopByDestination } from "./shopBy.js";
 import { normaliseReviewRecord, selectLatestPublishedReviews, sortPublishedReviews } from "./reviewModel.js";
 import { accountRequest } from "./accountApi";
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 
 
 
@@ -212,13 +208,9 @@ export function buildOccasionDiscovery(products, title = "Shop by Occasion") {
  * Shop discovery is generated from the Shop By groups configured by the
  * admin and the values genuinely assigned to published products. The three
  * core groups are Occasion, Style and Fabric & Pattern, but extra groups can
-<<<<<<< HEAD
- * be added without changing this builder. Empty groups remain visible so the
- * admin can immediately see which part of the catalogue still needs data.
-=======
  * be added without changing this builder. Empty groups stay in Admin configuration
  * but do not render as dead public discovery tabs.
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
  */
 export const SHOP_DISCOVERY_GROUPS = DEFAULT_SHOP_BY_GROUPS;
 
@@ -229,11 +221,8 @@ export function buildShopDiscovery(products, title = "Shop By", groupDefinitions
   const items = [];
   const definitions = Array.isArray(groupDefinitions) ? groupDefinitions : SHOP_DISCOVERY_GROUPS;
 
-<<<<<<< HEAD
-  (groupDefinitions?.length ? groupDefinitions : SHOP_DISCOVERY_GROUPS).forEach((group) => {
-=======
   definitions.forEach((group) => {
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     const key = group.key || group.id;
     if (!key || group.active === false) return;
 
@@ -255,11 +244,6 @@ export function buildShopDiscovery(products, title = "Shop By", groupDefinitions
       });
     });
 
-<<<<<<< HEAD
-    groups.push({ id: group.id || key, label: group.label || key, order: groups.length });
-    if (!found.size) return;
-
-=======
     // The Shop discovery surface only renders catalogue-backed groups.
     // An admin-configured group with no published products is valid config,
     // but it should not become an empty public tab.
@@ -267,7 +251,7 @@ export function buildShopDiscovery(products, title = "Shop By", groupDefinitions
 
     groups.push({ id: group.id || key, label: group.label || key, order: groups.length });
 
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     const ordered = [...found.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
     const usedImages = new Set();
     ordered.slice(0, SHOP_DISCOVERY_MAX_PER_GROUP).forEach((entry, index) => {
@@ -300,11 +284,8 @@ export function buildShopDiscovery(products, title = "Shop By", groupDefinitions
         id: `${key}-${index}`,
         name: entry.name,
         image,
-<<<<<<< HEAD
-        destination,
-=======
         destination: shopByDestination(group, entry.name),
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
         group: group.id || key,
         order: index,
         published: true,
@@ -312,11 +293,8 @@ export function buildShopDiscovery(products, title = "Shop By", groupDefinitions
     });
   });
 
-<<<<<<< HEAD
-  if (!groups.length) return null;
-=======
   if (!groups.length || !items.length) return null;
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   return { id: "shop-discovery", title, groups, items };
 }
 
@@ -350,11 +328,8 @@ export async function fetchCustomStylePromo() {
  * Returns { category: [], occasion: [], ... } with trimmed, deduped labels.
  */
 export async function fetchTaxonomyLabels() {
-<<<<<<< HEAD
-  const empty = { category: [], occasion: [], style: [], fabric: [], colour: [], size: [] };
-=======
   const empty = { category: [], occasion: [], style: [], fabric: [], colour: [] };
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   if (!isFirebaseConfigured) return empty;
   try {
     const snapshot = await getDocs(query(collection(db, "taxonomy"), limit(500)));
@@ -363,11 +338,8 @@ export async function fetchTaxonomyLabels() {
       const data = entry.data() ?? {};
       const dimension = String(data.dimension ?? "").trim();
       const name = String(data.name ?? "").trim();
-<<<<<<< HEAD
-      if (!grouped[dimension] || !name) return;
-=======
       if (!grouped[dimension] || !name || data.active === false) return;
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
       const exists = grouped[dimension].some((label) => label.toLowerCase() === name.toLowerCase());
       if (!exists) grouped[dimension].push(name);
     });
@@ -388,17 +360,10 @@ export async function fetchPublishedReviews(max = 20, strict = false) {
     // editing an older story must never make it "new" again. We sort the entire
     // published set before applying the homepage cap. A null max returns the
     // complete published feed for /reviews-feeds.
-<<<<<<< HEAD
-    const snapshot = await getDocs(
-      query(collection(db, "reviews"), where("published", "==", true))
-    );
-    const reviews = snapshot.docs
-      .map((entry) => normaliseReviewRecord(entry.id, entry.data() ?? {}))
-=======
     const response = await accountRequest("review-feed", {}, { publicRequest: true });
     const reviews = response.records
       .map((entry) => normaliseReviewRecord(entry.id, entry))
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
       .filter(Boolean);
     return max == null ? sortPublishedReviews(reviews) : selectLatestPublishedReviews(reviews, max);
   } catch (error) {

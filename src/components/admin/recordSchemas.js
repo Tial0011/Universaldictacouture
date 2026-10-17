@@ -4,25 +4,6 @@ const visibility = text("published", "Published on website", { type: "checkbox" 
 export const SCHEMAS = {
   products: {
     title: "Products", singular: "product", description: "Manage your collection, from first draft to published piece.",
-<<<<<<< HEAD
-    initial: { name: "", price: "", status: "draft", category: "", shopBy: {}, occasion: [], style: [], fabric: [], images: [], isNewIn: false },
-    fields: [
-      text("name", "Product name", { required: true }), text("price", "Price (NGN)", { type: "number", hint: "Required before publishing. Enter the base price in naira." }),
-      text("description", "Product description", { type: "textarea", hint: "Describe the fabric, finish and fit. Shown on the product page and included when customers share this piece (up to 4,000 characters)." }),
-      text("status", "Visibility", { type: "select", options: ["draft", "published", "archived"] }),
-      text("unitLabel", "Price unit", { hint: "Optional, for example: per yard." }),
-      text("category", "Categories", { type: "values", hint: "Separate multiple labels with commas." }),
-      text("shopBy", "Shop By", { type: "shopBy", hint: "Choose the reusable Shop By values that describe this product. Manage the available groups and choices from the Shop By admin page." }),
-      text("colour", "Colour", { type: "values", hint: "Separate multiple labels with commas." }),
-      text("size", "Size", { type: "values", hint: "Separate multiple labels with commas." }),
-      text("isNewIn", "Feature in New In", { type: "checkbox" }),
-      text("keywords", "Search keywords", { type: "values" }), text("aliases", "Alternative names", { type: "values" }),
-      text("images", "Product photos", { type: "images", hint: "The first photo is the cover. JPEG, PNG or WebP, up to 4 MB each." }),
-    ],
-  },
-  taxonomy: {
-    title: "Categories & attributes", singular: "label", description: "Allocate shop labels for your catalogue. Labels appear in Shop filters immediately (with zero count until a published product uses the exact spelling). Use these spellings when adding products.",
-=======
     initial: { name: "", price: "", unitLabel: "", status: "draft", category: "", shopBy: {}, occasion: [], style: [], fabric: [], images: [], isNewIn: false },
     fields: [
       text("name", "Product name", { required: true, section: "basic" }),
@@ -41,7 +22,7 @@ export const SCHEMAS = {
   },
   taxonomy: {
     title: "Categories & attributes", singular: "label", description: "Manage the catalogue labels used by Shop filters and product classification. Keep spellings consistent across products; Size is not part of Shop V1.",
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     initial: { name: "", dimension: "category" },
     fields: [text("name", "Label", { required: true }), text("dimension", "Type", { type: "select", options: DIMENSIONS })],
   },

@@ -2,10 +2,8 @@ import { Link } from "react-router-dom";
 import ProductImage from "../product/ProductImage";
 import { normaliseProductContext } from "../../services/chatModel";
 import { formatNaira } from "../../utils/formatters";
-<<<<<<< HEAD
-=======
 import { PRODUCT_SHOP_CTA } from "../../utils/productCopy";
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 import "./ChatProductTag.css";
 
 export default function ChatProductTag({ context }) {
@@ -13,12 +11,9 @@ export default function ChatProductTag({ context }) {
   if (!piece) return null;
   return <aside className="chat-product-tag" aria-label={`Discussing ${piece.name}`}>
     <Link className="chat-product-tag__piece" to={`/shop/${encodeURIComponent(piece.slug || piece.productId)}`}>
-      <div className="chat-product-tag__image"><ProductImage image={{ url: piece.imageUrl, publicId: piece.imagePublicId }} alt={piece.name} transformation="w_160,h_200,c_limit,q_auto,f_auto" /></div>
-<<<<<<< HEAD
-      <div><span>{piece.reviewId ? "From a customer review" : "Discussing this piece"}</span><strong>{piece.name}</strong>{piece.price !== null && <small>{piece.variable ? "From " : ""}{formatNaira(piece.price)} · At time of enquiry</small>}<span className="chat-product-tag__view">View piece ↗</span></div>
-=======
+      <div className="chat-product-tag__image"><ProductImage image={{ url: piece.imageUrl, publicId: piece.imagePublicId }} alt={piece.name} /></div>
       <div><span>{piece.reviewId ? "From a customer review" : "Discussing this piece"}</span><strong>{piece.name}</strong>{piece.price !== null && <small>{piece.variable ? "From " : ""}{formatNaira(piece.price)} · At time of enquiry</small>}<span className="chat-product-tag__view">{PRODUCT_SHOP_CTA}</span></div>
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     </Link>
     {piece.reviewId && <Link className="chat-product-tag__review" to={`/reviews-feeds?review=${encodeURIComponent(piece.reviewId)}`}>Read the original review</Link>}
   </aside>;

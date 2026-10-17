@@ -22,7 +22,7 @@ Spark has quotas; this architecture reduces reads but cannot guarantee a site st
 
 ## Photo storage
 
-Uploads use the authenticated Netlify image function and Netlify Blobs. No Cloudinary upload preset is required.
+Uploads use the authenticated Netlify image function and Netlify Blobs. Cloudinary configuration is not used.
 
 1. Deploy with the repository's `netlify.toml`, including `netlify/functions`.
 2. Set `FIREBASE_WEB_API_KEY` and `FIREBASE_PROJECT_ID` in the Netlify Functions environment, using the same Firebase project as the frontend. Set the `VITE_FIREBASE_*` variables in the build environment and rebuild.
@@ -32,7 +32,7 @@ Uploads use the authenticated Netlify image function and Netlify Blobs. No Cloud
 
 Netlify supplies the deployed Blobs credentials. Do not place service-account keys or private tokens in `VITE_*` variables. For local uploads, run `npx netlify dev` and use port 8888; Vite alone does not provide the function. Local Blobs data is separate from production.
 
-Photo files are public, including photos belonging to drafts. Removing a photo from a record does not delete the file, and a failed save can leave an unattached upload. Clean up only confirmed unused files in the `catalogue-images` Blobs store. Legacy Cloudinary images still render when `VITE_CLOUDINARY_CLOUD_NAME` is configured.
+Photo files are public, including photos belonging to drafts. Removing a photo from a record does not delete the file, and a failed save can leave an unattached upload. Clean up only confirmed unused files in the `catalogue-images` Blobs store. Existing records that contain only a Cloudinary public ID need to be migrated to direct image URLs; this app no longer generates Cloudinary URLs.
 
 ## Content workflow
 

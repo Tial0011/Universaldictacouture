@@ -10,11 +10,9 @@ import Logo from "../brand/Logo";
 import Button from "../common/Button";
 import LoadingSpinner from "../common/LoadingSpinner";
 import PageBoundary from "../common/PageBoundary";
-<<<<<<< HEAD
-=======
 import SearchEntry from "../admin/SearchEntry";
 import { searchDomains } from "../../services/operationalSearch";
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 import "./AdminLayout.css";
 import "../admin/AdminVisual.css";
 import AdminIcon from "../admin/AdminIcon";
@@ -90,11 +88,8 @@ export default function AdminLayout() {
         {canDiscover(staff,'notifications')&&<NotificationBell domain="staff"/>}
         <details className="admin-staff-menu"><summary><AdminIcon name="users" /><span>Staff menu</span></summary><div className="admin-panel"><p>{staff.displayName || "Staff"}</p><p className="admin-reference">{staff.staffId}</p><Button to="/admin/settings" variant="ghost">Staff context</Button><Button variant="secondary" isLoading={busy} onClick={logout}>Sign out</Button></div></details></header>
       {error && <p className="field__error" role="alert">{error}</p>}
-<<<<<<< HEAD
-      <main id="admin-main" tabIndex={-1} ref={main} className="admin-layout__content"><PageBoundary key={pathname}><Suspense fallback={<LoadingSpinner label="Loading admin page" />}><Outlet /></Suspense></PageBoundary></main>
-=======
       <main id="admin-main" tabIndex={-1} ref={main} className="admin-layout__content">{shopSection && <ShopWorkspaceNav />}<PageBoundary key={pathname}><Suspense fallback={<LoadingSpinner label="Loading admin page" />}><Outlet /></Suspense></PageBoundary></main>
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
       <footer className="admin-footer">Signed in as {user?.email || "administrator"}</footer>
       <nav className="admin-mobile-bottom" aria-label="Staff mobile navigation">{navLink('/admin','Home')}{navLink('/admin/attention','Attention')}{navLink('/admin/search','Search')}<Button variant="ghost" onClick={openNavigation} aria-expanded={menuOpen}>Menu</Button></nav>
     </div>

@@ -3,10 +3,7 @@ import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import Logo from "../brand/Logo";
 import { BRAND } from "../brand/brandLanguage";
 import { useAuth } from "../../context/AuthContext";
-<<<<<<< HEAD
-import { useAuthGate } from "../../context/AuthGateContext";
-=======
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 import CustomStyleIcon from "./icons/CustomStyleIcon";
 import ReviewsIcon from "./icons/ReviewsIcon";
 import "./Header.css";
@@ -81,10 +78,7 @@ function HeaderLink({ to, label, end = false, onNavigate, icon, description }) {
 
 export default function Header() {
   const { user } = useAuth();
-<<<<<<< HEAD
-  const { requestAuth } = useAuthGate();
-=======
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
   const drawerId = useId();
@@ -228,21 +222,12 @@ export default function Header() {
             </NavLink>
 
             <div className="site-header__mobile-actions">
-<<<<<<< HEAD
-              {user ? <NavLink className="site-header__action" to="/shop?focus=search" aria-label="Search" title="Search">
-                <Icon name="search" size={20} />
-                <span>Search</span>
-              </NavLink> : <button className="site-header__action" type="button" aria-label="Search" title="Search" onClick={() => requestAuth({ returnTo: "/shop?focus=search" })}>
-                <Icon name="search" size={20} />
-                <span>Search</span>
-              </button>}
-=======
               {user&&<NotificationBell/>}
               <NavLink className="site-header__action" to="/shop?focus=search" aria-label="Search" title="Search">
                 <Icon name="search" size={20} />
                 <span>Search</span>
               </NavLink>
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
               <NavLink className={({ isActive }) => `site-header__action${isActive ? " is-active" : ""}`} to="/custom-style" aria-label="Custom Style" title="Custom Style">
                 <CustomStyleIcon size={21} />
                 <span>Custom</span>
@@ -315,11 +300,8 @@ export default function Header() {
           <HeaderLink to="/" label="Home" icon="home" end />
           <HeaderLink to="/shop" label="Shop" icon="bag" />
           <HeaderLink to="/chats" label="Chats" icon="chat" />
-<<<<<<< HEAD
-          <HeaderLink to="/my-closet" label="My Closet" icon="closet" />
-=======
           <HeaderLink to="/my-closet" label="My Closet" icon="heart" />
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
         </nav>
 
         {pathname !== "/chats" && !pathname.startsWith("/profile") && !pathname.startsWith('/notifications') && <NavLink className="site-header__chat-launcher" to="/chats" aria-label="Chat with Dicta Couturier">

@@ -16,8 +16,6 @@
 .account-card--status { text-align:center; }
 .account-private-note { display:grid; gap:var(--space-sm); padding:var(--space-md); background:var(--color-brand-tint); border:1px solid var(--color-border); border-radius:var(--radius-md); }
 .account-private-note p { margin:0; color:var(--color-text-secondary); }
-<<<<<<< HEAD
-=======
 
 /* R01/R02 account rail and warm independent panels; shared shell stays intact. */
 .profile-workspace { display:grid; grid-template-columns:14.5rem minmax(0,1fr); gap:2rem; padding-block:2.25rem 4rem; align-items:start; }
@@ -105,4 +103,3 @@
 @media (max-width:599px) { .profile-photo-row dd { flex-wrap:wrap; gap:1rem; } .profile-explore-links { grid-template-columns:1fr; } .profile-photo-unavailable { min-width:6rem; min-height:6rem; } }
 @media (prefers-reduced-motion:reduce) { .profile-workspace *, .account-access-state * { scroll-behavior:auto; transition:none; animation:none; } }
 @media (forced-colors:active) { .profile-navigation nav button[aria-current="page"] { border:2px solid Highlight; } .profile-navigation nav button:focus-visible,.profile-heading h1:focus-visible,.profile-mobile-navigation select:focus-visible { outline:2px solid Highlight; } .profile-panel,.profile-source { border-color:CanvasText; } }
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9

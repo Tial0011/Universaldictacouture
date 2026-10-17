@@ -5,8 +5,6 @@ import { useAuth } from "../../context/AuthContext";
 import { useAuthGate } from "../../context/AuthGateContext";
 import EditorialSections from "../../components/common/EditorialSections";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
-<<<<<<< HEAD
-=======
 import { useRef, useState } from "react";
 import { resolveCustomerAccount } from "../../services/accountApi";
 import { saveCustomStyle, readCustomStyle, reconcilePretransaction } from "../../services/pretransaction";
@@ -15,18 +13,12 @@ import { useCustomerSession } from "../../hooks/useCustomerSession";
 import { AccountAccessState } from "../../components/account/AccountVisuals";
 import { usePrincipalFence } from "../../hooks/usePrincipalFence";
 import { ownerErrorCopy, ownerErrorState, readOperationMarker, writeOperationMarker, clearOperationMarker } from "../../services/ownerOperation";
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 
 export default function CustomStyle() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
-<<<<<<< HEAD
-  const { requestAuth } = useAuthGate();
-  const prepared = location.state?.customStyle || {};
-  useDocumentMeta({ title: "Custom Style | Universal Dicta Couture", description: "Share your style, fabric and fit preferences with a Dicta Couturier and start your custom enquiry.", canonicalPath: "/custom-style" });
-  function prepareEnquiry(event) {
-=======
   const resolved = useCustomerSession();
   const { requestAuth } = useAuthGate();
   const [sourceState, setState] = useState({ uid: user?.uid, status: "local", message: "" });
@@ -41,25 +33,18 @@ export default function CustomStyle() {
   const fence=usePrincipalFence(`custom-style:${user?.uid||"guest"}`,()=>{if(storedDraft.uid)setStoredDraft({uid:null,idea:"",fabric:"",occasion:""});setState({uid:user?.uid,status:"local",message:"Current request access must be checked before continuing."});});
   useDocumentMeta({ title: "Custom Style | Universal Dicta Couture", description: "Share your style, fabric and fit preferences with a Dicta Couturier and start your custom enquiry.", canonicalPath: "/custom-style" });
   async function prepareEnquiry(event) {
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     event.preventDefault();
     const values = new FormData(event.currentTarget);
     const idea = String(values.get("idea") || "").trim();
     if (!idea) { event.currentTarget.elements.idea.focus(); return; }
     const fabric = String(values.get("fabric") || "").trim();
     const occasion = String(values.get("occasion") || "").trim();
-<<<<<<< HEAD
-    const draft = ["Hello, I would like to discuss a Custom Style request.", `My idea: ${idea}`, fabric && `Preferred fabric or pattern: ${fabric}`, occasion && `Occasion or preferred date: ${occasion}`].filter(Boolean).join("\n\n");
-=======
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     if (!user) {
       requestAuth({ returnTo: "/custom-style", returnState: { customStyle: { idea, fabric, occasion } } });
       return;
     }
-<<<<<<< HEAD
-    navigate("/chats", { state: { draft } });
-  }
-=======
     if (restored || pending.current?.uid===user.uid || state.status === "pending") return;
     const uid = user.uid, ticket=fence.begin();
     setStoredDraft({...draft,uid});
@@ -93,7 +78,7 @@ export default function CustomStyle() {
   }
   if (user && (!resolved.user||auth.currentUser?.uid!==user.uid)||!user&&auth.currentUser) return <AccountAccessState state={resolved.accountState} onCheck={resolved.recheckCustomer} />;
   if(state.status==="restricted")return <AccountAccessState state="unavailable" onCheck={()=>{setState({uid:user?.uid,status:"local",message:""});resolved.recheckCustomer();}}/>;
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   return <>
     <PageIntro title="Custom Style" description="Discuss your preferred style, fabric and measurements with Dicta Couturier." />
     <div className="container editorial-content">
@@ -104,15 +89,6 @@ export default function CustomStyle() {
       ]} />
       <section className="custom-enquiry" aria-labelledby="custom-enquiry-title">
         <h2 id="custom-enquiry-title">Tell us what you have in mind</h2>
-<<<<<<< HEAD
-        <p>Prepare your enquiry here, then review it in Chats before sending.</p>
-        <form onSubmit={prepareEnquiry}>
-          <div className="field"><label htmlFor="custom-idea">Your idea</label><textarea id="custom-idea" name="idea" rows={5} required maxLength={1400} defaultValue={prepared.idea || ""} placeholder="Describe the style or look you would like to create." /></div>
-          <div className="field"><label htmlFor="custom-fabric">Fabric or pattern preference (optional)</label><input id="custom-fabric" name="fabric" maxLength={150} defaultValue={prepared.fabric || ""} /></div>
-          <div className="field"><label htmlFor="custom-occasion">Occasion or preferred date (optional)</label><input id="custom-occasion" name="occasion" maxLength={150} defaultValue={prepared.occasion || ""} /></div>
-          <Button type="submit">Continue with a Couturier</Button>
-        </form>
-=======
         <p>Save your request securely, then discuss it with a Couturier. This is not checkout.</p>
         <p role="status" aria-live="polite">{state.message}</p>
         <form onSubmit={prepareEnquiry}>
@@ -125,7 +101,7 @@ export default function CustomStyle() {
         </form>
         {state.status === "unknown" && <Button variant="secondary" onClick={checkOutcome}>Check outcome</Button>}
         {state.status === "confirmed" && <Button variant="secondary" onClick={() => navigate("/chats", { state: { customStyleRequestId: saved.current?.uid===user?.uid?saved.current.value.requestId:null } })}>Discuss with a Couturier</Button>}
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
       </section>
       <div className="editorial-actions"><Button to="/chats" variant="secondary">Contact Dicta Couturier</Button><Button to="/shop" variant="ghost">Browse the shop</Button></div>
     </div>

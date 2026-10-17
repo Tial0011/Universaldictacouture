@@ -48,8 +48,6 @@ test("reviews use separate ratings, one image, a product and moderation status",
 test("new review workflow rejects more than one customer photo", () => {
   const images = ["https://example.test/1.jpg", "https://example.test/2.jpg"];
   assert.throws(() => prepareRecord("reviews", { author: "Amara", body: "Lovely", images, status: "pending", productId: "piece", customerServiceRating: 5, productQualityRating: 4 }));
-<<<<<<< HEAD
-=======
 });
 
 
@@ -72,5 +70,5 @@ test("Task 8A: customer preview uses stable slug/id and Shop V1 taxonomy exclude
   assert.equal(productAdminHref({ id: "firestore-id", slug: "royal-weave" }), "/shop/royal-weave");
   assert.equal(productAdminHref({ id: "firestore-id" }), "/shop/firestore-id");
   assert.deepEqual(DIMENSIONS, ["category", "occasion", "style", "fabric", "colour"]);
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 });

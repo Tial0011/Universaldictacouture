@@ -134,14 +134,12 @@ export default function HeroCarousel({ slides }) {
                 alt=""
                 className="hero__image hero__image--mobile"
                 loading={slideIndex === 0 ? "eager" : "lazy"}
-                transformation="w_900,h_1100,c_fill,g_auto,q_auto,f_auto"
               />
               <ProductImage
                 image={item.image}
                 alt=""
                 className="hero__image hero__image--desktop"
                 loading={slideIndex === 0 ? "eager" : "lazy"}
-                transformation="w_1800,h_1000,c_fill,g_auto,q_auto,f_auto"
               />
             </div>
 

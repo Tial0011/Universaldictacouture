@@ -1056,8 +1056,6 @@ body:has(.chats-page) #main-content {
   .chat-file-bubble { min-width: min(300px, 80vw); }
 }
 .chat-guest-compose form { display:grid; gap:var(--space-sm); }
-<<<<<<< HEAD
-=======
 
 /* Trusted Section-10 integration and recovery surfaces. */
 .chats-page {
@@ -1321,4 +1319,3 @@ body:has(.chats-page) #main-content {
 @media (max-width: 767px) {
   .staff-chat-workspace { padding-bottom: 0; }
 }
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9

@@ -217,7 +217,7 @@ export default function ReviewManager() {
                   {editor.productId && !products.some((product) => product.id === editor.productId) && <option value={editor.productId}>{editor.productSnapshot?.name || "Current linked product"} — unavailable/unpublished</option>}
                   {productOptions.map((product) => <option key={product.id} value={product.id}>{product.name}</option>)}
                 </select>
-                {selectedProduct && <div className="admin-review-product-preview"><div>{selectedProduct.image ? <ProductImage image={selectedProduct.image} alt={selectedProduct.name} transformation="w_160,h_160,c_fill,g_auto,q_auto,f_auto" /> : <span>UDC</span>}</div><p><strong>{selectedProduct.name}</strong><small>{formatNaira(selectedProduct.minPrice)}{selectedProduct.hasVariablePricing ? " +" : ""}</small></p></div>}
+                {selectedProduct && <div className="admin-review-product-preview"><div>{selectedProduct.image ? <ProductImage image={selectedProduct.image} alt={selectedProduct.name} /> : <span>UDC</span>}</div><p><strong>{selectedProduct.name}</strong><small>{formatNaira(selectedProduct.minPrice)}{selectedProduct.hasVariablePricing ? " +" : ""}</small></p></div>}
                 {!selectedProduct && editor.productSnapshot?.name && <p className="field__hint">Historical link: {editor.productSnapshot.name}. The live product is currently unavailable or unpublished.</p>}
                 {productsError && <p className="field__error" role="alert">{productsError}</p>}
               </div>

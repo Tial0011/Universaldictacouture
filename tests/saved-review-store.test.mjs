@@ -143,8 +143,6 @@ test("blocked browser storage is reported without making the button inert", () =
   assert.deepEqual(store.getSnapshot().savedReviewIds, ["review"]);
   assert.match(store.getSnapshot().error, /Browser storage is unavailable/);
 });
-<<<<<<< HEAD
-=======
 
 test("confirmed product save rolls back after an authoritative write failure", async () => {
   const local = cache();
@@ -214,4 +212,3 @@ test("confirmed guest product save stays browser-local without requiring an acco
   assert.deepEqual(store.getSnapshot().savedIds, ["guest-piece"]);
   assert.deepEqual(local.read().productIds, ["guest-piece"]);
 });
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9

@@ -1,7 +1,4 @@
 export function reviewIds(value) {
-<<<<<<< HEAD
-  return Array.isArray(value) ? [...new Set(value.filter((id) => typeof id === "string" && id.trim()))] : [];
-=======
   if (!Array.isArray(value)) return [];
   return [...new Set(
     value
@@ -18,7 +15,7 @@ export function mergeValidatedSavedIds(accountIds, guestIds, validGuestIds = gue
     ...reviewIds(accountIds),
     ...reviewIds(guestIds).filter((id) => valid.has(id)),
   ]);
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 }
 
 /** Local bookmarks remain usable while account reads/writes are unavailable. */
@@ -86,11 +83,8 @@ export function createSavedItemsStore({ initial = {}, persist, loadRemote, write
   }
 
   function flush() {
-<<<<<<< HEAD
-    if (!writeRemote || !pending.size) return Promise.resolve();
-=======
     if (!writeRemote || !pending.size) return Promise.resolve(true);
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     if (writing) return writing;
     writing = Promise.resolve().then(async () => {
       while (pending.size) {
@@ -101,27 +95,20 @@ export function createSavedItemsStore({ initial = {}, persist, loadRemote, write
         } catch {
           writeError = true;
           publish();
-<<<<<<< HEAD
-          return;
-=======
           return false;
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
         }
         if (pending.get(id)?.revision === operation.revision) pending.delete(id);
         writeError = false;
         saveLocal();
         publish();
       }
-<<<<<<< HEAD
-=======
       return true;
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     }).finally(() => { writing = null; });
     return writing;
   }
 
-<<<<<<< HEAD
-=======
   function toggleLocal(id, autoFlush = true) {
     if (typeof id !== "string" || !id.trim()) return null;
     const added = !ids.includes(id);
@@ -137,7 +124,7 @@ export function createSavedItemsStore({ initial = {}, persist, loadRemote, write
     return { added, storage, operation };
   }
 
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   publish();
   return {
     getSnapshot: () => snapshot,
@@ -151,20 +138,6 @@ export function createSavedItemsStore({ initial = {}, persist, loadRemote, write
       void flush();
     },
     toggle(id) {
-<<<<<<< HEAD
-      if (typeof id !== "string" || !id.trim()) return null;
-      const added = !ids.includes(id);
-      const operation = { saved: added, revision: ++revision };
-      ids = apply(ids, new Map([[id, operation]]));
-      if (writeRemote) {
-        pending.set(id, operation);
-        overrides.set(id, operation);
-      }
-      saveLocal();
-      publish();
-      void flush();
-      return { added, storage };
-=======
       const result = toggleLocal(id);
       return result ? { added: result.added, storage: result.storage } : null;
     },
@@ -191,7 +164,7 @@ export function createSavedItemsStore({ initial = {}, persist, loadRemote, write
         publish();
       }
       return { ...publicResult, ok: false };
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     },
     replaceGuestIds(next) {
       if (writeRemote) return;

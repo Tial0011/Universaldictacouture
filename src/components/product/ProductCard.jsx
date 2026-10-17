@@ -8,36 +8,6 @@ import { formatNaira } from "../../utils/formatters";
 import { PRODUCT_SHOP_CTA, SECTION4_SHOP_CARD_CTA } from "../../utils/productCopy";
 import "./ProductCard.css";
 
-<<<<<<< HEAD
-// Product previews must show the complete upload. Resize without cropping;
-// the card contains the image proportionally inside its media frame.
-const GRID_IMAGE = "w_720,h_720,c_limit,q_auto,f_auto";
-const LIST_IMAGE = "w_480,h_480,c_limit,q_auto,f_auto";
-=======
-const GRID_IMAGE = "w_720,h_720,c_limit,q_auto,f_auto";
-const SHOP_GRID_IMAGE = "w_720,h_900,c_fill,g_auto,q_auto,f_auto";
-const LIST_IMAGE = "w_480,h_480,c_limit,q_auto,f_auto";
-
-const GRID_IMAGE_SOURCES = [
-  { width: 320, transformation: "w_320,h_320,c_limit,q_auto,f_auto" },
-  { width: 480, transformation: "w_480,h_480,c_limit,q_auto,f_auto" },
-  { width: 720, transformation: GRID_IMAGE },
-];
-
-const SHOP_IMAGE_SOURCES = [
-  { width: 320, transformation: "w_320,h_400,c_fill,g_auto,q_auto,f_auto" },
-  { width: 480, transformation: "w_480,h_600,c_fill,g_auto,q_auto,f_auto" },
-  { width: 640, transformation: "w_640,h_800,c_fill,g_auto,q_auto,f_auto" },
-  { width: 720, transformation: SHOP_GRID_IMAGE },
-];
-
-const LIST_IMAGE_SOURCES = [
-  { width: 240, transformation: "w_240,h_240,c_limit,q_auto,f_auto" },
-  { width: 360, transformation: "w_360,h_360,c_limit,q_auto,f_auto" },
-  { width: 480, transformation: LIST_IMAGE },
-];
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
-
 function HeartIcon({ filled }) {
   return (
     <svg
@@ -121,30 +91,9 @@ export default function ProductCard({
   const subtitle = isShopCard ? "" : buildSubtitle(product);
   const ctaLabel = isShopCard ? SECTION4_SHOP_CARD_CTA : PRODUCT_SHOP_CTA;
   const showCtaIcon = !isShopCard;
-  const imageTransformation = view === "list"
-    ? LIST_IMAGE
-    : isShopCard
-      ? SHOP_GRID_IMAGE
-      : GRID_IMAGE;
-  const imageSources = view === "list"
-    ? LIST_IMAGE_SOURCES
-    : isShopCard
-      ? SHOP_IMAGE_SOURCES
-      : GRID_IMAGE_SOURCES;
   const imageWidth = isShopCard ? 720 : view === "list" ? 480 : 720;
   const imageHeight = isShopCard ? 900 : view === "list" ? 480 : 720;
 
-<<<<<<< HEAD
-  const handleSave = () => {
-    const nowSaved = toggleSaved(product.id);
-    showToast(
-      nowSaved
-        ? isPersistent
-          ? "Saved to My Closet → My Pieces."
-          : "Saved for this visit. Create a Profile to keep your pieces."
-        : "Removed from My Pieces."
-    );
-=======
   useEffect(() => () => {
     if (navigationTimerRef.current) clearTimeout(navigationTimerRef.current);
   }, []);
@@ -162,7 +111,7 @@ export default function ProductCard({
       setNavigationPending(false);
     }, 1200);
     onNavigate?.(product, event);
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   };
 
   const handleSave = async () => {
@@ -210,33 +159,13 @@ export default function ProductCard({
           <ProductImage
             image={product.image}
             alt={product.name}
-            transformation={imageTransformation}
-            srcSetSources={imageSources}
             loading={imageLoading}
             fetchPriority={imageFetchPriority}
             width={imageWidth}
             height={imageHeight}
-            sizes={
-              view === "list"
-                ? "(min-width: 640px) 220px, 40vw"
-                : isShopCard
-                  ? "(min-width: 1500px) 16vw, (min-width: 1024px) 22vw, (min-width: 640px) 31vw, 48vw"
-                  : "(min-width: 1280px) 20vw, (min-width: 768px) 30vw, 45vw"
-            }
           />
         </Link>
 
-<<<<<<< HEAD
-          <button
-            type="button"
-            className={`product-card__save${saved ? " is-saved" : ""}`}
-            onClick={handleSave}
-            aria-pressed={saved}
-            aria-label={saved ? `Remove ${product.name} from My Pieces` : `Save ${product.name} to My Pieces`}
-          >
-            <HeartIcon filled={saved} />
-          </button>
-=======
         <button
           type="button"
           className={`product-card__save${saved ? " is-saved" : ""}${savePending ? " is-pending" : ""}`}
@@ -248,7 +177,7 @@ export default function ProductCard({
         >
           <HeartIcon filled={saved} />
         </button>
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
       </div>
 
       <div className="product-card__body">

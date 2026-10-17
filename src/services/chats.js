@@ -4,12 +4,10 @@ import { allows } from "./staffAuthorization";
 import { auth } from "../firebase/auth";
 import { db } from "../firebase/firestore";
 import { normaliseProductContext, prepareMessage } from "./chatModel";
-<<<<<<< HEAD
-=======
 import { beginStaffOperation, clearStaffOperation, pendingStaffOperation, staffOperationActor } from "./staffOperations";
 import { protectedWriteDeadline, currentReadDeadline } from "./operationalRuntime";
 import { requireCustomerAccountAuthority } from "./customerAccountAuthority";
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 export const MESSAGE_PAGE_SIZE = 30;
 const unresolvedSends = new Map();
 function database() {
@@ -31,8 +29,6 @@ export async function olderMessages(uid, cursor, admin = false) {
 export async function listConversations(cursor) {
   return loadOperationalPage("chats", cursor);
 }
-<<<<<<< HEAD
-=======
 function sendActor(uid, staffId) { return staffOperationActor(uid, staffId || "customer"); }
 function sendKind(customerId) { return "chat:" + customerId; }
 export async function hasPendingSend(uid, customerId, admin = false) {
@@ -45,7 +41,7 @@ export function watchConversation(id, next, error) {
   return onSnapshot(doc(database(), "conversations", id), { includeMetadataChanges: true }, snapshot =>
     next(snapshot.exists() && !snapshot.metadata.fromCache ? { ...snapshot.data(), id: snapshot.id } : null), error);
 }
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 export async function sendMessage({ user, customerId, text, admin = false, productContext = null }) {
   if (!user) throw new Error("Please sign in to send a message.");
   if (auth.currentUser?.uid !== user.uid) throw Object.assign(new Error("Current message principal changed."), { code: "permission-denied" });
@@ -81,10 +77,8 @@ export async function sendMessage({ user, customerId, text, admin = false, produ
   const role = admin ? "admin" : "customer";
   const batch = writeBatch(store);
   batch.set(message, { body, senderId: user.uid, senderRole: role, createdAt: serverTimestamp(), ...(context ? { productContext: context } : {}) });
-<<<<<<< HEAD
-=======
   if (admin) batch.set(doc(store, "staffAudit", message.id), { actorUid: user.uid, actorStaffId: staffActorId, execution: "staff", targetCollection: "conversations", targetId: customerId, action: "reply", outcome: "committed", createdAt: serverTimestamp() });
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   const summary = { lastMessageId: message.id, lastMessage: body, lastSenderRole: role, updatedAt: serverTimestamp() };
   // Existing Staff work never bootstraps a Customer conversation/Profile from
   // mutable provider metadata. The Customer owner service must create it.

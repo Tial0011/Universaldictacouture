@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { accountRequest } from "../../services/accountApi";
 import { auth } from "../../firebase/auth";
 import Button from "../common/Button";
-import { getImageUrl } from "../../cloudinary/cloudinary";
 import { usePrincipalFence } from "../../hooks/usePrincipalFence";
 import { ownerErrorCopy, readOperationMarker, writeOperationMarker, clearOperationMarker } from "../../services/ownerOperation";
 import { useStaff } from "../../context/StaffContext";
@@ -77,7 +76,7 @@ export default function OwnerImageField({ id, product, onChange, setUploading })
     {pending&&<Button disabled={busy} variant="secondary" onClick={check}>Check upload outcome</Button>}
     {recovered?.scope===scope&&<Button variant="secondary" disabled={busy||images.length>=8} onClick={()=>{if(fence.current(fence.begin())){onChange(images.some(image=>image.assetId===recovered.assetId)?images:[...images,{assetId:recovered.assetId,alt:""}]);setRecovered(null);}}}>Use recovered photo in this draft</Button>}
     <div className="admin-image-grid">{images.map((image, index) => <div className="admin-image" key={image.assetId || image.referenceId || image.url || index}>
-      {image.referenceId ? <PrivatePreview image={image} /> : image.url||image.publicId ? <img src={image.publicId ? getImageUrl(image.publicId) : image.url} alt={image.alt || "Product photo"} /> : <span>Staged private photo. Preview unavailable.</span>}
+      {image.referenceId ? <PrivatePreview image={image} /> : image.url ? <img src={image.url} alt={image.alt || "Product photo"} /> : <span>Staged private photo. Preview unavailable.</span>}
       <label htmlFor={`${id}-alt-${index}`}>Photo {index + 1} description</label><input id={`${id}-alt-${index}`} disabled={busy} value={image.alt || ""} maxLength={250} onChange={event => onChange(images.map((value, i) => i === index ? { ...value, alt: event.target.value } : value))} />
       <Button variant="ghost" disabled={busy} onClick={() => onChange(images.filter((_, i) => i !== index))}>Remove photo {index + 1}</Button>
     </div>)}</div>

@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-=======
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import ProductGrid from "../../components/product/ProductGrid";
 import ProductImage from "../../components/product/ProductImage";
@@ -109,23 +106,12 @@ function ShopSkeleton() {
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-<<<<<<< HEAD
-  const { user } = useAuth();
-  const { requestAuth } = useAuthGate();
-=======
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   const { products, isLoading, error, retry } = useCatalogue();
   const catalogue = products;
   const batchSize = useBatchSize();
 
   const state = useMemo(() => parseShopState(searchParams), [searchParams]);
-<<<<<<< HEAD
-  const [searchDraft, setSearchDraft] = useState(() => String(location.state?.shopSearchDraft || state.query || ""));
-  const [visibleCount, setVisibleCount] = useState(batchSize);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
-  const [taxonomy, setTaxonomy] = useState(null);
-=======
   const searchKey = searchParams.toString();
   const currentShopPath = `/shop${location.search}`;
   const restoreBrowseKey = String(location.state?.restoreBrowseKey || location.key || "");
@@ -172,7 +158,7 @@ export default function Shop() {
   const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
   const [taxonomy, setTaxonomy] = useState(null);
   const [shopConfigReady, setShopConfigReady] = useState(false);
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 
   const searchRequested = searchParams.get("focus") === "search";
   const [searchOpen, setSearchOpen] = useState(searchRequested);
@@ -190,17 +176,6 @@ export default function Shop() {
 
   useEffect(() => {
     let active = true;
-<<<<<<< HEAD
-    fetchShopByGroups().then((groups) => {
-      if (active && groups.length) setShopByGroups(groups);
-    });
-    fetchTaxonomyLabels().then((labels) => {
-      if (active) setTaxonomy(labels);
-    });
-    return () => {
-      active = false;
-    };
-=======
     Promise.all([fetchShopByGroups(), fetchTaxonomyLabels()])
       .then(([groups, labels]) => {
         if (!active) return;
@@ -211,7 +186,7 @@ export default function Shop() {
         if (active) setShopConfigReady(true);
       });
     return () => { active = false; };
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   }, []);
 
   useEffect(() => {
@@ -272,40 +247,6 @@ export default function Shop() {
     return () => cancelAnimationFrame(frame);
   }, [searchKey]);
 
-<<<<<<< HEAD
-  const toggleShopBy = useCallback(
-    (group, value) => {
-      const current = state.shopBy?.[group] ?? [];
-      const nextValues = current.includes(value)
-        ? current.filter((entry) => entry !== value)
-        : [...current, value];
-      updateState({ ...state, shopBy: { ...(state.shopBy || {}), [group]: nextValues } });
-    },
-    [state, updateState]
-  );
-
-  const removeChip = useCallback(
-    (chip) => {
-      if (chip.type === "query") updateState({ ...state, query: "" });
-      else if (chip.type === "newIn") updateState({ ...state, newIn: false });
-      else if (chip.type === "price") updateState({ ...state, min: null, max: null });
-      else if (chip.type === "shopBy") toggleShopBy(chip.group, chip.value);
-      else toggleValue(chip.dimension, chip.value);
-    },
-    [state, updateState, toggleShopBy, toggleValue]
-  );
-
-  const clearAll = useCallback(() => {
-    updateState({
-      ...state,
-      query: "",
-      filters: Object.fromEntries(Object.keys(state.filters).map((key) => [key, []])),
-      shopBy: {},
-      min: null,
-      max: null,
-      newIn: false,
-    });
-=======
   const updateState = useCallback((next, { replace = false } = {}) => {
     setStateNotice("");
     setSearchParams(buildSearchParams(next), { replace });
@@ -325,15 +266,12 @@ export default function Shop() {
 
   const clearSearch = useCallback(() => {
     updateState({ ...state, query: "" });
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   }, [state, updateState]);
 
   const results = useMemo(() => applyShopState(catalogue, state), [catalogue, state]);
   const facets = useMemo(() => buildFacets(catalogue, state, taxonomy), [catalogue, state, taxonomy]);
-<<<<<<< HEAD
-  const chips = useMemo(() => buildChips(state), [state]);
-=======
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 
   const discoveryModule = useMemo(
     () => buildShopDiscovery(catalogue, "Shop By", shopByGroups),
@@ -343,16 +281,6 @@ export default function Shop() {
   useEffect(() => {
     if (!shopConfigReady || isLoading || error) return;
 
-<<<<<<< HEAD
-      const next = new URLSearchParams(searchParams);
-      next.delete("focus");
-      new URLSearchParams(queryString).forEach((value, key) => {
-        if (DIMENSION_KEYS.includes(key) || key === "shopby") {
-          if (!next.getAll(key).includes(value)) next.append(key, value);
-        } else {
-          next.set(key, value);
-        }
-=======
     let reconciled = state;
     let removed = [];
     if (catalogue.length > 0) {
@@ -360,7 +288,7 @@ export default function Shop() {
         products: catalogue,
         taxonomy,
         discoveryGroups: discoveryModule?.groups ?? [],
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
       });
       reconciled = reconciliation.state;
       removed = reconciliation.removed;
@@ -590,7 +518,7 @@ export default function Shop() {
             className="discovery--shop"
             hideTitleWithTabs
             activeGroup={activeDiscoveryGroup}
-            renderMedia={(item) => <ProductImage image={item.image} alt="" transformation="w_480,h_600,c_fill,g_auto,q_auto,f_auto" />}
+            renderMedia={(item) => <ProductImage image={item.image} alt="" />}
             onGroupChange={(groupId) => updateState({ ...state, discovery: groupId })}
             resolveDestination={resolveTileDestination}
             railControls
@@ -611,37 +539,6 @@ export default function Shop() {
           {desktopFilterPanel}
         </aside>
 
-<<<<<<< HEAD
-        <section className="shop__results" aria-label="Products">
-          <div className="shop__toolbar">
-            {showSearch ? (
-              <form
-                className="shop__search"
-                role="search"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  if (!user) { requestAuth({ returnTo: "/shop?focus=search", returnState: { shopSearchDraft: searchDraft.trim() } }); return; }
-                  updateState({ ...state, query: searchDraft.trim() });
-                }}
-              >
-                <label className="visually-hidden" htmlFor="shop-search">
-                  Product Search
-                </label>
-                <input
-                  id="shop-search"
-                  ref={searchInputRef}
-                  className="form-control"
-                  type="search"
-                  value={searchDraft}
-                  placeholder="Search pieces, fabrics, occasions"
-                  onChange={(event) => setSearchDraft(event.target.value)}
-                />
-                <button type="submit" className="btn btn--secondary shop__search-submit">
-                  Search
-                </button>
-              </form>
-            ) : null}
-=======
         <section id="shop-results" ref={resultsRef} className="shop__results" aria-label="Product results" aria-busy={isLoading || undefined}>
           {showSearch ? (
             <form
@@ -665,7 +562,7 @@ export default function Shop() {
               <button type="submit" className="btn btn--secondary shop__search-submit">Search</button>
             </form>
           ) : null}
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 
           <div className="shop__toolbar" aria-label="Catalogue controls">
             <button

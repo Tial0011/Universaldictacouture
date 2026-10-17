@@ -1,13 +1,10 @@
-<<<<<<< HEAD
-import { collection, deleteDoc, doc, getDocFromServer, getDocsFromServer, query, orderBy, documentId, limit, startAfter, setDoc, serverTimestamp } from "firebase/firestore";
-=======
 import { collection, deleteDoc, doc, getCountFromServer, getDocFromServer, getDocsFromServer, onSnapshot, query, orderBy, documentId, limit, startAfter, runTransaction, serverTimestamp, where } from "firebase/firestore";
 import { allows, currentStaff, safeOperationalId, normalizeStaffMembership, staffMembershipState } from "./staffAuthorization";
 import { ownsCommittedReceipt, protectedWriteDeadline, currentReadDeadline } from "./operationalRuntime";
 import { loadScopedOwnerPage, readCurrentStaff } from "./operations";
 import { milliseconds, reconcileUnknown } from "./operationsModel";
 import { beginStaffOperation, clearStaffOperation, pendingStaffOperation, staffOperationActor } from "./staffOperations";
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 import { db } from "../firebase/firestore";
 import { prepareRecord } from "./adminModel";
 import { accountRequest } from "./accountApi";
@@ -116,17 +113,6 @@ export async function saveAdminRecord(kind, raw, { action = "save" } = {}) {
   }
   const data = kind === "products" && action !== "save" ? { status: raw.status, archived: raw.status === "archived" } : prepareRecord(kind, raw);
   const reference = raw.id ? doc(target(kind), raw.id) : doc(target(kind));
-<<<<<<< HEAD
-  if (!raw.id) data.createdAt = serverTimestamp();
-  if (kind === "products" && data.status === "published" && !data.publishedAt) data.publishedAt = serverTimestamp();
-  if (kind === "reviews") {
-    // First-publication time is immutable. Hiding or editing a review never
-    // resets it, so an old review cannot become the newest homepage story.
-    if (data.published && !raw.publishedAt) data.publishedAt = serverTimestamp();
-    else if (!raw.publishedAt) delete data.publishedAt;
-  }
-  await setDoc(reference, { ...data, updatedAt: serverTimestamp() }, { merge: true });
-=======
   const staff = await readCurrentStaff();
   const actorKey = staffOperationActor(staff.principalUid, staff.staffId);
   const pending = pendingStaffOperation(actorKey, kind);
@@ -173,17 +159,11 @@ export async function saveAdminRecord(kind, raw, { action = "save" } = {}) {
     if (result.state !== "committed") throw Object.assign(new Error("The save outcome is unknown. Refresh authoritative state before trying again."), { code: "outcome-unknown", operationId: receipt.id });
   }
   clearStaffOperation(actorKey, kind, receipt.id);
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   return reference.id;
 }
 
 export async function deleteAdminRecord(kind, id) {
-<<<<<<< HEAD
-  if (!["reviews", "heroSlides"].includes(kind)) throw new Error("Deletion is not available for this content section.");
-  if (!id) throw new Error("Choose a record to delete.");
-  await deleteDoc(doc(target(kind), id));
-}
-=======
   if (kind === "heroSlides") throw new Error("Content deletion requires current historical and dependency eligibility. It is not available in this workspace.");
   if (!["products", "reviews", "heroSlides"].includes(kind)) throw new Error("Deletion is not available for this content section.");
   if (!id) throw new Error("Choose a record to delete.");
@@ -194,7 +174,7 @@ export async function deleteProductPermanently(_record) {
   throw new Error("Product deletion requires current historical-reference and media-retention eligibility from the Product owner.");
 }
 
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 export function adminError(error) {
   if (error?.code === "outcome-unknown" || error?.code === "aborted") return error.message;
   if (error?.code === "permission-denied") return "Access was denied. Check your admin access and the published Firestore rules.";

@@ -17,23 +17,19 @@ beforeEach(async () => {
 });
 after(async () => { await env?.cleanup(); });
 const client = uid => env.authenticatedContext(uid, { email: uid + "@example.test" }).firestore();
-<<<<<<< HEAD
-=======
 const seedLegacyConversation = productContext => env.withSecurityRulesDisabled(async context => {
   const store = context.firestore();
   await setDoc(doc(store, 'conversations/alice'), {customerId:'alice',customerName:'Customer',customerEmail:'alice@example.test',createdAt:serverTimestamp(),updatedAt:serverTimestamp(),lastMessageId:'legacy',lastMessage:'Historical customer message',lastSenderRole:'customer'});
   await setDoc(doc(store, 'conversations/alice/messages/legacy'), {senderId:'alice',senderRole:'customer',body:'Historical customer message',createdAt:serverTimestamp(),...(productContext ? {productContext} : {})});
 });
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 function send(store, customerId, senderId, { first = false, role = "customer", body = "Hello", productContext } = {}) {
   const parent = doc(store, "conversations", customerId);
   const message = doc(collection(parent, "messages"));
   const batch = writeBatch(store);
   batch.set(message, { senderId, senderRole: role, body, createdAt: serverTimestamp(), ...(productContext === undefined ? {} : { productContext }) });
-<<<<<<< HEAD
-=======
   if (role === "admin") batch.set(doc(store, "staffAudit", message.id), { actorUid: senderId, actorStaffId: "staff-studio", execution: "staff", targetCollection: "conversations", targetId: customerId, action: "reply", outcome: "committed", createdAt: serverTimestamp() });
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   const summary = { lastMessageId: message.id, lastMessage: body, lastSenderRole: role, updatedAt: serverTimestamp() };
   if (first) batch.set(parent, { ...summary, customerId, customerName: "Customer", customerEmail: customerId + "@example.test", createdAt: serverTimestamp() });
   else batch.update(parent, summary);
@@ -89,23 +85,16 @@ test("unbounded queries are denied and revoked admins lose chat access", async (
 });
 
 const productTag = { productId: "piece", name: "Wine Aso Oke", slug: "wine-set", imageUrl: "https://example.test/piece.jpg", imagePublicId: "", price: 50000, variable: false, reviewId: "review" };
-<<<<<<< HEAD
-test("product tags persist above a message for its customer and admin only", async () => {
-  await assertSucceeds(send(client("alice"), "alice", "alice", { first: true, productContext: productTag }));
-  for (const store of [client("alice"), client("studio")]) {
-=======
 test("legacy product tag history stays intact for current staff; unresolved customer authority stays closed", async () => {
   await assertFails(send(client("alice"), "alice", "alice", { first: true, productContext: productTag }));
   await seedLegacyConversation(productTag);
   for (const store of [client("studio")]) {
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     const result = await assertSucceeds(getDocs(query(collection(store, "conversations/alice/messages"), limit(30))));
     assert.deepEqual(result.docs[0].data().productContext, productTag);
   }
   await assertFails(getDocs(query(collection(client("bob"), "conversations/alice/messages"), limit(30))));
 });
-<<<<<<< HEAD
-=======
 test("staff reply audit preserves durable human attribution without disclosing it to customers", async () => {
   await seedLegacyConversation();
   await send(client("studio"), "alice", "studio", { role: "admin" });
@@ -116,14 +105,11 @@ test("staff reply audit preserves durable human attribution without disclosing i
   await assertFails(getDoc(doc(client("alice"), "staffAudit", reply.id)));
   await assertFails(updateDoc(evidence.ref, { actorStaffId: "other-human" }));
 });
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 test("malformed or oversized product tags cannot bypass chat validation", async () => {
   for (const tag of [null, {}, { ...productTag, name: "x".repeat(241) }, { ...productTag, price: -1 }, { ...productTag, imageUrl: "javascript:alert(1)" }, { ...productTag, extra: true }]) {
     await assertFails(send(client("alice"), "alice", "alice", { first: true, productContext: tag }));
   }
-<<<<<<< HEAD
-  await assertSucceeds(send(client("alice"), "alice", "alice", { first: true, productContext: { ...productTag, price: null, imageUrl: "/.netlify/functions/image?id=a" } }));
-=======
   await assertFails(send(client("alice"), "alice", "alice", { first: true, productContext: { ...productTag, price: null, imageUrl: "/.netlify/functions/image?id=a" } }));
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 });

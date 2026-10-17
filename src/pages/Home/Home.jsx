@@ -1,9 +1,6 @@
-<<<<<<< HEAD
-import { useEffect, useMemo, useState } from "react";
-=======
 import { useCallback,useEffect, useMemo, useState } from "react";
 import { useReviewPublicationGuard } from "../../hooks/useReviewPublicationGuard";
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 import HeroCarousel from "../../components/home/HeroCarousel";
 import TrustStrip from "../../components/home/TrustStrip";
 import DiscoveryModule from "../../components/discovery/DiscoveryModule";
@@ -44,11 +41,9 @@ export default function Home() {
   const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
   const [reviewState, setReviewState] = useState({ entries: [], loading: true, error: "" });
   const [reviewAttempt, setReviewAttempt] = useState(0);
-<<<<<<< HEAD
-=======
   const withdrawReviews=useCallback(()=>setReviewState({entries:[],loading:false,error:"Current publication must be rechecked. Refresh customer stories."}),[]);
   useReviewPublicationGuard(reviewState.entries,withdrawReviews);
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   const [customStyleImage, setCustomStyleImage] = useState({
     url: heroReadyToWear,
     publicId: "",
@@ -73,11 +68,8 @@ export default function Home() {
       .catch(() => { /* Keep the local hero visible when remote content is offline. */ });
 
     fetchShopByGroups().then((groups) => {
-<<<<<<< HEAD
-      if (active && groups.length) setShopByGroups(groups);
-=======
       if (active) setShopByGroups(groups);
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     });
 
     fetchCustomStylePromo().then((result) => {
@@ -103,15 +95,10 @@ export default function Home() {
     () => buildShopDiscovery(products, "Shop By", shopByGroups),
     [products, shopByGroups]
   );
-<<<<<<< HEAD
-  // New In is always the newest published pieces (see selectNewIn),
-  // capped at 20 — never a manually curated set — so "View all" can
-  // simply point at the shop's default, newest-first view.
-=======
   // New In is an admin-managed merchandising context. The homepage
   // previews the first 20 valid members; View all reopens that same
   // context in Shop instead of conflating it with Newest First.
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   const newInProducts = selectNewIn(products, 20);
 
   return (
@@ -128,11 +115,8 @@ export default function Home() {
               module={shopByModule}
               className="discovery--home"
               groupNavigation="arrows"
-<<<<<<< HEAD
-              viewAllTo="/shop"
-=======
               viewAllTo={(groupId) => groupId ? `/shop?discovery=${encodeURIComponent(groupId)}` : "/shop"}
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
             />
           </div>
         ) : null}
@@ -141,11 +125,8 @@ export default function Home() {
           products={newInProducts}
           isLoading={isLoading}
           error={error}
-<<<<<<< HEAD
-          viewAllTo="/shop"
-=======
           viewAllTo="/shop?newin=1"
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
         />
 
         <CustomStylePromo image={customStyleImage} />

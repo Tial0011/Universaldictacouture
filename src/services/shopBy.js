@@ -8,13 +8,9 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-<<<<<<< HEAD
-import { db } from "../firebase/firestore";
-import { isFirebaseConfigured } from "../firebase/config";
-=======
 import { db } from "../firebase/firestore.js";
 import { isFirebaseConfigured } from "../firebase/config.js";
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 
 export const DEFAULT_SHOP_BY_GROUPS = [
   { id: "occasion", label: "Occasion", key: "occasion", param: "occasion", order: 0, locked: true, values: [] },
@@ -46,12 +42,9 @@ export function cleanShopByValues(values) {
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
-<<<<<<< HEAD
-    });
-=======
     })
     .slice(0, 10);
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 }
 
 function normaliseStoredGroup(raw = {}) {
@@ -61,20 +54,15 @@ function normaliseStoredGroup(raw = {}) {
   return {
     id: key,
     key,
-<<<<<<< HEAD
-    label: String(fallback?.label || raw.label || key).trim(),
-=======
     label: String(raw.label || fallback?.label || key).trim(),
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     param: fallback?.param || "shopby",
     order: Number.isFinite(Number(raw.order)) ? Number(raw.order) : (fallback?.order ?? 99),
     locked: Boolean(fallback),
     active: raw.active !== false,
     values: cleanShopByValues(raw.values),
-<<<<<<< HEAD
-=======
     faces: raw.faces && typeof raw.faces === "object" ? { ...raw.faces } : {},
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   };
 }
 
@@ -93,11 +81,8 @@ async function readConfigGroups() {
  * Existing legacy taxonomy labels are merged into those core groups so
  * previous admin data is immediately available as reusable choices.
  */
-<<<<<<< HEAD
-export async function fetchShopByGroups() {
-=======
 export async function fetchShopByGroups({ includeInactive = false } = {}) {
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   const defaults = DEFAULT_SHOP_BY_GROUPS.map((group) => ({ ...group, active: true, values: [] }));
   if (!isFirebaseConfigured || !db) return defaults;
 
@@ -126,17 +111,6 @@ export async function fetchShopByGroups({ includeInactive = false } = {}) {
         id: fallback.id,
         key: fallback.key,
         param: fallback.param,
-<<<<<<< HEAD
-        label: fallback.label,
-        locked: true,
-        active: saved?.active !== false,
-        values: cleanShopByValues([...(saved?.values ?? []), ...legacyValues[fallback.id]]),
-      };
-    });
-
-    const custom = [...stored.values()].filter((group) => group.active !== false);
-    return [...core, ...custom].sort((a, b) => a.order - b.order || a.label.localeCompare(b.label));
-=======
         label: String(saved?.label || fallback.label).trim() || fallback.label,
         locked: true,
         active: saved?.active !== false,
@@ -148,7 +122,7 @@ export async function fetchShopByGroups({ includeInactive = false } = {}) {
     const all = [...core, ...stored.values()]
       .sort((a, b) => a.order - b.order || a.label.localeCompare(b.label));
     return includeInactive ? all : all.filter((group) => group.active !== false);
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   } catch (error) {
     if (import.meta.env.DEV) console.error(error);
     return defaults;
@@ -171,10 +145,8 @@ async function writeGroups(groups) {
         order: Number.isFinite(Number(group.order)) ? Number(group.order) : index,
         active: group.active !== false,
         values: cleanShopByValues(group.values),
-<<<<<<< HEAD
-=======
         faces: group.faces && typeof group.faces === "object" ? { ...group.faces } : {},
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
       })),
       updatedAt: serverTimestamp(),
     },
@@ -187,18 +159,6 @@ export async function saveShopByGroup(raw) {
   const key = shopByKey(raw?.key || raw?.id || raw?.label);
   const label = String(raw?.label || "").trim();
   if (!key || !label) throw new Error("Enter a Shop By group name.");
-<<<<<<< HEAD
-
-  const fallback = DEFAULT_SHOP_BY_GROUPS.find((group) => group.id === key);
-  const groups = await fetchShopByGroups();
-  const nextGroup = {
-    id: key,
-    key,
-    label: fallback?.label || label,
-    order: Number.isFinite(Number(raw.order)) ? Number(raw.order) : groups.length,
-    active: raw.active !== false,
-    values: cleanShopByValues(raw.values),
-=======
   if (label.length > 80) throw new Error("Keep the Shop By group name within 80 characters.");
   const order = Number(raw?.order);
   if (!Number.isFinite(order) || order < 0) throw new Error("Display order must be zero or more.");
@@ -212,7 +172,7 @@ export async function saveShopByGroup(raw) {
     active: raw.active !== false,
     values: cleanShopByValues(raw.values),
     faces: raw.faces && typeof raw.faces === "object" ? { ...raw.faces } : {},
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   };
   const next = groups.some((group) => group.id === key)
     ? groups.map((group) => group.id === key ? { ...group, ...nextGroup } : group)
@@ -227,11 +187,6 @@ export async function deleteShopByGroup(groupId) {
   if (DEFAULT_SHOP_BY_GROUPS.some((group) => group.id === key)) {
     throw new Error("Occasion, Style and Fabric & Pattern are core Shop By groups and cannot be removed.");
   }
-<<<<<<< HEAD
-  const groups = await fetchShopByGroups();
-  await writeGroups(groups.filter((group) => group.id !== key));
-}
-=======
   const groups = await fetchShopByGroups({ includeInactive: true });
   await writeGroups(groups.filter((group) => group.id !== key));
 }
@@ -263,4 +218,3 @@ export function shopByDestination(group, value) {
     ? `/shop?${encodeURIComponent(param)}=${encodeURIComponent(choice)}`
     : `/shop?shopby=${encodeURIComponent(`${key}:${choice}`)}`;
 }
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9

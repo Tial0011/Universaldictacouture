@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-import { useEffect, useRef, useState } from "react";
-=======
 import { useEffect, useMemo, useRef, useState } from "react";
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 import { Link } from "react-router-dom";
 import NewInCard from "./NewInCard";
 import LoadingSpinner from "../common/LoadingSpinner";
@@ -16,8 +13,6 @@ import "../discovery/HomeDiscovery.css";
  * stroke/viewBox convention as the Shop By and Review & Feeds arrows,
  * and kept local to this component the same way those are.
  */
-<<<<<<< HEAD
-=======
 function prefersReducedMotion() {
   return typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 }
@@ -27,7 +22,7 @@ function continuousRailSpeed(node) {
   return Math.min(52, Math.max(24, width * 0.04));
 }
 
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 function ChevronIcon({ direction }) {
   return (
     <svg
@@ -48,15 +43,10 @@ function ChevronIcon({ direction }) {
 }
 
 /**
-<<<<<<< HEAD
- * New In. `products` is always the newest published pieces (see
- * selectNewIn in services/products) — never a manually curated list
- * and never filtered by category — rendered as a single horizontal
-=======
  * New In. `products` is the admin-curated New In merchandising set
  * (see selectNewIn in services/products), ordered deterministically by
  * first-published chronology and rendered as a single horizontal
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
  * carousel so the homepage stays compact instead of growing into a
  * multi-row grid. The header, arrows and scroll progress are
  * coordinated with the Shop By carousel above it; the cards themselves
@@ -64,14 +54,6 @@ function ChevronIcon({ direction }) {
  */
 export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" }) {
   const trackRef = useRef(null);
-<<<<<<< HEAD
-  const [scrollState, setScrollState] = useState({
-    index: 0,
-    canPrev: false,
-    canNext: false,
-  });
-
-=======
   const isInteractingRef = useRef(false);
   const resumeTimerRef = useRef(null);
   const [scrollState, setScrollState] = useState({
@@ -156,44 +138,16 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
     });
   };
 
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return undefined;
 
-<<<<<<< HEAD
-    const update = () => {
-      // Nearest-card index, purely for the "01 / 20" readout — mirrors
-      // the same approach already used by the Review & Feeds carousel.
-      const cards = Array.from(track.querySelectorAll("[data-new-in-item]"));
-      let index = 0;
-      let distance = Infinity;
-      cards.forEach((card, cardIndex) => {
-        const nextDistance = Math.abs(card.offsetLeft - track.scrollLeft - track.offsetLeft);
-        if (nextDistance < distance) {
-          distance = nextDistance;
-          index = cardIndex;
-        }
-      });
 
-      setScrollState({
-        index,
-        canPrev: track.scrollLeft > 8,
-        canNext: track.scrollLeft + track.clientWidth < track.scrollWidth - 8,
-      });
-    };
-
-=======
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
     update();
     track.addEventListener("scroll", update, { passive: true });
     const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(update) : null;
     observer?.observe(track);
-<<<<<<< HEAD
-    return () => {
-      track.removeEventListener("scroll", update);
-      observer?.disconnect();
-=======
     window.addEventListener("resize", update);
     return () => {
       track.removeEventListener("scroll", update);
@@ -245,27 +199,20 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
       clearTimeout(startTimer);
       clearTimeout(resumeTimerRef.current);
       if (animId) cancelAnimationFrame(animId);
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     };
   }, [products, isLoading, error]);
 
   function scroll(direction) {
     const track = trackRef.current;
     if (!track) return;
-<<<<<<< HEAD
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-    track.scrollBy({
-      left: direction * Math.max(240, track.clientWidth * 0.78),
-      behavior: reduced ? "auto" : "smooth",
-    });
-=======
     handleInteractionStart();
     track.scrollBy({
       left: direction * Math.max(240, track.clientWidth * 0.78),
       behavior: prefersReducedMotion() ? "auto" : "smooth",
     });
     handleInteractionEnd();
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   }
 
   const showControls = !isLoading && !error && products.length > 1;
@@ -282,11 +229,8 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
                 aria-label="Previous new pieces"
                 className="discovery__group-arrow discovery__group-arrow--previous"
                 aria-controls="new-in-track"
-<<<<<<< HEAD
-                disabled={!scrollState.canPrev}
-=======
                 disabled={false}
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
                 onClick={() => scroll(-1)}
               >
                 <ChevronIcon direction="previous" />
@@ -296,11 +240,8 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
                 aria-label="Next new pieces"
                 className="discovery__group-arrow discovery__group-arrow--next"
                 aria-controls="new-in-track"
-<<<<<<< HEAD
-                disabled={!scrollState.canNext}
-=======
                 disabled={false}
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
                 onClick={() => scroll(1)}
               >
                 <ChevronIcon direction="next" />
@@ -339,11 +280,6 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
       ) : null}
 
       {!isLoading && !error && products.length > 0 ? (
-<<<<<<< HEAD
-        <ul className="menu-grid" id="new-in-track" ref={trackRef} aria-label="New In">
-          {products.map((product, index) => (
-            <li key={product.id} data-new-in-item>
-=======
         <ul
           className="menu-grid"
           id="new-in-track"
@@ -362,7 +298,7 @@ export default function NewIn({ products, isLoading, error, viewAllTo = "/shop" 
         >
           {repeatedProducts.map(({ product, key, isDuplicate }, index) => (
             <li key={key} data-new-in-item aria-hidden={isDuplicate ? "true" : undefined}>
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
               <NewInCard product={product} imageLoading={index < 4 ? "eager" : "lazy"} />
             </li>
           ))}

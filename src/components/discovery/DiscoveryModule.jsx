@@ -13,8 +13,6 @@ function GroupArrow({ direction }) {
     </svg>
   );
 }
-<<<<<<< HEAD
-=======
 
 function prefersReducedMotion() {
   return typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -24,7 +22,7 @@ function continuousRailSpeed(node) {
   const width = node?.clientWidth || 0;
   return Math.min(52, Math.max(24, width * 0.04));
 }
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 
 /**
  * Configurable discovery module (Shop by Occasion, Style, Fabric & Pattern).
@@ -44,13 +42,11 @@ export default function DiscoveryModule({
   resolveDestination,
   hideTitleWithTabs = false,
   groupNavigation = "tabs",
-<<<<<<< HEAD
-=======
   activeGroup: controlledActiveGroup,
   onGroupChange,
   railControls = false,
   onItemClick,
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 }) {
   const [internalActiveGroup, setInternalActiveGroup] = useState(module?.groups?.[0]?.id ?? "");
   const tabRefs = useRef({});
@@ -64,16 +60,11 @@ export default function DiscoveryModule({
 
   const groups = module?.groups;
   const arrowNavigation = groupNavigation === "arrows" && groups?.length > 0;
-<<<<<<< HEAD
-  // Fall back to first group if current activeGroup doesn't exist
-  const currentGroup = groups?.some((group) => group.id === activeGroup)
-    ? activeGroup
-=======
   const requestedGroup = controlledActiveGroup || internalActiveGroup;
   // Fall back to first group if current activeGroup doesn't exist.
   const currentGroup = groups?.some((group) => group.id === requestedGroup)
     ? requestedGroup
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     : (groups?.[0]?.id ?? "");
 
   const items = useMemo(() => {
@@ -83,14 +74,6 @@ export default function DiscoveryModule({
     return module.items.filter((item) => !item.group || item.group === currentGroup);
   }, [module, groups, currentGroup, arrowNavigation]);
 
-<<<<<<< HEAD
-  if (!module || (!arrowNavigation && !items.length)) return null;
-
-  const hasTabs = !arrowNavigation && groups?.length > 1;
-  const currentIndex = groups?.findIndex((group) => group.id === currentGroup) ?? -1;
-  const activeTitle = arrowNavigation ? `Shop by ${groups[currentIndex].label}` : module.title;
-
-=======
   const repeatCount = useMemo(() => {
     if (items.length < 2) return 1;
     if (items.length <= 3) return 6;
@@ -229,7 +212,7 @@ export default function DiscoveryModule({
   const currentIndex = groups?.findIndex((group) => group.id === currentGroup) ?? -1;
   const activeTitle = arrowNavigation ? `Shop by ${groups[currentIndex].label}` : module.title;
 
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   const titleWords = activeTitle.trim().split(" ");
   const titleLead = titleWords.slice(0, -1).join(" ");
   const titleAccent = titleWords.slice(-1).join(" ");
@@ -299,9 +282,6 @@ export default function DiscoveryModule({
                 <ProductImage
                   image={item.image}
                   alt=""
-                  transformation={arrowNavigation
-                    ? "w_420,h_420,c_fill,g_auto,q_auto,f_auto"
-                    : "w_520,h_360,c_fill,g_auto,q_auto,f_auto"}
                 />
               )}
             </span>
@@ -359,15 +339,10 @@ export default function DiscoveryModule({
                 <GroupArrow direction="next" />
               </button>
             </div>
-<<<<<<< HEAD
-            {viewAllTo ? <ViewAllLink to={viewAllTo} className="discovery__view-all" /> : null}
-          </div>
-        ) : viewAllTo ? <ViewAllLink to={viewAllTo} /> : null}
-=======
             {resolvedViewAllTo ? <ViewAllLink to={resolvedViewAllTo} className="discovery__view-all" /> : null}
           </div>
         ) : resolvedViewAllTo ? <ViewAllLink to={resolvedViewAllTo} /> : null}
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
       </div>
 
       {arrowNavigation && groups.length > 1 ? (
@@ -408,46 +383,6 @@ export default function DiscoveryModule({
         </div>
       ) : null}
 
-<<<<<<< HEAD
-      {items.length ? (
-        <ul
-          key={arrowNavigation ? currentGroup : undefined}
-          className="discovery__list"
-          id={`discovery-panel-${module.id}`}
-          role={hasTabs ? "tabpanel" : undefined}
-          aria-labelledby={hasTabs ? `discovery-tab-${currentGroup}` : arrowNavigation ? `discovery-${module.id}` : undefined}
-        >
-          {items.map((item) => (
-            <li key={item.id}>
-              <Link
-                to={resolveDestination ? resolveDestination(item) : item.destination}
-                className="discovery__item"
-              >
-                <span className="discovery__media">
-                  {(renderMedia && renderMedia(item)) ?? (
-                    <ProductImage
-                      image={item.image}
-                      alt=""
-                      transformation={arrowNavigation
-                        ? "w_420,h_420,c_fill,g_auto,q_auto,f_auto"
-                        : "w_420,h_420,c_limit,q_auto,f_auto"}
-                    />
-                  )}
-                </span>
-                {arrowNavigation ? (
-                  <span className="discovery__caption">
-                    <span className="discovery__name">{item.name}</span>
-                    <StitchArrowIcon size={16} className="discovery__caption-arrow" />
-                  </span>
-                ) : <span className="discovery__name">{item.name}</span>}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p id={`discovery-panel-${module.id}`} className="discovery__empty">No categories are available in this group yet.</p>
-      )}
-=======
       {railControls && items.length ? (
         <div
           className="discovery__rail"
@@ -475,7 +410,7 @@ export default function DiscoveryModule({
           ) : null}
         </div>
       ) : list}
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     </section>
   );
 }

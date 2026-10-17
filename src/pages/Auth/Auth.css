@@ -24,8 +24,6 @@
 .auth-flow__timer { font-variant-numeric:tabular-nums; color:var(--color-text-secondary); text-align:center; font-size:var(--text-sm); }
 .auth-success { text-align:center; }
 .auth-success .auth-flow__mark { width:4.5rem; height:4.5rem; margin-inline:auto; background:var(--color-brand); color:white; }
-<<<<<<< HEAD
-=======
 
 .auth-flow {gap:1.1rem;}
 .auth-flow__mark {width:2.5rem;height:2.5rem;font-size:1rem;box-shadow:0 0 0 4px rgba(176,141,87,.06);}
@@ -66,4 +64,3 @@
 .auth-flow__status[role="alert"] {border-left-color:var(--color-brand);background:var(--color-brand-tint-strong);}
 .auth-flow__status[role="status"] {border-left-color:var(--color-border-control);background:var(--color-bg);}
 @media(forced-colors:active){.auth-icon {background:white;forced-color-adjust:none;}.auth-flow__mark {border-color:CanvasText;}}
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9

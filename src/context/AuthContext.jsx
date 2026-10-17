@@ -1,16 +1,10 @@
-<<<<<<< HEAD
-import { createContext, useContext, useEffect, useState } from "react";
-import { expireSession, sessionPolicyExpired, subscribeToAuthChanges } from "../firebase/auth";
-
-const AuthContext = createContext({ user: null, isLoading: true, sessionExpired: false });
-=======
 import { createContext, Fragment, useContext, useEffect, useLayoutEffect, useState, useCallback } from "react";
 import { flushSync } from "react-dom";
 import { auth, expireSession, revalidateFirebasePrincipal, sessionPolicyExpired, subscribeToAuthChanges } from "../firebase/auth";
 import { safeNavigationState, clearAuthContinuations } from "../services/authFlow";
 
 const AuthContext = createContext({ user: null, isLoading: true, sessionExpired: false, sessionState: "checking", recheckSession: async () => {} });
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 const SESSION_MARKER = "udc:auth:had-session";
 const INTENTIONAL_SIGNOUT_MARKER = "udc:auth:intentional-signout";
 
@@ -31,13 +25,6 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sessionExpired, setSessionExpired] = useState(false);
-<<<<<<< HEAD
-
-  useEffect(() => {
-    const unsubscribe = subscribeToAuthChanges((nextUser) => {
-      if (nextUser) {
-        if (sessionPolicyExpired()) {
-=======
   const [sessionState, setSessionState] = useState("checking");
   const [attempt, setAttempt] = useState(0);
   const [verificationRevision, setVerificationRevision] = useState(0);
@@ -70,19 +57,11 @@ export function AuthProvider({ children }) {
       if (nextUser) {
         lastPrincipalUid = nextUser.uid;
         if (expired) {
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
           setSessionValue(SESSION_MARKER, "1");
           setSessionExpired(true);
           setUser(null);
           setIsLoading(false);
-<<<<<<< HEAD
-          void expireSession();
-          return;
-        }
-        setSessionValue(SESSION_MARKER, "1");
-        setSessionValue(INTENTIONAL_SIGNOUT_MARKER, null);
-        setSessionExpired(false);
-=======
           setSessionState("expired"); knownReason = "expired";
           void expireSession().catch(() => {});
           return;
@@ -108,7 +87,7 @@ export function AuthProvider({ children }) {
         // Firebase can refresh metadata on the same User object. Re-render
         // confirmed values without remounting the identity-scoped subtree.
         setVerificationRevision(value => value + 1);
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
       } else {
         const intentionalAt = Number(sessionValue(INTENTIONAL_SIGNOUT_MARKER) || 0);
         const intentional = intentionalAt > 0 && Date.now() - intentionalAt < 15000;
@@ -116,15 +95,11 @@ export function AuthProvider({ children }) {
           setSessionValue(SESSION_MARKER, null);
           setSessionValue(INTENTIONAL_SIGNOUT_MARKER, null);
           setSessionExpired(false);
-<<<<<<< HEAD
-        } else {
-          setSessionExpired(sessionValue(SESSION_MARKER) === "1");
-=======
           setSessionState("signed-out"); knownReason = "signed-out";
         } else {
           setSessionExpired(knownReason === "expired");
           setSessionState(knownReason || (sessionValue(SESSION_MARKER) === "1" ? "session-ended" : "guest"));
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
         }
       }
       setUser(nextUser);
@@ -161,13 +136,9 @@ export function AuthProvider({ children }) {
   }, [user]);
 
   return (
-<<<<<<< HEAD
-    <AuthContext.Provider value={{ user, isLoading, sessionExpired }}>
-      {children}
-=======
     <AuthContext.Provider value={{ user, isLoading, sessionExpired, sessionState, recheckSession, verificationRevision }}>
       <Fragment key={user?.uid || sessionState}>{children}</Fragment>
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     </AuthContext.Provider>
   );
 }

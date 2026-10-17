@@ -47,9 +47,8 @@ function normaliseImage(image) {
   if (!image) return null;
   if (typeof image === "string") return { url: image, publicId: "", alt: "" };
   const url = image.url || image.secureUrl || image.secure_url || "";
-  const publicId = image.publicId || image.public_id || "";
-  if (!url && !publicId) return null;
-  return { url, publicId, alt: image.alt || "" };
+  if (!url) return null;
+  return { url, alt: image.alt || "" };
 }
 
 function normaliseOptions(raw) {
@@ -133,29 +132,6 @@ export function normaliseProduct(id, raw) {
   // price. Legacy published records with no configured unit are incomplete
   // public catalogue data and stay out of the customer Shop until corrected.
   if (!unitLabel) return null;
-
-  const rawShopBy = raw.shopBy && typeof raw.shopBy === "object" && !Array.isArray(raw.shopBy) ? raw.shopBy : {};
-  const shopBy = Object.fromEntries(
-    Object.entries(rawShopBy)
-      .map(([key, values]) => [String(key).trim(), toArray(values)])
-      .filter(([key, values]) => key && values.length)
-  );
-  const legacyShopBy = {
-    occasion: toArray(raw.occasion ?? raw.occasions),
-    style: toArray(raw.style ?? raw.styles),
-    fabric: toArray(raw.fabric ?? raw.weave ?? raw.fabrics),
-  };
-  Object.entries(legacyShopBy).forEach(([key, values]) => {
-    const merged = [...(shopBy[key] ?? []), ...values];
-    const seen = new Set();
-    const unique = merged.filter((value) => {
-      const normalised = String(value).trim().toLowerCase();
-      if (!normalised || seen.has(normalised)) return false;
-      seen.add(normalised);
-      return true;
-    });
-    if (unique.length) shopBy[key] = unique;
-  });
 
   const rawShopBy = raw.shopBy && typeof raw.shopBy === "object" && !Array.isArray(raw.shopBy) ? raw.shopBy : {};
   const shopBy = Object.fromEntries(

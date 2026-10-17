@@ -40,17 +40,6 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
   const price = formatNaira(product.minPrice);
   const unit = product.unitLabel ? ` ${product.unitLabel}` : "";
 
-<<<<<<< HEAD
-  const handleSave = () => {
-    const nowSaved = toggleSaved(product.id);
-    showToast(
-      nowSaved
-        ? isPersistent
-          ? "Saved to My Closet → My Pieces."
-          : "Saved for this visit. Create a Profile to keep your pieces."
-        : "Removed from My Pieces."
-    );
-=======
   const handleSave = async () => {
     if (savePending) return;
     setSavePending(true);
@@ -72,7 +61,7 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
     } finally {
       setSavePending(false);
     }
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   };
 
   return (
@@ -82,7 +71,6 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
           <ProductImage
             image={product.image}
             alt={product.image ? product.name : ""}
-            transformation="w_720,h_720,c_limit,q_auto,f_auto"
             loading={imageLoading}
             sizes="(min-width: 1280px) 16vw, (min-width: 640px) 30vw, 45vw"
           />
@@ -97,13 +85,9 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
             disabled={savePending}
             aria-label={
               saved
-<<<<<<< HEAD
-                ? `Remove ${product.name} from My Pieces`
-                : `Save ${product.name} to My Pieces`
-=======
                 ? `Remove ${product.name} from My Closet`
                 : `Save ${product.name} to My Closet`
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
             }
           >
             <HeartIcon filled={saved} />

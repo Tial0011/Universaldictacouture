@@ -15,7 +15,7 @@ export function hasUsableImage(value) {
   if (!value) return false;
   if (typeof value === "string") return Boolean(value.trim());
   if (typeof value !== "object" || Array.isArray(value)) return false;
-  return Boolean(String(value.url || value.secureUrl || value.secure_url || value.publicId || value.public_id || "").trim());
+  return Boolean(String(value.url || value.secureUrl || value.secure_url || "").trim());
 }
 
 export function productAdminHref(raw = {}) {

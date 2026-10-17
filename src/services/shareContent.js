@@ -9,15 +9,10 @@ export function productDescription(product) {
     .map(([label, values]) => `${label}: ${values.join(", ")}`).join("\n");
 }
 function pieceSections(product) {
-<<<<<<< HEAD
-  const price = product?.minPrice ?? product?.price;
-  return [clean(product?.name) || "Customer story", "Universal Dicta Couture", productDescription(product),
-    typeof price === "number" && Number.isFinite(price) ? `${product?.hasVariablePricing ? "From " : ""}${formatNaira(price)}${product?.unitLabel ? ` ${product.unitLabel}` : ""}` : "",
-=======
   const price = product?.mainPrice ?? product?.price ?? product?.minPrice;
   return [clean(product?.name) || "Customer story", "Universal Dicta Couture", productDescription(product),
     typeof price === "number" && Number.isFinite(price) ? `${formatNaira(price)}${product?.unitLabel ? ` (${product.unitLabel})` : ""}` : "",
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   ].filter(Boolean);
 }
 function productUrl(product, origin) {

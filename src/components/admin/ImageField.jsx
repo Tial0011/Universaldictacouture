@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { getImageUrl } from "../../cloudinary/cloudinary";
 import { uploadImage } from "../../services/imageStorage";
 import { imageValue } from "../../services/adminModel";
 import Button from "../common/Button";
@@ -57,12 +56,9 @@ export default function ImageField({ id, value, onChange, multiple = false, setU
     {guidance && !error && <p role="status" className="field__hint">{guidance}</p>}
     <div className="admin-image-grid">{images.map((raw, index) => {
       const image = imageValue(raw);
-      return <div className="admin-image" key={`${image.publicId || image.url || "photo"}-${index}`}>
-<<<<<<< HEAD
-        <img src={image.url || getImageUrl(image.publicId)} alt={image.alt || "Uploaded photo " + (index + 1)} />
-=======
-        <img src={image.publicId ? getImageUrl(image.publicId, "c_limit,w_520,h_650,q_auto,f_auto") : image.url} alt={image.alt || "Uploaded photo " + (index + 1)} />
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+      return <div className="admin-image" key={`${image.url || "photo"}-${index}`}>
+        {image.url && <img src={image.url} alt={image.alt || "Uploaded photo " + (index + 1)} />}
+
         <label htmlFor={id + "-alt-" + index}>Photo {index + 1} description</label>
         <input id={id + "-alt-" + index} value={image.alt || ""} maxLength={250} onChange={event => changeImage(index, { alt: event.target.value })} />
         <div className="admin-actions">

@@ -1,18 +1,3 @@
-<<<<<<< HEAD
-/* The hero is the page's one large moment; everything below it keeps
-   the quiet, evenly spaced editorial rhythm of the design system. */
-body:has(#main-content > .trust-strip-wrap) {
-  --content-max-width: clamp(77.5rem, 85vw, 92.5rem);
-}
-
-.home-hero-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: min(60vh, 28rem);
-  background-color: var(--color-white);
-  border-bottom: 1px solid var(--color-border);
-=======
 /* Page rhythm and fabric layers shared with the collection. */
 .home-cultural-flow {background:linear-gradient(rgba(251,248,242,.97),rgba(251,248,242,.96)),var(--pattern-atlas) center top/1440px auto;}
 .home-cultural-flow .home-section {padding-block:clamp(2rem,4vw,4rem);}
@@ -45,5 +30,5 @@ body:has(#main-content > .trust-strip-wrap) {
 .home-cultural-flow .custom-promo__media {
   -webkit-mask-image: linear-gradient(to right, #000 98.75%, transparent 100%);
   mask-image: linear-gradient(to right, #000 98.75%, transparent 100%);
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 }

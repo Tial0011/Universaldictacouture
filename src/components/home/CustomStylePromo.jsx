@@ -19,7 +19,6 @@ export default function CustomStylePromo({ image }) {
           <ProductImage
             image={image}
             alt=""
-            transformation="w_800,h_900,c_fill,g_auto,q_auto,f_auto"
             loading="lazy"
           />
         </div>

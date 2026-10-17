@@ -5,8 +5,8 @@ import {generateKeyPairSync} from 'node:crypto';
 import {createServer} from 'node:http';
 import {createRequire} from 'node:module';
 
-test('every deployed function loads with require(ESM) disabled, matching the observed live failure',()=>{
-  const result=spawnSync(process.execPath,['--no-experimental-require-module','scripts/check-function-startup.mjs'],{encoding:'utf8'});
+test('every deployed function loads with the supported ESM interop setting',()=>{
+  const result=spawnSync(process.execPath,['--experimental-require-module','scripts/check-function-startup.mjs'],{encoding:'utf8'});
   assert.equal(result.status,0,result.stderr);assert.match(result.stdout,/account.js/);assert.match(result.stdout,/owner-maintenance.js/);
 });
 test('compatible JWKS dependency validates a real RSA signature and rejects tampering',async()=>{

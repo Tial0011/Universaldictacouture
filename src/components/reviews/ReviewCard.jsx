@@ -4,10 +4,8 @@ import { useAuth } from "../../context/AuthContext";
 import { useAuthGate } from "../../context/AuthGateContext";
 import ProductImage from "../product/ProductImage";
 import { formatNaira, truncateText } from "../../utils/formatters";
-<<<<<<< HEAD
-=======
 import { PRODUCT_SHOP_CTA } from "../../utils/productCopy";
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 import { timestampDate } from "../../services/reviewModel";
 import { productChatContext } from "../../services/chatModel";
 import "./ReviewCard.css";
@@ -96,7 +94,7 @@ export default function ReviewCard({
   const productContext = productChatContext(product, entry);
   return <article className={`udc-review-card udc-review-card--${variant} udc-review-card--${entry.image ? "photo" : "written"}`} data-review-id={entry.id} tabIndex={-1}>
     {entry.image ? <div className="udc-review-card__media">
-      <ProductImage image={entry.image} alt={entry.image.alt || `${entry.author || "Customer"} review photo`} transformation="w_800,h_1200,c_limit,q_auto,f_auto" />
+      <ProductImage image={entry.image} alt={entry.image.alt || `${entry.author || "Customer"} review photo`} />
       <button className="udc-review-card__photo-like" type="button" aria-label={liked ? "Unlike reviewed piece" : "Like reviewed piece"} aria-pressed={liked} disabled={!likeReady} onClick={() => onLike?.(entry)}><Icon name="heart" filled={liked} /></button>
     </div> : null}
 
@@ -121,18 +119,15 @@ export default function ReviewCard({
       <div className={`udc-review-product${presentation?.available === false ? " is-unavailable" : ""}`}>
         {presentation ? <>
           <div className="udc-review-product__thumb">{presentation.image
-            ? <ProductImage image={presentation.image} alt={presentation.name} transformation="w_180,h_180,c_fill,g_auto,q_auto,f_auto" />
+            ? <ProductImage image={presentation.image} alt={presentation.name} />
             : null}</div>
           <div className="udc-review-product__copy">
             <strong>{presentation.name}</strong>
             {presentation.price != null && <small>{formatNaira(presentation.price)}{presentation.variable ? " +" : ""}</small>}
           </div>
           {presentation.available
-<<<<<<< HEAD
-            ? <Link className="udc-review-product__cta" to={presentation.href} aria-label={`Shop ${presentation.name}`}>Shop Piece <Icon name="arrow" /></Link>
-=======
             ? <Link className="udc-review-product__cta" to={presentation.href} aria-label={`Shop ${presentation.name}`}>{PRODUCT_SHOP_CTA} <Icon name="arrow" /></Link>
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
             : <span className="udc-review-product__unavailable">Currently unavailable</span>}
         </> : <div className="udc-review-product__missing"><strong>Reviewed piece unavailable</strong><span>The customer story remains published, but this product is no longer in the live catalogue.</span></div>}
       </div>

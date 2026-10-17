@@ -10,15 +10,6 @@ const SAFE_PREFIXES = [
   "/our-story",
   "/policies",
 ];
-<<<<<<< HEAD
-
-export const AUTH_PREFERENCE_KEY = "udc:auth:keep-signed-in";
-
-export function safeReturnPath(value, fallback = "/profile") {
-  if (typeof value !== "string" || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return fallback;
-  let url;
-  try {
-=======
 // Keep only navigation concepts consumed by the current routes. Unknown query
 // payloads must not carry forms/proofs/private snapshots through auth/history.
 const SHOP_RETURN_KEYS = new Set(["q", "focus", "category", "occasion", "style", "fabric", "colour", "min", "max", "sort", "newin", "discovery", "shopby"]);
@@ -36,17 +27,11 @@ export function safeReturnPath(value, fallback = "/profile") {
   try {
     let decoded = value;
     for (let round = 0; round < 3; round++) { decoded = decodeURIComponent(decoded); if (unsafeCharacters(decoded) || decoded.startsWith("//") || decoded.split(/[?#]/)[0].split("/").some(segment => segment === "." || segment === "..")) return fallback; }
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     url = new URL(value, "https://udc.local");
   } catch {
     return fallback;
   }
-<<<<<<< HEAD
-  const allowed = SAFE_PREFIXES.some((prefix) => prefix === "/" ? url.pathname === "/" : url.pathname === prefix || url.pathname.startsWith(prefix + "/"));
-  return allowed ? `${url.pathname}${url.search}${url.hash}` : fallback;
-}
-
-=======
   const allowed = url.origin === "https://udc.local" && SAFE_PREFIXES.some((prefix) => prefix === "/" ? url.pathname === "/" : url.pathname === prefix || url.pathname.startsWith(prefix + "/"));
   const keys = url.pathname === "/shop" || url.pathname.startsWith("/shop/") ? SHOP_RETURN_KEYS
     : url.pathname === "/profile" ? new Set(["area"]) : url.pathname === "/reviews-feeds" ? new Set(["review"]) : new Set();
@@ -106,7 +91,7 @@ export function safeNavigationState(state) {
   return Object.keys(result).length ? result : null;
 }
 
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 export function currentInternalPath(location) {
   if (!location) return "/";
   return safeReturnPath(`${location.pathname || "/"}${location.search || ""}${location.hash || ""}`, "/");

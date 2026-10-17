@@ -105,11 +105,6 @@
 }
 
 /* ---------- Shop variant ----------
-<<<<<<< HEAD
-   A segmented tab bar (the tabs stand in for the heading) over a
-   scrolling row of small photo tiles. Scoped to .discovery--shop so
-   the homepage and any other use of the module are untouched. */
-=======
    Shop keeps the configured groups as a compact segmented control and
    presents real catalogue-backed choices in one horizontally navigable
    image rail. The visual language is deliberately calmer than the
@@ -118,7 +113,7 @@
   position: relative;
 }
 
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 .discovery--shop .discovery__groups {
   display: flex;
   flex-wrap: nowrap;
@@ -336,4 +331,3 @@
 .discovery--shop .discovery__item {padding:.4rem;}
 .discovery--shop .discovery__media {background:var(--color-couture-media);}
 .discovery--shop .discovery__name {font-family:var(--font-display);font-size:clamp(.95rem,.85rem + .3vw,1.08rem);font-weight:var(--weight-semibold);line-height:1.15;}
-

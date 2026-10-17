@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import Button from "../common/Button";
 import ChatProductTag from "./ChatProductTag";
-<<<<<<< HEAD
-import { chatError, olderMessages, sendMessage, watchMessages } from "../../services/chats";
-=======
 import { chatError, hasPendingSend, olderMessages, reconcileMessage, sendMessage, watchMessages } from "../../services/chats";
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
 import { mergeMessages, MESSAGE_LIMIT, normaliseProductContext } from "../../services/chatModel";
 import "./Conversation.css";
 
@@ -13,11 +10,8 @@ function sentAt(timestamp) {
   return timestamp?.toDate?.().toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) || "Sending...";
 }
 
-<<<<<<< HEAD
-export default function Conversation({ user, customerId, admin = false, title = "Dicta Couturier", initialDraft = "", initialProductContext = null, onSent }) {
-=======
 export default function Conversation({ user, customerId, admin = false, readOnly = false, title = "Dicta Couturier", initialDraft = "", initialProductContext = null, onSent }) {
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
   const [messages, setMessages] = useState([]);
   const [cursor, setCursor] = useState(null);
   const [hasMore, setHasMore] = useState(false);
@@ -78,11 +72,8 @@ export default function Conversation({ user, customerId, admin = false, readOnly
     try {
       await sendMessage({ user, customerId, text, admin, productContext });
       if (mounted.current) { setText(""); setProductContext(null); onSent?.(); }
-<<<<<<< HEAD
-    } catch (error) { if (mounted.current) setActionError(chatError(error)); }
-=======
     } catch (error) { if (mounted.current) { setActionError(chatError(error)); setUncertain(error.code === "outcome-unknown"); } }
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
     finally { sendingRef.current = false; if (mounted.current) setSending(false); }
   }
   return <section className="conversation" aria-label={title + " conversation"}>
@@ -99,11 +90,8 @@ export default function Conversation({ user, customerId, admin = false, readOnly
         <div ref={bottom} />
       </div>
     </>}
-<<<<<<< HEAD
-    <form className="conversation__composer" onSubmit={submit}>
-=======
     {readOnly ? <p className="conversation__notice">Read-only context. Reply requires independent current authorization.</p> : <form className="conversation__composer" onSubmit={submit}>
->>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
+
       {productContext && <div className="conversation__attachment"><ChatProductTag context={productContext} /><button type="button" disabled={sending} onClick={() => setProductContext(null)}>Remove product tag</button></div>}
       <label htmlFor="chat-message">{admin ? "Reply to customer" : "Your message"}</label>
       <textarea id="chat-message" value={text} onChange={event => setText(event.target.value)} maxLength={MESSAGE_LIMIT} rows={3} required disabled={sending || Boolean(readError) || loading} placeholder="Write your message..." aria-describedby="chat-message-help" />
