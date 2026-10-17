@@ -24,6 +24,37 @@ body:has(.home-cultural-flow) .site-header__chat-launcher { display:none; }
 .home-cultural-flow .menu-card__cta {border-radius:2px;}
 .home-cultural-flow .menu-card__media .product-image--empty {background:var(--color-couture-media);}
 
+/* Keep the horizontal product rails inside the phone viewport. Their cards
+   intentionally extend beyond the visible edge, but the rail itself must not
+   contribute that width to the document. */
+.home-cultural-flow,
+.home-cultural-flow > *,
+.home-cultural-flow .home-section,
+.home-cultural-flow .discovery--home,
+.home-cultural-flow .discovery--home .discovery__list,
+.home-cultural-flow .menu-grid {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.home-cultural-flow .discovery--home .discovery__list,
+.home-cultural-flow .menu-grid {
+  width: 100%;
+  overscroll-behavior-inline: contain;
+}
+
+@media (max-width: 480px) {
+  /* The portrait crop places the model behind the copy on narrow screens.
+     Keep the subject to the right while preserving the existing hero layout. */
+  .hero__image--mobile {
+    object-position: left center;
+  }
+
+  .hero__headline {
+    font-size: clamp(1.9rem, 8.8vw, 2.15rem);
+  }
+}
+
 /* The product frame carries the same quiet woven signature as the shop. */
 .home-cultural-flow .menu-card { background: url('../../assets/brand/couture-stitch.svg') center / 56px 80px, var(--color-couture-surface); }
 
