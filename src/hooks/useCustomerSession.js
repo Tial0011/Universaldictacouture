@@ -5,18 +5,44 @@ import { db } from "../firebase/firestore";
 import { auth } from "../firebase/auth";
 import { resolveCustomerAccount } from "../services/accountApi";
 import { flushSync } from "react-dom";
+import { useLocation } from "react-router-dom";
+
+const pendingResolutions = new Map();
+function resolveSharedCustomerAccount(uid) {
+  const pending = pendingResolutions.get(uid);
+  if (pending) return pending;
+  const request = resolveCustomerAccount({ uid });
+  pendingResolutions.set(uid, request);
+  request.finally(() => {
+    if (pendingResolutions.get(uid) === request) pendingResolutions.delete(uid);
+  }).catch(() => {});
+  return request;
+}
+
+function customerRouteNeedsSession(pathname) {
+  return pathname === "/custom-style" || pathname === "/chats" || pathname === "/profile"
+    || pathname === "/notifications" || pathname === "/my-closet" || pathname.startsWith("/my-closet/");
+}
+
 export function useCustomerSession() {
   const principal = useAuth();
+  const { pathname } = useLocation();
   const uid = principal.user?.uid;
   const [source, setSource] = useState(null);
   const [attempt, setAttempt] = useState(0);
+  const [manualCheck, setManualCheck] = useState(null);
+  const shouldResolve = Boolean(uid && db && (customerRouteNeedsSession(pathname)
+    || (manualCheck?.uid === uid && manualCheck?.pathname === pathname)));
   useEffect(() => {
-    if (!uid || !db) return;
+    if (!shouldResolve) {
+      setSource(null);
+      return;
+    }
     let live = true, generation = 0, stopSession = () => {};
     const clear = () => { if (!live) return; generation++; flushSync(() => setSource(null)); };
     const load = () => {
       const ticket = ++generation;
-      resolveCustomerAccount({ uid }).then(value => {
+      resolveSharedCustomerAccount(uid).then(value => {
         if (live && ticket === generation && auth.currentUser?.uid === uid) setSource({ uid, value });
       }).catch(error => {
         if (live && ticket === generation && auth.currentUser?.uid === uid) setSource({ uid, errorState: ["session-revoked", "fresh-auth-required", "session-required"].includes(error.code) ? "revoked" : error.code === "account-restricted" ? "restricted" : error.code === "account-deleted" ? "deleted" : "unavailable" });
@@ -45,10 +71,10 @@ export function useCustomerSession() {
     window.addEventListener("udc:account:authority-uncertain", uncertain);
     window.addEventListener("pageshow", restore); window.addEventListener("online", online); window.addEventListener("offline", uncertain);
     return () => { live = false; generation++; stop(); stopSession(); window.removeEventListener("udc:account:session-established", established); window.removeEventListener("udc:account:authority-uncertain", uncertain); window.removeEventListener("pageshow", restore); window.removeEventListener("online", online); window.removeEventListener("offline", uncertain); };
-  }, [uid, attempt]);
+  }, [uid, attempt, shouldResolve]);
   const value = uid && source?.uid === uid && source?.value?.authorized && source.value.principalUid === uid ? source.value : null;
   const customerPrincipal = value ? { uid: value.accountId, accountId: value.accountId, principalUid: uid, epoch: value.epoch } : null;
   return { ...principal, principal: principal.user, principalKind: customerPrincipal ? "customer" : principal.user ? "provider" : "guest", customerPrincipal,
-    user: customerPrincipal, accountState: value ? "active" : principal.user ? source?.uid === uid ? source.errorState || (source.value?.lifecycle === "RESTRICTED" ? "restricted" : source.value?.lifecycle?.startsWith("DELETED-") ? "deleted" : "unavailable") : "checking" : principal.sessionState,
-    recheckCustomer: () => { setSource(null); setAttempt(current => current + 1); } };
+    user: customerPrincipal, accountState: value ? "active" : principal.user ? !shouldResolve ? "deferred" : source?.uid === uid ? source.errorState || (source.value?.lifecycle === "RESTRICTED" ? "restricted" : source.value?.lifecycle?.startsWith("DELETED-") ? "deleted" : "unavailable") : "checking" : principal.sessionState,
+    recheckCustomer: () => { setSource(null); setManualCheck({ uid, pathname }); setAttempt(current => current + 1); } };
 }

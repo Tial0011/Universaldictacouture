@@ -8,15 +8,20 @@ import { useCustomerSession } from '../../hooks/useCustomerSession';
 
 function CustomerBell() {
   const session=useCustomerSession();
-  return session.user?<NotificationBellCore domain="customer"/>:null;
+  const {user}=useAuth();
+  const [requested,setRequested]=useState(false);
+  if(!user)return null;
+  if(session.user)return <NotificationBellCore domain="customer" openInitially={requested}/>;
+  const checking=session.accountState==="checking";
+  return <button type="button" className="notification-bell" aria-label={checking?"Checking notifications":"Check customer notifications"} aria-busy={checking} disabled={checking} onClick={()=>{setRequested(true);session.recheckCustomer();}}><AdminIcon name="bell"/><span className="notification-bell__label">{checking?"Checking":"Notifications"}</span></button>;
 }
 export default function NotificationBell({domain='customer'}) {
   const {user}=useAuth();
   if(!user)return null;
   return domain==='customer'?<CustomerBell key={user.uid}/>:<NotificationBellCore key={user.uid} domain="staff"/>;
 }
-function NotificationBellCore({domain}) {
-  const {user}=useAuth(),[opened,setOpened]=useState(false),state=useNotifications(domain),dialog=useRef(null),trigger=useRef(null),id=useId();
+function NotificationBellCore({domain,openInitially=false}) {
+  const {user}=useAuth(),[opened,setOpened]=useState(openInitially),state=useNotifications(domain),dialog=useRef(null),trigger=useRef(null),id=useId();
   useEffect(()=>{const element=dialog.current;if(!element)return;if(opened&&!element.open)element.showModal();else if(!opened&&element.open)element.close();if(!opened)return;const previous=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{document.body.style.overflow=previous;};},[opened]);
   if(!user)return null;
   const count=state.source?.badge;
