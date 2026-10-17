@@ -1,4 +1,4 @@
-import { collection, doc, getDocFromServer, getDocsFromServer, query, orderBy, documentId, limit, startAfter, setDoc, serverTimestamp } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocFromServer, getDocsFromServer, query, orderBy, documentId, limit, startAfter, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { prepareRecord } from "./adminModel";
 const COLLECTIONS = new Set(["products", "heroSlides", "reviews", "discoveryModules", "taxonomy"]);
@@ -23,8 +23,20 @@ export async function saveAdminRecord(kind, raw) {
   const reference = raw.id ? doc(target(kind), raw.id) : doc(target(kind));
   if (!raw.id) data.createdAt = serverTimestamp();
   if (kind === "products" && data.status === "published" && !data.publishedAt) data.publishedAt = serverTimestamp();
+  if (kind === "reviews") {
+    // First-publication time is immutable. Hiding or editing a review never
+    // resets it, so an old review cannot become the newest homepage story.
+    if (data.published && !raw.publishedAt) data.publishedAt = serverTimestamp();
+    else if (!raw.publishedAt) delete data.publishedAt;
+  }
   await setDoc(reference, { ...data, updatedAt: serverTimestamp() }, { merge: true });
   return reference.id;
+}
+
+export async function deleteAdminRecord(kind, id) {
+  if (!["reviews", "heroSlides"].includes(kind)) throw new Error("Deletion is not available for this content section.");
+  if (!id) throw new Error("Choose a record to delete.");
+  await deleteDoc(doc(target(kind), id));
 }
 export function adminError(error) {
   if (error?.code === "permission-denied") return "Access was denied. Check your admin access and the published Firestore rules.";

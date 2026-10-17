@@ -13,8 +13,12 @@
 
   /* ---------- Brand colours (locked) ---------- */
   --color-wine: #601013;   /* Primary Brand Wine */
+  --color-wine-deep: #43090d; /* Deep wine — luxury depth, polished surfaces */
+  --color-wine-rose: #7a2428; /* Slightly lifted wine for accents */
   --color-gold: #b08d57;   /* Luxury Gold Accent — restrained, never body text */
+  --color-gold-soft: #d3bc8a; /* Gentle gold stroke for couture details */
   --color-ivory: #fbf8f2;  /* Warm Ivory — main page background */
+  --color-ivory-deep: #f1eae0; /* Softer ivory for panels */
   --color-white: #ffffff;  /* Pure White — surfaces */
   --color-ink: #1f1f1f;    /* Near Black — primary text */
   --color-gray: #6b6b6b;   /* Muted Gray — secondary text */
@@ -22,11 +26,14 @@
   /* ---------- Semantic aliases ---------- */
   --color-bg: var(--color-ivory);
   --color-surface: var(--color-white);
+  --color-surface-elevated: var(--color-ivory-deep);
   --color-text-primary: var(--color-ink);
   --color-text-secondary: var(--color-gray);
   --color-text-on-brand: var(--color-white);
   --color-brand: var(--color-wine);
+  --color-brand-deep: var(--color-wine-deep);
   --color-accent: var(--color-gold); /* decorative only: rules, underlines, indicators */
+  --color-accent-soft: var(--color-gold-soft);
 
   /* ---------- Derived states ---------- */
   --color-brand-hover: #4d0d0f;               /* Wine darkened ~20% — hover/pressed only */
@@ -48,8 +55,34 @@
   --color-border: rgba(31, 31, 31, 0.12);         /* decorative hairlines & dividers */
   --color-border-strong: rgba(31, 31, 31, 0.22);  /* emphasised dividers */
   --color-border-control: rgba(31, 31, 31, 0.55); /* form controls — ≥3.6:1 (WCAG 1.4.11) */
+  --color-border-luxury: rgba(176, 141, 87, 0.28);
 
   --color-overlay: rgba(31, 17, 18, 0.5);
+
+  /* ---------- Textile pattern system ---------- */
+  --pattern-weave: radial-gradient(circle at 50% 50%, rgba(96, 16, 19, 0.04), transparent 35%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(96, 16, 19, 0.02),
+      rgba(96, 16, 19, 0.02) 2px,
+      rgba(176, 141, 87, 0.015) 2px,
+      rgba(176, 141, 87, 0.015) 12px
+    );
+  --pattern-loom: linear-gradient(135deg, rgba(255,255,255,0.18), transparent 34%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(96, 16, 19, 0.022),
+      rgba(96, 16, 19, 0.022) 2px,
+      rgba(176, 141, 87, 0.02) 2px,
+      rgba(176, 141, 87, 0.02) 12px
+    );
+  --pattern-emboss: repeating-linear-gradient(
+      0deg,
+      rgba(96, 16, 19, 0.028),
+      rgba(96, 16, 19, 0.028) 2px,
+      rgba(176, 141, 87, 0.016) 2px,
+      rgba(176, 141, 87, 0.016) 10px
+    );
 
   /* ---------- Typography ---------- */
   --font-display: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
@@ -123,6 +156,7 @@
   /* ---------- Elevation (warm-tinted, used sparingly) ---------- */
   --shadow-soft: 0 8px 24px rgba(31, 17, 18, 0.08);
   --shadow-lifted: 0 16px 40px rgba(31, 17, 18, 0.14);
+  --shadow-luxury: 0 12px 26px rgba(31, 17, 18, 0.08), 0 2px 0 rgba(176, 141, 87, 0.18);
 
   /* ---------- Motion ---------- */
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);

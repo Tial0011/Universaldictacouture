@@ -1,41 +1,35 @@
 import { Link } from "react-router-dom";
 
-/**
- * The approved service/trust items. Titles are the approved copy
- * unchanged; captions are short, generic supporting phrases only —
- * no percentages, timelines or service-tier claims that aren't
- * already stated elsewhere in the approved brand copy.
- */
+/** Homepage service highlights and their supporting copy. */
 const ITEMS = [
   {
     id: "delivery",
     label: "Nationwide & International Delivery",
-    caption: "Delivered to your door",
+    compactLabel: "Nationwide Delivery",
+    caption: "Customer-Paid Delivery",
+    compactCaption: "Overseas too · Customer-paid",
     icon: "truck",
-  },
-  {
-    id: "transfer",
-    label: "Bank Transfer Only",
-    caption: "Simple & secure",
-    icon: "shield",
   },
   {
     id: "authentic",
     label: "Authentic Aso Oke",
-    caption: "Genuine heritage fabric",
+    caption: "Authentic. Refined. Timeless.",
+    compactCaption: "Premium quality",
     icon: "diamond",
   },
   {
     id: "custom",
     label: "Custom Style",
-    caption: "Made for you",
+    caption: "Create What You Want",
+    compactCaption: "Made for you",
     icon: "hanger",
     to: "/custom-style",
   },
   {
     id: "chat",
     label: "Dicta Couturier",
-    caption: "Here to help",
+    caption: "Personal Guidance, Just for You",
+    compactCaption: "Personal guidance",
     icon: "headset",
     to: "/chats",
   },
@@ -63,12 +57,6 @@ function TrustIcon({ name }) {
         <path d="M13.5 10h3.5l3 3v2.5h-6.5z" />
         <circle cx="6" cy="18" r="1.6" />
         <circle cx="16.5" cy="18" r="1.6" />
-      </>
-    ),
-    shield: (
-      <>
-        <path d="M12 3.5 5 6v5.5c0 4.2 3 6.9 7 9 4-2.1 7-4.8 7-9V6Z" />
-        <path d="m9.2 12 1.9 1.9 3.7-3.9" />
       </>
     ),
     diamond: (
@@ -104,11 +92,19 @@ export default function TrustStrip() {
           {ITEMS.map((item) => {
             const content = (
               <>
-                <span className="trust-strip__badge">
+                <span className="trust-strip__icon">
                   <TrustIcon name={item.icon} />
                 </span>
-                <span className="trust-strip__label">{item.label}</span>
-                <span className="trust-strip__caption">{item.caption}</span>
+                <span className="trust-strip__copy">
+                  <span className="trust-strip__label">
+                    <span className="trust-strip__wide-copy">{item.label}</span>
+                    <span className="trust-strip__compact-copy">{item.compactLabel || item.label}</span>
+                  </span>
+                  <span className="trust-strip__caption">
+                    <span className="trust-strip__wide-copy">{item.caption}</span>
+                    <span className="trust-strip__compact-copy">{item.compactCaption || item.caption}</span>
+                  </span>
+                </span>
               </>
             );
             return (

@@ -11,7 +11,7 @@
  * list, in this order.
  */
 export const SOCIAL_LINKS = [
-  { id: "facebook", name: "Facebook", url: "https://www.facebook.com/adurayemibenardo.akinola" },
+  { id: "facebook", name: "Facebook", url: "https://www.facebook.com/mhiz_dicta" },
   { id: "instagram", name: "Instagram", url: "https://www.instagram.com/dicta_couture?igsh=dzZuazl6NG5na3Zs" },
   { id: "linkedin", name: "LinkedIn", url: "https://linkedin.com/in/benedicta-akinola-088979248" },
   { id: "whatsapp", name: "WhatsApp", url: "https://wa.me/2349061959388" },

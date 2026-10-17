@@ -8,14 +8,14 @@
  * invented data.
  */
 
-import { normaliseText } from "../utils/search";
+import { normaliseText } from "../utils/search.js";
 
 /** Taxonomy dimensions the Shop filters on. */
 export const FILTER_DIMENSIONS = [
   { key: "category", label: "Category" },
   { key: "occasion", label: "Occasion" },
   { key: "style", label: "Style" },
-  { key: "fabric", label: "Fabric/Weave" },
+  { key: "fabric", label: "Fabric & Pattern" },
   { key: "colour", label: "Colour" },
   { key: "size", label: "Size" },
 ];
@@ -103,9 +103,8 @@ export function normaliseProduct(id, raw) {
 
   const imageSource = Array.isArray(raw.images) ? raw.images : raw.images ? [raw.images] : [];
   const images = imageSource.map(normaliseImage).filter(Boolean);
-  // A piece with no uploaded photo yet is still publishable: the
-  // storefront supplies a stand-in image (see NewInCard) rather than
-  // hiding the piece.
+  // A piece with no uploaded photo stays publishable with an empty
+  // media frame; never substitute a photograph of another product.
   const primaryImage = normaliseImage(raw.primaryImage) || images[0] || null;
 
   const options = normaliseOptions(raw.options);
@@ -124,10 +123,34 @@ export function normaliseProduct(id, raw) {
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
 
+  const rawShopBy = raw.shopBy && typeof raw.shopBy === "object" && !Array.isArray(raw.shopBy) ? raw.shopBy : {};
+  const shopBy = Object.fromEntries(
+    Object.entries(rawShopBy)
+      .map(([key, values]) => [String(key).trim(), toArray(values)])
+      .filter(([key, values]) => key && values.length)
+  );
+  const legacyShopBy = {
+    occasion: toArray(raw.occasion ?? raw.occasions),
+    style: toArray(raw.style ?? raw.styles),
+    fabric: toArray(raw.fabric ?? raw.weave ?? raw.fabrics),
+  };
+  Object.entries(legacyShopBy).forEach(([key, values]) => {
+    const merged = [...(shopBy[key] ?? []), ...values];
+    const seen = new Set();
+    const unique = merged.filter((value) => {
+      const normalised = String(value).trim().toLowerCase();
+      if (!normalised || seen.has(normalised)) return false;
+      seen.add(normalised);
+      return true;
+    });
+    if (unique.length) shopBy[key] = unique;
+  });
+
   const product = {
     id,
     slug,
     name,
+    description: typeof raw.description === "string" ? raw.description.trim() : "",
     href: `/shop/${encodeURIComponent(slug)}`,
     image: primaryImage,
     images: images.length ? images : primaryImage ? [primaryImage] : [],
@@ -136,9 +159,10 @@ export function normaliseProduct(id, raw) {
     hasVariablePricing: maxPrice > minPrice,
     unitLabel: typeof raw.unitLabel === "string" ? raw.unitLabel.trim() : "",
     category,
-    occasion: toArray(raw.occasion ?? raw.occasions),
-    style: toArray(raw.style ?? raw.styles),
-    fabric: toArray(raw.fabric ?? raw.weave ?? raw.fabrics),
+    shopBy,
+    occasion: shopBy.occasion ?? [],
+    style: shopBy.style ?? [],
+    fabric: shopBy.fabric ?? [],
     colour: toArray(raw.colour ?? raw.color ?? raw.colours),
     size: toArray(raw.size ?? raw.sizes),
     isNewIn: raw.isNewIn === true || raw.newIn === true,
@@ -161,6 +185,7 @@ function buildSearchText(product) {
       ...product.occasion,
       ...product.style,
       ...product.fabric,
+      ...Object.values(product.shopBy ?? {}).flat(),
       ...product.colour,
       ...product.size,
       ...product.aliases,
@@ -183,17 +208,17 @@ export function resolveSelections(product, selections = {}) {
   const missing = [];
   const resolved = {};
 
-  requiredOptions(product).forEach((option) => {
+  (product?.options ?? []).forEach((option) => {
     const supplied = selections?.[option.name];
     if (supplied && option.values.includes(supplied)) {
       resolved[option.name] = supplied;
       return;
     }
-    if (option.values.length === 1) {
+    if (option.required && option.values.length === 1) {
       resolved[option.name] = option.values[0];
       return;
     }
-    missing.push(option.name);
+    if (option.required) missing.push(option.name);
   });
 
   return { resolved, missing, isComplete: missing.length === 0 };

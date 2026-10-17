@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import HeroCarousel from "../../components/home/HeroCarousel";
 import TrustStrip from "../../components/home/TrustStrip";
 import DiscoveryModule from "../../components/discovery/DiscoveryModule";
-import OccasionIllustration from "../../components/discovery/OccasionIllustration";
 import NewIn from "../../components/home/NewIn";
 import CustomStylePromo from "../../components/home/CustomStylePromo";
 import ReviewsPreview from "../../components/home/ReviewsPreview";
@@ -13,12 +12,12 @@ import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import heroReadyToWear from "../../assets/images/hero/hero-ready-to-wear.jpg";
 import {
   APPROVED_HERO_COPY,
-  buildOccasionDiscovery,
+  buildShopDiscovery,
   fetchCustomStylePromo,
-  fetchDiscoveryModule,
   fetchHeroSlides,
   fetchPublishedReviews,
 } from "../../services/content";
+import { DEFAULT_SHOP_BY_GROUPS, fetchShopByGroups } from "../../services/shopBy";
 import { selectNewIn } from "../../services/products";
 import "./Home.css";
 import "../../components/home/home-sections.css";
@@ -36,8 +35,9 @@ const FALLBACK_SLIDE = [
 export default function Home() {
   const { products, isLoading, error } = useCatalogue();
   const [slides, setSlides] = useState(FALLBACK_SLIDE);
-  const [discovery, setDiscovery] = useState(null);
-  const [reviews, setReviews] = useState([]);
+  const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
+  const [reviewState, setReviewState] = useState({ entries: [], loading: true, error: "" });
+  const [reviewAttempt, setReviewAttempt] = useState(0);
   const [customStyleImage, setCustomStyleImage] = useState({
     url: heroReadyToWear,
     publicId: "",
@@ -63,12 +63,8 @@ export default function Home() {
         if (active) setIsHeroReady(true);
       });
 
-    fetchDiscoveryModule("home").then((module) => {
-      if (active && module) setDiscovery(module);
-    });
-
-    fetchPublishedReviews(3).then((entries) => {
-      if (active) setReviews(entries);
+    fetchShopByGroups().then((groups) => {
+      if (active && groups.length) setShopByGroups(groups);
     });
 
     fetchCustomStylePromo().then((result) => {
@@ -80,19 +76,24 @@ export default function Home() {
     };
   }, []);
 
-  // Admin-managed discovery wins; then whatever occasions genuinely
-  // Use only published discovery content or real catalogue attributes.
-  const rawDiscoveryModule =
-    discovery ?? buildOccasionDiscovery(products);
-  const discoveryModule = rawDiscoveryModule
-    ? { ...rawDiscoveryModule, items: rawDiscoveryModule.items.slice(0, 9) }
-    : null;
-  const realNewIn = selectNewIn(products, 6);
-  const newInProducts = realNewIn;
-  // "View all" goes to the New In filter only when pieces are actually
-  // flagged New In; otherwise the section is showing the newest pieces
-  // and the whole collection is the honest destination.
-  const hasFlaggedNewIn = products.some((product) => product.isNewIn);
+
+  useEffect(() => {
+    let active = true;
+    setReviewState((previous) => ({ ...previous, loading: true, error: "" }));
+    fetchPublishedReviews(20, true)
+      .then((entries) => { if (active) setReviewState({ entries, loading: false, error: "" }); })
+      .catch(() => { if (active) setReviewState({ entries: [], loading: false, error: "Reviews could not be loaded. Please try again." }); });
+    return () => { active = false; };
+  }, [reviewAttempt]);
+
+  const shopByModule = useMemo(
+    () => buildShopDiscovery(products, "Shop By", shopByGroups),
+    [products, shopByGroups]
+  );
+  // New In is always the newest published pieces (see selectNewIn),
+  // capped at 20 — never a manually curated set — so "View all" can
+  // simply point at the shop's default, newest-first view.
+  const newInProducts = selectNewIn(products, 20);
 
   return (
     <>
@@ -104,33 +105,40 @@ export default function Home() {
         </div>
       )}
 
-      <TrustStrip />
+      {/* Cultural flow: Aso Oke woven design system flowing from benefits strip downward */}
+      <div className="home-cultural-flow">
+        <TrustStrip />
 
-      {discoveryModule ? (
-        <div className="home-section container">
-          <DiscoveryModule
-            module={discoveryModule}
-            className="discovery--home"
-            viewAllTo="/shop"
-            renderMedia={(item) =>
-              item.image ? null : <OccasionIllustration name={item.name} />
-            }
-          />
-        </div>
-      ) : null}
+        {!isLoading ? (
+          <div className="home-section home-section--shop-by container">
+            <DiscoveryModule
+              module={shopByModule}
+              className="discovery--home"
+              groupNavigation="arrows"
+              viewAllTo="/shop"
+            />
+          </div>
+        ) : null}
 
-      <NewIn
-        products={newInProducts}
-        isLoading={isLoading}
-        error={error}
-        viewAllTo={hasFlaggedNewIn ? "/shop?newin=1" : "/shop"}
-      />
+        <NewIn
+          products={newInProducts}
+          isLoading={isLoading}
+          error={error}
+          viewAllTo="/shop"
+        />
 
-      <CustomStylePromo image={customStyleImage} />
+        <CustomStylePromo image={customStyleImage} />
 
-      <ReviewsPreview entries={reviews} />
+        <ReviewsPreview
+          entries={reviewState.entries}
+          products={products}
+          isLoading={reviewState.loading}
+          error={reviewState.error}
+          onRetry={() => setReviewAttempt((value) => value + 1)}
+        />
 
-      <StyleCircle />
+        <StyleCircle />
+      </div>
     </>
   );
 }

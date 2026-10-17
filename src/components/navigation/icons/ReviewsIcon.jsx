@@ -1,5 +1,5 @@
 /**
- * Outlined five-point star for Reviews & Feeds. A single unfilled
+ * Outlined five-point star for Review & Feeds. A single unfilled
  * star polygon — not a filled star and not a library glyph.
  *
  * Mirrors src/assets/icons/reviews-star.svg; kept inline here so it

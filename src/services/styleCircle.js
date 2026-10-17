@@ -41,18 +41,20 @@ async function emailKey(email) {
 }
 
 export class SubscriptionError extends Error {}
-export class DuplicateSubscriptionError extends Error {}
 
 /**
  * @returns {Promise<{ status: "subscribed" }>}
- * @throws {DuplicateSubscriptionError|SubscriptionError}
+ * @throws {SubscriptionError}
  */
-export async function subscribeToStyleCircle(rawEmail) {
+export async function subscribeToStyleCircle(rawEmail, user) {
   const { isValid, email, message } = validateEmail(rawEmail);
   if (!isValid) throw new SubscriptionError(message);
 
   if (!isFirebaseConfigured) {
     throw new SubscriptionError("Style Circle is not available right now. Please try again later.");
+  }
+  if (!user?.uid) {
+    throw new SubscriptionError("Sign in to join the Style Circle.");
   }
 
   const key = await emailKey(email);
@@ -62,16 +64,16 @@ export async function subscribeToStyleCircle(rawEmail) {
     // Firestore rather than silently overwritten.
     await setDoc(
       doc(db, COLLECTION, key),
-      { email, source: "style-circle", createdAt: serverTimestamp() },
+      { email, customerId: user.uid, source: "style-circle", createdAt: serverTimestamp() },
       { merge: false }
     );
     return { status: "subscribed" };
   } catch (error) {
     if (import.meta.env.DEV) console.error(error);
     if (error?.code === "permission-denied") {
-      // Rules reject a write to an existing document, which is how a
-      // duplicate presents itself when reads are not permitted.
-      throw new DuplicateSubscriptionError("You are already part of the Style Circle.");
+      // Duplicate writes and a configuration failure have the same code.
+      // A public client cannot read subscriber records to distinguish them.
+      throw new SubscriptionError("We could not confirm your subscription. If you have subscribed before, you do not need to sign up again. Otherwise, please try again later.");
     }
     throw new SubscriptionError("Style Circle could not be reached. Please try again.");
   }

@@ -32,7 +32,22 @@ service cloud.firestore {
         && request.resource.data.headline is string
         && request.resource.data.headline.size() > 0
         && request.resource.data.concept in ['ready-to-wear', 'aso-oke-fabric', 'custom-style', 'shop-by-occasion', 'bridal-event-dressing'];
-      allow delete: if false;
+      allow delete: if isAdmin();
+    }
+    match /siteAppearance/{slotId} {
+      allow read: if slotId == 'auth' || isAdmin();
+      allow create, update: if isAdmin()
+        && slotId == 'auth'
+        && request.resource.data.eyebrow is string
+        && request.resource.data.eyebrow.size() > 0
+        && request.resource.data.eyebrow.size() <= 80
+        && request.resource.data.headline is string
+        && request.resource.data.headline.size() > 0
+        && request.resource.data.headline.size() <= 120
+        && request.resource.data.supportingText is string
+        && request.resource.data.supportingText.size() > 0
+        && request.resource.data.supportingText.size() <= 260;
+      allow delete: if isAdmin();
     }
     match /discoveryModules/{moduleId} {
       allow read: if resource.data.active == true || isAdmin();
@@ -45,15 +60,32 @@ service cloud.firestore {
     }
     match /reviews/{reviewId} {
       allow read: if resource.data.published == true || isAdmin();
+      // Customer submission is intentionally not opened here yet: this codebase
+      // has no authoritative order/purchase collection against which Firestore
+      // can securely prove review eligibility. Admin remains the only writer.
       allow create, update: if isAdmin()
         && request.resource.data.published is bool
+        && request.resource.data.status in ['pending', 'published', 'hidden']
         && request.resource.data.author is string
+        && request.resource.data.author.size() > 0
         && request.resource.data.body is string
-        && request.resource.data.body.size() > 0;
-      allow delete: if false;
+        && request.resource.data.body.size() > 0
+        && request.resource.data.customerServiceRating is int
+        && request.resource.data.customerServiceRating >= 1
+        && request.resource.data.customerServiceRating <= 5
+        && request.resource.data.productQualityRating is int
+        && request.resource.data.productQualityRating >= 1
+        && request.resource.data.productQualityRating <= 5
+        && request.resource.data.productId is string
+        && request.resource.data.productId.size() > 0;
+      allow delete: if isAdmin();
     }
     match /taxonomy/{labelId} {
-      allow read: if isAdmin();
+      // Labels drive the public Shop filters, so every visitor can read
+      // them. Writes stay admin-only. Public filters merge these labels
+      // with counts from published products, so an admin allocation
+      // appears even before a product uses it (with a zero count).
+      allow read: if true;
       allow create, update: if isAdmin()
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0
@@ -65,10 +97,27 @@ service cloud.firestore {
       allow write: if false;
     }
     match /styleCircleSubscribers/{key} {
-      allow create: if request.resource.data.keys().hasOnly(['email', 'source', 'createdAt'])
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['email', 'customerId', 'source', 'createdAt'])
+        && request.resource.data.customerId == request.auth.uid
         && request.resource.data.email is string
-        && request.resource.data.email.size() < 320;
+        && request.resource.data.email.size() < 320
+        && request.resource.data.source == 'style-circle'
+        && request.resource.data.createdAt == request.time;
       allow read, update, delete: if false;
+    }
+    match /customerProfiles/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['fullName', 'phoneNumber', 'email', 'createdAt', 'updatedAt'])
+        && request.resource.data.fullName is string
+        && request.resource.data.fullName.size() > 0
+        && request.resource.data.fullName.size() <= 120
+        && request.resource.data.phoneNumber is string
+        && request.resource.data.phoneNumber.size() <= 40
+        && request.resource.data.email == request.auth.token.email;
+      allow delete: if false;
     }
     // One private conversation per customer. Messages and summaries commit together.
     match /conversations/{customerId} {
@@ -106,10 +155,26 @@ service cloud.firestore {
         && validSummary();
       allow delete: if false;
       match /messages/{messageId} {
+        function validProductContext() {
+          let tag = request.resource.data.productContext;
+          return tag is map
+            && tag.keys().hasAll(['productId', 'name', 'slug', 'imageUrl', 'imagePublicId', 'price', 'variable', 'reviewId'])
+            && tag.keys().hasOnly(['productId', 'name', 'slug', 'imageUrl', 'imagePublicId', 'price', 'variable', 'reviewId'])
+            && tag.productId is string && tag.productId.size() > 0 && tag.productId.size() <= 200
+            && tag.name is string && tag.name.size() > 0 && tag.name.size() <= 240
+            && tag.slug is string && tag.slug.size() <= 300
+            && tag.imageUrl is string && tag.imageUrl.size() <= 2048
+            && (tag.imageUrl == '' || tag.imageUrl.matches('https://.*') || tag.imageUrl.matches('/[^/].*'))
+            && tag.imagePublicId is string && tag.imagePublicId.size() <= 512
+            && (tag.price == null || (tag.price is number && tag.price >= 0))
+            && tag.variable is bool
+            && tag.reviewId is string && tag.reviewId.size() <= 200;
+        }
         allow get: if participant();
         allow list: if participant() && request.query.limit <= 30;
         allow create: if request.auth != null
-          && request.resource.data.keys().hasOnly(['body', 'senderId', 'senderRole', 'createdAt'])
+          && request.resource.data.keys().hasOnly(['body', 'senderId', 'senderRole', 'createdAt', 'productContext'])
+          && (!request.resource.data.keys().hasAny(['productContext']) || validProductContext())
           && request.resource.data.body is string
           && request.resource.data.body.size() > 0
           && request.resource.data.body.size() <= 2000
@@ -123,6 +188,9 @@ service cloud.firestore {
       }
     }
     match /savedPieces/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+    match /savedReviews/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
   }

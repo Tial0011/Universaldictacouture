@@ -1,8 +1,9 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import Logo from "../brand/Logo";
-import { useAuth } from "../../context/AuthContext";
 import { BRAND } from "../brand/brandLanguage";
+import { useAuth } from "../../context/AuthContext";
+import { useAuthGate } from "../../context/AuthGateContext";
 import CustomStyleIcon from "./icons/CustomStyleIcon";
 import ReviewsIcon from "./icons/ReviewsIcon";
 import "./Header.css";
@@ -11,16 +12,15 @@ const PRIMARY_LINKS = [
   { to: "/", label: "Home", end: true },
   { to: "/shop", label: "Shop" },
   { to: "/custom-style", label: "Custom Style" },
-  { to: "/reviews-feeds", label: "Reviews & Feeds" },
+  { to: "/reviews-feeds", label: "Review & Feeds" },
   { to: "/chats", label: "Chats" },
   { to: "/about", label: "About" },
 ];
 
 const MOBILE_DRAWER_LINKS = [
-  { to: "/custom-style", label: "Custom Style" },
-  { to: "/reviews-feeds", label: "Reviews & Feeds" },
-  { to: "/about", label: "About" },
-  { to: "/profile", label: "Profile" },
+  { to: "/custom-style", label: "Custom Style", icon: "custom-style", description: "Create something personal" },
+  { to: "/reviews-feeds", label: "Review & Feeds", icon: "reviews", description: "Stories from our clients" },
+  { to: "/about", label: "About", icon: "weave", description: "Our house and heritage" },
 ];
 
 function Icon({ name, size = 20 }) {
@@ -46,12 +46,14 @@ function Icon({ name, size = 20 }) {
     chat: <><path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 8.8 8.8 0 0 1-3.3-.7L4 20l1.5-4.1A7.2 7.2 0 0 1 4.5 12 7.5 7.5 0 0 1 12 4.5a7.5 7.5 0 0 1 8 7Z" /><path d="M8 11.5h.01M12 11.5h.01M16 11.5h.01" /></>,
     home: <><path d="M4 11.5 12 4l8 7.5" /><path d="M6 10v9.5h12V10" /><path d="M9.75 19.5V14h4.5v5.5" /></>,
     truck: <><path d="M3 6.5h11v9H3z" /><path d="M14 9.5h3.6l3.4 3.1v2.9h-7" /><circle cx="7" cy="17.5" r="1.8" /><circle cx="17" cy="17.5" r="1.8" /></>,
+    quality: <><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9Z" /></>,
+    weave: <><path d="m12 3 9 9-9 9-9-9Z" /><path d="m7.5 7.5 9 9m-9 0 9-9M3 12h18M12 3v18" /></>,
     bag: <><path d="M7 8.5V7a5 5 0 0 1 10 0v1.5" /><path d="M5.5 8.5h13l.9 12.2a1.5 1.5 0 0 1-1.5 1.6H6.1a1.5 1.5 0 0 1-1.5-1.6Z" /></>,
   };
   return <svg {...common}>{paths[name]}</svg>;
 }
 
-function HeaderLink({ to, label, end = false, onNavigate, icon }) {
+function HeaderLink({ to, label, end = false, onNavigate, icon, description }) {
   return (
     <NavLink
       to={to}
@@ -59,25 +61,40 @@ function HeaderLink({ to, label, end = false, onNavigate, icon }) {
       onClick={onNavigate}
       className={({ isActive }) => (isActive ? "is-active" : undefined)}
     >
-      {icon ? <Icon name={icon} size={22} /> : null}
-      <span>{label}</span>
+      {icon === "custom-style" ? <CustomStyleIcon size={22} /> :
+        icon === "reviews" ? <ReviewsIcon size={22} /> :
+          icon ? <Icon name={icon} size={22} /> : null}
+      {description ? (
+        <span className="site-header__drawer-copy">
+          <span className="site-header__drawer-link-label">{label}</span>
+          <span className="site-header__drawer-link-description">{description}</span>
+        </span>
+      ) : <span>{label}</span>}
+      {description ? <span className="site-header__drawer-chevron" aria-hidden="true">›</span> : null}
     </NavLink>
   );
 }
 
 export default function Header() {
   const { user } = useAuth();
-  const adminLabel = user ? "Admin area" : "Admin login";
+  const { requestAuth } = useAuthGate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
   const drawerId = useId();
   const drawerRef = useRef(null);
   const menuButtonRef = useRef(null);
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const location = useLocation();
+  const { pathname } = location;
 
   useEffect(() => {
     if (!isMenuOpen) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const mobileViewport = window.matchMedia("(max-width: 767px)");
+    const onViewportChange = () => {
+      if (!mobileViewport.matches) setIsMenuOpen(false);
+    };
     const onKeyDown = (event) => {
       if (event.key === "Escape") {
         setIsMenuOpen(false);
@@ -100,35 +117,53 @@ export default function Header() {
       }
     };
     document.addEventListener("keydown", onKeyDown);
+    mobileViewport.addEventListener("change", onViewportChange);
     const firstFocusable = drawerRef.current?.querySelector("a[href], button:not([disabled])");
     firstFocusable?.focus();
-    return () => document.removeEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+      mobileViewport.removeEventListener("change", onViewportChange);
+    };
   }, [isMenuOpen]);
 
   const closeMenu = () => setIsMenuOpen(false);
+  const closeMenuAndFocus = () => {
+    closeMenu();
+    menuButtonRef.current?.focus();
+  };
 
   const submitSearch = (event) => {
     event.preventDefault();
+    if (!user) {
+      requestAuth({ returnTo: "/shop?focus=search", returnState: { shopSearchDraft: search.trim() } });
+      return;
+    }
     const query = search.trim();
-    // The Shop reads the search term from `q`.
-    navigate(query ? `/shop?q=${encodeURIComponent(query)}` : "/shop");
+    navigate(query ? `/shop?q=${encodeURIComponent(query)}` : "/shop?focus=search");
   };
 
   return (
     <>
-      {/* Announcement bar. It sits outside the sticky header on purpose:
-          it is seen on arrival and scrolls away, so it never costs the
-          phone screen sticky space. */}
+      {/* Desktop utility bar, outside the sticky header. */}
       <div className="site-header__utility" role="region" aria-label="Service information">
-        <div className="container site-header__utility-inner">
-          <span className="site-header__utility-tagline">{BRAND.tagline}</span>
+        <div className="site-header__utility-inner">
+          <span className="site-header__utility-item">
+            <Icon name="heart" size={17} />
+            <span>Beauty in Our Culture</span>
+          </span>
           <span className="site-header__utility-item">
             <Icon name="truck" size={17} />
             <span>Nationwide &amp; International Delivery</span>
           </span>
-          <Link to="/custom-style" className="site-header__utility-item site-header__utility-link">
-            Custom Styles Available
-          </Link>
+          <span className="site-header__utility-item">
+            <Icon name="quality" size={17} />
+            <span>Premium Quality</span>
+          </span>
+          <span className="site-header__utility-item">
+            <Icon name="weave" size={17} />
+            <span>{BRAND.tagline}</span>
+          </span>
         </div>
       </div>
 
@@ -141,7 +176,7 @@ export default function Header() {
 
             <nav className="site-header__primary" aria-label="Primary navigation">
               <ul>
-                {[...PRIMARY_LINKS, { to: "/admin", label: adminLabel }].map((link) => (
+                {PRIMARY_LINKS.map((link) => (
                   <li key={link.to}><HeaderLink {...link} /></li>
                 ))}
               </ul>
@@ -177,44 +212,80 @@ export default function Header() {
               aria-controls={drawerId}
               onClick={() => setIsMenuOpen((open) => !open)}
             >
-              <Icon name={isMenuOpen ? "close" : "menu"} />
-              <span aria-hidden="true">{isMenuOpen ? "Close" : "Menu"}</span>
+              <Icon name="menu" />
             </button>
 
             <NavLink to="/" className="site-header__mobile-brand" aria-label="Universal Dicta Couture home" onClick={closeMenu}>
               <Logo size="header" />
-              <span className="site-header__mobile-tagline" aria-hidden="true">
-                {BRAND.footerHeadline.split("\n").map((line) => (
-                  <span key={line}>{line}</span>
-                ))}
-              </span>
             </NavLink>
 
             <div className="site-header__mobile-actions">
-              <NavLink className="site-header__action" to="/shop?focus=search" aria-label="Search">
+              {user ? <NavLink className="site-header__action" to="/shop?focus=search" aria-label="Search" title="Search">
                 <Icon name="search" size={20} />
                 <span>Search</span>
-              </NavLink>
-              <NavLink className="site-header__action" to="/custom-style" aria-label="Custom Style">
+              </NavLink> : <button className="site-header__action" type="button" aria-label="Search" title="Search" onClick={() => requestAuth({ returnTo: "/shop?focus=search" })}>
+                <Icon name="search" size={20} />
+                <span>Search</span>
+              </button>}
+              <NavLink className={({ isActive }) => `site-header__action${isActive ? " is-active" : ""}`} to="/custom-style" aria-label="Custom Style" title="Custom Style">
                 <CustomStyleIcon size={21} />
-                <span>Custom Style</span>
+                <span>Custom</span>
               </NavLink>
-              <NavLink className="site-header__action" to="/reviews-feeds" aria-label="Reviews">
+              <NavLink className={({ isActive }) => `site-header__action${isActive ? " is-active" : ""}`} to="/reviews-feeds" aria-label="Review & Feeds" title="Review & Feeds">
                 <ReviewsIcon size={19} />
                 <span>Reviews</span>
               </NavLink>
             </div>
           </div>
 
+          <button
+            type="button"
+            className={`site-header__drawer-backdrop${isMenuOpen ? " is-open" : ""}`}
+            aria-label="Close menu"
+            tabIndex={-1}
+            onClick={closeMenuAndFocus}
+          />
           <div
             ref={drawerRef}
             id={drawerId}
             className={`site-header__drawer${isMenuOpen ? " is-open" : ""}`}
+            role="dialog"
+            aria-modal={isMenuOpen ? "true" : undefined}
+            aria-labelledby={`${drawerId}-title`}
             aria-hidden={!isMenuOpen}
+            inert={!isMenuOpen}
           >
+            <div className="site-header__drawer-top">
+              <div className="site-header__drawer-brand">
+                <Logo size="header" variant="white" className="site-header__drawer-logo" />
+                <h2 id={`${drawerId}-title`} className="visually-hidden">Universal Dicta Couture menu</h2>
+                <p>{BRAND.tagline}</p>
+              </div>
+              <button type="button" className="site-header__drawer-close" aria-label="Close menu" title="Close menu" onClick={closeMenuAndFocus}>
+                <svg className="site-header__clasp" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
+                  <path d="m7 7 9 9-9 9M25 7l-9 9 9 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  <path className="site-header__clasp-thread" d="m16 11 5 5-5 5-5-5Z" strokeWidth="1.2" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
             <nav aria-label="Mobile menu">
+              <p className="site-header__drawer-group-label">The House</p>
               <ul>
-                {[...MOBILE_DRAWER_LINKS, ...(!user ? [{ to: "/signin", label: "Client login" }, { to: "/signup", label: "Sign up" }] : []), { to: "/admin", label: adminLabel }].map((link) => (
+                {MOBILE_DRAWER_LINKS.map((link) => (
+                  <li key={link.to}>
+                    <HeaderLink {...link} onNavigate={closeMenu} />
+                  </li>
+                ))}
+              </ul>
+              <p className="site-header__drawer-group-label">Your Account</p>
+              <ul>
+                {[
+                  { to: "/profile", label: "Profile", icon: "user", description: "Your personal space" },
+                  ...(!user ? [
+                    { to: "/signin", label: "Client login", icon: "user", description: "Welcome back" },
+                    { to: "/signup", label: "Sign up", icon: "heart", description: "Create your customer account" },
+                  ] : []),
+                ].map((link) => (
                   <li key={link.to}>
                     <HeaderLink {...link} onNavigate={closeMenu} />
                   </li>
@@ -229,7 +300,6 @@ export default function Header() {
           <HeaderLink to="/shop" label="Shop" icon="bag" />
           <HeaderLink to="/chats" label="Chats" icon="chat" />
           <HeaderLink to="/my-closet" label="My Closet" icon="closet" />
-          <HeaderLink to={user ? "/profile" : "/signin"} label={user ? "Account" : "Client login"} icon="user" />
         </nav>
 
         {pathname !== "/chats" && <NavLink className="site-header__chat-launcher" to="/chats" aria-label="Chat with Dicta Couturier">

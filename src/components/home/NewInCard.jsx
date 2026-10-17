@@ -42,9 +42,9 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
     showToast(
       nowSaved
         ? isPersistent
-          ? "Saved to your Saved Pieces."
-          : "Saved for this visit. Create a Profile to keep your Saved Pieces."
-        : "Removed from your Saved Pieces."
+          ? "Saved to My Closet → My Pieces."
+          : "Saved for this visit. Create a Profile to keep your pieces."
+        : "Removed from My Pieces."
     );
   };
 
@@ -55,7 +55,7 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
           <ProductImage
             image={product.image}
             alt={product.image ? product.name : ""}
-            transformation="w_720,ar_3:1,c_fill,g_auto,q_auto,f_auto"
+            transformation="w_720,h_720,c_limit,q_auto,f_auto"
             loading={imageLoading}
             sizes="(min-width: 1280px) 16vw, (min-width: 640px) 30vw, 45vw"
           />
@@ -68,8 +68,8 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
             aria-pressed={saved}
             aria-label={
               saved
-                ? `Remove ${product.name} from Saved Pieces`
-                : `Save ${product.name} to Saved Pieces`
+                ? `Remove ${product.name} from My Pieces`
+                : `Save ${product.name} to My Pieces`
             }
           >
             <HeartIcon filled={saved} />

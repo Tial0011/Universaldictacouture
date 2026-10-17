@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../brand/Logo";
 import { BRAND } from "../brand/brandLanguage";
@@ -19,7 +20,7 @@ const NAV_GROUPS = [
     links: [
       { to: "/shop", label: "Shop" },
       { to: "/custom-style", label: "Custom Style" },
-      { to: "/reviews-feeds", label: "Reviews & Feeds" },
+      { to: "/reviews-feeds", label: "Review & Feeds" },
     ],
   },
   {
@@ -28,7 +29,7 @@ const NAV_GROUPS = [
     links: [
       { to: "/chats", label: "Chat with Dicta Couturier" },
       { to: "/profile", label: "Profile" },
-      { to: "/saved-pieces", label: "Saved Pieces" },
+      { to: "/my-closet/my-pieces", label: "My Pieces" },
       { to: "/my-closet", label: "My Closet" },
     ],
   },
@@ -40,7 +41,6 @@ const DIRECT_LINKS = [
   { to: "/about", label: "About Us" },
   { to: "/our-story", label: "Our Story" },
   { to: "/policies", label: "Policies" },
-  { to: "/admin", label: "Admin login" },
 ];
 
 const SOCIAL_ICONS = {
@@ -50,13 +50,25 @@ const SOCIAL_ICONS = {
   whatsapp: WhatsAppIcon,
 };
 
-/** One footer nav group. A native <details> gives an accessible,
- *  keyboard-operable collapse with no extra JS. Closed by default on
- *  every breakpoint — the desktop layout forces the content visible
- *  with CSS (see Footer.css) without changing the underlying state. */
+/** Native mobile disclosure; actually open on desktop, so links stay
+ *  available to assistive technology as well as visually displayed. */
 function FooterNavGroup({ heading, links }) {
+  const detailsRef = useRef(null);
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 768px)");
+    const details = detailsRef.current;
+    const update = () => {
+      details.open = media.matches;
+      details.querySelector("summary").tabIndex = media.matches ? -1 : 0;
+    };
+    const keepDesktopOpen = () => { if (media.matches && !details.open) details.open = true; };
+    update();
+    media.addEventListener("change", update);
+    details.addEventListener("toggle", keepDesktopOpen);
+    return () => { media.removeEventListener("change", update); details.removeEventListener("toggle", keepDesktopOpen); };
+  }, []);
   return (
-    <details className="footer-group">
+    <details className="footer-group" ref={detailsRef}>
       <summary className="footer-group__heading">{heading}</summary>
       <ul>
         {links.map((link) => (
@@ -97,22 +109,24 @@ function SocialItem({ id, name, url }) {
   );
 }
 
-export default function Footer() {
+export default function Footer({ followsStyleCircle = false }) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="site-footer surface--brand">
+    <>
+    {followsStyleCircle && <div className="couture-separator" aria-hidden="true"><div className="container couture-separator__inner"><span /><i /><span /></div></div>}
+    <footer className={`site-footer surface--brand${followsStyleCircle ? " site-footer--after-circle" : ""}`}>
       <div className="container site-footer__top">
-        {/* Left: brand mark, footer headline, social row, copyright. */}
+        {/* Left: brand mark, footer headline and social row. */}
         <div className="site-footer__brand-block">
           {/* White knockout of the wordmark (see logoAsset.js) sits
               directly on the wine footer background — no plaque
               needed since this variant is already legible on wine. */}
           <Logo size="footer" variant="white" className="site-footer__logo" />
           <p className="site-footer__headline">
-            {BRAND.footerHeadline.split("\n").map((line, i) => (
+            {BRAND.tagline.split(", ").map((line, i) => (
               <span key={i} className="site-footer__headline-line">
-                {line}
+                {i === 0 ? `${line},` : line}
               </span>
             ))}
           </p>
@@ -125,9 +139,6 @@ export default function Footer() {
             ))}
           </ul>
 
-          <p className="site-footer__legal">
-            &copy; {year} {BRAND.name}. All rights reserved.
-          </p>
         </div>
 
         {/* Right: collapsible nav rows + direct pages, then the signature. */}
@@ -157,6 +168,11 @@ export default function Footer() {
           />
         </div>
       </div>
+      <div className="container site-footer__bottom">
+        <p className="site-footer__legal">&copy; {year} {BRAND.name}. All rights reserved.</p>
+        <p className="site-footer__declaration">{BRAND.declaration}</p>
+      </div>
     </footer>
+    </>
   );
 }

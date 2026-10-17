@@ -1,30 +1,35 @@
-import { Routes, Route } from "react-router-dom";
+import { lazy } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import SiteLayout from "./components/navigation/SiteLayout";
 import AdminLayout from "./components/navigation/AdminLayout";
 import AdminAccess from "./components/admin/AdminAccess";
+import RequireAuth from "./components/auth/RequireAuth";
 
 import Home from "./pages/Home/Home";
-import Shop from "./pages/Shop/Shop";
-import ProductDetails from "./pages/ProductDetails/ProductDetails";
-import CustomStyle from "./pages/CustomStyle/CustomStyle";
-import ReviewsFeeds from "./pages/ReviewsFeeds/ReviewsFeeds";
-import Chats from "./pages/Chats/Chats";
-import About from "./pages/About/About";
-import OurStory from "./pages/OurStory/OurStory";
-import Policies from "./pages/Policies/Policies";
-import Profile from "./pages/Profile/Profile";
-import SavedPieces from "./pages/SavedPieces/SavedPieces";
-import MyCloset from "./pages/MyCloset/MyCloset";
-import NotFound from "./pages/NotFound";
+const Shop = lazy(() => import("./pages/Shop/Shop"));
+const ProductDetails = lazy(() => import("./pages/ProductDetails/ProductDetails"));
+const CustomStyle = lazy(() => import("./pages/CustomStyle/CustomStyle"));
+const ReviewsFeeds = lazy(() => import("./pages/ReviewsFeeds/ReviewsFeeds"));
+const Chats = lazy(() => import("./pages/Chats/Chats"));
+const About = lazy(() => import("./pages/About/About"));
+const OurStory = lazy(() => import("./pages/OurStory/OurStory"));
+const Policies = lazy(() => import("./pages/Policies/Policies"));
+const Profile = lazy(() => import("./pages/Profile/Profile"));
+const Auth = lazy(() => import("./pages/Auth/Auth"));
+const SavedPieces = lazy(() => import("./pages/SavedPieces/SavedPieces"));
+const SavedReviews = lazy(() => import("./pages/SavedReviews/SavedReviews"));
+const MyCloset = lazy(() => import("./pages/MyCloset/MyCloset"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
-import AdminSettings from "./pages/admin/Settings/Settings";
-import Dashboard from "./pages/admin/Dashboard/Dashboard";
-import AdminProducts from "./pages/admin/Products/Products";
-import AdminTaxonomy from "./pages/admin/Taxonomy/Taxonomy";
-import AdminDiscovery from "./pages/admin/Discovery/Discovery";
-import AdminHomepage from "./pages/admin/Homepage/Homepage";
-import AdminChats from "./pages/admin/Chats/Chats";
-import AdminReviews from "./pages/admin/Reviews/Reviews";
+const AdminSettings = lazy(() => import("./pages/admin/Settings/Settings"));
+const Dashboard = lazy(() => import("./pages/admin/Dashboard/Dashboard"));
+const AdminProducts = lazy(() => import("./pages/admin/Products/Products"));
+const AdminTaxonomy = lazy(() => import("./pages/admin/Taxonomy/Taxonomy"));
+const AdminDiscovery = lazy(() => import("./pages/admin/Discovery/Discovery"));
+const AdminHomepage = lazy(() => import("./pages/admin/Homepage/Homepage"));
+const AdminChats = lazy(() => import("./pages/admin/Chats/Chats"));
+const AdminReviews = lazy(() => import("./pages/admin/Reviews/Reviews"));
+const AdminAppearance = lazy(() => import("./pages/admin/Appearance/Appearance"));
 
 export default function App() {
   return (
@@ -40,12 +45,14 @@ export default function App() {
         <Route path="/our-story" element={<OurStory />} />
         <Route path="/policies" element={<Policies />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/signin" element={<Profile />} />
-        <Route path="/signup" element={<Profile />} />
-        <Route path="/saved-pieces" element={<SavedPieces />} />
+        <Route path="/saved-pieces" element={<Navigate to="/my-closet/my-pieces" replace />} />
         <Route path="/my-closet" element={<MyCloset />} />
+        <Route path="/my-closet/my-pieces" element={<SavedPieces />} />
+        <Route path="/my-closet/saved-reviews" element={<RequireAuth><SavedReviews /></RequireAuth>} />
         <Route path="*" element={<NotFound />} />
       </Route>
+
+      {["/signin", "/signup", "/verify-email", "/forgot-password", "/reset-password", "/auth/action", "/account-unavailable"].map((path) => <Route key={path} path={path} element={<Auth />} />)}
 
       <Route
         path="/admin"
@@ -61,6 +68,7 @@ export default function App() {
         <Route path="discovery" element={<AdminDiscovery />} />
         <Route path="homepage" element={<AdminHomepage />} />
         <Route path="reviews" element={<AdminReviews />} />
+        <Route path="appearance" element={<AdminAppearance />} />
         <Route path="chats" element={<AdminChats />} />
         <Route path="settings" element={<AdminSettings />} />
         <Route path="*" element={<NotFound />} />

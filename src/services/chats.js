@@ -1,6 +1,6 @@
 import { collection, doc, getDoc, getDocs, limit, onSnapshot, orderBy, query, serverTimestamp, startAfter, writeBatch } from "firebase/firestore";
 import { db } from "../firebase/firestore";
-import { prepareMessage } from "./chatModel";
+import { normaliseProductContext, prepareMessage } from "./chatModel";
 export const MESSAGE_PAGE_SIZE = 30;
 const INBOX_PAGE_SIZE = 20;
 function database() {
@@ -22,10 +22,11 @@ export async function olderMessages(uid, cursor) {
 export async function listConversations(cursor) {
   return page(await getDocs(query(collection(database(), "conversations"), orderBy("updatedAt", "desc"), ...(cursor ? [startAfter(cursor)] : []), limit(INBOX_PAGE_SIZE))), INBOX_PAGE_SIZE);
 }
-export async function sendMessage({ user, customerId, text, admin = false }) {
+export async function sendMessage({ user, customerId, text, admin = false, productContext = null }) {
   if (!user) throw new Error("Please sign in to send a message.");
   if (!admin && customerId !== user.uid) throw new Error("You can only message from your own account.");
   const body = prepareMessage(text);
+  const context = normaliseProductContext(productContext);
   const store = database();
   const conversation = doc(store, "conversations", customerId);
   const existing = await getDoc(conversation);
@@ -33,7 +34,7 @@ export async function sendMessage({ user, customerId, text, admin = false }) {
   const message = doc(collection(conversation, "messages"));
   const role = admin ? "admin" : "customer";
   const batch = writeBatch(store);
-  batch.set(message, { body, senderId: user.uid, senderRole: role, createdAt: serverTimestamp() });
+  batch.set(message, { body, senderId: user.uid, senderRole: role, createdAt: serverTimestamp(), ...(context ? { productContext: context } : {}) });
   const summary = { lastMessageId: message.id, lastMessage: body, lastSenderRole: role, updatedAt: serverTimestamp() };
   if (existing.exists()) batch.update(conversation, summary);
   else batch.set(conversation, { ...summary, customerId, customerName: (user.displayName || "Customer").slice(0, 120), customerEmail: user.email || "", createdAt: serverTimestamp() });

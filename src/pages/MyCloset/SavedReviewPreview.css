@@ -1,0 +1,13 @@
+.closet-section { display: grid; gap: .8rem; padding-top: 1rem; border-top: 1px solid var(--color-border); }
+.closet-section h2 { margin: 0; font-size: var(--text-lg); }
+.customer-piece h3 { font-size: var(--text-lg); }
+.closet-section p { margin: 0; }
+.closet-section__heading { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.closet-section__heading a, .closet-saved-reviews a { color: var(--color-brand); }
+.closet-saved-reviews { display: grid; gap: .75rem; margin: 0; padding: 0; list-style: none; }
+.closet-saved-reviews li { display: grid; gap: .3rem; padding: .85rem; border: 1px solid var(--color-border); background: var(--color-bg); }
+.closet-saved-reviews p { color: var(--color-text-secondary); }
+.closet-saved-reviews small { color: var(--color-brand); }
+.closet-saved-reviews__actions { display: flex; flex-wrap: wrap; gap: .8rem; align-items: center; margin-top: .3rem; }
+.closet-saved-reviews__actions button { border: 0; padding: 0; background: transparent; color: var(--color-brand); font: inherit; text-decoration: underline; cursor: pointer; }
+.closet-saved-reviews__actions button:focus-visible, .closet-saved-reviews a:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 3px; }

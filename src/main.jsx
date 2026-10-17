@@ -6,21 +6,27 @@ import { BrowserRouter } from "react-router-dom";
 import "./styles/global.css";
 import App from "./App.jsx";
 import { AuthProvider } from "./context/AuthContext";
+import { AuthGateProvider } from "./context/AuthGateContext";
 import { ToastProvider } from "./context/ToastContext";
 import { SavedPiecesProvider } from "./context/SavedPiecesContext";
 import { ClosetProvider } from "./context/ClosetContext";
+import { SavedReviewsProvider } from "./context/SavedReviewsContext";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
+        <AuthGateProvider>
         <ToastProvider>
           <SavedPiecesProvider>
-            <ClosetProvider>
+            <SavedReviewsProvider>
+              <ClosetProvider>
               <App />
             </ClosetProvider>
+            </SavedReviewsProvider>
           </SavedPiecesProvider>
         </ToastProvider>
+        </AuthGateProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>

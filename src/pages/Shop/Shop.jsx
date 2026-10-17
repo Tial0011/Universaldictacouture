@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import ProductGrid from "../../components/product/ProductGrid";
 import DiscoveryModule from "../../components/discovery/DiscoveryModule";
 import ShopFilters from "../../components/shop/ShopFilters";
@@ -14,11 +14,14 @@ import {
 } from "../../components/shop/ShopIcons";
 import { useCatalogue } from "../../hooks/useCatalogue";
 import { useBatchSize } from "../../hooks/useBatchSize";
+import { useAuth } from "../../context/AuthContext";
+import { useAuthGate } from "../../context/AuthGateContext";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import {
   buildShopDiscovery,
-  fetchDiscoveryModule,
+  fetchTaxonomyLabels,
 } from "../../services/content";
+import { DEFAULT_SHOP_BY_GROUPS, fetchShopByGroups } from "../../services/shopBy";
 import { FILTER_DIMENSIONS } from "../../services/productModel";
 import {
   SORT_OPTIONS,
@@ -38,15 +41,19 @@ const DIMENSION_KEYS = FILTER_DIMENSIONS.map((dimension) => dimension.key);
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const { user } = useAuth();
+  const { requestAuth } = useAuthGate();
   const { products, isLoading, error, retry } = useCatalogue();
   const catalogue = products;
   const batchSize = useBatchSize();
 
   const state = useMemo(() => parseShopState(searchParams), [searchParams]);
-  const [searchDraft, setSearchDraft] = useState(state.query);
+  const [searchDraft, setSearchDraft] = useState(() => String(location.state?.shopSearchDraft || state.query || ""));
   const [visibleCount, setVisibleCount] = useState(batchSize);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [discovery, setDiscovery] = useState(null);
+  const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
+  const [taxonomy, setTaxonomy] = useState(null);
 
   // The header's Search icon lands here with ?focus=search. Search is
   // otherwise tucked away (the header already carries it), so the field
@@ -69,8 +76,11 @@ export default function Shop() {
 
   useEffect(() => {
     let active = true;
-    fetchDiscoveryModule("shop").then((module) => {
-      if (active && module) setDiscovery(module);
+    fetchShopByGroups().then((groups) => {
+      if (active && groups.length) setShopByGroups(groups);
+    });
+    fetchTaxonomyLabels().then((labels) => {
+      if (active) setTaxonomy(labels);
     });
     return () => {
       active = false;
@@ -80,6 +90,15 @@ export default function Shop() {
   useEffect(() => {
     if (searchRequested) setSearchOpen(true);
   }, [searchRequested]);
+
+  useEffect(() => {
+    if (user || !state.query) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete("q");
+    next.set("focus", "search");
+    setSearchParams(next, { replace: true });
+    requestAuth({ returnTo: "/shop?focus=search", returnState: { shopSearchDraft: state.query } });
+  }, [user, state.query]);
 
   useEffect(() => {
     if (searchOpen && searchRequested) searchInputRef.current?.focus();
@@ -113,14 +132,26 @@ export default function Shop() {
     [state, updateState]
   );
 
+  const toggleShopBy = useCallback(
+    (group, value) => {
+      const current = state.shopBy?.[group] ?? [];
+      const nextValues = current.includes(value)
+        ? current.filter((entry) => entry !== value)
+        : [...current, value];
+      updateState({ ...state, shopBy: { ...(state.shopBy || {}), [group]: nextValues } });
+    },
+    [state, updateState]
+  );
+
   const removeChip = useCallback(
     (chip) => {
       if (chip.type === "query") updateState({ ...state, query: "" });
       else if (chip.type === "newIn") updateState({ ...state, newIn: false });
       else if (chip.type === "price") updateState({ ...state, min: null, max: null });
+      else if (chip.type === "shopBy") toggleShopBy(chip.group, chip.value);
       else toggleValue(chip.dimension, chip.value);
     },
-    [state, updateState, toggleValue]
+    [state, updateState, toggleShopBy, toggleValue]
   );
 
   const clearAll = useCallback(() => {
@@ -128,6 +159,7 @@ export default function Shop() {
       ...state,
       query: "",
       filters: Object.fromEntries(Object.keys(state.filters).map((key) => [key, []])),
+      shopBy: {},
       min: null,
       max: null,
       newIn: false,
@@ -135,14 +167,13 @@ export default function Shop() {
   }, [state, updateState]);
 
   const results = useMemo(() => applyShopState(catalogue, state), [catalogue, state]);
-  const facets = useMemo(() => buildFacets(catalogue, state), [catalogue, state]);
+  const facets = useMemo(() => buildFacets(catalogue, state, taxonomy), [catalogue, state, taxonomy]);
   const chips = useMemo(() => buildChips(state), [state]);
 
   // Discovery comes from published content or real product attributes.
   const discoveryModule = useMemo(
-    () =>
-      discovery ?? buildShopDiscovery(catalogue, "Shop By"),
-    [discovery, catalogue]
+    () => buildShopDiscovery(catalogue, "Shop By", shopByGroups),
+    [catalogue, shopByGroups]
   );
 
   // A tile adds its filter to what is already applied (a Colour and an
@@ -155,7 +186,7 @@ export default function Shop() {
       const next = new URLSearchParams(searchParams);
       next.delete("focus");
       new URLSearchParams(queryString).forEach((value, key) => {
-        if (DIMENSION_KEYS.includes(key)) {
+        if (DIMENSION_KEYS.includes(key) || key === "shopby") {
           if (!next.getAll(key).includes(value)) next.append(key, value);
         } else {
           next.set(key, value);
@@ -222,6 +253,7 @@ export default function Shop() {
                 role="search"
                 onSubmit={(event) => {
                   event.preventDefault();
+                  if (!user) { requestAuth({ returnTo: "/shop?focus=search", returnState: { shopSearchDraft: searchDraft.trim() } }); return; }
                   updateState({ ...state, query: searchDraft.trim() });
                 }}
               >

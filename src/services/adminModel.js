@@ -21,7 +21,21 @@ export function prepareRecord(kind, raw) {
   };
   if (kind === "products") {
     required("name", "Product name");
+    data.description = typeof data.description === "string" ? data.description.trim() : "";
+    if (data.description.length > 4000) throw new Error("Keep the product description within 4,000 characters.");
     DIMENSIONS.forEach(key => { data[key] = splitValues(data[key]); });
+    const rawShopBy = data.shopBy && typeof data.shopBy === "object" && !Array.isArray(data.shopBy) ? data.shopBy : {};
+    data.shopBy = Object.fromEntries(
+      Object.entries(rawShopBy)
+        .map(([key, values]) => [String(key).trim(), splitValues(values)])
+        .filter(([key, values]) => key && values.length)
+    );
+    ["occasion", "style", "fabric"].forEach((key) => {
+      const selected = data.shopBy[key]?.length ? data.shopBy[key] : data[key];
+      data[key] = splitValues(selected);
+      if (data[key].length) data.shopBy[key] = data[key];
+      else delete data.shopBy[key];
+    });
     data.aliases = splitValues(data.aliases);
     data.keywords = splitValues(data.keywords);
     if (!["draft", "published", "archived"].includes(data.status)) throw new Error("Choose a product status.");
@@ -43,6 +57,47 @@ export function prepareRecord(kind, raw) {
   if (kind === "reviews") {
     required("author", "Customer name");
     required("body", "Review");
+
+    const sourceImages = Array.isArray(data.images)
+      ? data.images
+      : data.image
+        ? [data.image]
+        : [];
+    if (sourceImages.length > 1) throw new Error("Use zero or one customer review photo.");
+    data.image = sourceImages.map(imageValue).filter(Boolean)[0] || null;
+    delete data.images;
+
+    const normaliseRating = (value, label) => {
+      const rating = Number(value);
+      if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+        throw new Error(label + " must be between 1 and 5 stars.");
+      }
+      return rating;
+    };
+    data.customerServiceRating = normaliseRating(data.customerServiceRating, "Customer Service rating");
+    data.productQualityRating = normaliseRating(data.productQualityRating, "Product Quality rating");
+    data.productId = String(data.productId || "").trim();
+    if (!data.productId) throw new Error("Choose the product this review is about.");
+
+    data.status = String(data.status || (data.published ? "published" : "pending")).trim().toLowerCase();
+    if (!["pending", "published", "hidden"].includes(data.status)) throw new Error("Choose a valid review status.");
+    data.published = data.status === "published";
+
+    data.customerId = String(data.customerId || "").trim();
+    data.orderId = String(data.orderId || "").trim();
+    data.orderItemId = String(data.orderItemId || "").trim();
+
+    if (data.productSnapshot && typeof data.productSnapshot === "object") {
+      const price = Number(data.productSnapshot.price);
+      data.productSnapshot = {
+        name: String(data.productSnapshot.name || "").trim(),
+        image: imageValue(data.productSnapshot.image),
+        price: Number.isFinite(price) && price >= 0 ? price : null,
+        slug: String(data.productSnapshot.slug || "").trim(),
+      };
+    } else {
+      data.productSnapshot = null;
+    }
   }
   if (kind === "discoveryModules") {
     required("title", "Section title");

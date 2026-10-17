@@ -1,0 +1,3 @@
+.review-showcase { padding-block:clamp(1.5rem,4vw,3rem); background:#fbf8f2; position:relative; isolation:isolate; }
+.review-showcase::before { content:""; position:absolute; inset:0; z-index:-1; opacity:.035; background:url("../../assets/brand/menu-weave.svg") center/420px; pointer-events:none; }
+.review-showcase__state { padding:2rem 0; }

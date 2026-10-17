@@ -26,7 +26,24 @@ test("discovery rejects external and ambiguous links", () => {
   assert.throws(() => prepareRecord("discoveryModules", { title: "Shop", placement: "home", active: true, items: [] }));
   assert.throws(() => prepareRecord("discoveryModules", { title: "Shop", placement: "home", active: true, items: [{ name: "Bridal", destination: "//example.com" }] }));
 });
-test("only approved hero concepts and valid reviews can be saved", () => {
+test("only approved hero concepts and complete reviews can be saved", () => {
   assert.throws(() => prepareRecord("heroSlides", { headline: "Headline", concept: "other" }));
   assert.throws(() => prepareRecord("reviews", { author: "Customer", body: " " }));
+  assert.throws(() => prepareRecord("reviews", { author: "Customer", body: "Lovely", productId: "piece", customerServiceRating: 5, productQualityRating: 0 }));
+});
+
+test("reviews use separate ratings, one image, a product and moderation status", () => {
+  const pending = prepareRecord("reviews", { author: "Amara", body: "Lovely", status: "pending", productId: "piece", customerServiceRating: 5, productQualityRating: 4 });
+  assert.equal(pending.published, false);
+  assert.equal(pending.status, "pending");
+  const published = prepareRecord("reviews", { author: "Amara", body: "Lovely", status: "published", productId: "piece", customerServiceRating: 5, productQualityRating: 4, image: "https://example.test/review.jpg" });
+  assert.equal(published.published, true);
+  assert.equal(published.image.url, "https://example.test/review.jpg");
+  assert.equal(published.images, undefined);
+  assert.throws(() => prepareRecord("reviews", { author: "Amara", body: "Lovely", status: "other", productId: "piece", customerServiceRating: 5, productQualityRating: 4 }));
+});
+
+test("new review workflow rejects more than one customer photo", () => {
+  const images = ["https://example.test/1.jpg", "https://example.test/2.jpg"];
+  assert.throws(() => prepareRecord("reviews", { author: "Amara", body: "Lovely", images, status: "pending", productId: "piece", customerServiceRating: 5, productQualityRating: 4 }));
 });

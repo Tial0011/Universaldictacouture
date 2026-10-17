@@ -1,0 +1,2 @@
+.saved-reviews { display: grid; gap: 1.5rem; }
+@media (max-width: 699px) { .saved-reviews { padding-inline: .65rem; } }

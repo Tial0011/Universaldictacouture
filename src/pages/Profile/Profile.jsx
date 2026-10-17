@@ -1,75 +1,62 @@
-import { useState } from "react";
-import { Link, Navigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { signIn, signUp, signOutUser } from "../../firebase/auth";
-import { isFirebaseConfigured } from "../../firebase/config";
+import { signOutUser } from "../../firebase/auth";
+import { refreshAccountVerification, sendAccountVerification } from "../../firebase/accountActions";
+import { fetchCustomerProfile } from "../../services/customerProfile";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import Button from "../../components/common/Button";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import "./Profile.css";
 
 export default function Profile() {
-  const { user, isLoading } = useAuth();
-  const { pathname } = useLocation();
-  const creating = pathname === "/signup";
+  const { user, isLoading, sessionExpired } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
-  useDocumentMeta({ title: (creating ? "Create account" : "Your account") + " | Universal Dicta Couture", noindex: true });
-  async function submit(event) {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const email = String(data.get("email")).trim();
-    const password = String(data.get("password"));
-    const name = String(data.get("name") || "").trim();
-    if (creating && !name) { setError("Enter your name."); return; }
-    if (creating && password !== data.get("confirm")) { setError("The passwords do not match."); return; }
-    setError(""); setBusy(true);
+  const [signedOut, setSignedOut] = useState(false);
+  const [verified, setVerified] = useState(Boolean(user?.emailVerified));
+  useDocumentMeta({ title: "Your account | Universal Dicta Couture", noindex: true });
+
+  useEffect(() => {
+    if (!user?.uid) return;
+    let active = true;
+    fetchCustomerProfile(user.uid).then((value) => { if (active) setProfile(value); }).catch(() => {});
+    return () => { active = false; };
+  }, [user?.uid]);
+
+  if (isLoading) return <LoadingSpinner />;
+  if (!user && !signedOut) return <Navigate to="/signin" replace state={{ returnTo: `${location.pathname}${location.search}`, sessionExpired }} />;
+  if (signedOut) return <section className="account-page container"><div className="account-card account-card--status"><p className="text-secondary">Universal Dicta Couture</p><h1>Signed Out</h1><p>You’ve been signed out successfully. We’ll be here whenever you’re ready to return.</p><div className="account-actions"><Button to="/">CONTINUE BROWSING</Button><Button to="/signin" variant="secondary">SIGN IN AGAIN</Button></div></div></section>;
+
+  async function verify(action) {
+    if (busy) return;
+    setBusy(true); setError(""); setNotice("");
     try {
-      if (creating) await signUp(email, password, name);
-      else await signIn(email, password);
-    } catch (error) {
-      const messages = {
-        "auth/email-already-in-use": "An account already uses this email. Please sign in.",
-        "auth/weak-password": "Choose a stronger password with at least 6 characters.",
-        "auth/password-does-not-meet-requirements": "Your password does not meet the account security requirements. Use a longer password with upper and lowercase letters, a number and a symbol.",
-        "auth/invalid-email": "Enter a valid email address.",
-        "auth/operation-not-allowed": "Email sign-in is not available yet. Please contact us.",
-        "auth/too-many-requests": "Too many attempts. Please wait and try again.",
-        "auth/network-request-failed": "Check your internet connection and try again.",
-      };
-      setError(messages[error.code] || "Unable to continue. Check your details and try again.");
-    } finally { setBusy(false); }
-  }
-  async function logout() {
-    setBusy(true); setError("");
-    try { await signOutUser(); } catch { setError("Unable to sign out. Please try again."); }
+      if (action === "send") { await sendAccountVerification(user, "/profile"); setNotice("Verification email sent. Check your inbox and spam folder."); }
+      else { const result = await refreshAccountVerification(user); setVerified(result); setNotice(result ? "Your email address is verified." : "Your email is not verified yet."); }
+    } catch { setError("We couldn’t complete that account request. Please try again."); }
     finally { setBusy(false); }
   }
-  if (isLoading) return <LoadingSpinner label="Checking your account" />;
-  if (user && !busy && pathname !== "/profile") return <Navigate to="/profile" replace />;
-  return <section className="account-page container">
-    <div className="account-card">
-      <p className="text-secondary">Universal Dicta Couture</p>
-      <h1>{user ? "Your account" : creating ? "Create your account" : "Welcome back"}</h1>
-      {user ? <>
-        <p>Signed in as <strong>{user.email}</strong>.</p>
-        <div className="account-actions"><Button to="/shop">Browse the shop</Button><Button to="/saved-pieces" variant="secondary">Saved pieces</Button><Button to="/chats" variant="secondary">My messages</Button><Button to="/my-closet" variant="secondary">My Closet</Button></div>
-        <Button variant="ghost" isLoading={busy} onClick={logout}>Sign out</Button>
-      </> : <>
-        <p>{creating ? "Create an account to save your favourite pieces and message the studio." : "Sign in to access your saved pieces and conversations."}</p>
-        {!isFirebaseConfigured && <p role="alert">Account access is temporarily unavailable. Please try again later.</p>}
-        <form onSubmit={submit} key={pathname} className="account-form">
-          <fieldset disabled={busy || !isFirebaseConfigured} className="account-form">
-            {creating && <div className="field"><label htmlFor="customer-name">Your name</label><input id="customer-name" name="name" autoComplete="name" required maxLength={100} /></div>}
-            <div className="field"><label htmlFor="customer-email">Email address</label><input id="customer-email" name="email" type="email" autoComplete="email" required /></div>
-            <div className="field"><label htmlFor="customer-password">Password</label><input id="customer-password" name="password" type="password" autoComplete={creating ? "new-password" : "current-password"} required minLength={creating ? 6 : undefined} />{creating && <p className="field__hint">Use at least 6 characters.</p>}</div>
-            {creating && <div className="field"><label htmlFor="customer-confirm">Confirm password</label><input id="customer-confirm" name="confirm" type="password" autoComplete="new-password" required minLength={6} /></div>}
-            <Button type="submit" isLoading={busy}>{busy ? "Please wait…" : creating ? "Create account" : "Sign in"}</Button>
-          </fieldset>
-        </form>
-        <p>{creating ? "Already have an account? " : "New here? "}<Link onClick={() => setError("")} to={creating ? "/signin" : "/signup"}>{creating ? "Sign in" : "Create an account"}</Link></p>
-      </>}
-      {error && <p className="field__error" role="alert">{error}</p>}
-    </div>
-  </section>;
+
+  async function logout() {
+    if (busy) return;
+    setBusy(true); setError("");
+    try { await signOutUser(); setSignedOut(true); }
+    catch { setError("Unable to sign out. Please try again."); }
+    finally { setBusy(false); }
+  }
+
+  return <section className="account-page container"><div className="account-card">
+    <p className="text-secondary">Universal Dicta Couture · Client account</p>
+    <h1>Welcome{user.displayName ? `, ${user.displayName.split(" ")[0]}` : ""}</h1>
+    <div className="account-profile-summary"><div><span>Email</span><strong>{user.email}</strong></div>{profile?.phoneNumber && <div><span>Phone</span><strong>{profile.phoneNumber}</strong></div>}<div><span>Email status</span><strong>{verified ? "Verified" : "Verification pending"}</strong></div></div>
+    {!verified && <div className="account-form"><p>Verify your email to finish securing your account.</p><div className="account-actions"><Button disabled={busy} onClick={() => verify("send")}>Send verification email</Button><Button disabled={busy} variant="ghost" onClick={() => verify("check")}>Check verification</Button></div></div>}
+    <div className="account-actions"><Button to="/shop">Browse Shop</Button><Button to="/my-closet" variant="secondary">My Closet</Button><Button to="/chats" variant="secondary">My messages</Button></div>
+    {notice && <p role="status">{notice}</p>}{error && <p role="alert">{error}</p>}
+    <div className="account-actions"><Button type="button" variant="ghost" isLoading={busy} onClick={logout}>Sign out</Button><Button type="button" variant="ghost" onClick={() => navigate(-1)}>Back</Button></div>
+  </div></section>;
 }

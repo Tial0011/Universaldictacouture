@@ -1,6 +1,10 @@
 import { useId, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useAuthGate } from "../../context/AuthGateContext";
+import StitchArrowIcon from "../common/icons/StitchArrowIcon";
+import "./StyleCircle.css";
 import {
-  DuplicateSubscriptionError,
   subscribeToStyleCircle,
   validateEmail,
 } from "../../services/styleCircle";
@@ -14,14 +18,18 @@ import {
  */
 export default function StyleCircle() {
   const fieldId = useId();
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState("idle"); // idle | loading | success | duplicate | error
+  const location = useLocation();
+  const { user } = useAuth();
+  const { requestAuth } = useAuthGate();
+  const [email, setEmail] = useState(() => String(location.state?.styleCircleEmail || ""));
+  const [status, setStatus] = useState("idle"); // idle | loading | success | error
   const [message, setMessage] = useState("");
 
   const isInvalid = status === "error";
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (status === "loading") return;
 
     const check = validateEmail(email);
     if (!check.isValid) {
@@ -30,20 +38,20 @@ export default function StyleCircle() {
       return;
     }
 
+    if (!user) {
+      requestAuth({ returnTo: location.pathname, returnState: { styleCircleEmail: check.email } });
+      return;
+    }
+
     setStatus("loading");
     setMessage("");
 
     try {
-      await subscribeToStyleCircle(email);
+      await subscribeToStyleCircle(email, user);
       setStatus("success");
       setMessage("You are in. Welcome to the Style Circle.");
       setEmail("");
     } catch (error) {
-      if (error instanceof DuplicateSubscriptionError) {
-        setStatus("duplicate");
-        setMessage(error.message);
-        return;
-      }
       setStatus("error");
       setMessage(error?.message || "Style Circle could not be reached. Please try again.");
     }
@@ -52,14 +60,20 @@ export default function StyleCircle() {
   return (
     <section className="style-circle surface--brand" aria-labelledby="home-style-circle">
       <div className="container style-circle__inner">
-        <h2 id="home-style-circle">Join Our Style Circle</h2>
+        <div className="style-circle__copy">
+        <p className="style-circle__eyebrow">Universal Dicta Couture</p>
+        <h2 id="home-style-circle">Join Our <em>Style Circle</em></h2>
         <p className="style-circle__intro">
           Be the first to see our new arrivals, exclusive offers and style inspiration.
         </p>
+        <div className="style-circle__threads" aria-hidden="true"><span /><span /><span /></div>
+        </div>
 
+        <div className="style-circle__invitation">
+        <p className="style-circle__invitation-title">A little inspiration, in your inbox.</p>
         <form className="style-circle__form" onSubmit={handleSubmit} noValidate>
           <div className="field style-circle__field">
-            <label className="field__label visually-hidden" htmlFor={fieldId}>
+            <label className="field__label" htmlFor={fieldId}>
               Email address
             </label>
             <input
@@ -68,6 +82,10 @@ export default function StyleCircle() {
               type="email"
               name="email"
               autoComplete="email"
+              inputMode="email"
+              autoCapitalize="none"
+              spellCheck={false}
+              disabled={status === "loading"}
               placeholder="Enter your email address"
               value={email}
               onChange={(event) => {
@@ -89,6 +107,7 @@ export default function StyleCircle() {
             aria-busy={status === "loading" || undefined}
           >
             {status === "loading" ? "Subscribing…" : "Subscribe"}
+            <StitchArrowIcon size={20} />
           </button>
         </form>
 
@@ -100,6 +119,8 @@ export default function StyleCircle() {
         >
           {message}
         </p>
+        <Link className="style-circle__policy" to="/policies">Read our policies <StitchArrowIcon size={14} /></Link>
+        </div>
       </div>
     </section>
   );

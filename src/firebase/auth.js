@@ -1,61 +1,107 @@
 import {
+  browserLocalPersistence,
+  createUserWithEmailAndPassword,
   getAuth,
   onAuthStateChanged,
+  setPersistence,
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   signOut,
   updateProfile,
+  verifyBeforeUpdateEmail,
 } from "firebase/auth";
 import app, { isFirebaseConfigured } from "./config";
 
-/** The Auth instance, or null while Firebase is unconfigured. */
 export const auth = isFirebaseConfigured ? getAuth(app) : null;
 
+const SESSION_POLICY_KEY = "udc:auth:session-policy";
+const DEFAULT_STANDARD_HOURS = 24;
+const DEFAULT_EXTENDED_DAYS = 30;
+
 function requireAuth() {
-  if (!auth) {
-    throw new Error(
-      "Firebase is not configured. Set the VITE_FIREBASE_* environment variables."
-    );
-  }
+  if (!auth) throw new Error("Firebase is not configured. Set the VITE_FIREBASE_* environment variables.");
   return auth;
 }
 
-/**
- * Subscribe to auth state changes.
- *
- * Without Firebase configuration there is no session to observe, so
- * the caller is told once that nobody is signed in and given a no-op
- * unsubscribe. Auth state therefore resolves normally and the app
- * finishes loading instead of hanging or throwing.
- *
- * @param {(user: import("firebase/auth").User | null) => void} callback
- * @returns {() => void} unsubscribe function
- */
-export function subscribeToAuthChanges(callback) {
-  if (!auth) {
-    callback(null);
-    return () => {};
+function positiveNumber(value, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) && number > 0 ? number : fallback;
+}
+
+function sessionDurationMs(keepSignedIn) {
+  const standardHours = positiveNumber(import.meta.env.VITE_AUTH_STANDARD_SESSION_HOURS, DEFAULT_STANDARD_HOURS);
+  const extendedDays = positiveNumber(import.meta.env.VITE_AUTH_EXTENDED_SESSION_DAYS, DEFAULT_EXTENDED_DAYS);
+  return keepSignedIn ? extendedDays * 24 * 60 * 60 * 1000 : standardHours * 60 * 60 * 1000;
+}
+
+function storeSessionPolicy(keepSignedIn) {
+  try {
+    localStorage.setItem(SESSION_POLICY_KEY, JSON.stringify({
+      keepSignedIn: Boolean(keepSignedIn),
+      expiresAt: Date.now() + sessionDurationMs(keepSignedIn),
+    }));
+  } catch {
+    // Firebase still protects the account if browser storage is unavailable.
   }
+}
+
+export function clearSessionPolicy() {
+  try { localStorage.removeItem(SESSION_POLICY_KEY); } catch { /* optional */ }
+}
+
+export function sessionPolicyExpired() {
+  try {
+    const value = JSON.parse(localStorage.getItem(SESSION_POLICY_KEY) || "null");
+    return Boolean(value?.expiresAt && Number(value.expiresAt) <= Date.now());
+  } catch {
+    return false;
+  }
+}
+
+async function applyPersistence() {
+  const instance = requireAuth();
+  // Both ordinary and extended sessions survive a tab/browser close. The
+  // app-level policy below controls their configurable lifetime instead.
+  await setPersistence(instance, browserLocalPersistence);
+  return instance;
+}
+
+export function subscribeToAuthChanges(callback) {
+  if (!auth) { callback(null); return () => {}; }
   return onAuthStateChanged(auth, callback);
 }
 
-export function signIn(email, password) {
-  return signInWithEmailAndPassword(requireAuth(), email, password);
+export async function signIn(email, password, { keepSignedIn = false } = {}) {
+  const instance = await applyPersistence();
+  const credential = await signInWithEmailAndPassword(instance, email, password);
+  storeSessionPolicy(keepSignedIn);
+  return credential;
 }
 
-export function signUp(email, password, displayName) {
-  return createUserWithEmailAndPassword(requireAuth(), email, password).then(
-    (credential) => {
-      if (displayName) {
-        return updateProfile(credential.user, { displayName }).then(
-          () => credential
-        );
-      }
-      return credential;
-    }
-  );
+export async function signUp(email, password, displayName, { keepSignedIn = false } = {}) {
+  const instance = await applyPersistence();
+  const credential = await createUserWithEmailAndPassword(instance, email, password);
+  if (displayName) await updateProfile(credential.user, { displayName });
+  storeSessionPolicy(keepSignedIn);
+  return credential;
 }
 
-export function signOutUser() {
+export function changePendingEmail(user, email, actionCodeSettings) {
+  if (!user) throw new Error("Please sign in again before changing your email.");
+  return verifyBeforeUpdateEmail(user, email, actionCodeSettings);
+}
+
+export async function expireSession() {
   return signOut(requireAuth());
+}
+
+export async function signOutUser() {
+  try { sessionStorage.setItem("udc:auth:intentional-signout", String(Date.now())); } catch { /* optional */ }
+  try {
+    const result = await signOut(requireAuth());
+    clearSessionPolicy();
+    return result;
+  } catch (error) {
+    try { sessionStorage.removeItem("udc:auth:intentional-signout"); } catch { /* optional */ }
+    throw error;
+  }
 }

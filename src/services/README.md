@@ -72,4 +72,4 @@ duplicate signup is detected.
 
 ### `savedPieces/{uid}`
 `{ productIds: [] }`, readable and writable only by that user. Guests
-keep Saved Pieces in `sessionStorage` for the current session only.
+keep My Pieces in `sessionStorage` for the current session only.

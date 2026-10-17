@@ -13,6 +13,8 @@ import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { isFirebaseConfigured } from "../firebase/config";
 import heroReadyToWear from "../assets/images/hero/hero-ready-to-wear.jpg";
+import { DEFAULT_SHOP_BY_GROUPS } from "./shopBy";
+import { normaliseReviewRecord, selectLatestPublishedReviews, sortPublishedReviews } from "./reviewModel";
 
 
 
@@ -29,7 +31,7 @@ export const APPROVED_HERO_CONCEPTS = [
 /** The approved hero copy. Admin slides may override the imagery and concept. */
 export const APPROVED_HERO_COPY = {
   eyebrow: "PREMIUM ASO OKE",
-  headline: "Timeless Tradition",
+  headline: "Modern Tradition",
   secondary: "Modern You",
   body: "Beautifully crafted Aso Oke for every occasion. Classic, elegant and proudly Nigerian.",
   primaryCta: { label: "Shop the Collection", to: "/shop" },
@@ -181,17 +183,18 @@ export function buildOccasionDiscovery(products, title = "Shop by Occasion") {
     product.occasion.forEach((value) => available.add(value.trim()));
   });
 
-  const items = APPROVED_OCCASION_EXAMPLES.filter((occasion) =>
-    available.has(occasion)
-  ).map((occasion, index) => ({
-    id: `occasion-${index}`,
-    name: occasion,
-    image: null,
-    destination: `/shop?occasion=${encodeURIComponent(occasion)}`,
-    group: "",
-    order: index,
-    published: true,
-  }));
+  const items = [...available]
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    .map((occasion, index) => ({
+      id: `occasion-${index}`,
+      name: occasion,
+      image: null,
+      destination: `/shop?occasion=${encodeURIComponent(occasion)}`,
+      group: "",
+      order: index,
+      published: true,
+    }));
 
   if (!items.length) return null;
   return { id: "occasion-fallback", title, groups: [], items };
@@ -200,45 +203,32 @@ export function buildOccasionDiscovery(products, title = "Shop by Occasion") {
 
 
 /**
- * Shop discovery: three tabs — Occasion, Style, Fabric & Pattern — each
- * built from values that genuinely exist on the given pieces, so a
- * tile never leads to an empty result. Occasion keeps to the approved
- * occasions (in their approved order); Style and Fabric & Pattern list
- * whatever the pieces carry, most-used first. Each tile borrows the
- * photograph of a piece that has that value.
- *
- * Tabs with nothing behind them are left out, and null is returned
- * when no tab has anything (callers then fall back to the approved
- * occasion placeholders).
+ * Shop discovery is generated from the Shop By groups configured by the
+ * admin and the values genuinely assigned to published products. The three
+ * core groups are Occasion, Style and Fabric & Pattern, but extra groups can
+ * be added without changing this builder. Empty groups remain visible so the
+ * admin can immediately see which part of the catalogue still needs data.
  */
-const SHOP_DISCOVERY_GROUPS = [
-  { id: "occasion", label: "Occasion", key: "occasion", param: "occasion", approved: APPROVED_OCCASION_EXAMPLES },
-  { id: "style", label: "Style", key: "style", param: "style" },
-  { id: "fabric", label: "Fabric & Pattern", key: "fabric", param: "fabric" },
-];
+export const SHOP_DISCOVERY_GROUPS = DEFAULT_SHOP_BY_GROUPS;
 
 const SHOP_DISCOVERY_MAX_PER_GROUP = 12;
 
-export function buildShopDiscovery(products, title = "Shop By") {
+export function buildShopDiscovery(products, title = "Shop By", groupDefinitions = SHOP_DISCOVERY_GROUPS) {
   const groups = [];
   const items = [];
 
-  SHOP_DISCOVERY_GROUPS.forEach((group) => {
-    // Keyed case-insensitively (Shop filters match that way too), but
-    // shown in the casing first seen.
+  (groupDefinitions?.length ? groupDefinitions : SHOP_DISCOVERY_GROUPS).forEach((group) => {
+    const key = group.key || group.id;
+    if (!key || group.active === false) return;
+
+    // Keyed case-insensitively, but shown in the casing first seen.
     const found = new Map();
 
     products.forEach((product) => {
-      (product[group.key] ?? []).forEach((raw) => {
-        const trimmed = String(raw).trim();
-        if (!trimmed) return;
-
-        const approvedName = group.approved?.find(
-          (name) => name.toLowerCase() === trimmed.toLowerCase()
-        );
-        if (group.approved && !approvedName) return;
-
-        const name = approvedName ?? trimmed;
+      const values = product.shopBy?.[key] ?? product[key] ?? [];
+      values.forEach((raw) => {
+        const name = String(raw).trim();
+        if (!name) return;
         const entry = found.get(name.toLowerCase()) ?? { name, count: 0, images: [] };
         entry.count += 1;
         const imageKey = product.image?.publicId || product.image?.url;
@@ -249,19 +239,10 @@ export function buildShopDiscovery(products, title = "Shop By") {
       });
     });
 
+    groups.push({ id: group.id || key, label: group.label || key, order: groups.length });
     if (!found.size) return;
 
-    const ordered = group.approved
-      ? group.approved
-          .map((name) => found.get(name.toLowerCase()))
-          .filter(Boolean)
-      : [...found.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-
-    groups.push({ id: group.id, label: group.label, order: groups.length });
-
-    // Each tile borrows a photo of a piece that has its value, preferring
-    // one no earlier tile in this tab already shows, so neighbouring
-    // tiles do not repeat the same picture when there is a choice.
+    const ordered = [...found.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
     const usedImages = new Set();
     ordered.slice(0, SHOP_DISCOVERY_MAX_PER_GROUP).forEach((entry, index) => {
       const image =
@@ -270,19 +251,23 @@ export function buildShopDiscovery(products, title = "Shop By") {
         null;
       if (image) usedImages.add(image.publicId || image.url);
 
+      const destination = group.param && group.param !== "shopby"
+        ? `/shop?${group.param}=${encodeURIComponent(entry.name)}`
+        : `/shop?shopby=${encodeURIComponent(`${key}:${entry.name}`)}`;
+
       items.push({
-        id: `${group.id}-${index}`,
+        id: `${key}-${index}`,
         name: entry.name,
         image,
-        destination: `/shop?${group.param}=${encodeURIComponent(entry.name)}`,
-        group: group.id,
+        destination,
+        group: group.id || key,
         order: index,
         published: true,
       });
     });
   });
 
-  if (!items.length) return null;
+  if (!groups.length) return null;
   return { id: "shop-discovery", title, groups, items };
 }
 
@@ -309,28 +294,50 @@ export async function fetchCustomStylePromo() {
   }
 }
 
-/** Published review / feed entries for the homepage preview. */
-export async function fetchPublishedReviews(max = 3, strict = false) {
+/**
+ * Admin taxonomy labels, grouped by dimension.
+ * Public read is allowed (see firestore.rules) so Shop filters can show
+ * admin allocations even before a published product uses them.
+ * Returns { category: [], occasion: [], ... } with trimmed, deduped labels.
+ */
+export async function fetchTaxonomyLabels() {
+  const empty = { category: [], occasion: [], style: [], fabric: [], colour: [], size: [] };
+  if (!isFirebaseConfigured) return empty;
+  try {
+    const snapshot = await getDocs(query(collection(db, "taxonomy"), limit(500)));
+    const grouped = { ...empty };
+    snapshot.docs.forEach((entry) => {
+      const data = entry.data() ?? {};
+      const dimension = String(data.dimension ?? "").trim();
+      const name = String(data.name ?? "").trim();
+      if (!grouped[dimension] || !name) return;
+      const exists = grouped[dimension].some((label) => label.toLowerCase() === name.toLowerCase());
+      if (!exists) grouped[dimension].push(name);
+    });
+    Object.keys(grouped).forEach((key) => grouped[key].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })));
+    return grouped;
+  } catch (error) {
+    if (import.meta.env.DEV) console.error(error);
+    return empty;
+  }
+}
+
+/** Published review / feed entries, newest first by first publication time. */
+export async function fetchPublishedReviews(max = 20, strict = false) {
   if (!isFirebaseConfigured) { if (strict) throw new Error("Reviews are not connected."); return []; }
 
   try {
+    // The homepage rule is intentionally based on publishedAt, not updatedAt:
+    // editing an older story must never make it "new" again. We sort the entire
+    // published set before applying the homepage cap. A null max returns the
+    // complete published feed for /reviews-feeds.
     const snapshot = await getDocs(
-      query(collection(db, "reviews"), where("published", "==", true), limit(max))
+      query(collection(db, "reviews"), where("published", "==", true))
     );
-
-    return snapshot.docs
-      .map((entry) => {
-        const data = entry.data() ?? {};
-        const body = data.body ? String(data.body).trim() : "";
-        if (!body) return null;
-        return {
-          id: entry.id,
-          body,
-          author: data.author ? String(data.author).trim() : "",
-          image: normaliseImage(data.image),
-        };
-      })
+    const reviews = snapshot.docs
+      .map((entry) => normaliseReviewRecord(entry.id, entry.data() ?? {}))
       .filter(Boolean);
+    return max == null ? sortPublishedReviews(reviews) : selectLatestPublishedReviews(reviews, max);
   } catch (error) {
     if (import.meta.env.DEV) console.error(error);
     if (strict) throw new Error("Reviews could not be loaded.");

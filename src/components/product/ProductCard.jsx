@@ -6,11 +6,10 @@ import { useToast } from "../../context/ToastContext";
 import { formatNaira } from "../../utils/formatters";
 import "./ProductCard.css";
 
-// Wide "swatch" crop in the grid (matches --product-card-media-ratio in
-// ProductCard.css — change the two together), square beside the text
-// in the list view.
-const GRID_IMAGE = "w_720,ar_3:1,c_fill,g_auto,q_auto,f_auto";
-const LIST_IMAGE = "w_480,ar_1:1,c_fill,g_auto,q_auto,f_auto";
+// Product previews must show the complete upload. Resize without cropping;
+// the card contains the image proportionally inside its media frame.
+const GRID_IMAGE = "w_720,h_720,c_limit,q_auto,f_auto";
+const LIST_IMAGE = "w_480,h_480,c_limit,q_auto,f_auto";
 
 function HeartIcon({ filled }) {
   return (
@@ -81,9 +80,9 @@ export default function ProductCard({ product, view = "grid", imageLoading = "la
     showToast(
       nowSaved
         ? isPersistent
-          ? "Saved to your Saved Pieces."
-          : "Saved for this visit. Create a Profile to keep your Saved Pieces."
-        : "Removed from your Saved Pieces."
+          ? "Saved to My Closet → My Pieces."
+          : "Saved for this visit. Create a Profile to keep your pieces."
+        : "Removed from My Pieces."
     );
   };
 
@@ -109,7 +108,7 @@ export default function ProductCard({ product, view = "grid", imageLoading = "la
             className={`product-card__save${saved ? " is-saved" : ""}`}
             onClick={handleSave}
             aria-pressed={saved}
-            aria-label={saved ? `Remove ${product.name} from Saved Pieces` : `Save ${product.name} to Saved Pieces`}
+            aria-label={saved ? `Remove ${product.name} from My Pieces` : `Save ${product.name} to My Pieces`}
           >
             <HeartIcon filled={saved} />
           </button>

@@ -16,11 +16,11 @@ beforeEach(async () => {
 });
 after(async () => { await env?.cleanup(); });
 const client = uid => env.authenticatedContext(uid, { email: uid + "@example.test" }).firestore();
-function send(store, customerId, senderId, { first = false, role = "customer", body = "Hello" } = {}) {
+function send(store, customerId, senderId, { first = false, role = "customer", body = "Hello", productContext } = {}) {
   const parent = doc(store, "conversations", customerId);
   const message = doc(collection(parent, "messages"));
   const batch = writeBatch(store);
-  batch.set(message, { senderId, senderRole: role, body, createdAt: serverTimestamp() });
+  batch.set(message, { senderId, senderRole: role, body, createdAt: serverTimestamp(), ...(productContext === undefined ? {} : { productContext }) });
   const summary = { lastMessageId: message.id, lastMessage: body, lastSenderRole: role, updatedAt: serverTimestamp() };
   if (first) batch.set(parent, { ...summary, customerId, customerName: "Customer", customerEmail: customerId + "@example.test", createdAt: serverTimestamp() });
   else batch.update(parent, summary);
@@ -71,4 +71,20 @@ test("unbounded queries are denied and revoked admins lose chat access", async (
   await env.withSecurityRulesDisabled(context => updateDoc(doc(context.firestore(), "admins/studio"), { active: false }));
   await assertFails(getDoc(doc(studio, "conversations/alice")));
   await assertFails(send(studio, "alice", "studio", { role: "admin" }));
+});
+
+const productTag = { productId: "piece", name: "Wine Aso Oke", slug: "wine-set", imageUrl: "https://example.test/piece.jpg", imagePublicId: "", price: 50000, variable: false, reviewId: "review" };
+test("product tags persist above a message for its customer and admin only", async () => {
+  await assertSucceeds(send(client("alice"), "alice", "alice", { first: true, productContext: productTag }));
+  for (const store of [client("alice"), client("studio")]) {
+    const result = await assertSucceeds(getDocs(query(collection(store, "conversations/alice/messages"), limit(30))));
+    assert.deepEqual(result.docs[0].data().productContext, productTag);
+  }
+  await assertFails(getDocs(query(collection(client("bob"), "conversations/alice/messages"), limit(30))));
+});
+test("malformed or oversized product tags cannot bypass chat validation", async () => {
+  for (const tag of [null, {}, { ...productTag, name: "x".repeat(241) }, { ...productTag, price: -1 }, { ...productTag, imageUrl: "javascript:alert(1)" }, { ...productTag, extra: true }]) {
+    await assertFails(send(client("alice"), "alice", "alice", { first: true, productContext: tag }));
+  }
+  await assertSucceeds(send(client("alice"), "alice", "alice", { first: true, productContext: { ...productTag, price: null, imageUrl: "/.netlify/functions/image?id=a" } }));
 });

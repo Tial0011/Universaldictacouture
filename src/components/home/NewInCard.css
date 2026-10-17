@@ -1,56 +1,89 @@
-/* ---------- New In menu-card grid ----------
-   Two across on phones (as in the reference), three on tablets, and
-   six in one row on wide screens — six pieces are shown, so the
-   4/5-column product grid would strand an orphan row. */
+/* ---------- New In: single horizontal product carousel ----------
+   One scrolling row instead of a grid, so New In reads as a carousel
+   alongside Shop By rather than a multi-row product listing. Card
+   width scales fluidly with the viewport (clamp) instead of jumping
+   between a few fixed column counts, so tablet widths interpolate
+   smoothly between the phone and desktop sizes, and the next card
+   always peeks in at the edge as an affordance to keep scrolling. */
 .menu-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: nowrap;
   gap: var(--space-sm);
   margin: 0;
-  padding: 0;
+  padding: 0.25rem 0.25rem 1rem;
   list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 0.25rem;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(96, 16, 19, 0.3) transparent;
+  -webkit-overflow-scrolling: touch;
 }
 
 .menu-grid > li {
+  flex: 0 0 clamp(9.5rem, 30vw, 13.5rem);
   min-width: 0;
+  scroll-snap-align: start;
 }
 
 @media (min-width: 640px) {
   .menu-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-md);
   }
-}
 
-@media (min-width: 1280px) {
-  .menu-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+  .menu-grid > li {
+    flex-basis: clamp(11rem, 22vw, 14.5rem);
   }
 }
 
-/* ---------- Card ---------- */
-.menu-card {
-  /* Wide "swatch" crop, the same shape as the Shop card image. Keep in
-     step with the transformation in NewInCard.jsx. */
-  --menu-card-media-ratio: 3 / 1;
+@media (min-width: 1024px) {
+  .menu-grid > li {
+    flex-basis: clamp(12rem, 17vw, 15rem);
+  }
+}
 
+@media (pointer: coarse) {
+  .menu-grid {
+    scrollbar-width: none;
+  }
+
+  .menu-grid::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-grid {
+    scroll-behavior: auto;
+  }
+}
+
+/* ---------- Card: Elevated Couture Lookbook Framing ---------- */
+.menu-card {
+  --menu-card-media-ratio: 1 / 1;
+
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: var(--space-2xs);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 2px 10px rgba(31, 17, 18, 0.05);
+  padding: 0.55rem;
+  background-color: rgba(255, 255, 255, 0.97);
+  border: 1px solid rgba(176, 141, 87, 0.28);
+  border-radius: 1.15rem;
+  box-shadow: 0 4px 16px rgba(31, 17, 18, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.85);
   container: menu-card / inline-size;
   transition: box-shadow var(--duration-base) var(--ease-standard),
-    transform var(--duration-base) var(--ease-standard);
+    transform var(--duration-base) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard);
 }
 
 @media (hover: hover) {
   .menu-card:hover {
-    box-shadow: var(--shadow-soft);
-    transform: translateY(-2px);
+    border-color: rgba(96, 16, 19, 0.38);
+    box-shadow: 0 14px 32px rgba(31, 17, 18, 0.09), inset 0 0 0 1px rgba(176, 141, 87, 0.25);
+    transform: translateY(-3px);
   }
 }
 
@@ -58,7 +91,8 @@
   position: relative;
   overflow: hidden;
   background-color: var(--color-bg);
-  border-radius: var(--radius-md);
+  border: 1px solid rgba(176, 141, 87, 0.18);
+  border-radius: 0.85rem;
 }
 
 .menu-card__media-link {
@@ -67,9 +101,17 @@
 }
 
 .menu-card__media .product-image {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (hover: hover) {
+  .menu-card:hover .menu-card__media .product-image {
+    transform: scale(1.035);
+  }
 }
 
 .menu-card__media .product-image--empty {
@@ -90,18 +132,21 @@
   background-color: transparent;
   border-radius: var(--radius-pill);
   isolation: isolate;
+  border: 0;
+  cursor: pointer;
 }
 
-/* The visible disc is smaller than the 44px tap target, so the image
-   stays the hero while the control stays easy to hit. */
 .menu-card__save::before {
   content: "";
   position: absolute;
-  inset: 0.4rem;
+  inset: 0.35rem;
   z-index: -1;
-  background-color: rgba(255, 255, 255, 0.92);
-  border: 1px solid var(--color-border);
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(176, 141, 87, 0.35);
   border-radius: inherit;
+  box-shadow: 0 2px 8px rgba(31, 17, 18, 0.08);
+  transition: border-color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard);
 }
 
 .menu-card__save.is-saved {
@@ -110,11 +155,15 @@
 
 .menu-card__save.is-saved::before {
   border-color: var(--color-brand);
+  background-color: var(--color-brand-tint);
 }
 
 @media (hover: hover) {
   .menu-card__save:hover {
     color: var(--color-brand);
+  }
+  .menu-card__save:hover::before {
+    border-color: var(--color-brand);
   }
 }
 
@@ -138,6 +187,8 @@
 
 .menu-card__name a {
   color: var(--color-text-primary);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-standard);
 }
 
 @media (hover: hover) {
@@ -146,7 +197,7 @@
   }
 }
 
-/* Price ······· mark — the menu line. */
+/* Price ······· mark — the couture menu line. */
 .menu-card__line {
   display: flex;
   align-items: center;
@@ -172,7 +223,7 @@
   flex: 1 1 0;
   min-width: 0;
   height: 0;
-  border-bottom: 2px dotted var(--color-border-strong);
+  border-bottom: 1.5px dotted rgba(176, 141, 87, 0.45);
   transform: translateY(2px);
 }
 
@@ -182,7 +233,7 @@
   color: var(--color-brand);
 }
 
-/* ---------- View Piece ---------- */
+/* ---------- View Piece CTA ---------- */
 .menu-card__cta {
   display: inline-flex;
   align-items: center;
@@ -190,9 +241,8 @@
   gap: var(--space-2xs);
   width: 100%;
   min-height: var(--touch-target);
-  /* auto keeps every card's button on one line when names wrap unevenly */
   margin-top: auto;
-  padding: 0.55em 1em;
+  padding: 0.58em 1em;
   font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
@@ -202,8 +252,12 @@
   background-color: var(--color-brand);
   border: 1px solid var(--color-brand);
   border-radius: var(--radius-control);
+  box-shadow: 0 4px 12px rgba(96, 16, 19, 0.18);
+  text-decoration: none;
   transition: background-color var(--duration-fast) var(--ease-standard),
-    border-color var(--duration-fast) var(--ease-standard);
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
 }
 
 .menu-card__cta-icon {
@@ -214,12 +268,15 @@
 .menu-card__cta:active {
   background-color: var(--color-brand-hover);
   border-color: var(--color-brand-hover);
+  transform: scale(0.98);
 }
 
 @media (hover: hover) {
   .menu-card__cta:hover {
     background-color: var(--color-brand-hover);
     border-color: var(--color-brand-hover);
+    box-shadow: 0 6px 18px rgba(96, 16, 19, 0.25);
+    transform: translateY(-1px);
   }
 
   .menu-card__cta:hover .menu-card__cta-icon {
@@ -227,16 +284,12 @@
   }
 }
 
-/* Six across on wide screens makes each card narrow: a slightly
-   smaller price keeps "From ₦…" and the mark on one line. */
 @media (min-width: 1280px) {
   .menu-card__price {
     font-size: var(--text-xs);
   }
 }
 
-/* Very narrow cards (small phones): drop the leader + mark and tighten
-   the button so nothing wraps or overflows. */
 @container menu-card (max-width: 9.5rem) {
   .menu-card__leader,
   .menu-card__mark {
