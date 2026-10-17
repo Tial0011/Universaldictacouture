@@ -54,8 +54,33 @@
   gap: var(--space-xs);
   padding-block: var(--space-lg);
   /* Mobile portrait proportions */
-  min-height: min(76vh, 34rem);
+  min-height: max(34rem, 76vh);
   justify-content: flex-end;
+}
+
+@media (max-width: 480px) {
+  .hero__content {
+    min-height: max(36rem, 82vh);
+    min-height: max(36rem, 82svh);
+    padding-block: clamp(2rem, 8vh, 4rem);
+    padding-block: clamp(2rem, 8svh, 4rem);
+    gap: clamp(.5rem, 2.2vh, var(--space-xs));
+    gap: clamp(.5rem, 2.2svh, var(--space-xs));
+  }
+
+  .hero__headline {
+    font-size: clamp(2rem, 9.5vw, var(--text-3xl));
+    line-height: 1.08;
+  }
+
+  .hero__body {
+    max-width: 30ch;
+    font-size: clamp(.95rem, 4vw, var(--text-md));
+  }
+
+  .hero__actions {
+    gap: .5rem;
+  }
 }
 
 /* A slide with imagery gets a wash so the copy stays legible; a slide
