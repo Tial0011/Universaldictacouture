@@ -56,11 +56,10 @@ export default function DiscoveryModule({
   const resumeTimerRef = useRef(null);
   const Heading = headingLevel;
 
-  const shouldAutoScroll = railControls || className.includes("discovery--home");
-  const loopRail = shouldAutoScroll && !arrowNavigation;
-
   const groups = module?.groups;
   const arrowNavigation = groupNavigation === "arrows" && groups?.length > 0;
+  const shouldAutoScroll = railControls || className.includes("discovery--home");
+  const loopRail = shouldAutoScroll && !arrowNavigation;
   const requestedGroup = controlledActiveGroup || internalActiveGroup;
   // Fall back to first group if current activeGroup doesn't exist.
   const currentGroup = groups?.some((group) => group.id === requestedGroup)
