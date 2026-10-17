@@ -1,3 +1,4 @@
+// User-approved homepage hero: preserve this design. Change only with explicit user permission.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import ProductImage from "../product/ProductImage";

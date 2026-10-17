@@ -5,6 +5,13 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react()],
   server: {
+<<<<<<< HEAD
+=======
+    proxy: {
+      '/.netlify/functions/account': 'http://127.0.0.1:5183',
+      '/_section16_test/': 'http://127.0.0.1:5183',
+    },
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
     watch: {
       ignored: ['**/.tools.local/**'],
     },

@@ -1,15 +1,17 @@
+<<<<<<< HEAD
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+=======
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import ProductGrid from "../../components/product/ProductGrid";
+import ProductImage from "../../components/product/ProductImage";
 import DiscoveryModule from "../../components/discovery/DiscoveryModule";
 import ShopFilters from "../../components/shop/ShopFilters";
 import FilterDrawer from "../../components/shop/FilterDrawer";
 import FilterChips from "../../components/shop/FilterChips";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
 import {
   ChevronDownIcon,
-  GridViewIcon,
-  ListViewIcon,
   SlidersIcon,
 } from "../../components/shop/ShopIcons";
 import { useCatalogue } from "../../hooks/useCatalogue";
@@ -17,6 +19,7 @@ import { useBatchSize } from "../../hooks/useBatchSize";
 import { useAuth } from "../../context/AuthContext";
 import { useAuthGate } from "../../context/AuthGateContext";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
+import { SHOP_SEO } from "../../config/shopSeo";
 import {
   buildShopDiscovery,
   fetchTaxonomyLabels,
@@ -25,57 +28,169 @@ import { DEFAULT_SHOP_BY_GROUPS, fetchShopByGroups } from "../../services/shopBy
 import { FILTER_DIMENSIONS } from "../../services/productModel";
 import {
   SORT_OPTIONS,
+  applyFilterDraft,
   applyShopState,
   buildChips,
   buildFacets,
   buildSearchParams,
+  clearAllRefinements,
+  clearFilterSelections,
+  copyShopState,
   hasActiveRefinements,
+  hasFilterSelections,
   parseShopState,
+  reconcileShopState,
+  removeShopRefinement,
+  toggleFilterValue,
 } from "../../utils/shopState";
+import {
+  appendedCount,
+  createShopBrowseSnapshot,
+  nextVisibleCount,
+  readShopBrowseSnapshot,
+  restoredVisibleCount,
+  writeShopBrowseSnapshot,
+} from "../../utils/shopBrowseState";
 import "./Shop.css";
 
-const SHOP_LEDE = "Premium Aso Oke fabrics for life\u2019s most meaningful moments.";
-const SHOP_TAGLINE = "Authentic heritage. Timeless beauty. Endless possibilities.";
-
+const SHOP_LEDE = SHOP_SEO.description;
 const DIMENSION_KEYS = FILTER_DIMENSIONS.map((dimension) => dimension.key);
+function ChatIcon({ size = 20 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 8.8 8.8 0 0 1-3.3-.7L4 20l1.5-4.1A7.2 7.2 0 0 1 4.5 12 7.5 7.5 0 0 1 12 4.5a7.5 7.5 0 0 1 8 7Z" />
+      <path d="M8 11.5h.01M12 11.5h.01M16 11.5h.01" />
+    </svg>
+  );
+}
+
+function SortControl({ value, onChange }) {
+  return (
+    <div className="shop__sort">
+      <label className="visually-hidden" htmlFor="shop-sort">Sort by</label>
+      <span className="shop__sort-face" aria-hidden="true">
+        <span className="shop__sort-prefix">Sort:</span>
+        <span className="shop__sort-value">
+          {SORT_OPTIONS.find((option) => option.value === value)?.label}
+        </span>
+        <ChevronDownIcon size={18} />
+      </span>
+      <select
+        id="shop-sort"
+        className="shop__sort-select"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      >
+        {SORT_OPTIONS.map((option) => (
+          <option key={option.value} value={option.value}>{option.label}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function ShopSkeleton() {
+  return (
+    <ul className="product-grid shop-skeleton" aria-hidden="true">
+      {Array.from({ length: 8 }, (_, index) => (
+        <li key={index}>
+          <div className="shop-skeleton__card">
+            <span className="shop-skeleton__media" />
+            <span className="shop-skeleton__line shop-skeleton__line--name" />
+            <span className="shop-skeleton__line shop-skeleton__line--price" />
+            <span className="shop-skeleton__button" />
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
+<<<<<<< HEAD
   const { user } = useAuth();
   const { requestAuth } = useAuthGate();
+=======
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   const { products, isLoading, error, retry } = useCatalogue();
   const catalogue = products;
   const batchSize = useBatchSize();
 
   const state = useMemo(() => parseShopState(searchParams), [searchParams]);
+<<<<<<< HEAD
   const [searchDraft, setSearchDraft] = useState(() => String(location.state?.shopSearchDraft || state.query || ""));
   const [visibleCount, setVisibleCount] = useState(batchSize);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
   const [taxonomy, setTaxonomy] = useState(null);
+=======
+  const searchKey = searchParams.toString();
+  const currentShopPath = `/shop${location.search}`;
+  const restoreBrowseKey = String(location.state?.restoreBrowseKey || location.key || "");
+  const storedReturnSnapshot = useMemo(
+    () => readShopBrowseSnapshot(restoreBrowseKey, currentShopPath),
+    [restoreBrowseKey, currentShopPath]
+  );
+  const legacyRestoredCount = Number(location.state?.restoreVisibleCount);
+  const routeReturnSnapshot = useMemo(() => {
+    const anchorProductId = String(location.state?.restoreAnchorProductId || "").trim();
+    if (!anchorProductId) return null;
+    return createShopBrowseSnapshot({
+      path: currentShopPath,
+      anchorProductId,
+      anchorResultIndex: null,
+      visibleCount: Number.isFinite(legacyRestoredCount) ? legacyRestoredCount : batchSize,
+      scrollY: 0,
+      anchorViewportTop: null,
+    });
+  }, [batchSize, currentShopPath, legacyRestoredCount, location.state?.restoreAnchorProductId]);
+  const returnSnapshot = storedReturnSnapshot || routeReturnSnapshot;
+  const [searchDraft, setSearchDraft] = useState(() => String(location.state?.shopSearchDraft || state.query || ""));
+  const [visibleCount, setVisibleCount] = useState(() => {
+    if (returnSnapshot) return restoredVisibleCount(returnSnapshot, batchSize);
+    return Number.isFinite(legacyRestoredCount) ? Math.max(batchSize, legacyRestoredCount) : batchSize;
+  });
+  const [loadAnnouncement, setLoadAnnouncement] = useState("");
+  const [isLoadMorePending, setIsLoadMorePending] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState("");
+  const [restoreNotice, setRestoreNotice] = useState("");
+  const [stateNotice, setStateNotice] = useState("");
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [drawerState, setDrawerState] = useState(() => copyShopState(state));
+  const [drawerFiltersValid, setDrawerFiltersValid] = useState(true);
+  const [drawerResetToken, setDrawerResetToken] = useState(0);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const resultsRef = useRef(null);
+  const batchSizeRef = useRef(batchSize);
+  const previousSearchKeyRef = useRef(searchKey);
+  const restorationDoneKeyRef = useRef("");
+  const loadMorePendingRef = useRef(false);
+  const loadMoreFrameRef = useRef(null);
+  const suppressNextResultResetRef = useRef(false);
+  const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
+  const [taxonomy, setTaxonomy] = useState(null);
+  const [shopConfigReady, setShopConfigReady] = useState(false);
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 
-  // The header's Search icon lands here with ?focus=search. Search is
-  // otherwise tucked away (the header already carries it), so the field
-  // appears when asked for, or whenever a search is active.
   const searchRequested = searchParams.get("focus") === "search";
   const [searchOpen, setSearchOpen] = useState(searchRequested);
   const searchInputRef = useRef(null);
   const showSearch = searchOpen || Boolean(state.query);
-
-  const refined = hasActiveRefinements(state) || state.sort !== "newest" || state.view !== "grid";
+  const refined = hasActiveRefinements(state) || state.sort !== "newest";
+  const hasQueryString = searchKey.length > 0;
 
   useDocumentMeta({
-    title: "Shop — Universal Dicta Couture",
-    description: SHOP_LEDE,
-    // Refinements share the Shop's canonical and are not indexed
-    // separately, so no duplicate SEO pages are created.
-    canonicalPath: "/shop",
-    noindex: refined,
+    title: SHOP_SEO.title,
+    description: SHOP_SEO.description,
+    canonicalPath: SHOP_SEO.canonicalPath,
+    noindex: refined || hasQueryString,
   });
 
   useEffect(() => {
     let active = true;
+<<<<<<< HEAD
     fetchShopByGroups().then((groups) => {
       if (active && groups.length) setShopByGroups(groups);
     });
@@ -85,6 +200,18 @@ export default function Shop() {
     return () => {
       active = false;
     };
+=======
+    Promise.all([fetchShopByGroups(), fetchTaxonomyLabels()])
+      .then(([groups, labels]) => {
+        if (!active) return;
+        setShopByGroups(groups);
+        setTaxonomy(labels);
+      })
+      .finally(() => {
+        if (active) setShopConfigReady(true);
+      });
+    return () => { active = false; };
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   }, []);
 
   useEffect(() => {
@@ -104,34 +231,48 @@ export default function Shop() {
     if (searchOpen && searchRequested) searchInputRef.current?.focus();
   }, [searchOpen, searchRequested]);
 
-  // Keep the search box in step with the URL (Back/Forward, chips).
   useEffect(() => {
     setSearchDraft(state.query);
   }, [state.query]);
 
-  // A new refinement or a viewport change restarts the batch.
   useEffect(() => {
-    setVisibleCount(batchSize);
-  }, [batchSize, searchParams]);
+    batchSizeRef.current = batchSize;
+  }, [batchSize]);
 
-  const updateState = useCallback(
-    (next) => {
-      setSearchParams(buildSearchParams(next));
-    },
-    [setSearchParams]
-  );
+  useEffect(() => () => {
+    if (loadMoreFrameRef.current) cancelAnimationFrame(loadMoreFrameRef.current);
+  }, []);
 
-  const toggleValue = useCallback(
-    (dimension, value) => {
-      const current = state.filters[dimension] ?? [];
-      const nextValues = current.includes(value)
-        ? current.filter((entry) => entry !== value)
-        : [...current, value];
-      updateState({ ...state, filters: { ...state.filters, [dimension]: nextValues } });
-    },
-    [state, updateState]
-  );
+  // Public/shareable Shop state owns the result set. When it changes, restart
+  // progressive reveal for that new result set and return to the results
+  // region. Responsive breakpoint changes deliberately do not reset depth.
+  useEffect(() => {
+    if (previousSearchKeyRef.current === searchKey) return;
+    previousSearchKeyRef.current = searchKey;
+    if (suppressNextResultResetRef.current) {
+      suppressNextResultResetRef.current = false;
+      return;
+    }
+    restorationDoneKeyRef.current = "";
+    if (loadMoreFrameRef.current) cancelAnimationFrame(loadMoreFrameRef.current);
+    loadMoreFrameRef.current = null;
+    loadMorePendingRef.current = false;
+    setIsLoadMorePending(false);
+    setVisibleCount(batchSizeRef.current);
+    setLoadAnnouncement("");
+    setLoadMoreError("");
+    setRestoreNotice("");
+    setStateNotice("");
+    const frame = requestAnimationFrame(() => {
+      resultsRef.current?.scrollIntoView({
+        block: "start",
+        behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [searchKey]);
 
+<<<<<<< HEAD
   const toggleShopBy = useCallback(
     (group, value) => {
       const current = state.shopBy?.[group] ?? [];
@@ -164,25 +305,45 @@ export default function Shop() {
       max: null,
       newIn: false,
     });
+=======
+  const updateState = useCallback((next, { replace = false } = {}) => {
+    setStateNotice("");
+    setSearchParams(buildSearchParams(next), { replace });
+  }, [setSearchParams]);
+
+  const toggleValue = useCallback((dimension, value) => {
+    updateState(toggleFilterValue(state, dimension, value));
+  }, [state, updateState]);
+
+  const removeChip = useCallback((chip) => {
+    updateState(removeShopRefinement(state, chip));
+  }, [state, updateState]);
+
+  const clearAll = useCallback(() => {
+    updateState(clearAllRefinements(state));
+  }, [state, updateState]);
+
+  const clearSearch = useCallback(() => {
+    updateState({ ...state, query: "" });
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   }, [state, updateState]);
 
   const results = useMemo(() => applyShopState(catalogue, state), [catalogue, state]);
   const facets = useMemo(() => buildFacets(catalogue, state, taxonomy), [catalogue, state, taxonomy]);
+<<<<<<< HEAD
   const chips = useMemo(() => buildChips(state), [state]);
+=======
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 
-  // Discovery comes from published content or real product attributes.
   const discoveryModule = useMemo(
     () => buildShopDiscovery(catalogue, "Shop By", shopByGroups),
     [catalogue, shopByGroups]
   );
 
-  // A tile adds its filter to what is already applied (a Colour and an
-  // Occasion can be combined) rather than starting the search over.
-  const resolveTileDestination = useCallback(
-    (item) => {
-      const [path, queryString = ""] = item.destination.split("?");
-      if (path !== "/shop") return item.destination;
+  useEffect(() => {
+    if (!shopConfigReady || isLoading || error) return;
 
+<<<<<<< HEAD
       const next = new URLSearchParams(searchParams);
       next.delete("focus");
       new URLSearchParams(queryString).forEach((value, key) => {
@@ -191,43 +352,236 @@ export default function Shop() {
         } else {
           next.set(key, value);
         }
+=======
+    let reconciled = state;
+    let removed = [];
+    if (catalogue.length > 0) {
+      const reconciliation = reconcileShopState(state, {
+        products: catalogue,
+        taxonomy,
+        discoveryGroups: discoveryModule?.groups ?? [],
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
       });
-      const query = next.toString();
-      return query ? `${path}?${query}` : path;
-    },
-    [searchParams]
-  );
-  const visible = results.slice(0, visibleCount);
-  const remaining = results.length - visible.length;
+      reconciled = reconciliation.state;
+      removed = reconciliation.removed;
+    }
 
-  const filterPanel = (
+    const canonicalParams = buildSearchParams(reconciled);
+    if (canonicalParams.toString() === searchParams.toString()) return;
+
+    suppressNextResultResetRef.current = true;
+    setSearchParams(canonicalParams, { replace: true });
+    if (removed.length) {
+      setStateNotice("Some previous Shop refinements are no longer available. The rest of your browsing context was kept.");
+    }
+  }, [catalogue, discoveryModule, error, isLoading, searchParams, setSearchParams, shopConfigReady, state, taxonomy]);
+
+  const activeDiscoveryGroup = discoveryModule?.groups?.some((group) => group.id === state.discovery)
+    ? state.discovery
+    : (discoveryModule?.groups?.[0]?.id ?? "");
+  const activeDiscoveryLabel = discoveryModule?.groups?.find((group) => group.id === state.discovery)?.label || "";
+  const chips = useMemo(
+    () => buildChips(state, { discoveryLabel: activeDiscoveryLabel }),
+    [state, activeDiscoveryLabel]
+  );
+
+  const resolveTileDestination = useCallback((item) => {
+    const [path, queryString = ""] = item.destination.split("?");
+    if (path !== "/shop") return item.destination;
+
+    const next = new URLSearchParams(searchParams);
+    next.delete("focus");
+    if (item.group) next.set("discovery", item.group);
+    new URLSearchParams(queryString).forEach((value, key) => {
+      if (DIMENSION_KEYS.includes(key) || key === "shopby") {
+        if (!next.getAll(key).includes(value)) next.append(key, value);
+      } else {
+        next.set(key, value);
+      }
+    });
+    const query = next.toString();
+    return query ? `${path}?${query}` : path;
+  }, [searchParams]);
+
+  const visible = results.slice(0, visibleCount);
+  const remaining = Math.max(0, results.length - visible.length);
+
+  useLayoutEffect(() => {
+    if (isLoading || !returnSnapshot || restorationDoneKeyRef.current === restoreBrowseKey) return;
+
+    const targetIndex = results.findIndex((product) =>
+      product.id === returnSnapshot.anchorProductId || product.slug === returnSnapshot.anchorProductId
+    );
+
+    if (targetIndex >= 0 && visibleCount <= targetIndex) {
+      setVisibleCount((count) => Math.max(count, targetIndex + 1, restoredVisibleCount(returnSnapshot, batchSizeRef.current)));
+      return;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      let restored = false;
+
+      if (targetIndex >= 0) {
+        const nodes = resultsRef.current?.querySelectorAll("[data-product-id]") ?? [];
+        const target = Array.from(nodes).find((node) => node.dataset.productId === results[targetIndex]?.id);
+        if (target) {
+          const preferredTop = returnSnapshot.anchorViewportTop;
+          if (Number.isFinite(preferredTop)) {
+            const top = Math.max(0, target.getBoundingClientRect().top + window.scrollY - preferredTop);
+            window.scrollTo({ top, left: 0, behavior: "auto" });
+          } else {
+            target.scrollIntoView({ block: "center", behavior: "auto" });
+          }
+          restored = true;
+        }
+      }
+
+      if (!restored && Number.isFinite(returnSnapshot.scrollY) && returnSnapshot.scrollY > 0) {
+        window.scrollTo({ top: returnSnapshot.scrollY, left: 0, behavior: "auto" });
+        restored = true;
+      }
+
+      if (!restored && returnSnapshot.anchorProductId) {
+        resultsRef.current?.scrollIntoView({ block: "start", behavior: "auto" });
+      }
+
+      if (targetIndex < 0 && returnSnapshot.anchorProductId) {
+        setRestoreNotice("That piece is no longer in this Shop view. Your browsing context was kept.");
+      }
+
+      restorationDoneKeyRef.current = restoreBrowseKey;
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [batchSize, isLoading, restoreBrowseKey, results, returnSnapshot, visibleCount]);
+
+  const navigationState = useMemo(() => ({
+    shopReturn: `/shop${location.search}`,
+    shopVisibleCount: visibleCount,
+    shopBrowseKey: location.key,
+  }), [location.key, location.search, visibleCount]);
+
+  const rememberShopPosition = useCallback((product, event) => {
+    if (!product?.id) return;
+    const card = event?.currentTarget?.closest?.("[data-product-id]");
+    const snapshot = createShopBrowseSnapshot({
+      path: `/shop${location.search}`,
+      anchorProductId: product.id,
+      anchorResultIndex: results.findIndex((entry) => entry.id === product.id),
+      visibleCount,
+      scrollY: window.scrollY,
+      anchorViewportTop: card?.getBoundingClientRect?.().top,
+    });
+    if (snapshot) writeShopBrowseSnapshot(location.key, snapshot);
+  }, [location.key, location.search, results, visibleCount]);
+
+  const openDrawer = useCallback(() => {
+    setDrawerState(copyShopState(state));
+    setDrawerFiltersValid(true);
+    setDrawerResetToken((token) => token + 1);
+    setIsDrawerOpen(true);
+  }, [state]);
+
+  const closeDrawer = useCallback(() => {
+    setIsDrawerOpen(false);
+  }, []);
+
+  const clearDrawerDraft = useCallback(() => {
+    setDrawerState((current) => clearFilterSelections(current));
+    setDrawerFiltersValid(true);
+    setDrawerResetToken((token) => token + 1);
+  }, []);
+
+  const applyDrawerDraft = useCallback(() => {
+    if (!drawerFiltersValid) return;
+    updateState(applyFilterDraft(state, drawerState));
+    setIsDrawerOpen(false);
+  }, [drawerFiltersValid, drawerState, state, updateState]);
+
+  const drawerFacets = useMemo(
+    () => buildFacets(catalogue, drawerState, taxonomy),
+    [catalogue, drawerState, taxonomy]
+  );
+
+  const drawerHasRefinements = hasFilterSelections(drawerState);
+
+  const loadMorePieces = useCallback(() => {
+    if (loadMorePendingRef.current) return;
+    const nextCount = nextVisibleCount(visibleCount, batchSize, results.length);
+    const added = appendedCount(visibleCount, nextCount, results.length);
+    if (added <= 0) return;
+
+    loadMorePendingRef.current = true;
+    setIsLoadMorePending(true);
+    setLoadMoreError("");
+
+    loadMoreFrameRef.current = requestAnimationFrame(() => {
+      try {
+        setVisibleCount(nextCount);
+        setLoadAnnouncement(`${added} more ${added === 1 ? "piece" : "pieces"} loaded.`);
+      } catch {
+        setLoadMoreError("We couldn't reveal more pieces. Please try again.");
+      } finally {
+        loadMorePendingRef.current = false;
+        loadMoreFrameRef.current = null;
+        setIsLoadMorePending(false);
+      }
+    });
+  }, [batchSize, results.length, visibleCount]);
+
+  const desktopFilterPanel = (
     <ShopFilters
       facets={facets}
       state={state}
       onToggleValue={toggleValue}
       onToggleNewIn={(checked) => updateState({ ...state, newIn: checked })}
       onPriceChange={(min, max) => updateState({ ...state, min, max })}
-      onClearAll={clearAll}
-      hasRefinements={hasActiveRefinements(state)}
+      showClear={false}
     />
   );
 
+  const drawerFilterPanel = (
+    <ShopFilters
+      facets={drawerFacets}
+      state={drawerState}
+      onToggleValue={(dimension, value) => setDrawerState((current) => toggleFilterValue(current, dimension, value))}
+      onToggleNewIn={(checked) => setDrawerState((current) => ({ ...current, newIn: checked }))}
+      onPriceChange={(min, max) => setDrawerState((current) => ({ ...current, min, max }))}
+      showClear={false}
+      idPrefix="drawer-filters"
+      resetToken={drawerResetToken}
+      onValidityChange={setDrawerFiltersValid}
+    />
+  );
+
+  const couturierDraft = useMemo(() => {
+    const context = chips.map((chip) => chip.text ?? chip.label).slice(0, 4).join(", ");
+    return context
+      ? `I’d like help choosing an Aso Oke piece. I’m currently browsing with: ${context}.`
+      : "I’d like help choosing an Aso Oke piece from the Shop.";
+  }, [chips]);
+
   return (
     <div className="shop">
-      <div className="container shop__intro">
-        <nav className="shop__breadcrumb" aria-label="Breadcrumb">
-          <ol>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li aria-current="page">Shop</li>
-          </ol>
-        </nav>
-
-        <h1 className="shop__title">Shop</h1>
-        <p className="shop__lede">{SHOP_LEDE}</p>
-        <p className="shop__tagline">{SHOP_TAGLINE}</p>
-      </div>
+      <section className="shop__intro-wrap" aria-labelledby="shop-title">
+        <div className="container shop__intro">
+          <div className="shop__intro-content">
+            <div className="shop__intro-main">
+              <h1 className="shop__title" id="shop-title">Shop</h1>
+              <p className="shop__lede">{SHOP_LEDE}</p>
+            </div>
+            <div className="shop__intro-assist">
+              <p className="shop__assist-text">Need help choosing?</p>
+              <Link className="shop__assist-link" to="/chats" state={{ draft: couturierDraft }}>
+                <ChatIcon size={18} />
+                <span>Chat with a Couturier</span>
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+        <div className="shop__cloth-hem" aria-hidden="true" />
+      </section>
 
       {discoveryModule ? (
         <div className="container shop__discovery">
@@ -235,16 +589,29 @@ export default function Shop() {
             module={discoveryModule}
             className="discovery--shop"
             hideTitleWithTabs
+            activeGroup={activeDiscoveryGroup}
+            renderMedia={(item) => <ProductImage image={item.image} alt="" transformation="w_480,h_600,c_fill,g_auto,q_auto,f_auto" />}
+            onGroupChange={(groupId) => updateState({ ...state, discovery: groupId })}
             resolveDestination={resolveTileDestination}
+            railControls
+            onItemClick={() => {
+              requestAnimationFrame(() => {
+                resultsRef.current?.scrollIntoView({
+                  block: "start",
+                  behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+                });
+              });
+            }}
           />
         </div>
       ) : null}
 
-      <div className="container shop__layout">
-        <aside className="shop__sidebar" aria-label="Filters">
-          {filterPanel}
+      <div className={`container shop__layout${isSidebarOpen ? "" : " shop__layout--filters-closed"}`}>
+        <aside id="shop-filter-sidebar" className="shop__sidebar" aria-label="Filters" aria-hidden={!isSidebarOpen}>
+          {desktopFilterPanel}
         </aside>
 
+<<<<<<< HEAD
         <section className="shop__results" aria-label="Products">
           <div className="shop__toolbar">
             {showSearch ? (
@@ -274,140 +641,153 @@ export default function Shop() {
                 </button>
               </form>
             ) : null}
+=======
+        <section id="shop-results" ref={resultsRef} className="shop__results" aria-label="Product results" aria-busy={isLoading || undefined}>
+          {showSearch ? (
+            <form
+              className="shop__search"
+              role="search"
+              onSubmit={(event) => {
+                event.preventDefault();
+                updateState({ ...state, query: searchDraft.trim() });
+              }}
+            >
+              <label className="visually-hidden" htmlFor="shop-search">Search the Shop</label>
+              <input
+                id="shop-search"
+                ref={searchInputRef}
+                className="form-control"
+                type="search"
+                value={searchDraft}
+                placeholder="Search fabrics, colours, occasions, styles…"
+                onChange={(event) => setSearchDraft(event.target.value)}
+              />
+              <button type="submit" className="btn btn--secondary shop__search-submit">Search</button>
+            </form>
+          ) : null}
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 
-            <div className="shop__controls">
-              <button
-                type="button"
-                className="shop__filter-button"
-                onClick={() => setIsDrawerOpen(true)}
-                aria-haspopup="dialog"
-              >
-                <SlidersIcon size={20} />
-                <span>Filters{chips.length ? ` (${chips.length})` : ""}</span>
-              </button>
+          <div className="shop__toolbar" aria-label="Catalogue controls">
+            <button
+              type="button"
+              className="shop__filter-button"
+              onClick={openDrawer}
+              aria-haspopup="dialog"
+              aria-controls="shop-filter-drawer"
+              aria-expanded={isDrawerOpen}
+            >
+              <SlidersIcon size={20} />
+              <span>Filters</span>
+            </button>
 
-              <div className="shop__sort">
-                <label className="visually-hidden" htmlFor="shop-sort">
-                  Sort by
-                </label>
-                {/* The visible text is drawn here; the native select sits
-                    invisibly over it so the OS picker (and 16px text, which
-                    stops iOS zooming in) still does the choosing. */}
-                <span className="shop__sort-face" aria-hidden="true">
-                  <span className="shop__sort-prefix">Sort:</span>
-                  <span className="shop__sort-value">
-                    {SORT_OPTIONS.find((option) => option.value === state.sort)?.label}
-                  </span>
-                  <ChevronDownIcon size={18} />
-                </span>
-                <select
-                  id="shop-sort"
-                  className="shop__sort-select"
-                  value={state.sort}
-                  onChange={(event) => updateState({ ...state, sort: event.target.value })}
-                >
-                  {SORT_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <button
+              type="button"
+              className="shop__sidebar-toggle"
+              aria-controls="shop-filter-sidebar"
+              aria-expanded={isSidebarOpen}
+              onClick={() => setIsSidebarOpen((open) => !open)}
+            >
+              <SlidersIcon size={18} />
+              <span>{isSidebarOpen ? "Hide Filters" : "Show Filters"}</span>
+            </button>
 
-              <div className="shop__view" role="group" aria-label="Layout">
-                <button
-                  type="button"
-                  className={`shop__view-button${state.view === "grid" ? " is-active" : ""}`}
-                  aria-pressed={state.view === "grid"}
-                  aria-label="Grid view"
-                  onClick={() => updateState({ ...state, view: "grid" })}
-                >
-                  <GridViewIcon size={20} />
-                </button>
-                <button
-                  type="button"
-                  className={`shop__view-button${state.view === "list" ? " is-active" : ""}`}
-                  aria-pressed={state.view === "list"}
-                  aria-label="List view"
-                  onClick={() => updateState({ ...state, view: "list" })}
-                >
-                  <ListViewIcon size={20} />
-                </button>
-              </div>
-            </div>
+            <SortControl value={state.sort} onChange={(sort) => updateState({ ...state, sort })} />
           </div>
 
           <FilterChips chips={chips} onRemove={removeChip} onClearAll={clearAll} />
 
-          {/* Read out to assistive tech as results change; shown on screen
-              only when there is a message to give (loading, none found). */}
-          <p
-            className={`shop__count${isLoading || results.length === 0 ? "" : " visually-hidden"}`}
-            role="status"
-            aria-live="polite"
-          >
-            {isLoading
-              ? "Loading pieces…"
-              : error
-                ? ""
-                : `${results.length} ${results.length === 1 ? "piece" : "pieces"}`}
-          </p>
+          {restoreNotice ? <p className="shop__restore-notice" role="status">{restoreNotice}</p> : null}
+          {stateNotice ? <p className="shop__restore-notice" role="status">{stateNotice}</p> : null}
 
-          {isLoading ? <LoadingSpinner label="Loading the collection" /> : null}
+          <p className="visually-hidden" role="status" aria-live="polite">
+            {isLoading ? "Loading pieces." : error ? "The collection could not be loaded." : results.length === 0 ? "No pieces match the current Shop state." : "Product results updated."}
+          </p>
+          <p className="visually-hidden" role="status" aria-live="polite">{loadAnnouncement}</p>
+
+          {isLoading ? <ShopSkeleton /> : null}
 
           {!isLoading && error ? (
-            <div className="shop__state">
-              <p>{error}</p>
-              <button type="button" className="btn btn--primary" onClick={retry}>
-                Try again
-              </button>
+            <div className="shop__state shop__state--error" role="alert">
+              <p className="shop__state-kicker">The collection is taking a little longer</p>
+              <h2>We couldn’t load the Shop.</h2>
+              <p>Please check your connection and try again. Your Shop settings have not been changed.</p>
+              <button type="button" className="btn btn--primary" onClick={retry}>Try again</button>
             </div>
           ) : null}
 
           {!isLoading && !error && products.length === 0 ? (
             <div className="shop__state">
-              <p>No pieces have been published yet. Please check back soon.</p>
+              <p className="shop__state-kicker">The collection</p>
+              <h2>New pieces are being prepared.</h2>
+              <p>Explore Custom Style, or speak with a Dicta Couturier about the piece you have in mind.</p>
+              <Link className="btn btn--secondary" to="/custom-style">Explore Custom Style</Link>
             </div>
           ) : null}
 
           {!isLoading && catalogue.length > 0 && results.length === 0 ? (
-            <div className="shop__state">
+            <div className="shop__state shop__state--empty">
+              <p className="shop__state-kicker">Refine your search</p>
+              <h2>{state.query ? `No match for “${state.query}”` : "No pieces match these refinements"}</h2>
               <p>
                 {state.query
-                  ? `Nothing matches “${state.query}” with the current filters.`
-                  : "Nothing matches these filters."}
+                  ? "No matching pieces were found. Your search is still applied, so you can clear it or keep refining."
+                  : "Your current refinements produced no matching pieces. Remove a filter, clear the refinements, or ask a Dicta Couturier for help."}
               </p>
-              <button type="button" className="btn btn--secondary" onClick={clearAll}>
-                Clear All
-              </button>
+              <div className="shop__state-actions">
+                {state.query ? (
+                  <button type="button" className="btn btn--secondary" onClick={clearSearch}>Clear Search</button>
+                ) : null}
+                <button type="button" className="btn btn--secondary" onClick={clearAll}>Clear All</button>
+                <Link className="btn btn--primary" to="/chats" state={{ draft: couturierDraft }}>Ask a Couturier</Link>
+              </div>
             </div>
           ) : null}
 
           {visible.length > 0 ? (
             <>
-              <ProductGrid products={visible} view={state.view} label="Shop results" />
-              {remaining > 0 ? (
-                <div className="shop__load-more">
+              <ProductGrid
+                products={visible}
+                variant="shop"
+                navigationState={navigationState}
+                onProductNavigate={rememberShopPosition}
+                label="Shop results"
+              />
+              <div className="shop__load-more">
+                {loadMoreError ? (
+                  <div className="shop__load-more-error" role="alert">
+                    <span>{loadMoreError}</span>
+                    <button type="button" className="shop__load-more-retry" onClick={loadMorePieces}>Retry</button>
+                  </div>
+                ) : null}
+                {remaining > 0 ? (
                   <button
                     type="button"
                     className="shop__load-more-button"
-                    onClick={() => setVisibleCount((count) => count + batchSize)}
+                    onClick={loadMorePieces}
+                    disabled={isLoadMorePending}
+                    aria-busy={isLoadMorePending || undefined}
                   >
-                    <span>Load More Pieces</span>
+                    <span>{isLoadMorePending ? "Loading Pieces…" : "Load More Pieces"}</span>
                     <ChevronDownIcon size={18} />
                   </button>
-                  <p className="shop__count">
-                    Showing {visible.length} of {results.length}
-                  </p>
-                </div>
-              ) : null}
+                ) : (
+                  <p className="shop__exhausted">You've shopped all available pieces.</p>
+                )}
+              </div>
             </>
           ) : null}
         </section>
       </div>
 
-      <FilterDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
-        {filterPanel}
+      <FilterDrawer
+        isOpen={isDrawerOpen}
+        onClose={closeDrawer}
+        onApply={applyDrawerDraft}
+        onClearAll={clearDrawerDraft}
+        canClear={drawerHasRefinements || !drawerFiltersValid}
+        canApply={drawerFiltersValid}
+      >
+        {drawerFilterPanel}
       </FilterDrawer>
     </div>
   );

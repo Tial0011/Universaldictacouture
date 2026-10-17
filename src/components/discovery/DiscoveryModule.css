@@ -105,46 +105,116 @@
 }
 
 /* ---------- Shop variant ----------
+<<<<<<< HEAD
    A segmented tab bar (the tabs stand in for the heading) over a
    scrolling row of small photo tiles. Scoped to .discovery--shop so
    the homepage and any other use of the module are untouched. */
+=======
+   Shop keeps the configured groups as a compact segmented control and
+   presents real catalogue-backed choices in one horizontally navigable
+   image rail. The visual language is deliberately calmer than the
+   homepage discovery treatment so merchandise remains primary. */
+.discovery--shop {
+  position: relative;
+}
+
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 .discovery--shop .discovery__groups {
   display: flex;
   flex-wrap: nowrap;
-  gap: var(--space-3xs);
-  margin-bottom: var(--space-xs);
-  padding: var(--space-3xs);
-  background: var(--color-neutral-tint);
+  gap: 0;
+  margin: 0 auto var(--space-xs);
+  padding: 3px;
+  max-width: 44rem;
+  background: linear-gradient(90deg, rgba(96,16,19,.06), rgba(245,238,228,.88), rgba(96,16,19,.06));
+  border: 1px solid rgba(176,141,87,.22);
   border-radius: var(--radius-pill);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.75);
 }
 
-/* Sized by their labels, then sharing the spare room, so a longer
-   label ("Fabric & Pattern") is never the one that gets clipped. */
 .discovery--shop .discovery__group {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   min-width: 0;
-  padding-inline: var(--space-2xs);
+  min-height: 2.5rem;
+  padding-inline: var(--space-xs);
   font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+  background: transparent;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-color: transparent;
+  border: 0;
+  border-radius: var(--radius-pill);
+}
+
+.discovery--shop .discovery__group.is-active {
+  color: var(--color-white);
+  background: var(--color-brand);
+  box-shadow: 0 4px 12px rgba(96,16,19,.18);
 }
 
 @media (hover: hover) {
   .discovery--shop .discovery__group:not(.is-active):hover {
     color: var(--color-brand);
-    border-color: transparent;
-    background: var(--color-brand-tint);
+    background: rgba(96,16,19,.07);
+  }
+}
+
+.discovery--shop .discovery__rail {
+  position: relative;
+  width: 100%;
+}
+
+.discovery--shop .discovery__rail-arrow {
+  position: absolute;
+  top: calc(50% - 1.2rem);
+  transform: translateY(-50%);
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target);
+  min-width: var(--touch-target);
+  height: var(--touch-target);
+  padding: 0;
+  color: var(--color-brand);
+  background: rgba(251, 248, 242, 0.94);
+  border: 1px solid var(--color-border-luxury);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 14px rgba(31, 17, 18, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.discovery--shop .discovery__rail-arrow--previous {
+  left: 0.25rem;
+}
+
+.discovery--shop .discovery__rail-arrow--next {
+  right: 0.25rem;
+}
+
+@media (hover: hover) {
+  .discovery--shop .discovery__rail-arrow:hover {
+    color: var(--color-text-on-brand);
+    background: var(--color-brand);
+    border-color: var(--color-brand);
   }
 }
 
 .discovery--shop .discovery__list {
   display: flex;
-  gap: var(--space-2xs);
+  gap: var(--space-xs);
+  min-width: 0;
+  margin: 0;
+  padding: 4px 0 var(--space-3xs) 0;
   overflow-x: auto;
-  padding-bottom: var(--space-3xs);
-  scroll-snap-type: x proximity;
+  overscroll-behavior-inline: contain;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -153,59 +223,117 @@
   display: none;
 }
 
-/* Each tile is a small card: photo on top, name beneath. Six across
-   is too tight to read on a phone, so the row scrolls and the next
-   tile peeks in to show there is more. */
 .discovery--shop .discovery__list > li {
-  flex: 0 0 5.75rem;
-  scroll-snap-align: start;
+  flex: 0 0 clamp(7.5rem, 30vw, 9rem);
+  min-width: 0;
 }
 
 .discovery--shop .discovery__item {
   gap: 0;
   height: 100%;
-  padding: var(--space-3xs);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: url("../../assets/brand/couture-stitch.svg") center / 56px 80px, var(--color-couture-surface);
+  border: 1px solid rgba(176,141,87,.36);
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 2px rgba(255,250,240,.4), 0 5px 16px rgba(67,9,13,.06);
+  transition: transform var(--duration-base) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard);
 }
 
 .discovery--shop .discovery__media {
-  aspect-ratio: 6 / 5;
-  border: 0;
-  border-radius: var(--radius-md);
+  aspect-ratio: 4 / 5;
+  border: 1px solid rgba(255,255,255,.72);
+  border-radius: 0;
+  background: var(--color-couture-media);
+}
+
+.discovery--shop .discovery__media .product-image {
+  object-fit: cover;
 }
 
 .discovery--shop .discovery__name {
-  padding: var(--space-3xs) 0.1rem 0.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.8rem;
+  padding: .5rem .35rem;
   font-family: var(--font-display);
-  font-size: var(--text-sm);
+  font-size: clamp(.95rem, .85rem + .3vw, 1.08rem);
   font-weight: var(--weight-semibold);
-  line-height: 1.15;
+  line-height: 1.08;
+  color: var(--color-brand-deep);
+  text-align: center;
   text-wrap: balance;
+}
+
+@media (hover: hover) {
+  .discovery--shop .discovery__item:hover {
+    transform: translateY(-2px);
+    border-color: rgba(96, 16, 19, .32);
+    box-shadow: 0 9px 24px rgba(31, 17, 18, 0.075);
+  }
+
+    .discovery--shop .discovery__item:hover .discovery__media .product-image {
+      transform: scale(1.045);
+    }
+
+  .discovery--shop .discovery__item:hover .discovery__name {
+    color: var(--color-brand);
+    text-decoration: none;
+  }
+}
+
+.discovery--shop .discovery__empty {
+  margin: 0;
+  padding: var(--space-md);
+  color: var(--color-text-secondary);
+  text-align: center;
+  border: 1px dashed var(--color-border-luxury);
+  border-radius: var(--radius-lg);
+  background: rgba(255,255,255,.66);
 }
 
 @media (min-width: 640px) {
   .discovery--shop .discovery__list > li {
-    flex-basis: 7rem;
-  }
-}
-
-@media (min-width: 768px) {
-  .discovery--shop .discovery__groups {
-    max-width: 30rem;
+    flex-basis: clamp(9rem, 22vw, 11rem);
   }
 }
 
 @media (min-width: 1024px) {
-  /* Room for the whole set: wrap into a grid rather than scroll. */
-  .discovery--shop .discovery__list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
-    overflow: visible;
-  }
-
   .discovery--shop .discovery__list > li {
-    flex: initial;
+    flex-basis: clamp(10rem, 16vw, 12.5rem);
   }
 }
+
+@media (max-width: 480px) {
+  .discovery--shop .discovery__rail-arrow {
+    width: 2.2rem;
+    min-width: 2.2rem;
+    height: 2.2rem;
+  }
+
+  .discovery--shop .discovery__rail-arrow--previous { left: .15rem; }
+  .discovery--shop .discovery__rail-arrow--next { right: .15rem; }
+
+  .discovery--shop .discovery__list {
+    padding-inline: 0;
+    scroll-padding-inline: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .discovery--shop .discovery__item,
+  .discovery--shop .discovery__rail-arrow {
+    transition: none;
+  }
+}
+
+/* A quieter woven band beneath the richly detailed collection entrance. */
+.discovery--shop .discovery__groups {max-width:44rem;gap:.25rem;padding:.35rem;background:var(--pattern-weave),rgba(245,238,228,.82);border:1px solid rgba(176,141,87,.2);border-radius:3px;box-shadow:inset 0 1px 0 rgba(255,255,255,.6);}
+.discovery--shop .discovery__group {min-height:var(--touch-target);border-radius:2px;padding:.5rem .4rem;overflow:visible;text-overflow:clip;white-space:normal;font-size:clamp(.7rem,2.3vw,.86rem);line-height:1.35;color:var(--color-text-primary);}
+.discovery--shop .discovery__group.is-active {color:var(--color-white);background:var(--color-brand);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 3px 10px rgba(96,16,19,.15);}
+.discovery--shop .discovery__item {padding:.4rem;}
+.discovery--shop .discovery__media {background:var(--color-couture-media);}
+.discovery--shop .discovery__name {font-family:var(--font-display);font-size:clamp(.95rem,.85rem + .3vw,1.08rem);font-weight:var(--weight-semibold);line-height:1.15;}
+

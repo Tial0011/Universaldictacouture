@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 import { deleteDoc, doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+=======
+import { doc, getDoc, getDocFromServer } from "firebase/firestore";
+import { saveAdminRecord } from "./admin";
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 import { db } from "../firebase/firestore";
 import { isFirebaseConfigured } from "../firebase/config";
 import heroReadyToWear from "../assets/images/hero/hero-ready-to-wear.jpg";
@@ -42,7 +47,11 @@ export async function fetchAuthAppearance() {
 
 export async function loadAuthAppearanceAdmin() {
   if (!db) throw new Error("Connect Firebase before managing website appearance.");
+<<<<<<< HEAD
   const snapshot = await getDoc(doc(db, "siteAppearance", "auth"));
+=======
+  const snapshot = await getDocFromServer(doc(db, "siteAppearance", "auth"));
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   return snapshot.exists() ? { ...snapshot.data(), id: "auth" } : { id: "auth", ...DEFAULT_AUTH_APPEARANCE };
 }
 
@@ -53,6 +62,7 @@ export async function saveAuthAppearanceAdmin(raw) {
   const supportingText = String(raw.supportingText || "").trim();
   if (!eyebrow || !headline || !supportingText) throw new Error("Complete the authentication hero text before saving.");
   if (eyebrow.length > 80 || headline.length > 120 || supportingText.length > 260) throw new Error("Keep the appearance copy within the stated limits.");
+<<<<<<< HEAD
   await setDoc(doc(db, "siteAppearance", "auth"), {
     eyebrow,
     headline,
@@ -65,4 +75,16 @@ export async function saveAuthAppearanceAdmin(raw) {
 export async function resetAuthAppearanceAdmin() {
   if (!db) throw new Error("Connect Firebase before managing website appearance.");
   await deleteDoc(doc(db, "siteAppearance", "auth"));
+=======
+  return saveAdminRecord('siteAppearance', {
+    id: 'auth', eyebrow, headline, supportingText, image: raw.image || null,
+    _version: raw._version || 0, updatedAt: raw.updatedAt,
+  });
+}
+
+export async function resetAuthAppearanceAdmin(raw) {
+  if (!raw) throw new Error('Reload the current appearance before resetting.');
+  // Reset is a new versioned current change, never destructive history deletion.
+  return saveAuthAppearanceAdmin({ ...raw, ...DEFAULT_AUTH_APPEARANCE });
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 }

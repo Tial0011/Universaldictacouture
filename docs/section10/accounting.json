@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-10-09T10:03:35.480Z",
+  "contracts": 74,
+  "originalSourceRows": 547,
+  "originalStatuses": {
+    "ACTIVE": 466,
+    "VISUAL REFERENCE": 11,
+    "SUPERSEDED / TRACEABILITY": 25,
+    "CONFLICT / RESOLUTION": 11,
+    "IMPLEMENTATION GAP / LATER-SECTION": 14,
+    "HISTORICAL TRACEABILITY": 20
+  },
+  "acceptanceCases": 112,
+  "formalAcceptancePasses": 0,
+  "visualIds": 28,
+  "visualClasses": {
+    "B": 13,
+    "E": 12,
+    "B/C": 1,
+    "C/E": 1,
+    "D": 1
+  },
+  "note": "Source accounting is not implementation/test completion."
+}

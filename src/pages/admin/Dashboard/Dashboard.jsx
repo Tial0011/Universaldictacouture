@@ -1,11 +1,32 @@
 import { Link } from "react-router-dom";
 import { ADMIN_SECTIONS } from "../../../components/admin/adminSections";
+import { useStaff } from "../../../context/StaffContext";
+import { useOperations } from "../../../hooks/useOperations";
+import { attentionItems, operationalMetrics } from "../../../services/operationsModel";
+import { canDiscover, allows, DOMAIN_CONTRACTS } from "../../../services/staffAuthorization";
+import { SourceStatus, MetricCards } from "../../../components/admin/OperationalViews";
 import Button from "../../../components/common/Button";
+import ActivityPreview from "../../../components/admin/ActivityPreview";
+import OperationalState from "../../../components/admin/OperationalState";
 export default function Dashboard() {
-  return <div className="admin-stack">
-    <header className="admin-page-heading"><div><p className="admin-eyebrow">Your studio, at a glance</p><h1>A little care. A beautiful collection.</h1><p>Manage your pieces and keep your website fresh, all from one place.</p></div><Button to="/admin/products?new=1">Add a product</Button></header>
-    <section className="admin-panel admin-start"><div><p className="admin-eyebrow">A simple place to start</p><h2>Bring your next piece to the shop.</h2><p>Add its details and photos, save a draft, then publish when it is ready.</p></div><ol><li>Add the piece</li><li>Check the details</li><li>Publish to the shop</li></ol></section>
-    <section aria-labelledby="manage-title"><h2 id="manage-title">What would you like to manage?</h2><div className="admin-card-grid">{ADMIN_SECTIONS.map((section, index) => <Link className="admin-panel admin-section-card" key={section.path} to={section.path}><span className="admin-card-number" aria-hidden="true">0{index + 1}</span><h3>{section.label}</h3><p>{section.description}</p><span className="admin-card-action">{section.action} <span aria-hidden="true">→</span></span></Link>)}</div></section>
-    <section className="admin-panel"><h2>Setting up for the first time?</h2><p>Check account access and image uploads before publishing your first piece.</p><Button to="/admin/settings" variant="secondary">Open setup & access</Button></section>
+  const { staff } = useStaff();
+  const { sources, domains, items, load } = useOperations();
+  const work = attentionItems(items);
+  const checked = domains.filter(domain => ["success", "empty"].includes(sources[domain]?.state)).length;
+  const sections = ADMIN_SECTIONS.filter(section => section.domain === "content"
+    ? allows(staff, "content.read", { purpose: "content" }) : canDiscover(staff, section.domain));
+  return <div className="admin-stack"><header className="admin-page-heading"><div><p className="admin-eyebrow">Your private operational atelier</p><h1>Dashboard</h1><p>See what needs attention and reach the correct owner workflow.</p></div>
+    {domains.length > 0 && <Button to="/admin/attention">Open Attention Centre</Button>}</header>
+    {!sections.length ? <section className="admin-panel admin-stack"><h2>Minimum staff experience</h2><OperationalState state="restricted" message="Your staff identity is verified, but no current usable operational authority is available. You can review your staff context and sign out." /><Button to="/admin/settings" variant="secondary">Staff context</Button></section> : <>
+      {!domains.length && !allows(staff, "content.read", { purpose: "content" }) && <section className="admin-panel"><h2>Restricted operational experience</h2><p>Your permitted destinations have no integrated owner source in this codebase. No normal work counts or healthy-system conclusion are available; each destination reports its own source state.</p></section>}
+      {domains.length > 0 && <section className="admin-panel" aria-labelledby="attention-preview"><h2 id="attention-preview">Needs attention</h2>
+        <p>{checked ? `${work.length} actionable records in loaded pages from ${checked} checked sources. This is not a whole-system count.` : "No operational count is available until a source is successfully checked."}</p>
+        <ul className="admin-attention-preview">{work.slice(0, 5).map(item => <li key={item.key}><Link to={`/admin/attention?source=${item.domain}`}>{DOMAIN_CONTRACTS[item.domain].label}: {item.label}</Link><span>{item.reason}</span></li>)}</ul>
+        {checked > 0 && !work.length && <p>No actionable work found in the sources checked so far.</p>}<Button to="/admin/attention" variant="secondary">Review accessible work</Button></section>}
+      <SourceStatus sources={sources} domains={domains} onRefresh={load} />
+      <MetricCards metrics={operationalMetrics(staff, sources, domains)} />
+      <section aria-labelledby="quick-access"><h2 id="quick-access">Quick access</h2><div className="admin-card-grid">{sections.map(section => <Link className="admin-panel admin-section-card" key={section.path} to={section.path}><h3>{section.label}</h3><p>{section.description}</p><span className="admin-card-action">{section.action} →</span></Link>)}</div></section>
+      {domains.length > 0 && <ActivityPreview />}
+    </>}
   </div>;
 }

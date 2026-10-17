@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 import { useEffect, useMemo, useState } from "react";
+=======
+import { useCallback,useEffect, useMemo, useState } from "react";
+import { useReviewPublicationGuard } from "../../hooks/useReviewPublicationGuard";
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 import { Link, useSearchParams } from "react-router-dom";
 import ReviewCard from "../../components/reviews/ReviewCard";
 import ReviewCarousel from "../../components/reviews/ReviewCarousel";
@@ -39,6 +44,11 @@ export default function ReviewsFeeds() {
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("newest");
+<<<<<<< HEAD
+=======
+  const withdraw = useCallback(()=>setState(previous=>({...previous,entries:[],loading:false,error:"Current publication is being rechecked. Refresh to load eligible reviews."})),[]);
+  useReviewPublicationGuard(state.entries,withdraw);
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   const { isLiked, toggleLike, isReviewSaved, toggleSavedReview, shareReview, piecesReady, reviewsReady } = useReviewInteractions();
 
   useEffect(() => {

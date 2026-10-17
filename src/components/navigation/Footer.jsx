@@ -149,6 +149,7 @@ export default function Footer({ followsStyleCircle = false }) {
             ))}
 
             <div className="footer-direct">
+              <p className="footer-group__heading footer-direct__heading">Discover</p>
               {DIRECT_LINKS.map((link) => (
                 <Link key={link.to} to={link.to} className="footer-direct__link">
                   {link.label}

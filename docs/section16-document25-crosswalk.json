@@ -1,0 +1,4600 @@
+{
+  "document": 25,
+  "baseline": "a1f1259026197223b62ac0b66dc1e74a02f72bf8",
+  "moduleCoverage": 16,
+  "primaryRecords": 80,
+  "supportingRecords": 96,
+  "classifiedRecords": 176,
+  "sourceHashes": [
+    {
+      "file": "SECTION 16 VISUAL OFFICIAL .docx",
+      "sha256": "B554DD216CBF6B663C2FB811CA667B10680A1A6FAEF48426151591C27983ECD9"
+    },
+    {
+      "file": "SECTION 16 VISUAL .docx",
+      "sha256": "EBA80DC1665782BABCD2AF62F70BC651D4347ECF36EEDD3A97DAD7F248972E3A"
+    }
+  ],
+  "sourceQualifiedIds": true,
+  "reusedLabels": 80,
+  "newFormalFlows": 0,
+  "newSection16Ui": false,
+  "ownerDecision": "NONE — no business contradiction found",
+  "verdict": "PARTIAL",
+  "records": [
+    {
+      "sourceQualifiedId": "primary:S16-XW-M01-001",
+      "id": "S16-XW-M01-001",
+      "module": "M01",
+      "condition": "Session expired during protected Account work",
+      "paragraph": 463,
+      "audience": "Customer",
+      "visualReference": "S11-M10-F2-B7-V01",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 11",
+      "surfaces": [
+        "/signin",
+        "/signup",
+        "/verify-email",
+        "/profile"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/account-service.js",
+        "netlify/lib/account-proofs.js",
+        "src/pages/Auth/Auth.jsx",
+        "src/hooks/useCustomerSession.js"
+      ],
+      "tests": [
+        "tests/section16-account.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M01-002",
+      "id": "S16-XW-M01-002",
+      "module": "M01",
+      "condition": "Recovery link expired / superseded",
+      "paragraph": 469,
+      "audience": "Customer",
+      "visualReference": "S11-M10-F2-B2-V01/V02/V03",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 11",
+      "surfaces": [
+        "/signin",
+        "/signup",
+        "/verify-email",
+        "/profile"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/account-service.js",
+        "netlify/lib/account-proofs.js",
+        "src/pages/Auth/Auth.jsx",
+        "src/hooks/useCustomerSession.js"
+      ],
+      "tests": [
+        "tests/section16-account.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M01-003",
+      "id": "S16-XW-M01-003",
+      "module": "M01",
+      "condition": "Recovery outcome unknown",
+      "paragraph": 475,
+      "audience": "Customer",
+      "visualReference": "S16-VIS-006",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 11",
+      "surfaces": [
+        "/signin",
+        "/signup",
+        "/verify-email",
+        "/profile"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/account-service.js",
+        "netlify/lib/account-proofs.js",
+        "src/pages/Auth/Auth.jsx",
+        "src/hooks/useCustomerSession.js"
+      ],
+      "tests": [
+        "tests/section16-account.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M01-004",
+      "id": "S16-XW-M01-004",
+      "module": "M01",
+      "condition": "Account context changed / switched",
+      "paragraph": 481,
+      "audience": "Customer",
+      "visualReference": "S16-VIS-007",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 11",
+      "surfaces": [
+        "/signin",
+        "/signup",
+        "/verify-email",
+        "/profile"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/account-service.js",
+        "netlify/lib/account-proofs.js",
+        "src/pages/Auth/Auth.jsx",
+        "src/hooks/useCustomerSession.js"
+      ],
+      "tests": [
+        "tests/section16-account.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M01-005",
+      "id": "S16-XW-M01-005",
+      "module": "M01",
+      "condition": "Restricted / deleted Account reaches normal private surface",
+      "paragraph": 487,
+      "audience": "Customer",
+      "visualReference": "S11-M10-F2-B2-V01/V02/V03",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 11",
+      "surfaces": [
+        "/signin",
+        "/signup",
+        "/verify-email",
+        "/profile"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/account-service.js",
+        "netlify/lib/account-proofs.js",
+        "src/pages/Auth/Auth.jsx",
+        "src/hooks/useCustomerSession.js"
+      ],
+      "tests": [
+        "tests/section16-account.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M02-001",
+      "id": "S16-XW-M02-001",
+      "module": "M02",
+      "condition": "Staff capability removed while page remains open",
+      "paragraph": 493,
+      "audience": "Staff/Admin",
+      "visualReference": "S16-VIS-007",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 12",
+      "surfaces": [
+        "existing scoped Admin surfaces"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/staff-authority.js",
+        "src/services/staffAuthorization.js",
+        "src/components/admin/AdminAccess.jsx"
+      ],
+      "tests": [
+        "tests/section16-contract.test.mjs",
+        "tests/section16-rules.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M02-002",
+      "id": "S16-XW-M02-002",
+      "module": "M02",
+      "condition": "Unauthorized copied Account/deep-link ID",
+      "paragraph": 499,
+      "audience": "Staff/Admin",
+      "visualReference": "S16-VIS-002",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 12",
+      "surfaces": [
+        "existing scoped Admin surfaces"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/staff-authority.js",
+        "src/services/staffAuthorization.js",
+        "src/components/admin/AdminAccess.jsx"
+      ],
+      "tests": [
+        "tests/section16-contract.test.mjs",
+        "tests/section16-rules.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M02-003",
+      "id": "S16-XW-M02-003",
+      "module": "M02",
+      "condition": "Couturier reassigned away with Chat/Order open",
+      "paragraph": 505,
+      "audience": "Dicta Couturier",
+      "visualReference": "S12-XSEC-ASSIGN-01",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 12",
+      "surfaces": [
+        "existing scoped Admin surfaces"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/staff-authority.js",
+        "src/services/staffAuthorization.js",
+        "src/components/admin/AdminAccess.jsx"
+      ],
+      "tests": [
+        "tests/section16-contract.test.mjs",
+        "tests/section16-rules.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M02-004",
+      "id": "S16-XW-M02-004",
+      "module": "M02",
+      "condition": "Identity review resolved elsewhere",
+      "paragraph": 511,
+      "audience": "Authorized Staff",
+      "visualReference": "S16-VIS-007",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 12",
+      "surfaces": [
+        "existing scoped Admin surfaces"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/staff-authority.js",
+        "src/services/staffAuthorization.js",
+        "src/components/admin/AdminAccess.jsx"
+      ],
+      "tests": [
+        "tests/section16-contract.test.mjs",
+        "tests/section16-rules.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M02-005",
+      "id": "S16-XW-M02-005",
+      "module": "M02",
+      "condition": "Payment proof viewer lacks financial-evidence capability",
+      "paragraph": 517,
+      "audience": "Staff/Admin",
+      "visualReference": "S12-XSEC-PAY-01",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 12",
+      "surfaces": [
+        "existing scoped Admin surfaces"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/staff-authority.js",
+        "src/services/staffAuthorization.js",
+        "src/components/admin/AdminAccess.jsx"
+      ],
+      "tests": [
+        "tests/section16-contract.test.mjs",
+        "tests/section16-rules.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M03-001",
+      "id": "S16-XW-M03-001",
+      "module": "M03",
+      "condition": "Product publish result unknown",
+      "paragraph": 523,
+      "audience": "Authorized Staff",
+      "visualReference": "S16-VIS-006",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 13",
+      "surfaces": [
+        "/shop",
+        "/admin/products"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/components/admin/RecordManager.jsx",
+        "src/services/products.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M03-002",
+      "id": "S16-XW-M03-002",
+      "module": "M03",
+      "condition": "Stale public index returns Unpublished/Archived Product",
+      "paragraph": 529,
+      "audience": "Public/Customer",
+      "visualReference": "S16-VIS-003",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 13",
+      "surfaces": [
+        "/shop",
+        "/admin/products"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/components/admin/RecordManager.jsx",
+        "src/services/products.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M03-003",
+      "id": "S16-XW-M03-003",
+      "module": "M03",
+      "condition": "Concurrent Product edit",
+      "paragraph": 535,
+      "audience": "Staff/Admin",
+      "visualReference": "S16-VIS-007",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 13",
+      "surfaces": [
+        "/shop",
+        "/admin/products"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/components/admin/RecordManager.jsx",
+        "src/services/products.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M03-004",
+      "id": "S16-XW-M03-004",
+      "module": "M03",
+      "condition": "Current Product price changed after historical Order",
+      "paragraph": 541,
+      "audience": "Customer/Staff",
+      "visualReference": "S16-VIS-004",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 13",
+      "surfaces": [
+        "/shop",
+        "/admin/products"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/components/admin/RecordManager.jsx",
+        "src/services/products.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M03-005",
+      "id": "S16-XW-M03-005",
+      "module": "M03",
+      "condition": "Product archive while My Closet card is stale",
+      "paragraph": 547,
+      "audience": "Customer",
+      "visualReference": "S12-XSEC-PROD-01",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 13",
+      "surfaces": [
+        "/shop",
+        "/admin/products"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/components/admin/RecordManager.jsx",
+        "src/services/products.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M04-001",
+      "id": "S16-XW-M04-001",
+      "module": "M04",
+      "condition": "Private media upload failed before attachment",
+      "paragraph": 553,
+      "audience": "Customer/Staff",
+      "visualReference": "S15-VIS-033",
+      "visualClass": "A — CURRENT REFERENCE (SOURCE ASSET GAP)",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "owning media domain",
+      "surfaces": [
+        "existing Product/receipt/private media components"
+      ],
+      "classification": "COMPLETE",
+      "code": [
+        "netlify/lib/media-service.js",
+        "src/components/admin/OwnerImageField.jsx",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M04-002",
+      "id": "S16-XW-M04-002",
+      "module": "M04",
+      "condition": "Upload/finalization outcome unknown",
+      "paragraph": 559,
+      "audience": "Customer/Staff",
+      "visualReference": "S16-VIS-006",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "owning media domain",
+      "surfaces": [
+        "existing Product/receipt/private media components"
+      ],
+      "classification": "COMPLETE",
+      "code": [
+        "netlify/lib/media-service.js",
+        "src/components/admin/OwnerImageField.jsx",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M04-003",
+      "id": "S16-XW-M04-003",
+      "module": "M04",
+      "condition": "Copied private media locator after access removed",
+      "paragraph": 565,
+      "audience": "Customer/Staff",
+      "visualReference": "S16-VIS-002",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "owning media domain",
+      "surfaces": [
+        "existing Product/receipt/private media components"
+      ],
+      "classification": "COMPLETE",
+      "code": [
+        "netlify/lib/media-service.js",
+        "src/components/admin/OwnerImageField.jsx",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M04-004",
+      "id": "S16-XW-M04-004",
+      "module": "M04",
+      "condition": "Asset detached while another valid reference remains",
+      "paragraph": 571,
+      "audience": "SYSTEM-ONLY",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "owning media domain",
+      "surfaces": [
+        "existing Product/receipt/private media components"
+      ],
+      "classification": "COMPLETE",
+      "code": [
+        "netlify/lib/media-service.js",
+        "src/components/admin/OwnerImageField.jsx",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M04-005",
+      "id": "S16-XW-M04-005",
+      "module": "M04",
+      "condition": "Derivative/thumbnail generation fails",
+      "paragraph": 577,
+      "audience": "Customer/Staff",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "owning media domain",
+      "surfaces": [
+        "existing Product/receipt/private media components"
+      ],
+      "classification": "COMPLETE",
+      "code": [
+        "netlify/lib/media-service.js",
+        "src/components/admin/OwnerImageField.jsx",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M05-001",
+      "id": "S16-XW-M05-001",
+      "module": "M05",
+      "condition": "Double Add to My Closet",
+      "paragraph": 583,
+      "audience": "Customer",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 7",
+      "surfaces": [
+        "/my-closet/my-pieces",
+        "/my-closet/saved-reviews"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/hooks/useBoundSaves.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs",
+        "tests/section16-pretransaction-client.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M05-002",
+      "id": "S16-XW-M05-002",
+      "module": "M05",
+      "condition": "Add vs Remove race / stale heart",
+      "paragraph": 589,
+      "audience": "Customer",
+      "visualReference": "S16-VIS-007",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 7",
+      "surfaces": [
+        "/my-closet/my-pieces",
+        "/my-closet/saved-reviews"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/hooks/useBoundSaves.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs",
+        "tests/section16-pretransaction-client.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M05-003",
+      "id": "S16-XW-M05-003",
+      "module": "M05",
+      "condition": "Account switch while save request is in flight",
+      "paragraph": 595,
+      "audience": "Customer",
+      "visualReference": "S16-VIS-007",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 7",
+      "surfaces": [
+        "/my-closet/my-pieces",
+        "/my-closet/saved-reviews"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/hooks/useBoundSaves.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs",
+        "tests/section16-pretransaction-client.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M05-004",
+      "id": "S16-XW-M05-004",
+      "module": "M05",
+      "condition": "Saved Product becomes unavailable",
+      "paragraph": 601,
+      "audience": "Customer",
+      "visualReference": "S12-XSEC-PROD-01",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 7",
+      "surfaces": [
+        "/my-closet/my-pieces",
+        "/my-closet/saved-reviews"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/hooks/useBoundSaves.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs",
+        "tests/section16-pretransaction-client.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M05-005",
+      "id": "S16-XW-M05-005",
+      "module": "M05",
+      "condition": "Deleted Account private closet state",
+      "paragraph": 607,
+      "audience": "Customer",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 7",
+      "surfaces": [
+        "/my-closet/my-pieces",
+        "/my-closet/saved-reviews"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/hooks/useBoundSaves.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs",
+        "tests/section16-pretransaction-client.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M06-001",
+      "id": "S16-XW-M06-001",
+      "module": "M06",
+      "condition": "Custom Style draft save fails",
+      "paragraph": 613,
+      "audience": "Customer",
+      "visualReference": "S12-XSEC-CSTYLE-01",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 6",
+      "surfaces": [
+        "/custom-style"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/pages/CustomStyle/CustomStyle.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M06-002",
+      "id": "S16-XW-M06-002",
+      "module": "M06",
+      "condition": "Submit result unknown",
+      "paragraph": 619,
+      "audience": "Customer",
+      "visualReference": "S16-VIS-006",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 6",
+      "surfaces": [
+        "/custom-style"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/pages/CustomStyle/CustomStyle.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M06-003",
+      "id": "S16-XW-M06-003",
+      "module": "M06",
+      "condition": "Media upload finishes after request state changed",
+      "paragraph": 625,
+      "audience": "Customer/Staff",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 6",
+      "surfaces": [
+        "/custom-style"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/pages/CustomStyle/CustomStyle.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M06-004",
+      "id": "S16-XW-M06-004",
+      "module": "M06",
+      "condition": "Account becomes Restricted during submit",
+      "paragraph": 631,
+      "audience": "Customer",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 6",
+      "surfaces": [
+        "/custom-style"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/pages/CustomStyle/CustomStyle.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M06-005",
+      "id": "S16-XW-M06-005",
+      "module": "M06",
+      "condition": "Main Order handoff response lost",
+      "paragraph": 637,
+      "audience": "Customer/Staff",
+      "visualReference": "S16-VIS-005",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 6",
+      "surfaces": [
+        "/custom-style"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/pages/CustomStyle/CustomStyle.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M07-001",
+      "id": "S16-XW-M07-001",
+      "module": "M07",
+      "condition": "Main Order creation response lost",
+      "paragraph": 643,
+      "audience": "Customer/Staff",
+      "visualReference": "S16-VIS-006",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Sections 8/14",
+      "surfaces": [
+        "/my-closet/orders/:orderId",
+        "/admin/orders/:orderId"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/OrderWorkspace.jsx",
+        "src/pages/MyCloset/CatalogueIntake.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M07-002",
+      "id": "S16-XW-M07-002",
+      "module": "M07",
+      "condition": "Customer approves stale Edition",
+      "paragraph": 649,
+      "audience": "Customer",
+      "visualReference": "S12-XSEC-ORDER-02",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Sections 8/14",
+      "surfaces": [
+        "/my-closet/orders/:orderId",
+        "/admin/orders/:orderId"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/OrderWorkspace.jsx",
+        "src/pages/MyCloset/CatalogueIntake.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M07-003",
+      "id": "S16-XW-M07-003",
+      "module": "M07",
+      "condition": "Product/Profile changed after Original Order Snapshot",
+      "paragraph": 655,
+      "audience": "Customer/Staff",
+      "visualReference": "S16-VIS-004",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Sections 8/14",
+      "surfaces": [
+        "/my-closet/orders/:orderId",
+        "/admin/orders/:orderId"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/OrderWorkspace.jsx",
+        "src/pages/MyCloset/CatalogueIntake.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M07-004",
+      "id": "S16-XW-M07-004",
+      "module": "M07",
+      "condition": "Concurrent Edition/business edit",
+      "paragraph": 661,
+      "audience": "Staff/Customer",
+      "visualReference": "S16-VIS-007",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Sections 8/14",
+      "surfaces": [
+        "/my-closet/orders/:orderId",
+        "/admin/orders/:orderId"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/OrderWorkspace.jsx",
+        "src/pages/MyCloset/CatalogueIntake.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M07-005",
+      "id": "S16-XW-M07-005",
+      "module": "M07",
+      "condition": "Deleted customer with ongoing legitimate Order",
+      "paragraph": 667,
+      "audience": "Staff",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Sections 8/14",
+      "surfaces": [
+        "/my-closet/orders/:orderId",
+        "/admin/orders/:orderId"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/OrderWorkspace.jsx",
+        "src/pages/MyCloset/CatalogueIntake.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M08-001",
+      "id": "S16-XW-M08-001",
+      "module": "M08",
+      "condition": "Payment proof upload failed",
+      "paragraph": 673,
+      "audience": "Customer",
+      "visualReference": "S12-XSEC-PAY-01",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "transaction finance",
+      "surfaces": [
+        "existing Order receipt interface; protected finance API"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M08-002",
+      "id": "S16-XW-M08-002",
+      "module": "M08",
+      "condition": "Verification outcome unknown",
+      "paragraph": 679,
+      "audience": "Customer/Staff",
+      "visualReference": "S16-VIS-006",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "transaction finance",
+      "surfaces": [
+        "existing Order receipt interface; protected finance API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M08-003",
+      "id": "S16-XW-M08-003",
+      "module": "M08",
+      "condition": "Stale reviewer action after amount/Extension change",
+      "paragraph": 685,
+      "audience": "Authorized Staff",
+      "visualReference": "S16-VIS-007",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "transaction finance",
+      "surfaces": [
+        "existing Order receipt interface; protected finance API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M08-004",
+      "id": "S16-XW-M08-004",
+      "module": "M08",
+      "condition": "Couturier has Order access but not proof access",
+      "paragraph": 691,
+      "audience": "Dicta Couturier",
+      "visualReference": "S12-XSEC-PAY-01",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "transaction finance",
+      "surfaces": [
+        "existing Order receipt interface; protected finance API"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M08-005",
+      "id": "S16-XW-M08-005",
+      "module": "M08",
+      "condition": "Account deletion while Payment history retained",
+      "paragraph": 697,
+      "audience": "Staff/System",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "transaction finance",
+      "surfaces": [
+        "existing Order receipt interface; protected finance API"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M09-001",
+      "id": "S16-XW-M09-001",
+      "module": "M09",
+      "condition": "Duplicate Extension acceptance",
+      "paragraph": 703,
+      "audience": "Customer/Staff",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Current Work context; protected Extension API"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "System-only constraint: existing trusted core tested. No new visible surface is required."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M09-002",
+      "id": "S16-XW-M09-002",
+      "module": "M09",
+      "condition": "Stale Extension proposal approval",
+      "paragraph": 709,
+      "audience": "Customer",
+      "visualReference": "S16-VIS-007",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Current Work context; protected Extension API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M09-003",
+      "id": "S16-XW-M09-003",
+      "module": "M09",
+      "condition": "Another active Extension already exists",
+      "paragraph": 715,
+      "audience": "Staff",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Current Work context; protected Extension API"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "System-only constraint: existing trusted core tested. No new visible surface is required."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M09-004",
+      "id": "S16-XW-M09-004",
+      "module": "M09",
+      "condition": "Payment made while older Extension screen remains open",
+      "paragraph": 721,
+      "audience": "Customer/Staff",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Current Work context; protected Extension API"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "System-only constraint: existing trusted core tested. No new visible surface is required."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M09-005",
+      "id": "S16-XW-M09-005",
+      "module": "M09",
+      "condition": "Account deletion while accepted Extension work continues",
+      "paragraph": 727,
+      "audience": "Staff",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Current Work context; protected Extension API"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "System-only constraint: existing trusted core tested. No new visible surface is required."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M10-001",
+      "id": "S16-XW-M10-001",
+      "module": "M10",
+      "condition": "Reassignment while former Couturier page is open",
+      "paragraph": 733,
+      "audience": "Dicta Couturier",
+      "visualReference": "S12-XSEC-ASSIGN-01",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Order workspace; protected operations API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M10-002",
+      "id": "S16-XW-M10-002",
+      "module": "M10",
+      "condition": "Completion response lost",
+      "paragraph": 739,
+      "audience": "Staff",
+      "visualReference": "S16-VIS-006",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Order workspace; protected operations API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M10-003",
+      "id": "S16-XW-M10-003",
+      "module": "M10",
+      "condition": "Payment state changes while fulfilment page is stale",
+      "paragraph": 745,
+      "audience": "Staff",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Order workspace; protected operations API"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "System-only constraint: existing trusted core tested. No new visible surface is required."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M10-004",
+      "id": "S16-XW-M10-004",
+      "module": "M10",
+      "condition": "Active Extension changes current work component",
+      "paragraph": 751,
+      "audience": "Staff",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Order workspace; protected operations API"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "System-only constraint: existing trusted core tested. No new visible surface is required."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M10-005",
+      "id": "S16-XW-M10-005",
+      "module": "M10",
+      "condition": "Backup restores former assignee",
+      "paragraph": 757,
+      "audience": "SYSTEM-ONLY",
+      "visualReference": "S16-VIS-008",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Order workspace; protected operations API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M11-001",
+      "id": "S16-XW-M11-001",
+      "module": "M11",
+      "condition": "Chat send response lost",
+      "paragraph": 763,
+      "audience": "Customer/Staff",
+      "visualReference": "S16-VIS-006",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 10",
+      "surfaces": [
+        "existing general/transaction Chat"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/components/chat/TransactionConversation.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M11-002",
+      "id": "S16-XW-M11-002",
+      "module": "M11",
+      "condition": "Reconnect after duplicated callback",
+      "paragraph": 769,
+      "audience": "Customer/Staff",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 10",
+      "surfaces": [
+        "existing general/transaction Chat"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/components/chat/TransactionConversation.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M11-003",
+      "id": "S16-XW-M11-003",
+      "module": "M11",
+      "condition": "Couturier reassigned during pending send",
+      "paragraph": 775,
+      "audience": "Staff",
+      "visualReference": "S12-XSEC-CHAT-01",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 10",
+      "surfaces": [
+        "existing general/transaction Chat"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/components/chat/TransactionConversation.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M11-004",
+      "id": "S16-XW-M11-004",
+      "module": "M11",
+      "condition": "Customer switches Account during send",
+      "paragraph": 781,
+      "audience": "Customer",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 10",
+      "surfaces": [
+        "existing general/transaction Chat"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/components/chat/TransactionConversation.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M11-005",
+      "id": "S16-XW-M11-005",
+      "module": "M11",
+      "condition": "Order/Extension context changed after historical message",
+      "paragraph": 787,
+      "audience": "Customer/Staff",
+      "visualReference": "S12-XSEC-CHAT-02",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 10",
+      "surfaces": [
+        "existing general/transaction Chat"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/components/chat/TransactionConversation.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M12-001",
+      "id": "S16-XW-M12-001",
+      "module": "M12",
+      "condition": "Publish vs remove moderation race",
+      "paragraph": 793,
+      "audience": "Authorized Staff",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 9",
+      "surfaces": [
+        "/reviews-feeds",
+        "existing private Order review form"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/pages/MyCloset/OrderReview.jsx",
+        "src/hooks/useReviewPublicationGuard.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M12-002",
+      "id": "S16-XW-M12-002",
+      "module": "M12",
+      "condition": "Copied Review URL after removal",
+      "paragraph": 799,
+      "audience": "Public/Customer",
+      "visualReference": "S16-VIS-003",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 9",
+      "surfaces": [
+        "/reviews-feeds",
+        "existing private Order review form"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/pages/MyCloset/OrderReview.jsx",
+        "src/hooks/useReviewPublicationGuard.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M12-003",
+      "id": "S16-XW-M12-003",
+      "module": "M12",
+      "condition": "Duplicate Like / Save",
+      "paragraph": 805,
+      "audience": "Customer",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 9",
+      "surfaces": [
+        "/reviews-feeds",
+        "existing private Order review form"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/pages/MyCloset/OrderReview.jsx",
+        "src/hooks/useReviewPublicationGuard.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M12-004",
+      "id": "S16-XW-M12-004",
+      "module": "M12",
+      "condition": "Account deleted while Review remains legitimately public",
+      "paragraph": 811,
+      "audience": "Public",
+      "visualReference": "S12-XSEC-REV-01",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 9",
+      "surfaces": [
+        "/reviews-feeds",
+        "existing private Order review form"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/pages/MyCloset/OrderReview.jsx",
+        "src/hooks/useReviewPublicationGuard.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M12-005",
+      "id": "S16-XW-M12-005",
+      "module": "M12",
+      "condition": "Promotional permission changes while reuse work pending",
+      "paragraph": 817,
+      "audience": "Staff/System",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 9",
+      "surfaces": [
+        "/reviews-feeds",
+        "existing private Order review form"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/pages/MyCloset/OrderReview.jsx",
+        "src/hooks/useReviewPublicationGuard.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M13-001",
+      "id": "S16-XW-M13-001",
+      "module": "M13",
+      "condition": "Optional notification queued then Account deletes",
+      "paragraph": 823,
+      "audience": "SYSTEM / Customer history",
+      "visualReference": "S16-VIS-003",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 15 / downstream execution",
+      "surfaces": [
+        "system-only ports; Notification Centre owner integration incomplete"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/downstream-worker.js",
+        "netlify/lib/notification-delivery.js",
+        "netlify/lib/system-maintenance.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M13-002",
+      "id": "S16-XW-M13-002",
+      "module": "M13",
+      "condition": "Notification delivery fails after business commit",
+      "paragraph": 829,
+      "audience": "Customer/Staff",
+      "visualReference": "S15-VIS-023",
+      "visualClass": "A — CURRENT REFERENCE (SOURCE ASSET GAP)",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 15 / downstream execution",
+      "surfaces": [
+        "system-only ports; Notification Centre owner integration incomplete"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/downstream-worker.js",
+        "netlify/lib/notification-delivery.js",
+        "netlify/lib/system-maintenance.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M13-003",
+      "id": "S16-XW-M13-003",
+      "module": "M13",
+      "condition": "Notification delivery outcome unknown",
+      "paragraph": 835,
+      "audience": "Staff/System",
+      "visualReference": "S16-VIS-006",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 15 / downstream execution",
+      "surfaces": [
+        "system-only ports; Notification Centre owner integration incomplete"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/downstream-worker.js",
+        "netlify/lib/notification-delivery.js",
+        "netlify/lib/system-maintenance.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M13-004",
+      "id": "S16-XW-M13-004",
+      "module": "M13",
+      "condition": "Old background work resumes after newer lifecycle/config state",
+      "paragraph": 841,
+      "audience": "SYSTEM-ONLY",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 15 / downstream execution",
+      "surfaces": [
+        "system-only ports; Notification Centre owner integration incomplete"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/downstream-worker.js",
+        "netlify/lib/notification-delivery.js",
+        "netlify/lib/system-maintenance.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M13-005",
+      "id": "S16-XW-M13-005",
+      "module": "M13",
+      "condition": "Staff capability removed after business action already committed",
+      "paragraph": 847,
+      "audience": "SYSTEM-ONLY",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 15 / downstream execution",
+      "surfaces": [
+        "system-only ports; Notification Centre owner integration incomplete"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/downstream-worker.js",
+        "netlify/lib/notification-delivery.js",
+        "netlify/lib/system-maintenance.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M14-001",
+      "id": "S16-XW-M14-001",
+      "module": "M14",
+      "condition": "Two staff save shared configuration concurrently",
+      "paragraph": 853,
+      "audience": "Authorized Staff",
+      "visualReference": "S16-VIS-007",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 15",
+      "surfaces": [
+        "existing content/Staff surfaces; protected configuration API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/shared-configuration.js",
+        "netlify/lib/account-handler.js"
+      ],
+      "tests": [
+        "tests/section16-downstream-http.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M14-002",
+      "id": "S16-XW-M14-002",
+      "module": "M14",
+      "condition": "Protected bank instruction setting viewed without capability",
+      "paragraph": 859,
+      "audience": "Staff/Admin",
+      "visualReference": "S15-VIS-036",
+      "visualClass": "B — CURRENT WITH WRITTEN OVERRIDE (SOURCE ASSET GAP)",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 15",
+      "surfaces": [
+        "existing content/Staff surfaces; protected configuration API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/shared-configuration.js",
+        "netlify/lib/account-handler.js"
+      ],
+      "tests": [
+        "tests/section16-downstream-http.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M14-003",
+      "id": "S16-XW-M14-003",
+      "module": "M14",
+      "condition": "Current support/delivery copy changes after historical Order",
+      "paragraph": 865,
+      "audience": "Customer/Staff",
+      "visualReference": "S16-VIS-004",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 15",
+      "surfaces": [
+        "existing content/Staff surfaces; protected configuration API"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/shared-configuration.js",
+        "netlify/lib/account-handler.js"
+      ],
+      "tests": [
+        "tests/section16-downstream-http.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M14-004",
+      "id": "S16-XW-M14-004",
+      "module": "M14",
+      "condition": "Public content cache lags a configuration change",
+      "paragraph": 871,
+      "audience": "Public",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 15",
+      "surfaces": [
+        "existing content/Staff surfaces; protected configuration API"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/shared-configuration.js",
+        "netlify/lib/account-handler.js"
+      ],
+      "tests": [
+        "tests/section16-downstream-http.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M14-005",
+      "id": "S16-XW-M14-005",
+      "module": "M14",
+      "condition": "Staff capability revoked mid-change",
+      "paragraph": 877,
+      "audience": "Staff/Admin",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 15",
+      "surfaces": [
+        "existing content/Staff surfaces; protected configuration API"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/shared-configuration.js",
+        "netlify/lib/account-handler.js"
+      ],
+      "tests": [
+        "tests/section16-downstream-http.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M15-001",
+      "id": "S16-XW-M15-001",
+      "module": "M15",
+      "condition": "Product unpublishes while search index remains stale",
+      "paragraph": 883,
+      "audience": "Public/Customer",
+      "visualReference": "S16-VIS-003",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "relevant source owner / derived retrieval",
+      "surfaces": [
+        "existing Shop/feed/scoped search and read APIs"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/owner-projections.js",
+        "src/services/operationalSearch.js",
+        "src/services/operations.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section12-part2-search.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M15-002",
+      "id": "S16-XW-M15-002",
+      "module": "M15",
+      "condition": "Review removed while homepage projection is stale",
+      "paragraph": 889,
+      "audience": "Public",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "relevant source owner / derived retrieval",
+      "surfaces": [
+        "existing Shop/feed/scoped search and read APIs"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/owner-projections.js",
+        "src/services/operationalSearch.js",
+        "src/services/operations.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section12-part2-search.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M15-003",
+      "id": "S16-XW-M15-003",
+      "module": "M15",
+      "condition": "Staff count/autocomplete includes unauthorized record",
+      "paragraph": 895,
+      "audience": "Staff/Admin",
+      "visualReference": "S16-VIS-002",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "relevant source owner / derived retrieval",
+      "surfaces": [
+        "existing Shop/feed/scoped search and read APIs"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/owner-projections.js",
+        "src/services/operationalSearch.js",
+        "src/services/operations.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section12-part2-search.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M15-004",
+      "id": "S16-XW-M15-004",
+      "module": "M15",
+      "condition": "Projection update missed / consumer rebuilt",
+      "paragraph": 901,
+      "audience": "SYSTEM-ONLY",
+      "visualReference": "S16-VIS-003",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "relevant source owner / derived retrieval",
+      "surfaces": [
+        "existing Shop/feed/scoped search and read APIs"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/owner-projections.js",
+        "src/services/operationalSearch.js",
+        "src/services/operations.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section12-part2-search.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M15-005",
+      "id": "S16-XW-M15-005",
+      "module": "M15",
+      "condition": "Rare Merge leaves source Accounts in stale staff search",
+      "paragraph": 907,
+      "audience": "Authorized Staff",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "relevant source owner / derived retrieval",
+      "surfaces": [
+        "existing Shop/feed/scoped search and read APIs"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/owner-projections.js",
+        "src/services/operationalSearch.js",
+        "src/services/operations.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section12-part2-search.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M16-001",
+      "id": "S16-XW-M16-001",
+      "module": "M16",
+      "condition": "Dependency/provider unavailable before business commit",
+      "paragraph": 913,
+      "audience": "Customer/Staff",
+      "visualReference": "S16-VIS-006",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 16 runtime",
+      "surfaces": [
+        "existing owner recovery responses; system-only Audit/recovery ports"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/runtime-integrity.js",
+        "netlify/lib/intent-migration.js",
+        "src/services/ownerOperation.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M16-002",
+      "id": "S16-XW-M16-002",
+      "module": "M16",
+      "condition": "Process crashes after business commit before response",
+      "paragraph": 919,
+      "audience": "Customer/Staff",
+      "visualReference": "S16-VIS-006",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 16 runtime",
+      "surfaces": [
+        "existing owner recovery responses; system-only Audit/recovery ports"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/runtime-integrity.js",
+        "netlify/lib/intent-migration.js",
+        "src/services/ownerOperation.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M16-003",
+      "id": "S16-XW-M16-003",
+      "module": "M16",
+      "condition": "Audit persistence uncertain after committed domain action",
+      "paragraph": 925,
+      "audience": "SYSTEM-ONLY",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 16 runtime",
+      "surfaces": [
+        "existing owner recovery responses; system-only Audit/recovery ports"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/runtime-integrity.js",
+        "netlify/lib/intent-migration.js",
+        "src/services/ownerOperation.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M16-004",
+      "id": "S16-XW-M16-004",
+      "module": "M16",
+      "condition": "Backup restored with stale authority",
+      "paragraph": 931,
+      "audience": "SYSTEM/Staff",
+      "visualReference": "S16-VIS-008",
+      "visualClass": "E — NEW VISUAL JUSTIFIED / GENERATED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 16 runtime",
+      "surfaces": [
+        "existing owner recovery responses; system-only Audit/recovery ports"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/runtime-integrity.js",
+        "netlify/lib/intent-migration.js",
+        "src/services/ownerOperation.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Recovery gate code tested; no actual production restore/current-authority drill performed."
+    },
+    {
+      "sourceQualifiedId": "primary:S16-XW-M16-005",
+      "id": "S16-XW-M16-005",
+      "module": "M16",
+      "condition": "Old client attempts protected action after backend/security evolution",
+      "paragraph": 937,
+      "audience": "Customer/Staff",
+      "visualReference": "SYSTEM-ONLY",
+      "visualClass": "F — SYSTEM-ONLY / NO VISUAL REQUIRED",
+      "source": "SECTION 16 VISUAL OFFICIAL .docx",
+      "owner": "Section 16 runtime",
+      "surfaces": [
+        "existing owner recovery responses; system-only Audit/recovery ports"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/runtime-integrity.js",
+        "netlify/lib/intent-migration.js",
+        "src/services/ownerOperation.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "F — SUCCESSFUL NO-NEW-VISUAL CLASSIFICATION",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M01-001",
+      "id": "S16-XW-M01-001",
+      "module": "M01",
+      "condition": "Registration / verification submission unknown",
+      "paragraph": 288,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 11",
+      "surfaces": [
+        "/signin",
+        "/signup",
+        "/verify-email",
+        "/profile"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/account-service.js",
+        "netlify/lib/account-proofs.js",
+        "src/pages/Auth/Auth.jsx",
+        "src/hooks/useCustomerSession.js"
+      ],
+      "tests": [
+        "tests/section16-account.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M01-002",
+      "id": "S16-XW-M01-002",
+      "module": "M01",
+      "condition": "Verification link expired / malformed / consumed / superseded",
+      "paragraph": 297,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 11",
+      "surfaces": [
+        "/signin",
+        "/signup",
+        "/verify-email",
+        "/profile"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/account-service.js",
+        "netlify/lib/account-proofs.js",
+        "src/pages/Auth/Auth.jsx",
+        "src/hooks/useCustomerSession.js"
+      ],
+      "tests": [
+        "tests/section16-account.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M02-001",
+      "id": "S16-XW-M02-001",
+      "module": "M02",
+      "condition": "Staff session expired",
+      "paragraph": 306,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 12",
+      "surfaces": [
+        "existing scoped Admin surfaces"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/staff-authority.js",
+        "src/services/staffAuthorization.js",
+        "src/components/admin/AdminAccess.jsx"
+      ],
+      "tests": [
+        "tests/section16-contract.test.mjs",
+        "tests/section16-rules.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M02-002",
+      "id": "S16-XW-M02-002",
+      "module": "M02",
+      "condition": "Missing capability",
+      "paragraph": 315,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 12",
+      "surfaces": [
+        "existing scoped Admin surfaces"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/staff-authority.js",
+        "src/services/staffAuthorization.js",
+        "src/components/admin/AdminAccess.jsx"
+      ],
+      "tests": [
+        "tests/section16-contract.test.mjs",
+        "tests/section16-rules.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M03-001",
+      "id": "S16-XW-M03-001",
+      "module": "M03",
+      "condition": "Product load failure",
+      "paragraph": 324,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 13",
+      "surfaces": [
+        "/shop",
+        "/admin/products"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/components/admin/RecordManager.jsx",
+        "src/services/products.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M03-002",
+      "id": "S16-XW-M03-002",
+      "module": "M03",
+      "condition": "Stale Product save",
+      "paragraph": 333,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 13",
+      "surfaces": [
+        "/shop",
+        "/admin/products"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/components/admin/RecordManager.jsx",
+        "src/services/products.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M04-001",
+      "id": "S16-XW-M04-001",
+      "module": "M04",
+      "condition": "Upload pending / processing",
+      "paragraph": 342,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "owning media domain",
+      "surfaces": [
+        "existing Product/receipt/private media components"
+      ],
+      "classification": "COMPLETE",
+      "code": [
+        "netlify/lib/media-service.js",
+        "src/components/admin/OwnerImageField.jsx",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M04-002",
+      "id": "S16-XW-M04-002",
+      "module": "M04",
+      "condition": "Upload failed",
+      "paragraph": 351,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "owning media domain",
+      "surfaces": [
+        "existing Product/receipt/private media components"
+      ],
+      "classification": "COMPLETE",
+      "code": [
+        "netlify/lib/media-service.js",
+        "src/components/admin/OwnerImageField.jsx",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M05-001",
+      "id": "S16-XW-M05-001",
+      "module": "M05",
+      "condition": "Add to My Closet duplicate",
+      "paragraph": 360,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 7",
+      "surfaces": [
+        "/my-closet/my-pieces",
+        "/my-closet/saved-reviews"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/hooks/useBoundSaves.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs",
+        "tests/section16-pretransaction-client.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M05-002",
+      "id": "S16-XW-M05-002",
+      "module": "M05",
+      "condition": "Save/remove failed",
+      "paragraph": 369,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 7",
+      "surfaces": [
+        "/my-closet/my-pieces",
+        "/my-closet/saved-reviews"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/hooks/useBoundSaves.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs",
+        "tests/section16-pretransaction-client.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M06-001",
+      "id": "S16-XW-M06-001",
+      "module": "M06",
+      "condition": "Draft save failed",
+      "paragraph": 378,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 6",
+      "surfaces": [
+        "/custom-style"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/pages/CustomStyle/CustomStyle.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M06-002",
+      "id": "S16-XW-M06-002",
+      "module": "M06",
+      "condition": "Private measurement/media save failure",
+      "paragraph": 387,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 6",
+      "surfaces": [
+        "/custom-style"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/pages/CustomStyle/CustomStyle.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M07-001",
+      "id": "S16-XW-M07-001",
+      "module": "M07",
+      "condition": "Main Order creation outcome unknown",
+      "paragraph": 396,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Sections 8/14",
+      "surfaces": [
+        "/my-closet/orders/:orderId",
+        "/admin/orders/:orderId"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/OrderWorkspace.jsx",
+        "src/pages/MyCloset/CatalogueIntake.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M07-002",
+      "id": "S16-XW-M07-002",
+      "module": "M07",
+      "condition": "Stale Edition approval",
+      "paragraph": 405,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Sections 8/14",
+      "surfaces": [
+        "/my-closet/orders/:orderId",
+        "/admin/orders/:orderId"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/OrderWorkspace.jsx",
+        "src/pages/MyCloset/CatalogueIntake.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M08-001",
+      "id": "S16-XW-M08-001",
+      "module": "M08",
+      "condition": "Payment proof upload pending",
+      "paragraph": 414,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "transaction finance",
+      "surfaces": [
+        "existing Order receipt interface; protected finance API"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M08-002",
+      "id": "S16-XW-M08-002",
+      "module": "M08",
+      "condition": "Receipt submitted / Under Review",
+      "paragraph": 423,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "transaction finance",
+      "surfaces": [
+        "existing Order receipt interface; protected finance API"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M09-001",
+      "id": "S16-XW-M09-001",
+      "module": "M09",
+      "condition": "Duplicate Extension request",
+      "paragraph": 432,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Current Work context; protected Extension API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M09-002",
+      "id": "S16-XW-M09-002",
+      "module": "M09",
+      "condition": "Staff proposal awaiting customer acceptance",
+      "paragraph": 441,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Current Work context; protected Extension API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M10-001",
+      "id": "S16-XW-M10-001",
+      "module": "M10",
+      "condition": "Claim/assignment race",
+      "paragraph": 450,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Order workspace; protected operations API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M10-002",
+      "id": "S16-XW-M10-002",
+      "module": "M10",
+      "condition": "Former assignee acts from stale tab",
+      "paragraph": 459,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Order workspace; protected operations API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M11-001",
+      "id": "S16-XW-M11-001",
+      "module": "M11",
+      "condition": "Connecting / reconnecting",
+      "paragraph": 468,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 10",
+      "surfaces": [
+        "existing general/transaction Chat"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/components/chat/TransactionConversation.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M11-002",
+      "id": "S16-XW-M11-002",
+      "module": "M11",
+      "condition": "Send failed known",
+      "paragraph": 477,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 10",
+      "surfaces": [
+        "existing general/transaction Chat"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/components/chat/TransactionConversation.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M12-001",
+      "id": "S16-XW-M12-001",
+      "module": "M12",
+      "condition": "Review submission pending/failure",
+      "paragraph": 486,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 9",
+      "surfaces": [
+        "/reviews-feeds",
+        "existing private Order review form"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/pages/MyCloset/OrderReview.jsx",
+        "src/hooks/useReviewPublicationGuard.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M12-002",
+      "id": "S16-XW-M12-002",
+      "module": "M12",
+      "condition": "Review media upload failure",
+      "paragraph": 495,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 9",
+      "surfaces": [
+        "/reviews-feeds",
+        "existing private Order review form"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/pages/MyCloset/OrderReview.jsx",
+        "src/hooks/useReviewPublicationGuard.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M13-001",
+      "id": "S16-XW-M13-001",
+      "module": "M13",
+      "condition": "Notification list loading/unavailable",
+      "paragraph": 504,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 15 / downstream execution",
+      "surfaces": [
+        "system-only ports; Notification Centre owner integration incomplete"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/downstream-worker.js",
+        "netlify/lib/notification-delivery.js",
+        "netlify/lib/system-maintenance.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M13-002",
+      "id": "S16-XW-M13-002",
+      "module": "M13",
+      "condition": "Delivery issue",
+      "paragraph": 513,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 15 / downstream execution",
+      "surfaces": [
+        "system-only ports; Notification Centre owner integration incomplete"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/downstream-worker.js",
+        "netlify/lib/notification-delivery.js",
+        "netlify/lib/system-maintenance.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M14-001",
+      "id": "S16-XW-M14-001",
+      "module": "M14",
+      "condition": "Settings save failure",
+      "paragraph": 522,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 15",
+      "surfaces": [
+        "existing content/Staff surfaces; protected configuration API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/shared-configuration.js",
+        "netlify/lib/account-handler.js"
+      ],
+      "tests": [
+        "tests/section16-downstream-http.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M14-002",
+      "id": "S16-XW-M14-002",
+      "module": "M14",
+      "condition": "Stale concurrent setting edit",
+      "paragraph": 531,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 15",
+      "surfaces": [
+        "existing content/Staff surfaces; protected configuration API"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/shared-configuration.js",
+        "netlify/lib/account-handler.js"
+      ],
+      "tests": [
+        "tests/section16-downstream-http.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M15-001",
+      "id": "S16-XW-M15-001",
+      "module": "M15",
+      "condition": "Search loading / no results",
+      "paragraph": 540,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "relevant source owner / derived retrieval",
+      "surfaces": [
+        "existing Shop/feed/scoped search and read APIs"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/owner-projections.js",
+        "src/services/operationalSearch.js",
+        "src/services/operations.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section12-part2-search.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M15-002",
+      "id": "S16-XW-M15-002",
+      "module": "M15",
+      "condition": "Projection lag",
+      "paragraph": 549,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "relevant source owner / derived retrieval",
+      "surfaces": [
+        "existing Shop/feed/scoped search and read APIs"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/owner-projections.js",
+        "src/services/operationalSearch.js",
+        "src/services/operations.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section12-part2-search.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M16-001",
+      "id": "S16-XW-M16-001",
+      "module": "M16",
+      "condition": "Temporary service unavailable",
+      "paragraph": 558,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 16 runtime",
+      "surfaces": [
+        "existing owner recovery responses; system-only Audit/recovery ports"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/runtime-integrity.js",
+        "netlify/lib/intent-migration.js",
+        "src/services/ownerOperation.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M16-002",
+      "id": "S16-XW-M16-002",
+      "module": "M16",
+      "condition": "Stale client / version mismatch",
+      "paragraph": 567,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 16 runtime",
+      "surfaces": [
+        "existing owner recovery responses; system-only Audit/recovery ports"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/runtime-integrity.js",
+        "netlify/lib/intent-migration.js",
+        "src/services/ownerOperation.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M01-003",
+      "id": "S16-XW-M01-003",
+      "module": "M01",
+      "condition": "Session expired during protected action",
+      "paragraph": 585,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 11",
+      "surfaces": [
+        "/signin",
+        "/signup",
+        "/verify-email",
+        "/profile"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/account-service.js",
+        "netlify/lib/account-proofs.js",
+        "src/pages/Auth/Auth.jsx",
+        "src/hooks/useCustomerSession.js"
+      ],
+      "tests": [
+        "tests/section16-account.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M01-004",
+      "id": "S16-XW-M01-004",
+      "module": "M01",
+      "condition": "Account context changed / switch",
+      "paragraph": 588,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 11",
+      "surfaces": [
+        "/signin",
+        "/signup",
+        "/verify-email",
+        "/profile"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/account-service.js",
+        "netlify/lib/account-proofs.js",
+        "src/pages/Auth/Auth.jsx",
+        "src/hooks/useCustomerSession.js"
+      ],
+      "tests": [
+        "tests/section16-account.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M01-005",
+      "id": "S16-XW-M01-005",
+      "module": "M01",
+      "condition": "Restricted Account opens protected surface",
+      "paragraph": 591,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 11",
+      "surfaces": [
+        "/signin",
+        "/signup",
+        "/verify-email",
+        "/profile"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/account-service.js",
+        "netlify/lib/account-proofs.js",
+        "src/pages/Auth/Auth.jsx",
+        "src/hooks/useCustomerSession.js"
+      ],
+      "tests": [
+        "tests/section16-account.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M01-006",
+      "id": "S16-XW-M01-006",
+      "module": "M01",
+      "condition": "Unknown lifecycle mutation outcome",
+      "paragraph": 594,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 11",
+      "surfaces": [
+        "/signin",
+        "/signup",
+        "/verify-email",
+        "/profile"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/account-service.js",
+        "netlify/lib/account-proofs.js",
+        "src/pages/Auth/Auth.jsx",
+        "src/hooks/useCustomerSession.js"
+      ],
+      "tests": [
+        "tests/section16-account.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M02-003",
+      "id": "S16-XW-M02-003",
+      "module": "M02",
+      "condition": "Capability revoked while page open",
+      "paragraph": 606,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 12",
+      "surfaces": [
+        "existing scoped Admin surfaces"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/staff-authority.js",
+        "src/services/staffAuthorization.js",
+        "src/components/admin/AdminAccess.jsx"
+      ],
+      "tests": [
+        "tests/section16-contract.test.mjs",
+        "tests/section16-rules.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M02-004",
+      "id": "S16-XW-M02-004",
+      "module": "M02",
+      "condition": "Assignment removed / transferred",
+      "paragraph": 609,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 12",
+      "surfaces": [
+        "existing scoped Admin surfaces"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/staff-authority.js",
+        "src/services/staffAuthorization.js",
+        "src/components/admin/AdminAccess.jsx"
+      ],
+      "tests": [
+        "tests/section16-contract.test.mjs",
+        "tests/section16-rules.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M02-005",
+      "id": "S16-XW-M02-005",
+      "module": "M02",
+      "condition": "Stale deep link to protected record",
+      "paragraph": 612,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 12",
+      "surfaces": [
+        "existing scoped Admin surfaces"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/staff-authority.js",
+        "src/services/staffAuthorization.js",
+        "src/components/admin/AdminAccess.jsx"
+      ],
+      "tests": [
+        "tests/section16-contract.test.mjs",
+        "tests/section16-rules.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M02-006",
+      "id": "S16-XW-M02-006",
+      "module": "M02",
+      "condition": "Object-level denial after cached list result",
+      "paragraph": 615,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 12",
+      "surfaces": [
+        "existing scoped Admin surfaces"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/staff-authority.js",
+        "src/services/staffAuthorization.js",
+        "src/components/admin/AdminAccess.jsx"
+      ],
+      "tests": [
+        "tests/section16-contract.test.mjs",
+        "tests/section16-rules.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M03-003",
+      "id": "S16-XW-M03-003",
+      "module": "M03",
+      "condition": "Publish / Update Live outcome unknown",
+      "paragraph": 627,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 13",
+      "surfaces": [
+        "/shop",
+        "/admin/products"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/components/admin/RecordManager.jsx",
+        "src/services/products.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M03-004",
+      "id": "S16-XW-M03-004",
+      "module": "M03",
+      "condition": "Delete blocked by dependencies",
+      "paragraph": 630,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 13",
+      "surfaces": [
+        "/shop",
+        "/admin/products"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/components/admin/RecordManager.jsx",
+        "src/services/products.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M03-005",
+      "id": "S16-XW-M03-005",
+      "module": "M03",
+      "condition": "Search projection stale",
+      "paragraph": 633,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 13",
+      "surfaces": [
+        "/shop",
+        "/admin/products"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/components/admin/RecordManager.jsx",
+        "src/services/products.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M03-006",
+      "id": "S16-XW-M03-006",
+      "module": "M03",
+      "condition": "Cached Product card points to unavailable Product",
+      "paragraph": 636,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 13",
+      "surfaces": [
+        "/shop",
+        "/admin/products"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/components/admin/RecordManager.jsx",
+        "src/services/products.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M04-003",
+      "id": "S16-XW-M04-003",
+      "module": "M04",
+      "condition": "Upload outcome unknown",
+      "paragraph": 648,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "owning media domain",
+      "surfaces": [
+        "existing Product/receipt/private media components"
+      ],
+      "classification": "COMPLETE",
+      "code": [
+        "netlify/lib/media-service.js",
+        "src/components/admin/OwnerImageField.jsx",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M04-004",
+      "id": "S16-XW-M04-004",
+      "module": "M04",
+      "condition": "Private asset access denied",
+      "paragraph": 651,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "owning media domain",
+      "surfaces": [
+        "existing Product/receipt/private media components"
+      ],
+      "classification": "COMPLETE",
+      "code": [
+        "netlify/lib/media-service.js",
+        "src/components/admin/OwnerImageField.jsx",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M04-005",
+      "id": "S16-XW-M04-005",
+      "module": "M04",
+      "condition": "Derivative generation delayed",
+      "paragraph": 654,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "owning media domain",
+      "surfaces": [
+        "existing Product/receipt/private media components"
+      ],
+      "classification": "COMPLETE",
+      "code": [
+        "netlify/lib/media-service.js",
+        "src/components/admin/OwnerImageField.jsx",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M04-006",
+      "id": "S16-XW-M04-006",
+      "module": "M04",
+      "condition": "Replacement/reorder conflict",
+      "paragraph": 657,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "owning media domain",
+      "surfaces": [
+        "existing Product/receipt/private media components"
+      ],
+      "classification": "COMPLETE",
+      "code": [
+        "netlify/lib/media-service.js",
+        "src/components/admin/OwnerImageField.jsx",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M05-003",
+      "id": "S16-XW-M05-003",
+      "module": "M05",
+      "condition": "Save/remove outcome unknown",
+      "paragraph": 669,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 7",
+      "surfaces": [
+        "/my-closet/my-pieces",
+        "/my-closet/saved-reviews"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/hooks/useBoundSaves.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs",
+        "tests/section16-pretransaction-client.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M05-004",
+      "id": "S16-XW-M05-004",
+      "module": "M05",
+      "condition": "Account switch while saved state loaded",
+      "paragraph": 672,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 7",
+      "surfaces": [
+        "/my-closet/my-pieces",
+        "/my-closet/saved-reviews"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/hooks/useBoundSaves.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs",
+        "tests/section16-pretransaction-client.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M05-005",
+      "id": "S16-XW-M05-005",
+      "module": "M05",
+      "condition": "Product unavailable but save survives",
+      "paragraph": 675,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 7",
+      "surfaces": [
+        "/my-closet/my-pieces",
+        "/my-closet/saved-reviews"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/hooks/useBoundSaves.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs",
+        "tests/section16-pretransaction-client.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M05-006",
+      "id": "S16-XW-M05-006",
+      "module": "M05",
+      "condition": "Guest → Account handoff conflict",
+      "paragraph": 678,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 7",
+      "surfaces": [
+        "/my-closet/my-pieces",
+        "/my-closet/saved-reviews"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/hooks/useBoundSaves.js"
+      ],
+      "tests": [
+        "tests/section16-pretransaction.test.mjs",
+        "tests/section16-pretransaction-client.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M06-003",
+      "id": "S16-XW-M06-003",
+      "module": "M06",
+      "condition": "Stale edit",
+      "paragraph": 690,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 6",
+      "surfaces": [
+        "/custom-style"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/pages/CustomStyle/CustomStyle.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M06-004",
+      "id": "S16-XW-M06-004",
+      "module": "M06",
+      "condition": "Submission outcome unknown",
+      "paragraph": 693,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 6",
+      "surfaces": [
+        "/custom-style"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/pages/CustomStyle/CustomStyle.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M06-005",
+      "id": "S16-XW-M06-005",
+      "module": "M06",
+      "condition": "Duplicate handoff attempt",
+      "paragraph": 696,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 6",
+      "surfaces": [
+        "/custom-style"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/pages/CustomStyle/CustomStyle.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M06-006",
+      "id": "S16-XW-M06-006",
+      "module": "M06",
+      "condition": "Session expires before submit",
+      "paragraph": 699,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 6",
+      "surfaces": [
+        "/custom-style"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/pretransaction-service.js",
+        "src/pages/CustomStyle/CustomStyle.jsx"
+      ],
+      "tests": [
+        "tests/section16-document25.test.mjs",
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M07-003",
+      "id": "S16-XW-M07-003",
+      "module": "M07",
+      "condition": "Customer approval races staff change",
+      "paragraph": 711,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Sections 8/14",
+      "surfaces": [
+        "/my-closet/orders/:orderId",
+        "/admin/orders/:orderId"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/OrderWorkspace.jsx",
+        "src/pages/MyCloset/CatalogueIntake.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M07-004",
+      "id": "S16-XW-M07-004",
+      "module": "M07",
+      "condition": "Order/Chat linkage temporarily unavailable",
+      "paragraph": 714,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Sections 8/14",
+      "surfaces": [
+        "/my-closet/orders/:orderId",
+        "/admin/orders/:orderId"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/OrderWorkspace.jsx",
+        "src/pages/MyCloset/CatalogueIntake.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M07-005",
+      "id": "S16-XW-M07-005",
+      "module": "M07",
+      "condition": "Current Product unavailable",
+      "paragraph": 717,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Sections 8/14",
+      "surfaces": [
+        "/my-closet/orders/:orderId",
+        "/admin/orders/:orderId"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/OrderWorkspace.jsx",
+        "src/pages/MyCloset/CatalogueIntake.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M07-006",
+      "id": "S16-XW-M07-006",
+      "module": "M07",
+      "condition": "Account lifecycle changes while Order open",
+      "paragraph": 720,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Sections 8/14",
+      "surfaces": [
+        "/my-closet/orders/:orderId",
+        "/admin/orders/:orderId"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/OrderWorkspace.jsx",
+        "src/pages/MyCloset/CatalogueIntake.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M08-003",
+      "id": "S16-XW-M08-003",
+      "module": "M08",
+      "condition": "Needs Attention / correction",
+      "paragraph": 732,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "transaction finance",
+      "surfaces": [
+        "existing Order receipt interface; protected finance API"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M08-004",
+      "id": "S16-XW-M08-004",
+      "module": "M08",
+      "condition": "Verification outcome unknown",
+      "paragraph": 735,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "transaction finance",
+      "surfaces": [
+        "existing Order receipt interface; protected finance API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M08-005",
+      "id": "S16-XW-M08-005",
+      "module": "M08",
+      "condition": "Stale Amount Due Now",
+      "paragraph": 738,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "transaction finance",
+      "surfaces": [
+        "existing Order receipt interface; protected finance API"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M08-006",
+      "id": "S16-XW-M08-006",
+      "module": "M08",
+      "condition": "Proof access denied",
+      "paragraph": 741,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "transaction finance",
+      "surfaces": [
+        "existing Order receipt interface; protected finance API"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-service.js",
+        "src/pages/MyCloset/ReceiptSubmission.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M09-003",
+      "id": "S16-XW-M09-003",
+      "module": "M09",
+      "condition": "Stale Extension approval",
+      "paragraph": 753,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Current Work context; protected Extension API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M09-004",
+      "id": "S16-XW-M09-004",
+      "module": "M09",
+      "condition": "Active Extension blocks new one",
+      "paragraph": 756,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Current Work context; protected Extension API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M09-005",
+      "id": "S16-XW-M09-005",
+      "module": "M09",
+      "condition": "Extension payment outcome unknown",
+      "paragraph": 759,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Current Work context; protected Extension API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M09-006",
+      "id": "S16-XW-M09-006",
+      "module": "M09",
+      "condition": "Dormant Extension historical view",
+      "paragraph": 762,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Current Work context; protected Extension API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M10-003",
+      "id": "S16-XW-M10-003",
+      "module": "M10",
+      "condition": "Availability/eligibility changes",
+      "paragraph": 774,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Order workspace; protected operations API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M10-004",
+      "id": "S16-XW-M10-004",
+      "module": "M10",
+      "condition": "Fulfilment mutation fails",
+      "paragraph": 777,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Order workspace; protected operations API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M10-005",
+      "id": "S16-XW-M10-005",
+      "module": "M10",
+      "condition": "Completion races another operational change",
+      "paragraph": 780,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Order workspace; protected operations API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M10-006",
+      "id": "S16-XW-M10-006",
+      "module": "M10",
+      "condition": "Cancellation/dispatch conflict",
+      "paragraph": 783,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 14",
+      "surfaces": [
+        "existing Order workspace; protected operations API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/transaction-service.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M11-003",
+      "id": "S16-XW-M11-003",
+      "module": "M11",
+      "condition": "Send outcome unknown",
+      "paragraph": 795,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 10",
+      "surfaces": [
+        "existing general/transaction Chat"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/components/chat/TransactionConversation.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M11-004",
+      "id": "S16-XW-M11-004",
+      "module": "M11",
+      "condition": "Duplicate-send suppression",
+      "paragraph": 798,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 10",
+      "surfaces": [
+        "existing general/transaction Chat"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/components/chat/TransactionConversation.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M11-005",
+      "id": "S16-XW-M11-005",
+      "module": "M11",
+      "condition": "Permission revoked / assignment transferred",
+      "paragraph": 801,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 10",
+      "surfaces": [
+        "existing general/transaction Chat"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/components/chat/TransactionConversation.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M11-006",
+      "id": "S16-XW-M11-006",
+      "module": "M11",
+      "condition": "Order/Chat context stale",
+      "paragraph": 804,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 10",
+      "surfaces": [
+        "existing general/transaction Chat"
+      ],
+      "classification": "REFINE",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/components/chat/TransactionConversation.jsx"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M12-003",
+      "id": "S16-XW-M12-003",
+      "module": "M12",
+      "condition": "Consent withdrawal/change",
+      "paragraph": 816,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 9",
+      "surfaces": [
+        "/reviews-feeds",
+        "existing private Order review form"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/pages/MyCloset/OrderReview.jsx",
+        "src/hooks/useReviewPublicationGuard.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M12-004",
+      "id": "S16-XW-M12-004",
+      "module": "M12",
+      "condition": "Removed Review remains in cache",
+      "paragraph": 819,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 9",
+      "surfaces": [
+        "/reviews-feeds",
+        "existing private Order review form"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/pages/MyCloset/OrderReview.jsx",
+        "src/hooks/useReviewPublicationGuard.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M12-005",
+      "id": "S16-XW-M12-005",
+      "module": "M12",
+      "condition": "Product source unavailable",
+      "paragraph": 822,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 9",
+      "surfaces": [
+        "/reviews-feeds",
+        "existing private Order review form"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/pages/MyCloset/OrderReview.jsx",
+        "src/hooks/useReviewPublicationGuard.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M12-006",
+      "id": "S16-XW-M12-006",
+      "module": "M12",
+      "condition": "Like/Save outcome unknown",
+      "paragraph": 825,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 9",
+      "surfaces": [
+        "/reviews-feeds",
+        "existing private Order review form"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/transaction-conversation-review.js",
+        "src/pages/MyCloset/OrderReview.jsx",
+        "src/hooks/useReviewPublicationGuard.js"
+      ],
+      "tests": [
+        "tests/section16-transactions.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M13-003",
+      "id": "S16-XW-M13-003",
+      "module": "M13",
+      "condition": "Duplicate delivery callback",
+      "paragraph": 837,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 15 / downstream execution",
+      "surfaces": [
+        "system-only ports; Notification Centre owner integration incomplete"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/downstream-worker.js",
+        "netlify/lib/notification-delivery.js",
+        "netlify/lib/system-maintenance.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M13-004",
+      "id": "S16-XW-M13-004",
+      "module": "M13",
+      "condition": "Stale CTA target",
+      "paragraph": 840,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 15 / downstream execution",
+      "surfaces": [
+        "system-only ports; Notification Centre owner integration incomplete"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/downstream-worker.js",
+        "netlify/lib/notification-delivery.js",
+        "netlify/lib/system-maintenance.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M13-005",
+      "id": "S16-XW-M13-005",
+      "module": "M13",
+      "condition": "Notification centre projection stale",
+      "paragraph": 843,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 15 / downstream execution",
+      "surfaces": [
+        "system-only ports; Notification Centre owner integration incomplete"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/downstream-worker.js",
+        "netlify/lib/notification-delivery.js",
+        "netlify/lib/system-maintenance.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M13-006",
+      "id": "S16-XW-M13-006",
+      "module": "M13",
+      "condition": "Delivery outcome uncertain",
+      "paragraph": 846,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 15 / downstream execution",
+      "surfaces": [
+        "system-only ports; Notification Centre owner integration incomplete"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/downstream-worker.js",
+        "netlify/lib/notification-delivery.js",
+        "netlify/lib/system-maintenance.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M14-003",
+      "id": "S16-XW-M14-003",
+      "module": "M14",
+      "condition": "Protected setting access denied",
+      "paragraph": 858,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 15",
+      "surfaces": [
+        "existing content/Staff surfaces; protected configuration API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/shared-configuration.js",
+        "netlify/lib/account-handler.js"
+      ],
+      "tests": [
+        "tests/section16-downstream-http.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M14-004",
+      "id": "S16-XW-M14-004",
+      "module": "M14",
+      "condition": "Preview / test action fails",
+      "paragraph": 861,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 15",
+      "surfaces": [
+        "existing content/Staff surfaces; protected configuration API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/shared-configuration.js",
+        "netlify/lib/account-handler.js"
+      ],
+      "tests": [
+        "tests/section16-downstream-http.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M14-005",
+      "id": "S16-XW-M14-005",
+      "module": "M14",
+      "condition": "Public propagation delayed",
+      "paragraph": 864,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 15",
+      "surfaces": [
+        "existing content/Staff surfaces; protected configuration API"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/shared-configuration.js",
+        "netlify/lib/account-handler.js"
+      ],
+      "tests": [
+        "tests/section16-downstream-http.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M14-006",
+      "id": "S16-XW-M14-006",
+      "module": "M14",
+      "condition": "Unknown settings mutation outcome",
+      "paragraph": 867,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 15",
+      "surfaces": [
+        "existing content/Staff surfaces; protected configuration API"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/shared-configuration.js",
+        "netlify/lib/account-handler.js"
+      ],
+      "tests": [
+        "tests/section16-downstream-http.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Trusted core available where mapped; full owning surface, live adapter or reviewed source integration is not complete. No invented Section-16 UI substitutes it."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M15-003",
+      "id": "S16-XW-M15-003",
+      "module": "M15",
+      "condition": "Stale row remains after source change",
+      "paragraph": 879,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "relevant source owner / derived retrieval",
+      "surfaces": [
+        "existing Shop/feed/scoped search and read APIs"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/owner-projections.js",
+        "src/services/operationalSearch.js",
+        "src/services/operations.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section12-part2-search.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M15-004",
+      "id": "S16-XW-M15-004",
+      "module": "M15",
+      "condition": "Out-of-order response after Account switch",
+      "paragraph": 882,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "relevant source owner / derived retrieval",
+      "surfaces": [
+        "existing Shop/feed/scoped search and read APIs"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/owner-projections.js",
+        "src/services/operationalSearch.js",
+        "src/services/operations.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section12-part2-search.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M15-005",
+      "id": "S16-XW-M15-005",
+      "module": "M15",
+      "condition": "Permission-filtered result / count",
+      "paragraph": 885,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "relevant source owner / derived retrieval",
+      "surfaces": [
+        "existing Shop/feed/scoped search and read APIs"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/owner-projections.js",
+        "src/services/operationalSearch.js",
+        "src/services/operations.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section12-part2-search.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M15-006",
+      "id": "S16-XW-M15-006",
+      "module": "M15",
+      "condition": "Index unavailable",
+      "paragraph": 888,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "relevant source owner / derived retrieval",
+      "surfaces": [
+        "existing Shop/feed/scoped search and read APIs"
+      ],
+      "classification": "KEEP",
+      "code": [
+        "netlify/lib/owner-projections.js",
+        "src/services/operationalSearch.js",
+        "src/services/operations.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section12-part2-search.test.mjs"
+      ],
+      "implementationDisposition": "VERIFIED_BOUNDED_CORE",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M16-003",
+      "id": "S16-XW-M16-003",
+      "module": "M16",
+      "condition": "Audit persistence defect after business commit",
+      "paragraph": 900,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 16 runtime",
+      "surfaces": [
+        "existing owner recovery responses; system-only Audit/recovery ports"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/runtime-integrity.js",
+        "netlify/lib/intent-migration.js",
+        "src/services/ownerOperation.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M16-004",
+      "id": "S16-XW-M16-004",
+      "module": "M16",
+      "condition": "Backup/restore completed",
+      "paragraph": 903,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 16 runtime",
+      "surfaces": [
+        "existing owner recovery responses; system-only Audit/recovery ports"
+      ],
+      "classification": "DEPENDENCY",
+      "code": [
+        "netlify/lib/runtime-integrity.js",
+        "netlify/lib/intent-migration.js",
+        "src/services/ownerOperation.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Recovery gate code tested; no actual production restore/current-authority drill performed."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M16-005",
+      "id": "S16-XW-M16-005",
+      "module": "M16",
+      "condition": "Migration compatibility issue",
+      "paragraph": 906,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 16 runtime",
+      "surfaces": [
+        "existing owner recovery responses; system-only Audit/recovery ports"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/runtime-integrity.js",
+        "netlify/lib/intent-migration.js",
+        "src/services/ownerOperation.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    },
+    {
+      "sourceQualifiedId": "support:S16-XW-M16-006",
+      "id": "S16-XW-M16-006",
+      "module": "M16",
+      "condition": "Unknown infrastructure response",
+      "paragraph": 909,
+      "source": "SECTION 16 VISUAL .docx",
+      "owner": "Section 16 runtime",
+      "surfaces": [
+        "existing owner recovery responses; system-only Audit/recovery ports"
+      ],
+      "classification": "VERIFY",
+      "code": [
+        "netlify/lib/runtime-integrity.js",
+        "netlify/lib/intent-migration.js",
+        "src/services/ownerOperation.js"
+      ],
+      "tests": [
+        "tests/section16-downstream.test.mjs",
+        "tests/section16-document25.test.mjs"
+      ],
+      "implementationDisposition": "PARTIAL",
+      "visualDisposition": "REFERENCE / OWNING SURFACE ONLY",
+      "limitation": "Bounded core code/test evidence; not a claim every visible/native/production acceptance case is complete."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "section":16,"part":3,"scope":[7,8,9,10,11,12],"formalNumberedFlowsCreated":0,
+  "baseline":"9b9e4ef3fdb45fd15a2d357b831548d1e5304b6c",
+  "sourceSha256":"0B0D7F0A5524483B3DE02AC7E4A0C33673BC82FBD2091EF28559CF820045C4EA",
+  "sourceParagraphsRead":2423,
+  "percentageMeaning":"Approximate implementation coverage of this Part's mapped contract groups, not lines/pages/files edited, production certification or total Section-16 completion",
+  "codingCoverageEstimatePercent":85,
+  "workflowProgressPercent":100,
+  "validation":{"unitIntegrationRulesPassed":392,"failed":0,"skipped":0,"focusedTransactionTests":15,"focusedRulesTests":6,"nativeBrowserPassed":true,"lintErrors":0,"inheritedLintWarnings":34,"buildPassed":true,"productionTested":false},
+  "scopeDispositionCount":6,
+  "verdict":"PARTIAL",
+  "productionValidated":false,
+  "modules":[
+    {"module":7,"status":"STAGED PASS","code":["netlify/lib/transaction-service.js","netlify/lib/account-handler.js"],"tests":["tests/section16-transactions.test.mjs","tests/section16-part3-browser.mjs"]},
+    {"module":8,"status":"PARTIAL","code":["netlify/lib/transaction-service.js","netlify/lib/media-service.js","src/pages/MyCloset/ReceiptSubmission.jsx"],"tests":["tests/section16-transactions.test.mjs","tests/section16-part3-browser.mjs"],"remaining":["Governed financial adjustment/correction workflows beyond ordinary verification and evidence resubmission","Production private storage verification and supported non-image receipt policy"]},
+    {"module":9,"status":"STAGED PASS","code":["netlify/lib/transaction-service.js"],"tests":["tests/section16-transactions.test.mjs"],"boundary":"Scoped backend rule-contract; full Section-14 proposal/request UI is not claimed complete"},
+    {"module":10,"status":"PARTIAL","code":["netlify/lib/transaction-service.js"],"tests":["tests/section16-transactions.test.mjs","tests/section16-part3-browser.mjs"],"remaining":["Owner-specific blocker-source adapters beyond payment/approval","Full Escalation/Operational Notes integration","Live delivery-provider adapter/ingestion verification"]},
+    {"module":11,"status":"PARTIAL","code":["netlify/lib/transaction-conversation-review.js","src/components/chat/TransactionConversation.jsx"],"tests":["tests/section16-transactions.test.mjs","tests/section16-part3-browser.mjs"],"remaining":["Reviewed legacy UID thread/Staff session cutover","Realtime uses bounded current-authority HTTP polling, not a claimed production push-transport certification","Full native history pagination/attachment controls"]},
+    {"module":12,"status":"PARTIAL","code":["netlify/lib/transaction-conversation-review.js","src/services/reviewModel.js","src/hooks/useReviewPublicationGuard.js"],"tests":["tests/section16-transactions.test.mjs","tests/section16-part3-browser.mjs"],"remaining":["Reviewed legacy author/consent/provenance adoption","Full Staff moderation/customer media management UI and promotion execution owner integration"]}
+  ],
+  "releaseDependencies":["Reviewed durable Staff/legacy-data mappings","Coordinated Functions/Rules/index release","Production Firebase/Netlify credentials and private Blobs verification","Part-4 audit/runtime/projection/background integration"],
+  "next":"Section 16 Document 01 Part 4 — Modules 13–16; not implemented in this run"
+}

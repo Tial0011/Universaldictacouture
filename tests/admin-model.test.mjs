@@ -1,11 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { prepareRecord, localDestination } from "../src/services/adminModel.js";
+import { DIMENSIONS, localDestination, prepareRecord, productAdminHref, productReadiness } from "../src/services/adminModel.js";
 test("draft permits incomplete price but publishing requires price and category", () => {
   assert.equal(prepareRecord("products", { name: "Aso Oke", status: "draft", price: "" }).price, null);
   assert.throws(() => prepareRecord("products", { name: "Aso Oke", status: "published", price: "", category: "Fabric" }));
   assert.throws(() => prepareRecord("products", { name: "Aso Oke", status: "published", price: 100, category: "" }));
-  const result = prepareRecord("products", { name: " Aso Oke ", status: "published", price: "12000", category: "Fabric, Fabric, Ready to wear" });
+  assert.throws(() => prepareRecord("products", { name: "Aso Oke", status: "published", price: 100, category: "Fabric", unitLabel: "per set" }), /product photo/i);
+  assert.throws(() => prepareRecord("products", { name: "Aso Oke", status: "published", price: 100, category: "Fabric", primaryImage: { url: "https://example.test/aso-oke.jpg" } }), /commercial unit/i);
+  const result = prepareRecord("products", { name: " Aso Oke ", status: "published", price: "12000", unitLabel: "per set", category: "Fabric, Fabric, Ready to wear", primaryImage: { url: "https://example.test/aso-oke.jpg" } });
   assert.equal(result.price, 12000);
   assert.deepEqual(result.category, ["Fabric", "Ready to wear"]);
 });
@@ -46,4 +48,29 @@ test("reviews use separate ratings, one image, a product and moderation status",
 test("new review workflow rejects more than one customer photo", () => {
   const images = ["https://example.test/1.jpg", "https://example.test/2.jpg"];
   assert.throws(() => prepareRecord("reviews", { author: "Amara", body: "Lovely", images, status: "pending", productId: "piece", customerServiceRating: 5, productQualityRating: 4 }));
+<<<<<<< HEAD
+=======
+});
+
+
+test("Task 8A: product readiness is deterministic and names exact publication blockers", () => {
+  const incomplete = productReadiness({ id: "piece-1", name: "", price: "", category: [], images: [], status: "draft" });
+  assert.equal(incomplete.state, "needs-attention");
+  assert.deepEqual(incomplete.blockers.map((item) => item.key), ["name", "price", "image", "category", "unit"]);
+
+  const ready = productReadiness({ id: "piece-1", name: "Aso Oke", price: 25000, category: ["Fabric"], images: [{ url: "https://example.test/piece.jpg" }], status: "draft", unitLabel: "per bundle" });
+  assert.equal(ready.state, "ready");
+  assert.equal(ready.ready, true);
+  assert.equal(ready.warnings.length, 0);
+
+  const published = productReadiness({ id: "piece-1", name: "Aso Oke", price: 25000, category: ["Fabric"], images: [{ url: "https://example.test/piece.jpg" }], status: "published" });
+  assert.equal(published.state, "needs-attention");
+  assert.equal(published.blockers.some((item) => item.key === "unit"), true);
+});
+
+test("Task 8A: customer preview uses stable slug/id and Shop V1 taxonomy excludes Size", () => {
+  assert.equal(productAdminHref({ id: "firestore-id", slug: "royal-weave" }), "/shop/royal-weave");
+  assert.equal(productAdminHref({ id: "firestore-id" }), "/shop/firestore-id");
+  assert.deepEqual(DIMENSIONS, ["category", "occasion", "style", "fabric", "colour"]);
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 });

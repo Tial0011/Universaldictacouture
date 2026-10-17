@@ -1,0 +1,224 @@
+{
+  "section": 11,
+  "documentPart": 1,
+  "module": 1,
+  "flowCount": 10,
+  "verdict": "PARTIAL",
+  "wholeSectionLock": false,
+  "source": {
+    "path": "C:/Users/HP ENVY/Videos/1A1 IMPORTANT UDC PICTURES/SECTION 11/SECTION 11 DOCUMENT 1 PART 1 .docx",
+    "paragraphs": 1881,
+    "sha256": "8F5BC08FAEF22452CADBA8A5353CF4AEAF94DEF2C098FBC7961E3BF65167FC26"
+  },
+  "codeBaseline": "372994e",
+  "flows": [
+    {
+      "id": "S11-M01-F01",
+      "title": "Auth Gate",
+      "before": "PARTIALLY SATISFIED",
+      "disposition": "PARTIALLY SATISFIED",
+      "reason": "Native contextual dialog/mobile sheet, safe opaque navigation-only continuation, cancel/focus; successful protected destination depends on current durable Account source.",
+      "evidence": [
+        "src/context/AuthGateContext.jsx",
+        "src/components/auth/AuthGateDialog.jsx",
+        "src/services/authFlow.js",
+        "tests/section11-browser-check.mjs"
+      ],
+      "owner": "Section 16 M01 + applicable protected owner",
+      "completion": false
+    },
+    {
+      "id": "S11-M01-F02",
+      "title": "Sign In",
+      "before": "PARTIALLY SATISFIED",
+      "disposition": "PARTIALLY SATISFIED",
+      "reason": "Real Firebase credential authentication, neutral errors, serialized/cancelled late results and fresh principal reads; provider principal is never UDC Account authority.",
+      "evidence": [
+        "src/firebase/auth.js",
+        "src/pages/Auth/Auth.jsx",
+        "src/context/AuthContext.jsx",
+        "tests/auth-service.test.mjs"
+      ],
+      "owner": "Section 16 M01 + applicable protected owner",
+      "completion": false
+    },
+    {
+      "id": "S11-M01-F03",
+      "title": "Create Account",
+      "before": "SUPERSEDED / INCORRECT",
+      "disposition": "EXTERNAL OWNER DEPENDENCY",
+      "reason": "Minimal credential form, current 15–64 policy, no role/lifecycle/profile injection; unsafe provider-only creation is closed before any provider write pending trusted bootstrap/conflict/idempotency source.",
+      "evidence": [
+        "src/services/customerAccountAuthority.js",
+        "src/firebase/auth.js",
+        "src/pages/Auth/Auth.jsx",
+        "tests/auth-service.test.mjs"
+      ],
+      "owner": "Section 16 M01 + applicable protected owner",
+      "completion": false
+    },
+    {
+      "id": "S11-M01-F04",
+      "title": "Verify Email",
+      "before": "SUPERSEDED / INCORRECT",
+      "disposition": "PARTIALLY SATISFIED",
+      "reason": "Real purpose/read-only proof inspection, wrong-current-channel rejection, early token URL withdrawal; consumption/lifecycle/current durable binding/supersession/receipt owner is missing and closed.",
+      "evidence": [
+        "src/firebase/accountActions.js",
+        "src/pages/Auth/Auth.jsx",
+        "tests/section11-proof-service.test.mjs",
+        "tests/section11-browser-check.mjs"
+      ],
+      "owner": "Section 16 M01 + applicable protected owner",
+      "completion": false
+    },
+    {
+      "id": "S11-M01-F05",
+      "title": "Reset Password / Recovery",
+      "before": "SUPERSEDED / INCORRECT",
+      "disposition": "PARTIALLY SATISFIED",
+      "reason": "Neutral actual provider intake and read-only reset inspection; trusted lifecycle-aware credential commit/supersession/authoritative unknown outcome source remains closed/unavailable.",
+      "evidence": [
+        "src/firebase/accountActions.js",
+        "src/pages/Auth/Auth.jsx",
+        "tests/section11-proof-service.test.mjs"
+      ],
+      "owner": "Section 16 M01 + applicable protected owner",
+      "completion": false
+    },
+    {
+      "id": "S11-M01-F06",
+      "title": "Return to Origin",
+      "before": "PARTIALLY SATISFIED",
+      "disposition": "PARTIALLY SATISFIED",
+      "reason": "Strict internal roots, encoding/control/protocol checks, private query/hash filtering, navigation only; private target source absence denies instead of returning fake authority.",
+      "evidence": [
+        "src/services/authFlow.js",
+        "src/components/auth/RequireAuth.jsx",
+        "tests/section11-part1.test.mjs"
+      ],
+      "owner": "Section 16 M01 + applicable protected owner",
+      "completion": false
+    },
+    {
+      "id": "S11-M01-F07",
+      "title": "Already Signed In / Use Another Account",
+      "before": "PARTIALLY SATISFIED",
+      "disposition": "PARTIALLY SATISFIED",
+      "reason": "Deliberate sign-out/new principal, root private subtree unmount, safe history whitelist; no silent switch or A private drafts/forms/live regions under B.",
+      "evidence": [
+        "src/context/AuthContext.jsx",
+        "src/services/authFlow.js",
+        "src/hooks/useCustomerSession.js",
+        "tests/section11-browser-check.mjs"
+      ],
+      "owner": "Section 16 M01 + applicable protected owner",
+      "completion": false
+    },
+    {
+      "id": "S11-M01-F08",
+      "title": "Session / Sign Out / Expiry",
+      "before": "SUPERSEDED / INCORRECT",
+      "disposition": "PARTIALLY SATISFIED",
+      "reason": "Fresh provider reload/token recheck, expired/signed-out/revoked/unverifiable/session-ended distinctions, SDK revocation-before-error and null-signout fix, online/offline/BFCache generation guards; durable Account/server-session/audit owner remains absent.",
+      "evidence": [
+        "src/firebase/auth.js",
+        "src/context/AuthContext.jsx",
+        "tests/auth-service.test.mjs",
+        "tests/section11-browser-check.mjs"
+      ],
+      "owner": "Section 16 M01 + applicable protected owner",
+      "completion": false
+    },
+    {
+      "id": "S11-M01-F09",
+      "title": "Protected / Invalid Private Links",
+      "before": "PARTIALLY SATISFIED",
+      "disposition": "PARTIALLY SATISFIED",
+      "reason": "Legacy customer-only UID grants closed in real Rules, direct-own/foreign reads denied; customer-private caches/profile/chat not mounted/fetched based only on provider UID. Positive owner object relationships still external.",
+      "evidence": [
+        "firestore.rules",
+        "src/components/auth/CustomerAccountBoundary.jsx",
+        "src/services/customerProfile.js",
+        "tests/chat-rules.test.mjs",
+        "tests/section11-browser-check.mjs"
+      ],
+      "owner": "Section 16 M01 + applicable protected owner",
+      "completion": false
+    },
+    {
+      "id": "S11-M01-F10",
+      "title": "Integration / Final QA",
+      "before": "MISSING",
+      "disposition": "PARTIALLY SATISFIED",
+      "reason": "Actual emulator/provider/Rules/browser integration and eight widths; 3 reference composites inspected. Absent Account/bootstrap/lifecycle/proof/private transaction positive paths are explicitly not claimed.",
+      "evidence": [
+        "tests/section11-browser-check.mjs",
+        "tests/section11-part1.test.mjs",
+        "tests/section11-proof-service.test.mjs",
+        "tests/section12-browser-check.mjs"
+      ],
+      "owner": "Section 11 QA + Section 16 + protected domain owners",
+      "completion": false
+    }
+  ],
+  "visuals": [
+    {
+      "id": "S11-M10-F2-B1-V01/V02/V03",
+      "image": "image4.png",
+      "status": "INSPECTED / WRITTEN OVERRIDES APPLIED",
+      "flows": [
+        "F01",
+        "F02",
+        "F03"
+      ]
+    },
+    {
+      "id": "S11-M10-F2-B2-V01/V02/V03",
+      "image": "image9.png",
+      "status": "INSPECTED / WRITTEN OVERRIDES APPLIED",
+      "flows": [
+        "F04",
+        "F05",
+        "F07",
+        "F08"
+      ]
+    },
+    {
+      "id": "S11-M10-F2-B3-V01/V02/V03",
+      "image": "image13.png",
+      "status": "INSPECTED / WRITTEN OVERRIDES APPLIED",
+      "flows": [
+        "F08",
+        "F09",
+        "privacy shield"
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "S11-C01",
+      "severity": "CRITICAL",
+      "owner": "Section 16 M01 F1/F3 + Section 11 lifecycle",
+      "required": "Trusted durable Account/current principal/login binding/lifecycle source and authorized legacy binding/reconciliation; no provider UID substitution."
+    },
+    {
+      "id": "S11-C02",
+      "severity": "CRITICAL",
+      "owner": "Section 16 M01 F2/F11/F12",
+      "required": "Conflict/Tombstone/current login mapping/unique idempotent bootstrap, explicit Allow New or controlled identity resolution; existing identities/history cannot be guessed or silently migrated."
+    },
+    {
+      "id": "S11-C03",
+      "severity": "CRITICAL",
+      "owner": "Section 16 M01 F2/F4",
+      "required": "Lifecycle/binding-aware verification and reset commit, exact proof intent/expiry/consumption/supersession and durable committed/not-committed/unresolved result registry."
+    },
+    {
+      "id": "S11-H01",
+      "severity": "HIGH",
+      "owner": "Section 16 + destination owners",
+      "required": "Independent session revocation/security timing/enumeration/abuse/audit at trusted commands and complete exact owner/private-child relationships; project policy/rules/header provisioning and production rollout remain separately authorized."
+    }
+  ]
+}

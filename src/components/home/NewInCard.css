@@ -8,15 +8,25 @@
 .menu-grid {
   display: flex;
   flex-wrap: nowrap;
+<<<<<<< HEAD
   gap: var(--space-sm);
+=======
+  gap: var(--space-xs);
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   margin: 0;
   padding: 0.25rem 0.25rem 1rem;
   list-style: none;
   overflow-x: auto;
   overscroll-behavior-inline: contain;
+<<<<<<< HEAD
   scroll-snap-type: x proximity;
   scroll-padding-inline: 0.25rem;
   scroll-behavior: smooth;
+=======
+  scroll-snap-type: none;
+  scroll-padding-inline: 0.25rem;
+  scroll-behavior: auto;
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   scrollbar-width: thin;
   scrollbar-color: rgba(96, 16, 19, 0.3) transparent;
   -webkit-overflow-scrolling: touch;
@@ -29,10 +39,16 @@
 }
 
 @media (min-width: 640px) {
+<<<<<<< HEAD
   .menu-grid {
     gap: var(--space-md);
+=======
+  .menu-grid > li {
+    flex-basis: clamp(11rem, 22vw, 14.5rem);
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   }
 
+<<<<<<< HEAD
   .menu-grid > li {
     flex-basis: clamp(11rem, 22vw, 14.5rem);
   }
@@ -64,6 +80,34 @@
 .menu-card {
   --menu-card-media-ratio: 1 / 1;
 
+=======
+@media (min-width: 1024px) {
+  .menu-grid > li {
+    flex-basis: clamp(12rem, 17vw, 15rem);
+  }
+}
+
+@media (pointer: coarse) {
+  .menu-grid {
+    scrollbar-width: none;
+  }
+
+  .menu-grid::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-grid {
+    scroll-behavior: auto;
+  }
+}
+
+/* ---------- Card: Elevated Couture Lookbook Framing ---------- */
+.menu-card {
+  --menu-card-media-ratio: 1 / 1;
+
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   position: relative;
   display: flex;
   flex-direction: column;
@@ -233,7 +277,11 @@
   color: var(--color-brand);
 }
 
+<<<<<<< HEAD
 /* ---------- View Piece CTA ---------- */
+=======
+/* ---------- SHOP PIECE CTA ---------- */
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 .menu-card__cta {
   display: inline-flex;
   align-items: center;

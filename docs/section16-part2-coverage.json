@@ -1,0 +1,28 @@
+{
+  "section": 16,
+  "document": "01",
+  "part": 2,
+  "baseline": "b80ce9df6504bdf60cac093e9fafb1b746581641",
+  "sourceSha256": "5A4F5C4905B1A95406D39333FBE0DCC4A96103A85940758BEE1574C8381424EA",
+  "sourceParagraphsRead": 1897,
+  "scope": [3, 4, 5, 6],
+  "formalNumberedFlowsCreated": 0,
+  "finalModuleCount": 16,
+  "physicalMapping": "COMPLETED — current repository, owner services, Rules, Functions and tests; no production migration or deployment",
+  "productionValidated": false,
+  "verdict": "PARTIAL",
+  "modules": [
+    { "module": 3, "status": "PARTIAL", "disposition": "IMPLEMENTED / HARDENED; dependency-aware hard-delete eligibility remains closed", "code": ["netlify/lib/pretransaction-service.js", "src/services/products.js", "src/services/admin.js", "firestore.rules"], "tests": ["tests/section16-pretransaction.test.mjs", "tests/section16-rules.test.mjs"], "collections": ["products", "productHistory", "pretransactionOperations", "staffAudit", "taxonomy", "discoveryModules"] },
+    { "module": 4, "status": "PARTIAL", "disposition": "IMPLEMENTED / HARDENED for Product and Custom Style image staging/reference/delivery; retained-media and later owner ports remain closed", "code": ["netlify/lib/media-service.js", "netlify/functions/account.js", "src/components/admin/OwnerImageField.jsx", "firestore.rules"], "tests": ["tests/section16-pretransaction.test.mjs", "tests/section16-rules.test.mjs"], "collections": ["mediaAssets", "mediaReferences", "pretransactionOperations"] },
+    { "module": 5, "status": "PASS", "disposition": "STAGED PASS for bounded Product/public-Review relationships, positive guest import, Account isolation and confirmed native Shop saves; transaction owners are not duplicated", "code": ["netlify/lib/pretransaction-service.js", "src/services/pretransaction.js", "src/hooks/useCustomerSession.js", "src/hooks/useBoundSaves.js", "src/context/SavedPiecesContext.jsx", "src/context/SavedReviewsContext.jsx"], "tests": ["tests/section16-pretransaction.test.mjs", "tests/section16-pretransaction-client.test.mjs", "tests/section16-part2-browser.mjs"], "collections": ["customerContinuity", "pretransactionOperations", "accountOperations"] },
+    { "module": 6, "status": "PARTIAL", "disposition": "IMPLEMENTED / HARDENED request owner and private media; atomic one-effect M07 port tested with an explicitly synthetic transaction-owner fixture, not installed in production", "code": ["netlify/lib/pretransaction-service.js", "netlify/lib/media-service.js", "src/pages/CustomStyle/CustomStyle.jsx", "src/services/pretransaction.js"], "tests": ["tests/section16-pretransaction.test.mjs", "tests/section16-part2-browser.mjs"], "collections": ["customStyleRequests", "customStyleHandoffs", "pretransactionOperations"] }
+  ],
+  "dependencies": [
+    "Complete trusted Product historical-reference eligibility before hard delete",
+    "Owner-specific retained-media disposition and legacy-public-media migration review",
+    "Dedicated Profile Photo, Payment Proof, Chat and Review media owner ports; no generic assignment fallback",
+    "Real M07 prepare/exists port and final readiness/transaction-owner contract",
+    "Production Functions credentials, private Blobs verification and coordinated Rules/index rollout",
+    "Later M13/M15 worker/projection infrastructure; bounded catalogue/save reads are not a scalability certification"
+  ]
+}

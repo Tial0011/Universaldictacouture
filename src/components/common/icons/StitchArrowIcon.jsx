@@ -1,7 +1,7 @@
 /**
  * Stitch Arrow — the brand's "go" arrow. The shaft starts as a short
  * running stitch (two dashes) and finishes as a solid thread into the
- * arrowhead, so every "View Piece →" / "View all →" reads as a needle
+ * arrowhead, so every "SHOP PIECE" / "View all →" reads as a needle
  * pulling thread rather than a stock chevron.
  *
  * Draws in `currentColor`, so it follows the text colour of whatever

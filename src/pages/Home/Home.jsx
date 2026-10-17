@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 import { useEffect, useMemo, useState } from "react";
+=======
+import { useCallback,useEffect, useMemo, useState } from "react";
+import { useReviewPublicationGuard } from "../../hooks/useReviewPublicationGuard";
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 import HeroCarousel from "../../components/home/HeroCarousel";
 import TrustStrip from "../../components/home/TrustStrip";
 import DiscoveryModule from "../../components/discovery/DiscoveryModule";
@@ -6,7 +11,7 @@ import NewIn from "../../components/home/NewIn";
 import CustomStylePromo from "../../components/home/CustomStylePromo";
 import ReviewsPreview from "../../components/home/ReviewsPreview";
 import StyleCircle from "../../components/home/StyleCircle";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
+
 import { useCatalogue } from "../../hooks/useCatalogue";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import heroReadyToWear from "../../assets/images/hero/hero-ready-to-wear.jpg";
@@ -19,8 +24,9 @@ import {
 } from "../../services/content";
 import { DEFAULT_SHOP_BY_GROUPS, fetchShopByGroups } from "../../services/shopBy";
 import { selectNewIn } from "../../services/products";
-import "./Home.css";
+
 import "../../components/home/home-sections.css";
+import "./Home.css";
 
 const FALLBACK_SLIDE = [
   {
@@ -38,12 +44,17 @@ export default function Home() {
   const [shopByGroups, setShopByGroups] = useState(DEFAULT_SHOP_BY_GROUPS);
   const [reviewState, setReviewState] = useState({ entries: [], loading: true, error: "" });
   const [reviewAttempt, setReviewAttempt] = useState(0);
+<<<<<<< HEAD
+=======
+  const withdrawReviews=useCallback(()=>setReviewState({entries:[],loading:false,error:"Current publication must be rechecked. Refresh customer stories."}),[]);
+  useReviewPublicationGuard(reviewState.entries,withdrawReviews);
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   const [customStyleImage, setCustomStyleImage] = useState({
     url: heroReadyToWear,
     publicId: "",
     alt: "",
   });
-  const [isHeroReady, setIsHeroReady] = useState(false);
+
 
   useDocumentMeta({
     title: "Universal Dicta Couture — Aso Oke for every occasion",
@@ -59,12 +70,14 @@ export default function Home() {
       .then((result) => {
         if (active && result.length) setSlides(result);
       })
-      .finally(() => {
-        if (active) setIsHeroReady(true);
-      });
+      .catch(() => { /* Keep the local hero visible when remote content is offline. */ });
 
     fetchShopByGroups().then((groups) => {
+<<<<<<< HEAD
       if (active && groups.length) setShopByGroups(groups);
+=======
+      if (active) setShopByGroups(groups);
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
     });
 
     fetchCustomStylePromo().then((result) => {
@@ -90,20 +103,20 @@ export default function Home() {
     () => buildShopDiscovery(products, "Shop By", shopByGroups),
     [products, shopByGroups]
   );
+<<<<<<< HEAD
   // New In is always the newest published pieces (see selectNewIn),
   // capped at 20 — never a manually curated set — so "View all" can
   // simply point at the shop's default, newest-first view.
+=======
+  // New In is an admin-managed merchandising context. The homepage
+  // previews the first 20 valid members; View all reopens that same
+  // context in Shop instead of conflating it with Newest First.
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   const newInProducts = selectNewIn(products, 20);
 
   return (
     <>
-      {isHeroReady ? (
-        <HeroCarousel slides={slides} />
-      ) : (
-        <div className="home-hero-placeholder">
-          <LoadingSpinner label="Loading featured collections" />
-        </div>
-      )}
+      <HeroCarousel slides={slides} />
 
       {/* Cultural flow: Aso Oke woven design system flowing from benefits strip downward */}
       <div className="home-cultural-flow">
@@ -115,7 +128,11 @@ export default function Home() {
               module={shopByModule}
               className="discovery--home"
               groupNavigation="arrows"
+<<<<<<< HEAD
               viewAllTo="/shop"
+=======
+              viewAllTo={(groupId) => groupId ? `/shop?discovery=${encodeURIComponent(groupId)}` : "/shop"}
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
             />
           </div>
         ) : null}
@@ -124,7 +141,11 @@ export default function Home() {
           products={newInProducts}
           isLoading={isLoading}
           error={error}
+<<<<<<< HEAD
           viewAllTo="/shop"
+=======
+          viewAllTo="/shop?newin=1"
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
         />
 
         <CustomStylePromo image={customStyleImage} />

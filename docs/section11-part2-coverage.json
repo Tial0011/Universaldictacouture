@@ -1,0 +1,41 @@
+{
+  "scope": "Section 11 Document 01 Part 2, Module 2 only",
+  "baseline": "7cb18fa",
+  "verdict": "PARTIAL",
+  "wholeSectionLock": false,
+  "flowCount": 8,
+  "completedFlowCount": 0,
+  "flows": [
+    {"id":"S11-M02-F01","disposition":"EXTERNAL OWNER DEPENDENCY","implemented":"Usable signed-in account navigation, independent unavailable groups, safe continuity, no fake Attention or counts","remaining":"Trusted current Profile and authorized action-required/continuity projections","evidence":["src/pages/Profile/Profile.jsx","tests/section11-part2-browser.mjs"]},
+    {"id":"S11-M02-F02","disposition":"EXTERNAL OWNER DEPENDENCY","implemented":"Exact five-field contract, payload allowlist, private/public distinction, meaningful-conflict and identity/selection suppression primitives; removed unsafe legacy UID upsert","remaining":"Actual Profile edit/save/version/result service and protected Photo upload/retrieval","evidence":["src/services/profileExperience.js","src/services/customerProfile.js","tests/section11-part2.test.mjs"]},
+    {"id":"S11-M02-F03","disposition":"EXTERNAL OWNER DEPENDENCY","implemented":"Honest unavailable address area; historical-delivery separation retained","remaining":"Own-address CRUD, authoritative one-default transaction, tombstone/version and concurrent default/delete/edit enforcement","evidence":["src/pages/Profile/Profile.jsx","firestore.rules"]},
+    {"id":"S11-M02-F04","disposition":"EXTERNAL OWNER DEPENDENCY","implemented":"Current provider Login Email displayed only in Security; real current-session sign-out; private state withdrawn on session uncertainty","remaining":"Durable login binding/conflict verification, password commits, fresh auth, actual session registry/revocation and security activity; persisted-device preference","evidence":["src/pages/Profile/Profile.jsx","src/firebase/auth.js","tests/section11-part2-browser.mjs"]},
+    {"id":"S11-M02-F05","disposition":"EXTERNAL OWNER DEPENDENCY","implemented":"One unset disabled radio group, Email/in-site only, essential versus optional distinction; no fabricated consent/default","remaining":"Current authoritative preferences and confirmed versioned writes, multi-device reconciliation and finalized advanced settings","evidence":["src/pages/Profile/Profile.jsx","src/services/profileExperience.js","tests/section11-part2.test.mjs"]},
+    {"id":"S11-M02-F06","disposition":"EXTERNAL OWNER DEPENDENCY","implemented":"Privacy/management/policy navigation and accurate retention/delete explanation; no raw dump or assumed consent; privacy withdrawal uses inherited session remount","remaining":"Authorized per-source My Information, public identity/permission provenance, protected idempotent deletion/fresh auth/outcome reconciliation","evidence":["src/pages/Profile/Profile.jsx","src/context/AuthContext.jsx"]},
+    {"id":"S11-M02-F07","disposition":"EXTERNAL OWNER DEPENDENCY","implemented":"Four My Closet area labels, exact existing saved-area links, no unrelated transaction retarget, no private payload transfer or local-task replay","remaining":"Positive owner destinations for Orders/Payments and authorized current Resume Anchor/projection services","evidence":["src/services/profileExperience.js","src/pages/Profile/Profile.jsx"]},
+    {"id":"S11-M02-F08","disposition":"EXTERNAL OWNER DEPENDENCY","implemented":"56 rendered area/width checks, account switching, late-request/selection guards, offline/history withdrawal, reflow and no false success","remaining":"Positive protected-save/conflict/default/photo/deletion/unknown-outcome backend integration tests; complete loaded-state visual conformance","evidence":["tests/section11-part2.test.mjs","tests/section11-part2-browser.mjs"]}
+  ],
+  "directVisuals": [
+    {"id":"DOC-VIS-S11-M02-F01-01","sourceImage":"image1.png","status":"INSPECTED; account shell/state treatment partially implemented; loaded projections unavailable"},
+    {"id":"DOC-VIS-S11-M02-F02-F03-01","sourceImage":"image2.png","status":"INSPECTED; obsolete fields/navigation rejected; live forms unavailable"},
+    {"id":"DOC-VIS-S11-M02-F02-F03-02","sourceImage":"image3.png","status":"INSPECTED; final field/rail contract inherited; protected editing unavailable"},
+    {"id":"DOC-VIS-S11-M02-F04-01","sourceImage":"image4.png","status":"INSPECTED; current login and sign-out implemented; other security controls unavailable"},
+    {"id":"DOC-VIS-S11-M02-F05-01","sourceImage":"image5.png","status":"INSPECTED; one preset group and channel overrides; persistence unavailable"},
+    {"id":"DOC-VIS-S11-M02-F06-01","sourceImage":"image6.png","status":"INSPECTED; privacy/management navigation; current information sources unavailable"},
+    {"id":"DOC-VIS-S11-M02-F06-02","sourceImage":"image7.png","status":"INSPECTED; inherited visual and assistive session withdrawal validated; no blur-only state"},
+    {"id":"DOC-VIS-S11-M02-F08-01","sourceImage":"image12.png","status":"INSPECTED; no false success/unavailable distinctions; consequential outcome pipeline unavailable"}
+  ],
+  "supportingVisuals": [
+    {"id":"DOC-VIS-S11-M02-F07-S01","sourceImage":"image8.png","status":"INSPECTED; My Closet remains owner"},
+    {"id":"DOC-VIS-S11-M02-F07-S02","sourceImage":"image9.png","status":"INSPECTED; Custom Style remains owner"},
+    {"id":"DOC-VIS-S11-M02-F07-S03","sourceImage":"image10.png","status":"INSPECTED; Chat remains owner"},
+    {"id":"DOC-VIS-S11-M02-F07-S04","sourceImage":"image11.png","status":"INSPECTED; Order/Payment remain owner"}
+  ],
+  "dependencies": [
+    "Trusted durable Account/principal/login mapping, current lifecycle and controlled existing-customer provisioning from Section 16",
+    "Current Profile/address/preference owner read/command interfaces, transactions, versioning and durable operation-result registry",
+    "Private media validation/ownership/retrieval, identity/selection-pinned completion and withdrawal",
+    "Security/session/fresh-auth/revocation and protected lifecycle commands",
+    "Authorized per-source customer projections, publication/consent history and Resume Anchor resolution"
+  ]
+}

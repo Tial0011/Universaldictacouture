@@ -3,7 +3,11 @@ import assert from "node:assert/strict";
 import { normaliseProduct, resolveSelections, priceForSelections, closetLineKey } from "../src/services/productModel.js";
 
 const product = normaliseProduct("piece", {
+<<<<<<< HEAD
   name: "Aso Oke", status: "published", price: 100, category: ["Fabric"],
+=======
+  name: "Aso Oke", status: "published", price: 100, unitLabel: "per set", category: ["Fabric"], primaryImage: { url: "https://example.test/piece.jpg" },
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   options: [
     { name: "Size", required: true, values: ["M", "L"] },
     { name: "Finish", required: false, values: ["Plain", "Embroidered"] },
@@ -27,7 +31,42 @@ test("missing required options block a selection; optional choices remain option
   assert.equal(resolveSelections(product, { Size: "M", Finish: "Unknown" }).resolved.Finish, undefined);
 });
 test("product descriptions reach public details and sharing without fabricated legacy copy", () => {
+<<<<<<< HEAD
   const raw = { name: "Cloth", price: 200, status: "published", category: ["Fabric"] };
   assert.equal(normaliseProduct("p", { ...raw, description: "  Woven in wine.  " }).description, "Woven in wine.");
   assert.equal(normaliseProduct("p", raw).description, "");
 });
+=======
+  const raw = { name: "Cloth", price: 200, unitLabel: "per bundle", status: "published", category: ["Fabric"], primaryImage: { url: "https://example.test/cloth.jpg" } };
+  assert.equal(normaliseProduct("p", { ...raw, description: "  Woven in wine.  " }).description, "Woven in wine.");
+  assert.equal(normaliseProduct("p", raw).description, "");
+});
+
+
+test("published products without a primary image do not enter the public catalogue", () => {
+  assert.equal(normaliseProduct("no-image", { name: "Incomplete", price: 100, status: "published", category: ["Fabric"] }), null);
+});
+
+test("when multiple prices exist, the lower price is eliminated and the higher price is main price", () => {
+  const multiPriceProduct = normaliseProduct("multi-price", {
+    name: "Bundle Piece",
+    status: "published",
+    price: 165000,
+    unitLabel: "for complete",
+    category: ["Aso Oke"],
+    primaryImage: { url: "https://example.test/bundle.jpg" },
+    variants: [
+      { price: 180000, options: { Bundle: "Complete" } },
+      { price: 150000, options: { Bundle: "Single" } },
+    ],
+  });
+  assert.equal(multiPriceProduct.mainPrice, 180000);
+  assert.equal(multiPriceProduct.price, 180000);
+  assert.equal(multiPriceProduct.minPrice, 180000);
+  assert.equal(multiPriceProduct.maxPrice, 180000);
+  assert.equal(multiPriceProduct.hasVariablePricing, false);
+  assert.equal(multiPriceProduct.unitLabel, "for complete");
+  assert.equal(multiPriceProduct.priceToken, "for complete");
+  assert.equal(priceForSelections(multiPriceProduct, { Bundle: "Single" }), 180000);
+});
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9

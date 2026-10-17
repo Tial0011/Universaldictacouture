@@ -1,0 +1,1821 @@
+{
+  "source": "SECTION 12 DOCUMENT 1 PART 2 .docx",
+  "sourceSHA256": "682E5993F2A74F1CA0B3F9C3C37B2A00423B679C4ED37FC0A7A70851D9BDF8F5",
+  "baseline": "Current uncommitted post-Part-1 implementation; inherited checkpoint; repository HEAD 2f2628d is not the working implementation baseline",
+  "verdict": "PARTIAL",
+  "flowCount": 115,
+  "scope": "Document 01 Part 2 only; its official IDs/titles supersede the old 321-flow inventory for Modules 6–10",
+  "counts": {
+    "VALIDATION-ONLY": 11,
+    "IMPLEMENTED IN THIS RUN": 18,
+    "EXTERNAL OWNER DEPENDENCY": 78,
+    "ALREADY SATISFIED": 8
+  },
+  "authorityNotes": [
+    "Written module-level Payment ownership and explicit current owner instruction override copied Review-owner language in S12-M09-F04; Under Review remains Payment review.",
+    "Architecture completeness/closure claims in the supplied document are not code completion claims.",
+    "All 115 flows are accounted for, not all implemented. External dispositions explicitly identify missing actual owner integration.",
+    "Physical schemas/reference indexes, privileged private-field retrieval and operation registries are not invented under Section 12 authority."
+  ],
+  "modules": [
+    {
+      "module": 6,
+      "title": "Global Search & Entity Findability",
+      "flowCount": 25,
+      "verdict": "PARTIAL",
+      "dispositionCounts": {
+        "VALIDATION-ONLY": 1,
+        "IMPLEMENTED IN THIS RUN": 12,
+        "EXTERNAL OWNER DEPENDENCY": 9,
+        "ALREADY SATISFIED": 3
+      },
+      "flows": [
+        {
+          "id": "S12-M06-F01",
+          "title": "Global Search Purpose",
+          "paragraph": 137,
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Section 12 Search is a derived scoped view; no source-owned mutation exists in Search. Architecture inspection and command tests confirm navigation/findability only.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F02",
+          "title": "Desktop Search Entry",
+          "paragraph": 142,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Persistent labelled shell Search uses an actor/access-bound memory handoff; no query enters URL or history payload. Real desktop shell entry verified.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F03",
+          "title": "Mobile Full-Screen Search Entry",
+          "paragraph": 147,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "A dedicated full-height mobile page with labelled Search input, stacked controls and compact global header was tested at 320/390/768 widths; no bottom navigation.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F04",
+          "title": "Keyboard Search Shortcut",
+          "paragraph": 152,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Ctrl/Meta K focuses the desktop shell entry or opens mobile Search, respects an open modal and removes its listener on unmount. Real keyboard shortcut verified.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F05",
+          "title": "Search Input / Trigger Behaviour",
+          "paragraph": 157,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Two-character free-text threshold or explicit submission, 200-character bound, entity filtering and immediate submitted exact lookup; no query history.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F06",
+          "title": "Recent Authorized Entities",
+          "paragraph": 162,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "At most five actor-bound entity handles are retained in session storage without labels/PII/query text. Current owner read and authorization precede each displayed preview and subsequent open.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F07",
+          "title": "Customer Search",
+          "paragraph": 167,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No trusted staff-safe Customer read/search contract exists. customerProfiles is customer-owned with self-only rules and no independent Account state, public reference, field-purpose projection or lifecycle source.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Applicable entity owner / Section 16"
+        },
+        {
+          "id": "S12-M06-F08",
+          "title": "Main Order / Extension Search",
+          "paragraph": 172,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No Main Order/Extension owner service, stable-reference resolver, collections/rules or destination workflow exists; a Search grant does not manufacture that source.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Applicable entity owner / Section 16"
+        },
+        {
+          "id": "S12-M06-F09",
+          "title": "Payment Search",
+          "paragraph": 177,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No Payment record/reference/review service exists. Search exposes an authorized source-unavailable state, never proof or fake financial data.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Applicable entity owner / Section 16"
+        },
+        {
+          "id": "S12-M06-F10",
+          "title": "Chat Search",
+          "paragraph": 182,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "General Chat findability and exact existing-ID open are backed. Main Order Chat linkage, durable human-readable Chat references and authorized Customer-to-Chat name lookup remain owner dependencies.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Applicable entity owner / Section 16"
+        },
+        {
+          "id": "S12-M06-F11",
+          "title": "Product Search",
+          "paragraph": 187,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Scoped catalogue names/status are searchable in paginated loaded summaries and known IDs resolve directly. Complete all-page text/reference indexing and approved human-readable reference resolution remain unimplemented owner read-model dependencies; no claim of complete Product Search.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Applicable entity owner / Section 16"
+        },
+        {
+          "id": "S12-M06-F12",
+          "title": "Review / Dicta Moment Search",
+          "paragraph": 192,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Legacy Review state previews/exact lookup are backed, but the canonical Review/Dicta Moment source, public reference and complete search contract are not present.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Applicable entity owner / Section 16"
+        },
+        {
+          "id": "S12-M06-F13",
+          "title": "Custom Style Search",
+          "paragraph": 197,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No structured Custom Style request/reference/service exists. Only independently authorized source-unavailable Search status is exposed.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Applicable entity owner / Section 16"
+        },
+        {
+          "id": "S12-M06-F14",
+          "title": "Search Result Grouping & Preview",
+          "paragraph": 202,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Results group by authorized entity type with minimum metadata, semantic h2/h3/list structure and bounded pagination. Missing owner domains are separately unavailable, not fake result groups.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F15",
+          "title": "Permission-Aware Search",
+          "paragraph": 207,
+          "disposition": "ALREADY SATISFIED",
+          "reason": "Inherited current Staff Access/capability/purpose/complete-route scope is enforced in Firestore before retrieval. Narrow-scope, denied-deep-link and revocation tests pass.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F16",
+          "title": "Sensitive-Data Masking in Search",
+          "paragraph": 212,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Broad previews omit internal IDs, contact, transcripts, Review bodies/private media and Payment evidence. REST field masks limit payloads; scoped response privacy tests and real network checks pass.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F17",
+          "title": "Exact Identifier / Reference Search",
+          "paragraph": 217,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Known existing object IDs resolve directly beyond page one and are not displayed broadly. Authoritative human-readable Customer/Order/Extension/Payment/Chat/Review reference resolvers do not exist; guessing mappings would violate owner identity.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Applicable entity owner / Section 16"
+        },
+        {
+          "id": "S12-M06-F18",
+          "title": "Search Deep-Link Routing",
+          "paragraph": 222,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Each backed open rereads exact current owner context and rechecks authority before routing; Product/Review/General Chat destination rules remain independent. Unbacked exact routes fail explicitly, without substitute objects.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F19",
+          "title": "No-Results Behaviour",
+          "paragraph": 227,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "No results in successfully checked loaded pages is distinct from partial/unavailable/loading; coverage never implies all-page search exhaustion.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F20",
+          "title": "Search Error / Unavailable Behaviour",
+          "paragraph": 232,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Independent source states, checked-time metadata, read Retry and bounded page loading preserve query and healthy results. Synthetic isolated Review read outage/retry was tested without blanking Product results.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F21",
+          "title": "Stale Search Result Behaviour",
+          "paragraph": 237,
+          "disposition": "ALREADY SATISFIED",
+          "reason": "Inherited exact current owner re-resolution defeats stale projections. Attention resolved-elsewhere and Chat reassignment runtime checks validate no stale consequential shortcut.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F22",
+          "title": "Search Index vs Authoritative Truth",
+          "paragraph": 242,
+          "disposition": "ALREADY SATISFIED",
+          "reason": "Loaded summaries are explicitly projections, not indexes/business truth. Current owner reads/rules govern each use; no Search-owned mutable business state.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F23",
+          "title": "Natural-Language Search",
+          "paragraph": 247,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "A deterministic bounded parser supports entity/name phrases and chats-waiting-on-staff without AI, new provider, hidden broad retrieval or mutation. Unsupported phrases are literal find queries, not invented answers.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F24",
+          "title": "Universal / Command Search",
+          "paragraph": 252,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Only explicit safe navigation commands and exact owner opens are interpreted. Consequential verbs remain literal find queries; current staff and exact target checks are independent.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M06-F25",
+          "title": "Search Validation & Module Handoff",
+          "paragraph": 257,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "25 official flows are dispositioned; full Search validation/handoff is blocked by missing owner projections, references, complete index/rate/abuse contracts and transaction journeys.",
+          "evidence": [
+            "src/pages/admin/Operations/GlobalSearch.jsx",
+            "src/services/operationalSearch.js",
+            "src/services/operations.js",
+            "firestore.rules",
+            "tests/section12-part2-search.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Applicable entity owner / Section 16"
+        }
+      ]
+    },
+    {
+      "module": 7,
+      "title": "Customer Operational Context",
+      "flowCount": 25,
+      "verdict": "PARTIAL",
+      "dispositionCounts": {
+        "VALIDATION-ONLY": 2,
+        "EXTERNAL OWNER DEPENDENCY": 23
+      },
+      "flows": [
+        {
+          "id": "S12-M07-F01",
+          "title": "Customer Operational Context Purpose",
+          "paragraph": 350,
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Section 11 ownership is retained; the authorized Admin surface honestly states that its operational source is unavailable, not a duplicate Customer truth.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ]
+        },
+        {
+          "id": "S12-M07-F02",
+          "title": "Customer Directory Access",
+          "paragraph": 355,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Customer Directory Access”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Customer Directory Access remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F03",
+          "title": "Customer Directory Layout",
+          "paragraph": 360,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Customer Directory Layout”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Customer Directory Layout remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F04",
+          "title": "Customer Directory Filters",
+          "paragraph": 365,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Customer Directory Filters”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Customer Directory Filters remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F05",
+          "title": "Customer Operational Summary Entry",
+          "paragraph": 370,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Customer Operational Summary Entry”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Customer Operational Summary Entry remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F06",
+          "title": "Customer Summary Header",
+          "paragraph": 375,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Customer Summary Header”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Customer Summary Header remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F07",
+          "title": "Durable Customer Identity",
+          "paragraph": 380,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Durable Customer Identity”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Durable Customer Identity remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F08",
+          "title": "Account State & Verification Summary",
+          "paragraph": 385,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Account State & Verification Summary”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Account State & Verification Summary remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F09",
+          "title": "Current Contact Information",
+          "paragraph": 390,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Current Contact Information”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Current Contact Information remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F10",
+          "title": "Contact / Address Masking & Reveal",
+          "paragraph": 395,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Contact / Address Masking & Reveal”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Contact / Address Masking & Reveal remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F11",
+          "title": "Active Work Indicator",
+          "paragraph": 400,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Active Work Indicator”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Active Work Indicator remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F12",
+          "title": "Linked Main Orders / Extensions",
+          "paragraph": 405,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Linked Main Orders / Extensions”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Linked Main Orders / Extensions remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F13",
+          "title": "Linked Payment Context",
+          "paragraph": 410,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Linked Payment Context”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Linked Payment Context remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F14",
+          "title": "Linked Chat Context",
+          "paragraph": 415,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Linked Chat Context”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Linked Chat Context remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F15",
+          "title": "Linked Custom Style Context",
+          "paragraph": 420,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Linked Custom Style Context”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Linked Custom Style Context remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F16",
+          "title": "Current Profile vs Historical Transaction Data",
+          "paragraph": 425,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Current Profile vs Historical Transaction Data”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Current Profile vs Historical Transaction Data remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F17",
+          "title": "Customer Support Edit of Mutable Profile Data",
+          "paragraph": 430,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Customer Support Edit of Mutable Profile Data”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Customer Support Edit of Mutable Profile Data remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F18",
+          "title": "Account Restriction / Suspension / Reinstate Context",
+          "paragraph": 435,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Account Restriction / Suspension / Reinstate Context”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Account Restriction / Suspension / Reinstate Context remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F19",
+          "title": "Deletion-Request Processing Context",
+          "paragraph": 440,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Deletion-Request Processing Context”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Deletion-Request Processing Context remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F20",
+          "title": "Customer Recovery / Request-Customer-Action Flow",
+          "paragraph": 445,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Customer Recovery / Request-Customer-Action Flow”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Customer Recovery / Request-Customer-Action Flow remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F21",
+          "title": "Sensitive Customer Data Boundaries",
+          "paragraph": 450,
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Inherited self-only Customer Profile rules deny staff over-fetch; no PII, address, measurements or media is obtained for broad Admin surfaces. Tested denial is not claimed as a completed Customer Summary.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ]
+        },
+        {
+          "id": "S12-M07-F22",
+          "title": "Customer Context Partial-Source Failure",
+          "paragraph": 455,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Customer Context Partial-Source Failure”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Customer Context Partial-Source Failure remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F23",
+          "title": "Desktop Customer Summary",
+          "paragraph": 460,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Desktop Customer Summary”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Desktop Customer Summary remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F24",
+          "title": "Mobile Customer Summary",
+          "paragraph": 465,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Mobile Customer Summary”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Mobile Customer Summary remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        },
+        {
+          "id": "S12-M07-F25",
+          "title": "Customer Context Validation & Module Handoff",
+          "paragraph": 470,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The actual Section 11 implementation lacks the staff-safe operational read/field-purpose and verified lifecycle contract needed for “Customer Context Validation & Module Handoff”. Orders/Payments/structured requests are also absent where linked. Existing mutable fullName/phone/email records cannot safely substitute for these owner sources; Customer Context Validation & Module Handoff remains unimplemented, with authorized source-unavailable routing only.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 11 / Section 16"
+        }
+      ]
+    },
+    {
+      "module": 8,
+      "title": "Order & Extension Visibility",
+      "flowCount": 22,
+      "verdict": "PARTIAL",
+      "dispositionCounts": {
+        "VALIDATION-ONLY": 2,
+        "EXTERNAL OWNER DEPENDENCY": 20
+      },
+      "flows": [
+        {
+          "id": "S12-M08-F01",
+          "title": "Order Visibility Purpose & Ownership Boundary",
+          "paragraph": 573,
+          "disposition": "VALIDATION-ONLY",
+          "reason": "No Section 12 Order write/Edition/approval/completion/delivery/assignment shortcut exists; default-deny owner boundaries are retained and inspected. This validates the prohibition, not a completed Order workflow.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ]
+        },
+        {
+          "id": "S12-M08-F02",
+          "title": "Main Order Operational Summary",
+          "paragraph": 578,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Main Order Operational Summary”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F03",
+          "title": "Original Order / Original Order Snapshot Boundary",
+          "paragraph": 583,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Original Order / Original Order Snapshot Boundary”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F04",
+          "title": "Current Edition Visibility",
+          "paragraph": 588,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Current Edition Visibility”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F05",
+          "title": "Order Stage / Current State Visibility",
+          "paragraph": 593,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Order Stage / Current State Visibility”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F06",
+          "title": "Staff-Awaiting Order State",
+          "paragraph": 598,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Staff-Awaiting Order State”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F07",
+          "title": "Customer-Awaiting Order State",
+          "paragraph": 603,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Customer-Awaiting Order State”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F08",
+          "title": "Blocked / Problem Order State",
+          "paragraph": 608,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Blocked / Problem Order State”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F09",
+          "title": "Payment-Gated Order Context",
+          "paragraph": 613,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Payment-Gated Order Context”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F10",
+          "title": "Completed Order Visibility",
+          "paragraph": 618,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Completed Order Visibility”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F11",
+          "title": "Extension Visibility",
+          "paragraph": 623,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Extension Visibility”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F12",
+          "title": "Parent Main Order ↔ Extension Relationship",
+          "paragraph": 628,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Parent Main Order ↔ Extension Relationship”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F13",
+          "title": "Active Extension Work",
+          "paragraph": 633,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Active Extension Work”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F14",
+          "title": "Order Assignment Context",
+          "paragraph": 638,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Order Assignment Context”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F15",
+          "title": "Order Attention Signals",
+          "paragraph": 643,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Order Attention Signals”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F16",
+          "title": "Exact Order Deep Link",
+          "paragraph": 648,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Exact Order Deep Link”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F17",
+          "title": "Exact Extension Deep Link",
+          "paragraph": 653,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Exact Extension Deep Link”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F18",
+          "title": "Prohibited Dashboard Order Actions",
+          "paragraph": 658,
+          "disposition": "VALIDATION-ONLY",
+          "reason": "No Section 12 Order write/Edition/approval/completion/delivery/assignment shortcut exists; default-deny owner boundaries are retained and inspected. This validates the prohibition, not a completed Order workflow.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ]
+        },
+        {
+          "id": "S12-M08-F19",
+          "title": "Historical Order Integrity",
+          "paragraph": 663,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Historical Order Integrity”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F20",
+          "title": "Order / Extension Failure & Stale States",
+          "paragraph": 668,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Order / Extension Failure & Stale States”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F21",
+          "title": "Mobile Order Visibility",
+          "paragraph": 673,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Mobile Order Visibility”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M08-F22",
+          "title": "Order & Extension Validation / Module Handoff",
+          "paragraph": 678,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Main Order/Entry/Edition/Extension technical owner service or reference/destination contract exists in this repository for “Order & Extension Validation / Module Handoff”. Immutable history, assignment, current state and related independent source semantics cannot be fabricated. Existing default-deny/source-unavailable behavior is safe surrounding work, not flow completion.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Section 14 / Section 16"
+        }
+      ]
+    },
+    {
+      "module": 9,
+      "title": "Payment Visibility",
+      "flowCount": 21,
+      "verdict": "PARTIAL",
+      "dispositionCounts": {
+        "VALIDATION-ONLY": 5,
+        "EXTERNAL OWNER DEPENDENCY": 16
+      },
+      "flows": [
+        {
+          "id": "S12-M09-F01",
+          "title": "Payment Visibility Purpose & Boundary",
+          "paragraph": 777,
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Bank-transfer-only/no-fixed-percentage, private-proof and protected-owner-action/completion distinctions are retained in the safe unavailable surface; no generic verification, proof thumbnail or ledger is introduced. Static/rule inspection validates the safety boundary, not a functioning Payment owner.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ]
+        },
+        {
+          "id": "S12-M09-F02",
+          "title": "Bank-Transfer-Only Rule",
+          "paragraph": 782,
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Bank-transfer-only/no-fixed-percentage, private-proof and protected-owner-action/completion distinctions are retained in the safe unavailable surface; no generic verification, proof thumbnail or ledger is introduced. Static/rule inspection validates the safety boundary, not a functioning Payment owner.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ]
+        },
+        {
+          "id": "S12-M09-F03",
+          "title": "Receipt / Proof Submitted State",
+          "paragraph": 787,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Receipt / Proof Submitted State”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M09-F04",
+          "title": "Under Review State",
+          "paragraph": 792,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Under Review State”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M09-F05",
+          "title": "Verified State",
+          "paragraph": 797,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Verified State”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M09-F06",
+          "title": "Needs Attention State",
+          "paragraph": 802,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Needs Attention State”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M09-F07",
+          "title": "Total Paid / Outstanding Balance Visibility",
+          "paragraph": 807,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Total Paid / Outstanding Balance Visibility”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M09-F08",
+          "title": "Main Order vs Extension Payment Context",
+          "paragraph": 812,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Main Order vs Extension Payment Context”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M09-F09",
+          "title": "Payment-Capable Admin Visibility",
+          "paragraph": 817,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Payment-Capable Admin Visibility”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M09-F10",
+          "title": "Dicta Couturier Limited Payment Visibility",
+          "paragraph": 822,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Dicta Couturier Limited Payment Visibility”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M09-F11",
+          "title": "Payment Proof Access",
+          "paragraph": 827,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Payment Proof Access”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M09-F12",
+          "title": "Payment Proof Privacy & Protected Media",
+          "paragraph": 832,
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Bank-transfer-only/no-fixed-percentage, private-proof and protected-owner-action/completion distinctions are retained in the safe unavailable surface; no generic verification, proof thumbnail or ledger is introduced. Static/rule inspection validates the safety boundary, not a functioning Payment owner.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ]
+        },
+        {
+          "id": "S12-M09-F13",
+          "title": "Open Payment Review",
+          "paragraph": 837,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Open Payment Review”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M09-F14",
+          "title": "Verification Workflow Boundary",
+          "paragraph": 842,
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Bank-transfer-only/no-fixed-percentage, private-proof and protected-owner-action/completion distinctions are retained in the safe unavailable surface; no generic verification, proof thumbnail or ledger is introduced. Static/rule inspection validates the safety boundary, not a functioning Payment owner.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ]
+        },
+        {
+          "id": "S12-M09-F15",
+          "title": "Correction / Reversal Boundary",
+          "paragraph": 847,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Correction / Reversal Boundary”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M09-F16",
+          "title": "Payment Audit Evidence",
+          "paragraph": 852,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Payment Audit Evidence”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M09-F17",
+          "title": "Payment Completed vs Order Completed",
+          "paragraph": 857,
+          "disposition": "VALIDATION-ONLY",
+          "reason": "Bank-transfer-only/no-fixed-percentage, private-proof and protected-owner-action/completion distinctions are retained in the safe unavailable surface; no generic verification, proof thumbnail or ledger is introduced. Static/rule inspection validates the safety boundary, not a functioning Payment owner.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ]
+        },
+        {
+          "id": "S12-M09-F18",
+          "title": "Payment Attention Signals",
+          "paragraph": 862,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Payment Attention Signals”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M09-F19",
+          "title": "Weak-Network / Retry Protection",
+          "paragraph": 867,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Weak-Network / Retry Protection”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M09-F20",
+          "title": "Mobile Payment Review Entry",
+          "paragraph": 872,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Mobile Payment Review Entry”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M09-F21",
+          "title": "Payment Validation & Module Handoff",
+          "paragraph": 877,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Payment record/ledger/proof-media/review/correction/operation-result owner implementation exists for “Payment Validation & Module Handoff”. It requires exact Payment authorization and Section 14/16 state/history/reliability guarantees. No amount, proof, success, completion or safe retry result is invented.",
+          "evidence": [
+            "src/App.jsx",
+            "src/pages/admin/Operations/OwnerUnavailable.jsx",
+            "src/components/admin/StaffRoute.jsx",
+            "src/services/staffAuthorization.js",
+            "firestore.rules"
+          ],
+          "owner": "Payment owner / Section 14 / Section 16"
+        }
+      ]
+    },
+    {
+      "module": 10,
+      "title": "Chat & Customer-Service Operations Visibility",
+      "flowCount": 22,
+      "verdict": "PARTIAL",
+      "dispositionCounts": {
+        "VALIDATION-ONLY": 1,
+        "ALREADY SATISFIED": 5,
+        "EXTERNAL OWNER DEPENDENCY": 10,
+        "IMPLEMENTED IN THIS RUN": 6
+      },
+      "flows": [
+        {
+          "id": "S12-M10-F01",
+          "title": "Chat Visibility Purpose & Ownership Boundary",
+          "paragraph": 972,
+          "disposition": "VALIDATION-ONLY",
+          "reason": "General Chat remains owner truth and Section 12 coordinates/read-routes only; no Chat copy, assignment engine or transaction authority is created.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M10-F02",
+          "title": "Section 10 Chat Source-of-Truth Contract",
+          "paragraph": 977,
+          "disposition": "ALREADY SATISFIED",
+          "reason": "The existing conversations/messages owner service is inherited; summaries use current parent state and do not duplicate message truth.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M10-F03",
+          "title": "Staff Chat Operations Workspace Boundary",
+          "paragraph": 982,
+          "disposition": "ALREADY SATISFIED",
+          "reason": "The retained General assistance workspace is explicitly bounded; UI and rules independently separate Chat read and reply. It is not presented as a Main Order staff workflow.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M10-F04",
+          "title": "Unread Chat Signal",
+          "paragraph": 987,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative per-staff unread cursor/count model exists. Last customer sender is not fabricated into an unread count.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Chat owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M10-F05",
+          "title": "Waiting-on-Staff Chat Signal",
+          "paragraph": 992,
+          "disposition": "ALREADY SATISFIED",
+          "reason": "Current lastSenderRole supplies the bounded customer-awaiting-reply signal. It is not inferred from message-body previews or an invented unread metric.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M10-F06",
+          "title": "Chat Assignment Context",
+          "paragraph": 997,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Existing assignedStaffId supports resource-specific visibility and revoked authority. Owner-controlled claim/assign/reassign/transfer workflow and transaction relationship remain absent; no assignment action is invented.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Chat owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M10-F07",
+          "title": "Single Eligible Couturier Direct Routing",
+          "paragraph": 1002,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative Couturier eligibility/routing source exists. One human/one eligible actor is never treated as automatic assignment.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Chat owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M10-F08",
+          "title": "Multi-Couturier Routing & Assignment",
+          "paragraph": 1007,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No owner-controlled eligibility/assignment queue or concurrent protected assignment endpoint exists; no second assignment engine was added.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Chat owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M10-F09",
+          "title": "No Eligible Couturier State",
+          "paragraph": 1012,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No owner eligibility source can establish that zero eligible Couturiers exist. Source absence is not displayed as a fabricated zero-eligibility state.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Chat owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M10-F10",
+          "title": "Chat Attention Card",
+          "paragraph": 1017,
+          "disposition": "ALREADY SATISFIED",
+          "reason": "Inherited derived Chat Attention uses current minimal parent state; exact preflight detects resolution elsewhere and reconciles without duplicate work.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M10-F11",
+          "title": "Exact Open Chat Action",
+          "paragraph": 1022,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Backed exact General Chat open independently checks current server owner state and read authority; stale tab loses private context after authoritative reassignment.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M10-F12",
+          "title": "Main Order / Extension Chat Context",
+          "paragraph": 1027,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "The codebase has customer-keyed General Chat only, not durable dedicated Main Order/Extension Chat linkage. Creating a second identity/path without the owner technical integration would violate Section 14/16 lineage.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Chat owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M10-F13",
+          "title": "Generic Assistance Chat Context",
+          "paragraph": 1032,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "General assistance is explicitly labelled and cannot grant unrelated Main Order access. No transaction deep link or assignment is inferred from participation.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M10-F14",
+          "title": "Dormant / Completed Conversation Behaviour",
+          "paragraph": 1037,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No authoritative conversation dormancy/completion lifecycle is stored. It is not inferred from sender, age or an empty transcript.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Chat owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M10-F15",
+          "title": "Extension Reactivation of Existing Context",
+          "paragraph": 1042,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "No Extension owner exists to reactivate a dedicated Main Order Chat. No clone/delete/relabel operation exists; exact reactivation remains an owner dependency.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Chat owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M10-F16",
+          "title": "Chat Message Preview Privacy",
+          "paragraph": 1047,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Inbox now retrieves minimal scoped REST summaries instead of full parent payloads; no contact/raw UID/transcript appears in broad preview. Exact authorized workspace separately retrieves transcript.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M10-F17",
+          "title": "Chat Permission Boundaries",
+          "paragraph": 1052,
+          "disposition": "ALREADY SATISFIED",
+          "reason": "Current access, exact read/reply capabilities, purpose and current assignedStaffId are independently enforced in rules; revoked assignment cannot read/write protected children. Runtime transfer and deny tests pass.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M10-F18",
+          "title": "Chat in Customer Summary / Search Boundary",
+          "paragraph": 1057,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "Search-to-General-Chat is safe and backed. Customer Summary-to-Chat and transaction relationship integration remain unavailable because the Customer/transaction owners are absent.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Chat owner / Section 14 / Section 16"
+        },
+        {
+          "id": "S12-M10-F19",
+          "title": "Desktop Chat Visibility",
+          "paragraph": 1062,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Desktop and rail layouts retain independent scoped Inbox and exact General Chat workspace; runtime verification covers 900/1024/1280/1440/1920 without overflow.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M10-F20",
+          "title": "Mobile Chat Visibility",
+          "paragraph": 1067,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Mobile/card transformation preserves current privacy/reply semantics and reachable composer/back control; runtime checks cover 320/390/768 without horizontal overflow.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M10-F21",
+          "title": "Chat Concurrency / Handled-Elsewhere Behaviour",
+          "paragraph": 1072,
+          "disposition": "IMPLEMENTED IN THIS RUN",
+          "reason": "Actor-bound logical-message markers survive reopening/session reload; exact immutable receipt validates actor,target,action,outcome before clearing. Unknown absence/unavailability blocks blind resend. Service tests and emulator/browser sends, transfer and recovery pass.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ]
+        },
+        {
+          "id": "S12-M10-F22",
+          "title": "Chat Operations Validation & Module Handoff",
+          "paragraph": 1077,
+          "disposition": "EXTERNAL OWNER DEPENDENCY",
+          "reason": "22 official flows are dispositioned; full Chat handoff is blocked by dedicated Main Order linkage, unread/lifecycle/eligibility/assignment/reactivation owner contracts and transaction journeys.",
+          "evidence": [
+            "src/services/chats.js",
+            "src/pages/admin/Chats/Chats.jsx",
+            "src/components/chat/Conversation.jsx",
+            "firestore.rules",
+            "tests/section12-part2-chat-service.test.mjs",
+            "tests/section12-browser-check.mjs"
+          ],
+          "owner": "Chat owner / Section 14 / Section 16"
+        }
+      ]
+    }
+  ]
+}

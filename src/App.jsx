@@ -1,9 +1,23 @@
+<<<<<<< HEAD
 import { lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+=======
+import { lazy, Suspense } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 import SiteLayout from "./components/navigation/SiteLayout";
-import AdminLayout from "./components/navigation/AdminLayout";
+import AdminLayout, { ContentEntry } from "./components/navigation/AdminLayout";
 import AdminAccess from "./components/admin/AdminAccess";
+<<<<<<< HEAD
 import RequireAuth from "./components/auth/RequireAuth";
+=======
+import StaffRoute from "./components/admin/StaffRoute";
+import RequireAuth from "./components/auth/RequireAuth";
+import CustomerAccountBoundary, { CustomerOrGuest } from "./components/auth/CustomerAccountBoundary";
+
+import PageBoundary from "./components/common/PageBoundary";
+import LoadingSpinner from "./components/common/LoadingSpinner";
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 
 import Home from "./pages/Home/Home";
 const Shop = lazy(() => import("./pages/Shop/Shop"));
@@ -19,17 +33,54 @@ const Auth = lazy(() => import("./pages/Auth/Auth"));
 const SavedPieces = lazy(() => import("./pages/SavedPieces/SavedPieces"));
 const SavedReviews = lazy(() => import("./pages/SavedReviews/SavedReviews"));
 const MyCloset = lazy(() => import("./pages/MyCloset/MyCloset"));
+<<<<<<< HEAD
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const AdminSettings = lazy(() => import("./pages/admin/Settings/Settings"));
+=======
+const Orders = lazy(() => import("./pages/MyCloset/Orders"));
+const OrderWorkspace = lazy(() => import("./pages/MyCloset/OrderWorkspace"));
+const MainOrderWorkspace = lazy(() => import("./pages/admin/Operations/MainOrderWorkspace"));
+const OrderQueue = lazy(() => import("./pages/admin/Operations/OrderQueue"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const CustomerNotifications = lazy(() => import('./components/notifications/NotificationCentre'));
+const StaffNotifications = lazy(() => import('./pages/admin/Notifications/Notifications'));
+const CommunicationTemplates = lazy(() => import('./pages/admin/Notifications/Notifications').then(module=>({default:module.Templates})));
+const CommunicationDeliveryIssues = lazy(() => import('./pages/admin/Notifications/Notifications').then(module=>({default:module.DeliveryIssues})));
+
+const BankSettings = lazy(() => import('./pages/admin/Settings/BankSettings'));
+const AdminSettings = lazy(() => import("./pages/admin/Settings/Settings"));
+const AdminStaffAccess = lazy(() => import("./pages/admin/Settings/StaffAccess"));
+const AdminShop = lazy(() => import("./pages/admin/Shop/ShopControl"));
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 const Dashboard = lazy(() => import("./pages/admin/Dashboard/Dashboard"));
 const AdminProducts = lazy(() => import("./pages/admin/Products/Products"));
 const AdminTaxonomy = lazy(() => import("./pages/admin/Taxonomy/Taxonomy"));
 const AdminDiscovery = lazy(() => import("./pages/admin/Discovery/Discovery"));
 const AdminHomepage = lazy(() => import("./pages/admin/Homepage/Homepage"));
 const AdminChats = lazy(() => import("./pages/admin/Chats/Chats"));
+<<<<<<< HEAD
 const AdminReviews = lazy(() => import("./pages/admin/Reviews/Reviews"));
 const AdminAppearance = lazy(() => import("./pages/admin/Appearance/Appearance"));
+=======
+const AdminReviews = lazy(() => import("./pages/admin/Operations/ReviewContext"));
+const AdminOperations = lazy(() => import("./pages/admin/Operations/Operations"));
+const GlobalSearch = lazy(() => import("./pages/admin/Operations/GlobalSearch"));
+const RecentActivity = lazy(() => import("./pages/admin/Operations/RecentActivity"));
+const OwnerUnavailable = lazy(() => import("./pages/admin/Operations/OwnerUnavailable"));
+const AuditHistory = lazy(() => import("./pages/admin/Operations/AuditHistory"));
+const AdminAppearance = lazy(() => import("./pages/admin/Appearance/Appearance"));
+
+function AuthRoute() {
+  const location = useLocation();
+  const routeKey = location.pathname + location.search;
+  return <PageBoundary key={routeKey}>
+    <Suspense fallback={<main className="container section"><LoadingSpinner label="Opening your account" /></main>}>
+      <Auth key={routeKey} />
+    </Suspense>
+  </PageBoundary>;
+}
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 
 export default function App() {
   return (
@@ -44,7 +95,9 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/our-story" element={<OurStory />} />
         <Route path="/policies" element={<Policies />} />
+        {/* Safe account navigation is not a private-data authorization grant. */}
         <Route path="/profile" element={<Profile />} />
+<<<<<<< HEAD
         <Route path="/saved-pieces" element={<Navigate to="/my-closet/my-pieces" replace />} />
         <Route path="/my-closet" element={<MyCloset />} />
         <Route path="/my-closet/my-pieces" element={<SavedPieces />} />
@@ -53,6 +106,19 @@ export default function App() {
       </Route>
 
       {["/signin", "/signup", "/verify-email", "/forgot-password", "/reset-password", "/auth/action", "/account-unavailable"].map((path) => <Route key={path} path={path} element={<Auth />} />)}
+=======
+        <Route path="/notifications" element={<RequireAuth><CustomerAccountBoundary><CustomerNotifications/></CustomerAccountBoundary></RequireAuth>} />
+        <Route path="/saved-pieces" element={<Navigate to="/my-closet/my-pieces" replace />} />
+        <Route path="/my-closet" element={<CustomerOrGuest><MyCloset /></CustomerOrGuest>} />
+        <Route path="/my-closet/orders" element={<RequireAuth><CustomerAccountBoundary><Orders /></CustomerAccountBoundary></RequireAuth>} />
+        <Route path="/my-closet/orders/:orderId" element={<RequireAuth><CustomerAccountBoundary><OrderWorkspace /></CustomerAccountBoundary></RequireAuth>} />
+        <Route path="/my-closet/my-pieces" element={<CustomerOrGuest><SavedPieces /></CustomerOrGuest>} />
+        <Route path="/my-closet/saved-reviews" element={<RequireAuth><CustomerAccountBoundary><SavedReviews /></CustomerAccountBoundary></RequireAuth>} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+
+      {["/signin", "/signup", "/verify-email", "/forgot-password", "/reset-password", "/auth/action", "/account-unavailable"].map((path) => <Route key={path} path={path} element={<AuthRoute />} />)}
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 
       <Route
         path="/admin"
@@ -63,6 +129,7 @@ export default function App() {
         }
       >
         <Route index element={<Dashboard />} />
+<<<<<<< HEAD
         <Route path="products" element={<AdminProducts />} />
         <Route path="taxonomy" element={<AdminTaxonomy />} />
         <Route path="discovery" element={<AdminDiscovery />} />
@@ -70,7 +137,32 @@ export default function App() {
         <Route path="reviews" element={<AdminReviews />} />
         <Route path="appearance" element={<AdminAppearance />} />
         <Route path="chats" element={<AdminChats />} />
+=======
+        <Route path="attention" element={<AdminOperations />} />
+        <Route path="search" element={<GlobalSearch />} />
+        <Route path="activity" element={<RecentActivity />} />
+        <Route path="notifications" element={<StaffRoute domain="notifications"><StaffNotifications/></StaffRoute>} />
+        <Route path="notifications/templates" element={<CommunicationTemplates/>} />
+        <Route path="notifications/delivery-issues" element={<CommunicationDeliveryIssues/>} />
+        <Route path="content" element={<StaffRoute domain="content"><ContentEntry/></StaffRoute>} />
+        <Route path="shop" element={<StaffRoute domain="products"><AdminShop /></StaffRoute>} />
+        <Route path="products" element={<StaffRoute domain="products"><AdminProducts /></StaffRoute>} />
+        <Route path="taxonomy" element={<StaffRoute domain="settings.taxonomy"><AdminTaxonomy /></StaffRoute>} />
+        <Route path="discovery" element={<StaffRoute domain="content"><AdminDiscovery /></StaffRoute>} />
+        <Route path="homepage" element={<StaffRoute domain="content"><AdminHomepage /></StaffRoute>} />
+        <Route path="reviews" element={<StaffRoute domain="reviews"><AdminReviews /></StaffRoute>} />
+        <Route path="appearance" element={<StaffRoute domain="content"><AdminAppearance /></StaffRoute>} />
+        <Route path="chats" element={<StaffRoute domain="chats"><AdminChats /></StaffRoute>} />
+        <Route path="orders" element={<StaffRoute domain="orders"><OrderQueue /></StaffRoute>} />
+        <Route path="orders/:orderId" element={<StaffRoute domain="orders"><MainOrderWorkspace /></StaffRoute>} />
+        <Route path="audit" element={<StaffRoute domain="audit"><AuditHistory /></StaffRoute>} />
+        {[['customers', 'customers'], ['payments', 'payments'], ['custom-style', 'customStyle']].map(([path, domain]) =>
+          <Route key={path} path={path} element={<StaffRoute domain={domain}><OwnerUnavailable domain={domain} /></StaffRoute>} />)}
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
         <Route path="settings" element={<AdminSettings />} />
+        <Route path="settings/bank" element={<BankSettings />} />
+        <Route path="settings/taxonomy" element={<StaffRoute domain="settings.taxonomy"><AdminTaxonomy /></StaffRoute>} />
+        <Route path="settings/admins" element={<AdminStaffAccess />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

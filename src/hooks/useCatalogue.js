@@ -34,10 +34,13 @@ export function useCatalogue() {
       },
       (error) => {
         if (isActive()) {
+          // Keep raw provider/network details out of customer-facing UI.
+          // Service-layer diagnostics may still be logged in development.
+          void error;
           setState({
             products: [],
             isLoading: false,
-            error: error?.message || "The collection could not be loaded.",
+            error: "The collection could not be loaded. Please try again.",
           });
         }
       }

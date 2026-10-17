@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import ProductImage from "../product/ProductImage";
 import StitchArrowIcon from "../common/icons/StitchArrowIcon";
@@ -5,6 +6,7 @@ import { categoryIconFor } from "../product/icons/CategoryIcons";
 import { useSavedPieces } from "../../context/SavedPiecesContext";
 import { useToast } from "../../context/ToastContext";
 import { formatNaira } from "../../utils/formatters";
+import { PRODUCT_SHOP_CTA } from "../../utils/productCopy";
 import "./NewInCard.css";
 
 function HeartIcon({ filled }) {
@@ -28,15 +30,17 @@ function HeartIcon({ filled }) {
 
 /** A published piece using its own uploaded image. */
 export default function NewInCard({ product, imageLoading = "lazy" }) {
-  const { isSaved, toggleSaved, isPersistent } = useSavedPieces();
+  const { isSaved, toggleSavedConfirmed } = useSavedPieces();
   const { showToast } = useToast();
 
   const saved = isSaved(product.id);
+  const [savePending, setSavePending] = useState(false);
   const CategoryIcon = categoryIconFor(product.category);
   const categoryLabel = product.category.join(", ");
   const price = formatNaira(product.minPrice);
   const unit = product.unitLabel ? ` ${product.unitLabel}` : "";
 
+<<<<<<< HEAD
   const handleSave = () => {
     const nowSaved = toggleSaved(product.id);
     showToast(
@@ -46,6 +50,29 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
           : "Saved for this visit. Create a Profile to keep your pieces."
         : "Removed from My Pieces."
     );
+=======
+  const handleSave = async () => {
+    if (savePending) return;
+    setSavePending(true);
+    try {
+      const result = await toggleSavedConfirmed(product.id);
+      if (!result?.ok) {
+        showToast("We couldn't update My Closet. Please try again.", "error");
+        return;
+      }
+      if (result.storage === "memory") {
+        showToast(result.added
+          ? "Added to My Closet for this visit. Browser storage is unavailable."
+          : "Removed from My Closet for this visit.", "error");
+        return;
+      }
+      showToast(result.added ? "Added to My Closet." : "Removed from My Closet.");
+    } catch {
+      showToast("We couldn't update My Closet. Please try again.", "error");
+    } finally {
+      setSavePending(false);
+    }
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   };
 
   return (
@@ -63,13 +90,20 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
 
           <button
             type="button"
-            className={`menu-card__save${saved ? " is-saved" : ""}`}
+            className={`menu-card__save${saved ? " is-saved" : ""}${savePending ? " is-pending" : ""}`}
             onClick={handleSave}
             aria-pressed={saved}
+            aria-busy={savePending || undefined}
+            disabled={savePending}
             aria-label={
               saved
+<<<<<<< HEAD
                 ? `Remove ${product.name} from My Pieces`
                 : `Save ${product.name} to My Pieces`
+=======
+                ? `Remove ${product.name} from My Closet`
+                : `Save ${product.name} to My Closet`
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
             }
           >
             <HeartIcon filled={saved} />
@@ -102,7 +136,7 @@ export default function NewInCard({ product, imageLoading = "lazy" }) {
         </p>
 
         <Link to={product.href} className="menu-card__cta">
-          <span>View Piece</span>
+          <span>{PRODUCT_SHOP_CTA}</span>
           <StitchArrowIcon size={16} className="menu-card__cta-icon" />
         </Link>
       </div>

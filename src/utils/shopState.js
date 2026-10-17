@@ -9,17 +9,31 @@
  * an empty screen.
  */
 
-import { FILTER_DIMENSIONS } from "../services/productModel";
-import { matchesQuery } from "./search";
+import { FILTER_DIMENSIONS } from "../services/productModel.js";
+import { matchesQuery } from "./search.js";
 
 export const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
-  { value: "price-asc", label: "Price Low to High" },
-  { value: "price-desc", label: "Price High to Low" },
+  { value: "price-asc", label: "Price: Low to High" },
+  { value: "price-desc", label: "Price: High to Low" },
 ];
 
 const SORT_VALUES = SORT_OPTIONS.map((option) => option.value);
 const DIMENSION_KEYS = FILTER_DIMENSIONS.map((dimension) => dimension.key);
+
+const MAX_QUERY_LENGTH = 160;
+const MAX_FILTER_VALUE_LENGTH = 80;
+const MAX_FILTER_VALUES_PER_DIMENSION = 24;
+const MAX_SHOP_BY_ENTRIES = 48;
+const MAX_DISCOVERY_ID_LENGTH = 80;
+
+function boundedText(value, maxLength) {
+  return String(value ?? "").trim().slice(0, maxLength);
+}
+
+function boundedUniqueTextValues(values = [], maxItems = MAX_FILTER_VALUES_PER_DIMENSION, maxLength = MAX_FILTER_VALUE_LENGTH) {
+  return uniqueTextValues(values.map((value) => boundedText(value, maxLength))).slice(0, maxItems);
+}
 
 export const EMPTY_STATE = {
   query: "",
@@ -30,8 +44,94 @@ export const EMPTY_STATE = {
   sort: "newest",
   newIn: false,
   discovery: "",
-  view: "grid",
 };
+
+function uniqueTextValues(values = []) {
+  const seen = new Set();
+  return values
+    .map((value) => String(value ?? "").trim())
+    .filter(Boolean)
+    .filter((value) => {
+      const key = value.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+/** Clone the canonical Shop state before creating a mobile filter draft. */
+export function copyShopState(source = EMPTY_STATE) {
+  return {
+    ...source,
+    filters: Object.fromEntries(
+      DIMENSION_KEYS.map((key) => [key, [...(source.filters?.[key] ?? [])]])
+    ),
+    shopBy: Object.fromEntries(
+      Object.entries(source.shopBy || {}).map(([key, values]) => [key, [...values]])
+    ),
+  };
+}
+
+/** Toggle one value without mutating the committed state object. */
+export function toggleFilterValue(source, dimension, value) {
+  if (!DIMENSION_KEYS.includes(dimension)) return copyShopState(source);
+  const current = source.filters?.[dimension] ?? [];
+  const nextValues = current.includes(value)
+    ? current.filter((entry) => entry !== value)
+    : [...current, value];
+  return {
+    ...source,
+    filters: { ...source.filters, [dimension]: nextValues },
+  };
+}
+
+/** Refinements represented by controls inside the filter sidebar/sheet. */
+export function hasFilterSelections(state) {
+  return Boolean(
+    state?.newIn ||
+      (state?.min !== null && state?.min !== undefined) ||
+      (state?.max !== null && state?.max !== undefined) ||
+      DIMENSION_KEYS.some((key) => (state?.filters?.[key] ?? []).length > 0)
+  );
+}
+
+/**
+ * Clear only controls that exist inside the filter surface. Search, sort and
+ * Discovery remain intact because a mobile Clear All must not erase context
+ * the customer cannot see or edit inside that sheet.
+ */
+export function clearFilterSelections(source) {
+  return {
+    ...source,
+    filters: Object.fromEntries(DIMENSION_KEYS.map((key) => [key, []])),
+    min: null,
+    max: null,
+    newIn: false,
+  };
+}
+
+/** Primary result-band Clear All: clear every committed refinement, keep Sort. */
+export function clearAllRefinements(source) {
+  return {
+    ...clearFilterSelections(source),
+    query: "",
+    shopBy: {},
+    discovery: "",
+  };
+}
+
+/** Commit only filter-sheet-owned fields back into the latest canonical state. */
+export function applyFilterDraft(committed, draft) {
+  return {
+    ...committed,
+    filters: Object.fromEntries(
+      DIMENSION_KEYS.map((key) => [key, [...(draft.filters?.[key] ?? [])]])
+    ),
+    min: draft.min ?? null,
+    max: draft.max ?? null,
+    newIn: draft.newIn === true,
+  };
+}
 
 function toPrice(value) {
   if (value === null || value === undefined || value === "") return null;
@@ -39,10 +139,31 @@ function toPrice(value) {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
 }
 
+/** Validate draft price inputs before they are allowed into canonical Shop state. */
+export function validatePriceRange(minInput, maxInput) {
+  const parse = (value) => {
+    if (value === null || value === undefined || value === "") return { value: null, error: "" };
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return { value: null, error: "Enter prices as numbers." };
+    if (parsed < 0) return { value: null, error: "Prices cannot be negative." };
+    return { value: parsed, error: "" };
+  };
+
+  const min = parse(minInput);
+  const max = parse(maxInput);
+  const error = min.error || max.error ||
+    (min.value !== null && max.value !== null && min.value > max.value
+      ? "Minimum Price must not exceed Maximum Price."
+      : "");
+
+  return { min: min.value, max: max.value, error };
+}
+
 export function parseShopState(searchParams) {
   const filters = {};
   DIMENSION_KEYS.forEach((key) => {
-    filters[key] = searchParams.getAll(key).map((value) => value.trim()).filter(Boolean);
+    filters[key] = boundedUniqueTextValues(searchParams.getAll(key))
+      .filter((value) => !(key === "style" && value.toLowerCase() === "custom style"));
   });
 
   let min = toPrice(searchParams.get("min"));
@@ -55,6 +176,7 @@ export function parseShopState(searchParams) {
 
   const sort = searchParams.get("sort");
   const shopBy = {};
+<<<<<<< HEAD
   searchParams.getAll("shopby").forEach((entry) => {
     const separator = entry.indexOf(":");
     if (separator <= 0) return;
@@ -63,19 +185,37 @@ export function parseShopState(searchParams) {
     if (!group || !value) return;
     shopBy[group] = shopBy[group] || [];
     if (!shopBy[group].includes(value)) shopBy[group].push(value);
+=======
+  searchParams.getAll("shopby").slice(0, MAX_SHOP_BY_ENTRIES).forEach((entry) => {
+    const separator = entry.indexOf(":");
+    if (separator <= 0) return;
+    const group = boundedText(entry.slice(0, separator), MAX_FILTER_VALUE_LENGTH);
+    const value = boundedText(entry.slice(separator + 1), MAX_FILTER_VALUE_LENGTH);
+    if (!group || !value) return;
+    shopBy[group] = boundedUniqueTextValues([...(shopBy[group] || []), value]);
+  });
+
+  // Promote shopby entries whose group key is a canonical filter dimension
+  // (e.g. shopby=occasion:Wedding) into the filters map instead.  This
+  // eliminates dual-representation when a URL contains both ?occasion=X and
+  // ?shopby=occasion:X, so buildSearchParams always writes the canonical form.
+  Object.keys(shopBy).forEach((group) => {
+    if (DIMENSION_KEYS.includes(group)) {
+      filters[group] = uniqueTextValues([...(filters[group] ?? []), ...(shopBy[group] ?? [])]);
+      delete shopBy[group];
+    }
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   });
 
   return {
-    query: (searchParams.get("q") ?? "").trim(),
+    query: boundedText(searchParams.get("q"), MAX_QUERY_LENGTH),
     filters,
     shopBy,
     min,
     max,
     sort: SORT_VALUES.includes(sort) ? sort : "newest",
     newIn: searchParams.get("newin") === "1",
-    discovery: (searchParams.get("discovery") ?? "").trim(),
-    // Grid is the default; only the list view is written to the URL.
-    view: searchParams.get("view") === "list" ? "list" : "grid",
+    discovery: boundedText(searchParams.get("discovery"), MAX_DISCOVERY_ID_LENGTH),
   };
 }
 
@@ -84,7 +224,13 @@ export function buildSearchParams(state) {
   if (state.query) params.set("q", state.query);
 
   DIMENSION_KEYS.forEach((key) => {
-    (state.filters?.[key] ?? []).forEach((value) => params.append(key, value));
+    uniqueTextValues(state.filters?.[key] ?? [])
+      .filter((value) => !(key === "style" && value.toLowerCase() === "custom style"))
+      .forEach((value) => params.append(key, value));
+  });
+
+  Object.entries(state.shopBy ?? {}).forEach(([group, values]) => {
+    uniqueTextValues(values).forEach((value) => params.append("shopby", `${group}:${value}`));
   });
 
   Object.entries(state.shopBy ?? {}).forEach(([group, values]) => {
@@ -96,15 +242,90 @@ export function buildSearchParams(state) {
   if (state.sort && state.sort !== "newest") params.set("sort", state.sort);
   if (state.newIn) params.set("newin", "1");
   if (state.discovery) params.set("discovery", state.discovery);
-  if (state.view === "list") params.set("view", "list");
 
   return params;
+}
+
+/**
+ * Remove only catalogue/taxonomy/discovery values that are no longer valid.
+ * Public URL state remains authoritative; this is a compatibility pass for
+ * old shared links after admin-managed taxonomy or discovery changes.
+ */
+export function reconcileShopState(state, { products = [], taxonomy = null, discoveryGroups = [] } = {}) {
+  const next = copyShopState(state);
+  const removed = [];
+
+  const canonicalMap = (values = []) => {
+    const map = new Map();
+    values.forEach((raw) => {
+      const value = String(raw ?? "").trim();
+      if (!value) return;
+      const key = value.toLowerCase();
+      if (!map.has(key)) map.set(key, value);
+    });
+    return map;
+  };
+
+  DIMENSION_KEYS.forEach((dimension) => {
+    const available = [];
+    products.forEach((product) => available.push(...(product?.[dimension] ?? [])));
+    if (Array.isArray(taxonomy?.[dimension])) available.push(...taxonomy[dimension]);
+    const valid = canonicalMap(available);
+
+    next.filters[dimension] = (state.filters?.[dimension] ?? []).flatMap((raw) => {
+      const value = String(raw ?? "").trim();
+      const canonical = valid.get(value.toLowerCase());
+      if (canonical) return [canonical];
+      if (value) removed.push({ type: "filter", dimension, value });
+      return [];
+    });
+  });
+
+  const shopByMaps = new Map();
+  products.forEach((product) => {
+    Object.entries(product?.shopBy ?? {}).forEach(([group, values]) => {
+      const key = String(group ?? "").trim();
+      if (!key) return;
+      const existing = shopByMaps.get(key) ?? [];
+      existing.push(...(Array.isArray(values) ? values : []));
+      shopByMaps.set(key, existing);
+    });
+  });
+
+  const shopBy = {};
+  Object.entries(state.shopBy ?? {}).forEach(([group, values]) => {
+    const valid = canonicalMap(shopByMaps.get(group) ?? []);
+    const kept = (values ?? []).flatMap((raw) => {
+      const value = String(raw ?? "").trim();
+      const canonical = valid.get(value.toLowerCase());
+      if (canonical) return [canonical];
+      if (value) removed.push({ type: "shopBy", group, value });
+      return [];
+    });
+    if (kept.length) shopBy[group] = uniqueTextValues(kept);
+  });
+  next.shopBy = shopBy;
+
+  if (state.discovery) {
+    const validDiscovery = new Set(
+      (Array.isArray(discoveryGroups) ? discoveryGroups : [])
+        .map((group) => String(group?.id ?? "").trim())
+        .filter(Boolean)
+    );
+    if (!validDiscovery.has(state.discovery)) {
+      removed.push({ type: "discovery", value: state.discovery });
+      next.discovery = "";
+    }
+  }
+
+  return { state: next, removed };
 }
 
 export function hasActiveRefinements(state) {
   return Boolean(
     state.query ||
       state.newIn ||
+      state.discovery ||
       state.min !== null ||
       state.max !== null ||
       DIMENSION_KEYS.some((key) => (state.filters?.[key] ?? []).length > 0) ||
@@ -197,7 +418,11 @@ export function buildFacets(products, state, taxonomyByDimension = null) {
     pool.forEach((product) => {
       (product[dimension.key] ?? []).forEach((value) => {
         const label = String(value).trim();
+<<<<<<< HEAD
         if (!label) return;
+=======
+        if (!label || (dimension.key === "style" && label.toLowerCase() === "custom style")) return;
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
         remember(label, 1);
       });
     });
@@ -209,7 +434,11 @@ export function buildFacets(products, state, taxonomyByDimension = null) {
       : [];
     taxonomyLabels.forEach((raw) => {
       const label = String(raw ?? "").trim();
+<<<<<<< HEAD
       if (!label) return;
+=======
+      if (!label || (dimension.key === "style" && label.toLowerCase() === "custom style")) return;
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
       const lower = label.toLowerCase();
       if (lowerToLabel.has(lower)) return;
       lowerToLabel.set(lower, label);
@@ -219,7 +448,11 @@ export function buildFacets(products, state, taxonomyByDimension = null) {
     const selected = state.filters?.[dimension.key] ?? [];
     selected.forEach((value) => {
       const trimmed = String(value ?? "").trim();
+<<<<<<< HEAD
       if (!trimmed) return;
+=======
+      if (!trimmed || (dimension.key === "style" && trimmed.toLowerCase() === "custom style")) return;
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
       const lower = trimmed.toLowerCase();
       if (lowerToLabel.has(lower)) return;
       lowerToLabel.set(lower, trimmed);
@@ -235,8 +468,8 @@ export function buildFacets(products, state, taxonomyByDimension = null) {
   }).filter((dimension) => dimension.values.length > 0);
 }
 
-/** Every active refinement as a removable chip. */
-export function buildChips(state) {
+/** Every active refinement/context as a removable chip. */
+export function buildChips(state, { discoveryLabel = "" } = {}) {
   const chips = [];
 
   if (state.query) {
@@ -245,6 +478,16 @@ export function buildChips(state) {
 
   if (state.newIn) {
     chips.push({ id: "newin", label: "New In", text: "New In", type: "newIn" });
+  }
+
+  if (state.discovery) {
+    const label = discoveryLabel || state.discovery;
+    chips.push({
+      id: "discovery",
+      label: `Shop By: ${label}`,
+      text: `Shop By: ${label}`,
+      type: "discovery",
+    });
   }
 
   FILTER_DIMENSIONS.forEach((dimension) => {
@@ -277,8 +520,45 @@ export function buildChips(state) {
   });
 
   if (state.min !== null || state.max !== null) {
-    chips.push({ id: "price", label: "Price range", text: "Price range", type: "price" });
+    let priceText = "Price range";
+    if (state.min !== null && state.max !== null) {
+      priceText = `₦${state.min.toLocaleString()} – ₦${state.max.toLocaleString()}`;
+    } else if (state.min !== null) {
+      priceText = `From ₦${state.min.toLocaleString()}`;
+    } else if (state.max !== null) {
+      priceText = `Up to ₦${state.max.toLocaleString()}`;
+    }
+    chips.push({ id: "price", label: `Price: ${priceText}`, text: priceText, type: "price" });
   }
 
   return chips;
 }
+
+/** Remove exactly one active chip while preserving every other valid state. */
+export function removeShopRefinement(state, chip) {
+  if (!chip) return copyShopState(state);
+  if (chip.type === "query") return { ...state, query: "" };
+  if (chip.type === "newIn") return { ...state, newIn: false };
+  if (chip.type === "discovery") return { ...state, discovery: "" };
+  if (chip.type === "price") return { ...state, min: null, max: null };
+  if (chip.type === "shopBy") {
+    const current = state.shopBy?.[chip.group] ?? [];
+    const values = current.filter((entry) => entry !== chip.value);
+    const shopBy = { ...(state.shopBy || {}) };
+    if (values.length) shopBy[chip.group] = values;
+    else delete shopBy[chip.group];
+    return { ...state, shopBy };
+  }
+  if (chip.type === "dimension") {
+    const current = state.filters?.[chip.dimension] ?? [];
+    return {
+      ...state,
+      filters: {
+        ...state.filters,
+        [chip.dimension]: current.filter((entry) => entry !== chip.value),
+      },
+    };
+  }
+  return copyShopState(state);
+}
+

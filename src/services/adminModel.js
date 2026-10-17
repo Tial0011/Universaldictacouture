@@ -1,4 +1,4 @@
-export const DIMENSIONS = ["category", "occasion", "style", "fabric", "colour", "size"];
+export const DIMENSIONS = ["category", "occasion", "style", "fabric", "colour"];
 export const HERO_CONCEPTS = ["ready-to-wear", "aso-oke-fabric", "custom-style", "shop-by-occasion", "bridal-event-dressing"];
 export function splitValues(value) {
   return [...new Set((Array.isArray(value) ? value : String(value || "").split(",")).map(v => String(v).trim()).filter(Boolean))];
@@ -10,6 +10,74 @@ export function imageValue(value) {
   if (typeof value === "string") return { url: value, alt: "" };
   return value || null;
 }
+
+export function hasUsableImage(value) {
+  if (!value) return false;
+  if (typeof value === "string") return Boolean(value.trim());
+  if (typeof value !== "object" || Array.isArray(value)) return false;
+  return Boolean(String(value.url || value.secureUrl || value.secure_url || value.publicId || value.public_id || "").trim());
+}
+
+export function productAdminHref(raw = {}) {
+  const identity = String(raw.slug || raw.id || "").trim();
+  return identity ? `/shop/${encodeURIComponent(identity)}` : "";
+}
+
+export function productReadiness(raw = {}, { allowGeneratedIdentity = false } = {}) {
+  const name = String(raw.name || "").trim();
+  const price = raw.price === "" || raw.price == null ? null : Number(raw.price);
+  const categories = splitValues(raw.category ?? raw.categories);
+  const imageSource = Array.isArray(raw.images) ? raw.images : raw.images ? [raw.images] : [];
+  const hasImage = hasUsableImage(raw.primaryImage) || imageSource.some(hasUsableImage);
+  const hasIdentity = Boolean(String(raw.slug || raw.id || "").trim()) || allowGeneratedIdentity;
+  const unit = String(raw.unitLabel ?? raw.priceToken ?? "").trim();
+  const blockers = [];
+  if (!name) blockers.push({ key: "name", label: "Product name" });
+  if (!Number.isFinite(price) || price < 0) blockers.push({ key: "price", label: "Valid NGN price" });
+  if (!hasImage) blockers.push({ key: "image", label: "Primary product image" });
+  if (!categories.length) blockers.push({ key: "category", label: "At least one category" });
+  if (!hasIdentity) blockers.push({ key: "identity", label: "Stable product identity" });
+  if (!unit) blockers.push({ key: "unit", label: "Commercial unit" });
+
+  const warnings = [];
+
+  const lifecycle = String(raw.status || "draft").trim().toLowerCase();
+  let state = "draft";
+  let label = "Draft";
+  if (lifecycle === "archived") {
+    state = "archived";
+    label = "Archived";
+  } else if (blockers.length) {
+    state = "needs-attention";
+    label = "Needs attention";
+  } else if (lifecycle === "published") {
+    state = "published";
+    label = "Published";
+  } else if (lifecycle === "unpublished") {
+    state = "unpublished";
+    label = "Unpublished";
+  } else {
+    state = "ready";
+    label = "Catalogue checks complete";
+  }
+
+  return {
+    state,
+    label,
+    blockers,
+    warnings,
+    ready: blockers.length === 0,
+    checks: [
+      { key: "name", label: "Name", complete: Boolean(name) },
+      { key: "price", label: "Valid price", complete: Number.isFinite(price) && price >= 0 },
+      { key: "image", label: "Primary image", complete: hasImage },
+      { key: "identity", label: "Stable product identity", complete: hasIdentity },
+      { key: "category", label: "Required taxonomy", complete: categories.length > 0 },
+      { key: "unit", label: "Commercial unit", complete: Boolean(unit) },
+    ],
+  };
+}
+
 export function prepareRecord(kind, raw) {
   const data = { ...raw };
   delete data.id;
@@ -38,13 +106,36 @@ export function prepareRecord(kind, raw) {
     });
     data.aliases = splitValues(data.aliases);
     data.keywords = splitValues(data.keywords);
-    if (!["draft", "published", "archived"].includes(data.status)) throw new Error("Choose a product status.");
+    if (!["draft", "published", "unpublished", "archived"].includes(data.status)) throw new Error("Choose a product status.");
     if (data.price !== "" && data.price != null) {
       data.price = Number(data.price);
       if (!Number.isFinite(data.price) || data.price < 0) throw new Error("Enter a valid price of zero or more.");
     } else data.price = null;
-    if (data.status === "published" && (data.price === null || !data.category.length)) {
-      throw new Error("Add a price and at least one category before publishing.");
+    data.mainPrice = data.price;
+    const token = typeof (data.unitLabel ?? data.priceToken) === "string"
+      ? (data.unitLabel ?? data.priceToken).trim()
+      : "";
+    if (token.length > 120) throw new Error("Keep the commercial unit within 120 characters.");
+    data.unitLabel = token;
+    data.priceToken = token;
+    if (Array.isArray(data.variants) && data.variants.length > 0) {
+      const variantPrices = data.variants
+        .map((v) => Number(v.price))
+        .filter((p) => Number.isFinite(p) && p >= 0);
+      if (variantPrices.length > 0 && data.price !== null) {
+        data.price = Math.max(data.price, ...variantPrices);
+        data.mainPrice = data.price;
+      }
+      data.variants = data.variants.map((v) => ({ ...v, price: data.price }));
+    }
+    if (data.status === "published") {
+      if (data.price === null || !data.category.length || !data.unitLabel) {
+        throw new Error("Add a price, commercial unit and at least one category before publishing.");
+      }
+      const productImages = Array.isArray(data.images) ? data.images.filter(hasUsableImage) : [];
+      if (!hasUsableImage(data.primaryImage) && productImages.length === 0) {
+        throw new Error("Add at least one valid product photo before publishing.");
+      }
     }
     data.archived = data.status === "archived";
   }

@@ -1,0 +1,27 @@
+import {before,beforeEach,after,test} from "node:test";
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+import {initializeTestEnvironment,assertFails,assertSucceeds} from "@firebase/rules-unit-testing";
+import {doc,collection,getDoc,getDocs,setDoc,updateDoc,query,limit,writeBatch,serverTimestamp} from "firebase/firestore";
+import {studioStaff,legacyDevelopmentAdmin} from "./staff-fixtures.mjs";
+let env;
+before(async()=>{env=await initializeTestEnvironment({projectId:"demo-udc-admin-compatibility",firestore:{host:"127.0.0.1",port:8089,rules:readFileSync("firestore.rules","utf8")}});});
+beforeEach(async()=>{await env.clearFirestore();await env.withSecurityRulesDisabled(async context=>{const db=context.firestore();for(const uid of ["owner","second"])await setDoc(doc(db,"admins",uid),legacyDevelopmentAdmin());await setDoc(doc(db,"admins/inactive"),legacyDevelopmentAdmin(false));await setDoc(doc(db,"admins/canonical"),studioStaff());await setDoc(doc(db,"admins/narrow"),{active:true,staffId:"narrow",capabilities:{}});await setDoc(doc(db,"admins/partial"),{active:true,capabilities:{},role:"Super Admin"});await setDoc(doc(db,"customerProfiles/customer"),{active:true,role:"Admin",staffId:"fake"});await setDoc(doc(db,"products/p"),{name:"Existing draft",status:"draft",archived:false,_version:1,createdAt:serverTimestamp()});await setDoc(doc(db,"reviews/r"),{published:false,status:"pending"});await setDoc(doc(db,"heroSlides/h"),{published:false});await setDoc(doc(db,"siteAppearance/auth"),{headline:"Current"});await setDoc(doc(db,"discoveryModules/d"),{active:false});await setDoc(doc(db,"conversations/c"),{customerId:"c",lastMessageId:"initial",lastMessage:"Existing",lastSenderRole:"customer",createdAt:serverTimestamp(),updatedAt:serverTimestamp()});await setDoc(doc(db,"conversations/c/messages/initial"),{body:"Existing",senderId:"c",senderRole:"customer",createdAt:serverTimestamp()});});});
+after(async()=>{await env?.cleanup();});
+const client=uid=>env.authenticatedContext(uid,{email:uid+"@example.test"}).firestore();
+test("both active legacy admins and canonical Staff can retrieve/query backed Admin destinations",async()=>{
+  for(const uid of ["owner","second","canonical"]){const db=client(uid);for(const path of ["products/p","reviews/r","heroSlides/h","discoveryModules/d","siteAppearance/auth","conversations/c","conversations/c/messages/initial"])await assertSucceeds(getDoc(doc(db,path)));for(const name of ["products","reviews","heroSlides","discoveryModules","conversations"])await assertSucceeds(getDocs(query(collection(db,name),limit(20))));}
+});
+test("inactive/no membership/customer/partial/canonical-zero users cannot use legacy fallback",async()=>{
+  for(const uid of ["inactive","absent","customer","partial","narrow"]){const db=client(uid);for(const path of ["products/p","reviews/r","conversations/c","conversations/c/messages/initial"])await assertFails(getDoc(doc(db,path)));}
+});
+test("legacy compatibility cannot create/list/change membership or open customer/transaction data",async()=>{
+  for(const uid of ["owner","second","customer"]){const db=client(uid);await assertFails(setDoc(doc(db,"admins/new"),studioStaff()));await assertFails(setDoc(doc(db,"admins",uid),studioStaff()));await assertFails(updateDoc(doc(db,"admins/owner"),{capabilities:{},staffId:"escalated"}));await assertFails(getDocs(collection(db,"admins")));for(const path of ["customerProfiles/customer","savedPieces/customer","payments/p","orders/o"])await assertFails(getDoc(doc(db,path)));}
+});
+function productSave(uid,operation){const db=client(uid),batch=writeBatch(db);batch.update(doc(db,"products/p"),{name:"Development edit",_version:2,_lastOperationId:operation,updatedAt:serverTimestamp()});batch.set(doc(db,"staffAudit",operation),{actorUid:uid,actorStaffId:"legacy-dev:"+uid,execution:"staff",targetCollection:"products",targetId:"p",action:"save",outcome:"committed",createdAt:serverTimestamp()});return batch.commit();}
+test("legacy product operation commits with atomic truthful principal/effective alias evidence, no fabricated membership fields",async()=>{
+  await assertSucceeds(productSave("owner","legacy-save"));const db=client("owner");assert.equal((await getDoc(doc(db,"staffAudit/legacy-save"))).data().actorUid,"owner");const membership=(await getDoc(doc(db,"admins/owner"))).data();assert.deepEqual(membership,legacyDevelopmentAdmin());await assertFails(updateDoc(doc(db,"staffAudit/legacy-save"),{actorStaffId:"permanent-fake"}));
+});
+test("legacy Chat reply remains protected/atomic and attributable; revocation ends future reads/writes",async()=>{
+  const db=client("second"),batch=writeBatch(db);batch.set(doc(db,"conversations/c/messages/reply"),{body:"Development reply",senderId:"second",senderRole:"admin",createdAt:serverTimestamp()});batch.update(doc(db,"conversations/c"),{lastMessageId:"reply",lastMessage:"Development reply",lastSenderRole:"admin",updatedAt:serverTimestamp()});batch.set(doc(db,"staffAudit/reply"),{actorUid:"second",actorStaffId:"legacy-dev:second",execution:"staff",targetCollection:"conversations",targetId:"c",action:"reply",outcome:"committed",createdAt:serverTimestamp()});await assertSucceeds(batch.commit());await env.withSecurityRulesDisabled(context=>updateDoc(doc(context.firestore(),"admins/second"),{active:false}));await assertFails(getDoc(doc(db,"conversations/c")));await assertFails(productSave("second","revoked-save"));
+});

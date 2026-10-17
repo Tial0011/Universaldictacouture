@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import ProductImage from "../product/ProductImage";
 import ViewAllLink from "../common/ViewAllLink";
@@ -13,6 +13,18 @@ function GroupArrow({ direction }) {
     </svg>
   );
 }
+<<<<<<< HEAD
+=======
+
+function prefersReducedMotion() {
+  return typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+}
+
+function continuousRailSpeed(node) {
+  const width = node?.clientWidth || 0;
+  return Math.min(52, Math.max(24, width * 0.04));
+}
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 
 /**
  * Configurable discovery module (Shop by Occasion, Style, Fabric & Pattern).
@@ -32,16 +44,36 @@ export default function DiscoveryModule({
   resolveDestination,
   hideTitleWithTabs = false,
   groupNavigation = "tabs",
+<<<<<<< HEAD
+=======
+  activeGroup: controlledActiveGroup,
+  onGroupChange,
+  railControls = false,
+  onItemClick,
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 }) {
-  const [activeGroup, setActiveGroup] = useState(module?.groups?.[0]?.id ?? "");
+  const [internalActiveGroup, setInternalActiveGroup] = useState(module?.groups?.[0]?.id ?? "");
   const tabRefs = useRef({});
+  const railRef = useRef(null);
+  const [railState, setRailState] = useState({ previous: false, next: true });
+  const isInteractingRef = useRef(false);
+  const resumeTimerRef = useRef(null);
   const Heading = headingLevel;
+
+  const shouldAutoScroll = railControls || className.includes("discovery--home");
 
   const groups = module?.groups;
   const arrowNavigation = groupNavigation === "arrows" && groups?.length > 0;
+<<<<<<< HEAD
   // Fall back to first group if current activeGroup doesn't exist
   const currentGroup = groups?.some((group) => group.id === activeGroup)
     ? activeGroup
+=======
+  const requestedGroup = controlledActiveGroup || internalActiveGroup;
+  // Fall back to first group if current activeGroup doesn't exist.
+  const currentGroup = groups?.some((group) => group.id === requestedGroup)
+    ? requestedGroup
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
     : (groups?.[0]?.id ?? "");
 
   const items = useMemo(() => {
@@ -51,18 +83,160 @@ export default function DiscoveryModule({
     return module.items.filter((item) => !item.group || item.group === currentGroup);
   }, [module, groups, currentGroup, arrowNavigation]);
 
+<<<<<<< HEAD
   if (!module || (!arrowNavigation && !items.length)) return null;
 
   const hasTabs = !arrowNavigation && groups?.length > 1;
   const currentIndex = groups?.findIndex((group) => group.id === currentGroup) ?? -1;
   const activeTitle = arrowNavigation ? `Shop by ${groups[currentIndex].label}` : module.title;
 
+=======
+  const repeatCount = useMemo(() => {
+    if (items.length < 2) return 1;
+    if (items.length <= 3) return 6;
+    if (items.length <= 6) return 4;
+    return 3;
+  }, [items.length]);
+
+  const repeatedItems = useMemo(() => {
+    if (!shouldAutoScroll || items.length <= 1) {
+      return items.map((item) => ({ item, key: item.id, isDuplicate: false }));
+    }
+    const result = [];
+    for (let r = 0; r < repeatCount; r++) {
+      items.forEach((item) => {
+        result.push({
+          item,
+          key: r === 0 ? item.id : `${item.id}-dup-${r}`,
+          isDuplicate: r > 0,
+        });
+      });
+    }
+    return result;
+  }, [items, shouldAutoScroll, repeatCount]);
+
+  const updateRailState = () => {
+    const rail = railRef.current;
+    if (!rail) return;
+    setRailState({
+      previous: rail.scrollLeft > 6,
+      next: true,
+    });
+  };
+
+  const handleInteractionStart = () => {
+    clearTimeout(resumeTimerRef.current);
+    isInteractingRef.current = true;
+  };
+
+  const handleInteractionEnd = () => {
+    clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = setTimeout(() => {
+      isInteractingRef.current = false;
+    }, 2400);
+  };
+
+  const handleScroll = () => {
+    const rail = railRef.current;
+    if (!rail) return;
+    if (shouldAutoScroll && items.length > 1) {
+      const children = rail.children;
+      if (children && children.length >= items.length * 2) {
+        const first = children[0];
+        const secondSetFirst = children[items.length];
+        if (first && secondSetFirst) {
+          const loopWidth = secondSetFirst.offsetLeft - first.offsetLeft;
+          if (loopWidth > 0) {
+            if (rail.scrollLeft >= loopWidth * 2) {
+              rail.scrollLeft -= loopWidth;
+            } else if (rail.scrollLeft <= 2 && isInteractingRef.current) {
+              rail.scrollLeft += loopWidth;
+            }
+          }
+        }
+      }
+    }
+    updateRailState();
+  };
+
+  useEffect(() => {
+    if (!shouldAutoScroll) return undefined;
+    const rail = railRef.current;
+    if (!rail) return undefined;
+
+    rail.scrollTo({ left: 0, behavior: "auto" });
+    const frame = requestAnimationFrame(updateRailState);
+    const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(updateRailState) : null;
+    observer?.observe(rail);
+    window.addEventListener("resize", updateRailState);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer?.disconnect();
+      window.removeEventListener("resize", updateRailState);
+    };
+  }, [currentGroup, items.length, shouldAutoScroll]);
+
+  // Gentle, calm continuous seamless drift for the discovery rail
+  useEffect(() => {
+    if (!shouldAutoScroll || items.length <= 1 || prefersReducedMotion()) return undefined;
+    const rail = railRef.current;
+    if (!rail) return undefined;
+
+    let animId = null;
+    let lastTime = performance.now();
+
+    const tick = (now) => {
+      const dt = Math.min(now - lastTime, 50);
+      lastTime = now;
+
+      if (!isInteractingRef.current && rail) {
+        const children = rail.children;
+        if (children && children.length >= items.length * 2) {
+          const first = children[0];
+          const secondSetFirst = children[items.length];
+          if (first && secondSetFirst) {
+            const loopWidth = secondSetFirst.offsetLeft - first.offsetLeft;
+            if (loopWidth > 0) {
+              if (rail.scrollLeft >= loopWidth) {
+                rail.scrollLeft -= loopWidth;
+              } else if (rail.scrollLeft <= 0) {
+                rail.scrollLeft += loopWidth;
+              }
+              rail.scrollLeft += (dt / 1000) * continuousRailSpeed(rail);
+              updateRailState();
+            }
+          }
+        }
+      }
+      animId = requestAnimationFrame(tick);
+    };
+
+    const startTimer = setTimeout(() => {
+      lastTime = performance.now();
+      animId = requestAnimationFrame(tick);
+    }, 1200);
+
+    return () => {
+      clearTimeout(startTimer);
+      clearTimeout(resumeTimerRef.current);
+      if (animId) cancelAnimationFrame(animId);
+    };
+  }, [currentGroup, items.length, shouldAutoScroll]);
+
+  if (!module || (!groups?.length && !items.length)) return null;
+
+  const hasTabs = !arrowNavigation && groups?.length > 1;
+  const currentIndex = groups?.findIndex((group) => group.id === currentGroup) ?? -1;
+  const activeTitle = arrowNavigation ? `Shop by ${groups[currentIndex].label}` : module.title;
+
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   const titleWords = activeTitle.trim().split(" ");
   const titleLead = titleWords.slice(0, -1).join(" ");
   const titleAccent = titleWords.slice(-1).join(" ");
 
   const selectGroup = (id, { focus = false } = {}) => {
-    setActiveGroup(id);
+    if (onGroupChange) onGroupChange(id);
+    else setInternalActiveGroup(id);
     if (focus) tabRefs.current[id]?.focus();
   };
 
@@ -77,6 +251,73 @@ export default function DiscoveryModule({
     event.preventDefault();
     selectGroup(groups[next].id, { focus: true });
   };
+
+  const scrollRail = (direction) => {
+    const rail = railRef.current;
+    if (!rail) return;
+    handleInteractionStart();
+    const distance = Math.max(rail.clientWidth * 0.72, 180);
+    rail.scrollBy({
+      left: direction === "previous" ? -distance : distance,
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+    });
+    handleInteractionEnd();
+  };
+
+  const resolvedViewAllTo = typeof viewAllTo === "function" ? viewAllTo(currentGroup) : viewAllTo;
+
+  const list = items.length ? (
+    <ul
+      ref={shouldAutoScroll ? railRef : undefined}
+      key={arrowNavigation ? currentGroup : undefined}
+      className="discovery__list"
+      id={`discovery-panel-${module.id}`}
+      role={hasTabs ? "tabpanel" : undefined}
+      aria-labelledby={hasTabs ? `discovery-tab-${currentGroup}` : arrowNavigation ? `discovery-${module.id}` : undefined}
+      onScroll={shouldAutoScroll ? handleScroll : undefined}
+      onWheel={() => {
+        handleInteractionStart();
+        handleInteractionEnd();
+      }}
+      onTouchStart={handleInteractionStart}
+      onTouchEnd={handleInteractionEnd}
+      onPointerDown={handleInteractionStart}
+      onPointerUp={handleInteractionEnd}
+      onPointerCancel={handleInteractionEnd}
+      onPointerLeave={handleInteractionEnd}
+    >
+      {repeatedItems.map(({ item, key, isDuplicate }) => (
+        <li key={key} aria-hidden={isDuplicate ? "true" : undefined}>
+          <Link
+            to={resolveDestination ? resolveDestination(item) : item.destination}
+            className="discovery__item"
+            tabIndex={isDuplicate ? -1 : undefined}
+            onClick={() => onItemClick?.(item)}
+          >
+            <span className="discovery__media">
+              {(renderMedia && renderMedia(item)) ?? (
+                <ProductImage
+                  image={item.image}
+                  alt=""
+                  transformation={arrowNavigation
+                    ? "w_420,h_420,c_fill,g_auto,q_auto,f_auto"
+                    : "w_520,h_360,c_fill,g_auto,q_auto,f_auto"}
+                />
+              )}
+            </span>
+            {arrowNavigation ? (
+              <span className="discovery__caption">
+                <span className="discovery__name">{item.name}</span>
+                <StitchArrowIcon size={16} className="discovery__caption-arrow" />
+              </span>
+            ) : <span className="discovery__name">{item.name}</span>}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p id={`discovery-panel-${module.id}`} className="discovery__empty" role={hasTabs ? "tabpanel" : undefined} aria-labelledby={hasTabs ? `discovery-tab-${currentGroup}` : undefined}>No categories are available in this group yet. Choose another group to keep exploring.</p>
+  );
 
   return (
     <section className={`discovery ${className}`.trim()} aria-labelledby={`discovery-${module.id}`}>
@@ -118,9 +359,15 @@ export default function DiscoveryModule({
                 <GroupArrow direction="next" />
               </button>
             </div>
+<<<<<<< HEAD
             {viewAllTo ? <ViewAllLink to={viewAllTo} className="discovery__view-all" /> : null}
           </div>
         ) : viewAllTo ? <ViewAllLink to={viewAllTo} /> : null}
+=======
+            {resolvedViewAllTo ? <ViewAllLink to={resolvedViewAllTo} className="discovery__view-all" /> : null}
+          </div>
+        ) : resolvedViewAllTo ? <ViewAllLink to={resolvedViewAllTo} /> : null}
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
       </div>
 
       {arrowNavigation && groups.length > 1 ? (
@@ -161,6 +408,7 @@ export default function DiscoveryModule({
         </div>
       ) : null}
 
+<<<<<<< HEAD
       {items.length ? (
         <ul
           key={arrowNavigation ? currentGroup : undefined}
@@ -199,6 +447,35 @@ export default function DiscoveryModule({
       ) : (
         <p id={`discovery-panel-${module.id}`} className="discovery__empty">No categories are available in this group yet.</p>
       )}
+=======
+      {railControls && items.length ? (
+        <div
+          className="discovery__rail"
+        >
+          {railState.previous ? (
+            <button
+              type="button"
+              className="discovery__rail-arrow discovery__rail-arrow--previous"
+              aria-label={`Previous ${groups?.find((group) => group.id === currentGroup)?.label || "Shop By"} choices`}
+              onClick={() => scrollRail("previous")}
+            >
+              <GroupArrow direction="previous" />
+            </button>
+          ) : null}
+          {list}
+          {railState.next ? (
+            <button
+              type="button"
+              className="discovery__rail-arrow discovery__rail-arrow--next"
+              aria-label={`Next ${groups?.find((group) => group.id === currentGroup)?.label || "Shop By"} choices`}
+              onClick={() => scrollRail("next")}
+            >
+              <GroupArrow direction="next" />
+            </button>
+          ) : null}
+        </div>
+      ) : list}
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
     </section>
   );
 }

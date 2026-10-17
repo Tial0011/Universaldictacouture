@@ -249,12 +249,20 @@
   overflow-x: auto;
   margin: 0;
   padding: 0.5rem 0.25rem 1rem;
+<<<<<<< HEAD
   scroll-snap-type: x proximity;
+=======
+  scroll-snap-type: none;
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   scroll-padding-inline: 0.25rem;
   /* Deliberate, controlled motion on this axis rather than an instant
      jump — the item list itself has no button-driven steps, but this
      keeps momentum/snap settling smooth and consistent with New In. */
+<<<<<<< HEAD
   scroll-behavior: smooth;
+=======
+  scroll-behavior: auto;
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   scrollbar-width: thin;
   scrollbar-color: rgba(176, 141, 87, 0.3) transparent;
   -webkit-overflow-scrolling: touch;
@@ -263,7 +271,10 @@
 .discovery--home .discovery__list > li {
   flex: 0 0 clamp(8.75rem, 28vw, 12.5rem);
   min-width: 0;
+<<<<<<< HEAD
   scroll-snap-align: start;
+=======
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 }
 
 .discovery--home .discovery__item {
@@ -273,10 +284,17 @@
   height: 100%;
   padding: 0.55rem 0.55rem 0.75rem;
   gap: 0;
+<<<<<<< HEAD
   border: 1px solid rgba(176, 141, 87, 0.28);
   border-radius: 1.25rem;
   background-color: var(--color-white);
   box-shadow: 0 4px 14px rgba(31, 17, 18, 0.04);
+=======
+  border: 1px solid rgba(176, 141, 87, 0.36);
+  border-radius: 1.25rem;
+  background: url("../../assets/brand/couture-stitch.svg") center / 56px 80px, var(--color-couture-surface, var(--color-white));
+  box-shadow: inset 0 0 0 2px rgba(255, 250, 240, 0.5), 0 5px 16px rgba(67, 9, 13, 0.06);
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   text-decoration: none;
   transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
 }
@@ -284,13 +302,21 @@
 /* First card (active) has rich wine border, as in reference image */
 .discovery--home .discovery__list > li:first-child .discovery__item {
   border: 1.5px solid var(--color-brand);
+<<<<<<< HEAD
   box-shadow: 0 8px 22px rgba(96, 16, 19, 0.08);
+=======
+  box-shadow: inset 0 0 0 2px rgba(255, 250, 240, 0.6), 0 8px 22px rgba(96, 16, 19, 0.08);
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 }
 
 @media (hover: hover) {
   .discovery--home .discovery__item:hover {
     border-color: var(--color-brand);
+<<<<<<< HEAD
     box-shadow: 0 10px 24px rgba(96, 16, 19, 0.1);
+=======
+    box-shadow: inset 0 0 0 2px rgba(255, 250, 240, 0.7), 0 10px 24px rgba(96, 16, 19, 0.12);
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
     transform: translateY(-2px);
   }
 }
@@ -431,3 +457,35 @@
     background: Highlight;
   }
 }
+<<<<<<< HEAD
+=======
+
+.home-section--shop-by .discovery__list {
+  gap: var(--space-xs);
+}
+
+.home-section--shop-by .discovery__list > li {
+  flex-basis: clamp(10rem, 27vw, 13rem);
+}
+
+.home-section--shop-by .discovery__item {
+  padding: 0.4rem;
+  border-radius: 0.5rem;
+  background-color: var(--color-ivory);
+}
+
+.home-section--shop-by .discovery__media {
+  aspect-ratio: 4 / 5;
+  border-radius: 0.25rem;
+}
+
+.home-section--shop-by .discovery__caption {
+  padding: 0.65rem 0.25rem 0.2rem;
+}
+
+@media (min-width: 640px) {
+  .home-section--shop-by .discovery__list > li {
+    flex-basis: clamp(11rem, 19vw, 14rem);
+  }
+}
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9

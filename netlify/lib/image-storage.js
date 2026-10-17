@@ -1,5 +1,6 @@
 import sharp from "sharp";
 import { randomUUID } from "node:crypto";
+import { allows, firestoreFields, normalizeStaffMembership } from "../../src/services/staffAuthorization.js";
 export const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 const TYPES = { "image/jpeg": "jpeg", "image/png": "png", "image/webp": "webp" };
 const KEY = /^[a-f0-9-]{36}\.webp$/;
@@ -13,10 +14,10 @@ function json(body, status = 200) {
 // No service-account secret or privileged database bypass is needed.
 export async function requireAdmin(request, env = process.env, fetcher = fetch) {
   const token = request.headers.get("authorization")?.match(/^Bearer (\S+)$/)?.[1];
-  if (!token) throw new HttpError(401, "Sign in before uploading images.");
+  if (!token) throw new HttpError(401, "Sign in before managing images.");
   const apiKey = env.FIREBASE_WEB_API_KEY || env.VITE_FIREBASE_API_KEY;
   const project = env.FIREBASE_PROJECT_ID || env.VITE_FIREBASE_PROJECT_ID;
-  if (!apiKey || !project) throw new HttpError(503, "Image uploads need Firebase configuration in the Netlify Functions environment.");
+  if (!apiKey || !project) throw new HttpError(503, "Image management needs Firebase configuration in the Netlify Functions environment.");
   const accountResponse = await fetcher("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" + encodeURIComponent(apiKey), {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ idToken: token }), signal: AbortSignal.timeout(10000),
@@ -24,14 +25,31 @@ export async function requireAdmin(request, env = process.env, fetcher = fetch) 
   if (!accountResponse.ok) throw new HttpError(accountResponse.status >= 500 ? 503 : 401, "Unable to verify your session. Please sign in again.");
   const account = (await accountResponse.json()).users?.[0];
   if (!account?.localId || account.disabled) throw new HttpError(401, "Please sign in with an active account.");
+  if (account.validSince) {
+    let authTime;
+    try { authTime = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString('utf8')).auth_time; } catch { /* the provider already checked signature; malformed claims remain denied */ }
+    if (!Number.isInteger(authTime) || authTime <= Number(account.validSince)) throw new HttpError(401, "Please establish a current session again.");
+  }
   const membership = await fetcher("https://firestore.googleapis.com/v1/projects/" + encodeURIComponent(project) + "/databases/(default)/documents/admins/" + encodeURIComponent(account.localId), {
     headers: { Authorization: "Bearer " + token }, signal: AbortSignal.timeout(10000),
   });
   if (membership.status >= 500 || membership.status === 429) throw new HttpError(503, "Admin access cannot be checked right now. Please try again.");
-  if (!membership.ok || (await membership.json()).fields?.active?.booleanValue !== true) {
-    throw new HttpError(403, "An active admin account is required to upload images.");
+  const staff = normalizeStaffMembership(account.localId, membership.ok ? firestoreFields((await membership.json()).fields) : null);
+  const capability = request.method === "DELETE" ? "media.delete" : "media.upload";
+  if (!allows(staff, capability, { purpose: "public-media" })) {
+    throw new HttpError(403, "Current public-media capability is required to manage these images.");
   }
-  return account.localId;
+  if (!staff.compatibilityMode) {
+    const response = await fetcher("https://firestore.googleapis.com/v1/projects/" + encodeURIComponent(project) + "/databases/(default)/documents/staffIdentities/" + encodeURIComponent(staff.staffId), { headers: { Authorization: "Bearer " + token }, signal: AbortSignal.timeout(10000) });
+    if (response.status !== 404) {
+      if (!response.ok) throw new HttpError(response.status >= 500 ? 503 : 403, "Current Staff access cannot be established.");
+      const identity = firestoreFields((await response.json()).fields);
+      if (identity.active !== true || identity.principalUid !== account.localId || identity.staffId !== staff.staffId) throw new HttpError(403, "Current Staff access cannot be established.");
+    }
+    // Reviewed legacy/canonical memberships remain compatible before the
+    // separately controlled registry cutover; never fabricate a new identity.
+  }
+  return staff.staffId;
 }
 export function createImageHandler({ getStore, authorize = requireAdmin }) {
   return async request => {
@@ -48,7 +66,12 @@ export function createImageHandler({ getStore, authorize = requireAdmin }) {
           "X-Content-Type-Options": "nosniff",
         } });
       }
-      if (request.method !== "POST") return new Response(null, { status: 405, headers: { Allow: "GET, HEAD, POST" } });
+      if (request.method === "DELETE") {
+        // Reference-aware physical purge is an external owner guarantee. A
+        // general media permission must not delete referenced historical media.
+        throw new HttpError(403, "Physical deletion requires reference-aware media cleanup.");
+      }
+      if (request.method !== "POST") return new Response(null, { status: 405, headers: { Allow: "GET, HEAD, POST, DELETE" } });
       const uid = await authorize(request);
       const type = request.headers.get("content-type")?.split(";")[0];
       if (!TYPES[type]) throw new HttpError(415, "Choose a JPEG, PNG or WebP image.");

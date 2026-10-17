@@ -8,6 +8,7 @@ function setup(authorize = async () => "admin-id") {
   const handler = createImageHandler({ authorize, getStore: () => ({
     set: async (key, data) => { blobs.set(key, data); },
     get: async key => blobs.get(key) || null,
+    delete: async key => { blobs.delete(key); },
   }) });
   return { handler, blobs };
 }
@@ -18,12 +19,13 @@ test("signed-out uploads cannot write to storage", async () => {
   assert.equal(blobs.size, 0);
 });
 test("Firebase membership check rejects non-admin and disabled accounts", async () => {
-  const request = new Request(url, { headers: { Authorization: "Bearer test-token" } });
+  const request = new Request(url, { method: "POST", headers: { Authorization: "Bearer test-token" } });
   const env = { FIREBASE_WEB_API_KEY: "test-key", FIREBASE_PROJECT_ID: "test-project" };
   for (const active of [false, true]) {
-    const responses = [Response.json({ users: [{ localId: "user" }] }), Response.json({ fields: { active: { booleanValue: active } } })];
+    const responses = [Response.json({ users: [{ localId: "user" }] }), Response.json({ fields: { active: { booleanValue: active }, staffId: { stringValue: "staff-user" }, capabilities: { mapValue: { fields: { "media.upload": { mapValue: { fields: { domainWide: { mapValue: { fields: { active: { booleanValue: true }, purpose: { stringValue: "public-media" } } } } } } } } } } } })];
+    responses.push(Response.json({},{status:404}));
     const check = requireAdmin(request, env, async () => responses.shift());
-    if (active) assert.equal(await check, "user");
+    if (active) assert.equal(await check, "staff-user");
     else await assert.rejects(check, error => error.status === 403);
   }
   await assert.rejects(requireAdmin(request, env, async () => Response.json({users:[{localId:"user",disabled:true}]})), error => error.status === 401);
@@ -62,5 +64,25 @@ test("unknown images and unsupported operations are handled safely", async () =>
   const {handler} = setup();
   assert.equal((await handler(new Request(url+"?key=../../other"))).status,404);
   assert.equal((await handler(new Request(url+"?key=00000000-0000-0000-0000-000000000000.webp"))).status,404);
-  assert.equal((await handler(new Request(url,{method:"DELETE"}))).status,405);
+  assert.equal((await handler(new Request(url,{method:"PATCH"}))).status,405);
+});
+
+test("physical media deletion remains denied without reference-aware owner cleanup", async () => {
+  const {handler, blobs} = setup();
+  const key = "00000000-0000-0000-0000-000000000000.webp";
+  blobs.set(key, Buffer.from("owned"));
+  const response = await handler(new Request(url + "?key=" + key, { method: "DELETE", headers: { Authorization: "Bearer admin" } }));
+  assert.equal(response.status, 403);
+  assert.equal(blobs.has(key), true);
+  const invalid = await handler(new Request(url + "?key=../../secret", { method: "DELETE", headers: { Authorization: "Bearer admin" } }));
+  assert.equal(invalid.status, 403);
+});
+
+test("image DELETE requires the same active-admin authorization as upload", async () => {
+  const {handler, blobs} = setup(async () => { const error = new Error("No admin"); error.status = 403; throw error; });
+  const key = "00000000-0000-0000-0000-000000000000.webp";
+  blobs.set(key, Buffer.from("owned"));
+  const response = await handler(new Request(url + "?key=" + key, { method: "DELETE" }));
+  assert.equal(response.status, 403);
+  assert.equal(blobs.has(key), true);
 });

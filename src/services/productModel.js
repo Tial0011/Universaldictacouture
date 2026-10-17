@@ -17,7 +17,6 @@ export const FILTER_DIMENSIONS = [
   { key: "style", label: "Style" },
   { key: "fabric", label: "Fabric & Pattern" },
   { key: "colour", label: "Colour" },
-  { key: "size", label: "Size" },
 ];
 
 function toArray(value) {
@@ -106,6 +105,10 @@ export function normaliseProduct(id, raw) {
   // A piece with no uploaded photo stays publishable with an empty
   // media frame; never substitute a photograph of another product.
   const primaryImage = normaliseImage(raw.primaryImage) || images[0] || null;
+  // Section 4 public completeness gate: an eligible published piece must
+  // have a real primary image. A configured image that later fails to load
+  // is handled by ProductImage's branded fallback without fabricating media.
+  if (!primaryImage) return null;
 
   const options = normaliseOptions(raw.options);
   const variants = normaliseVariants(raw.variants);
@@ -120,8 +123,39 @@ export function normaliseProduct(id, raw) {
   const category = toArray(raw.category ?? raw.categories);
   if (!category.length) return null;
 
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
+  // Single fixed main price: if multiple prices exist (e.g. lower/higher for different kedas or bundles),
+  // delete the lower price and let the higher price be the main price.
+  const mainPrice = Math.max(...prices);
+  const unitLabel = typeof (raw.unitLabel ?? raw.priceToken) === "string"
+    ? (raw.unitLabel ?? raw.priceToken).trim()
+    : "";
+  // Section 4 cards must communicate a truthful commercial basis alongside
+  // price. Legacy published records with no configured unit are incomplete
+  // public catalogue data and stay out of the customer Shop until corrected.
+  if (!unitLabel) return null;
+
+  const rawShopBy = raw.shopBy && typeof raw.shopBy === "object" && !Array.isArray(raw.shopBy) ? raw.shopBy : {};
+  const shopBy = Object.fromEntries(
+    Object.entries(rawShopBy)
+      .map(([key, values]) => [String(key).trim(), toArray(values)])
+      .filter(([key, values]) => key && values.length)
+  );
+  const legacyShopBy = {
+    occasion: toArray(raw.occasion ?? raw.occasions),
+    style: toArray(raw.style ?? raw.styles),
+    fabric: toArray(raw.fabric ?? raw.weave ?? raw.fabrics),
+  };
+  Object.entries(legacyShopBy).forEach(([key, values]) => {
+    const merged = [...(shopBy[key] ?? []), ...values];
+    const seen = new Set();
+    const unique = merged.filter((value) => {
+      const normalised = String(value).trim().toLowerCase();
+      if (!normalised || seen.has(normalised)) return false;
+      seen.add(normalised);
+      return true;
+    });
+    if (unique.length) shopBy[key] = unique;
+  });
 
   const rawShopBy = raw.shopBy && typeof raw.shopBy === "object" && !Array.isArray(raw.shopBy) ? raw.shopBy : {};
   const shopBy = Object.fromEntries(
@@ -154,10 +188,13 @@ export function normaliseProduct(id, raw) {
     href: `/shop/${encodeURIComponent(slug)}`,
     image: primaryImage,
     images: images.length ? images : primaryImage ? [primaryImage] : [],
-    minPrice,
-    maxPrice,
-    hasVariablePricing: maxPrice > minPrice,
-    unitLabel: typeof raw.unitLabel === "string" ? raw.unitLabel.trim() : "",
+    price: mainPrice,
+    mainPrice,
+    minPrice: mainPrice,
+    maxPrice: mainPrice,
+    hasVariablePricing: false,
+    unitLabel,
+    priceToken: unitLabel,
     category,
     shopBy,
     occasion: shopBy.occasion ?? [],
@@ -187,7 +224,6 @@ function buildSearchText(product) {
       ...product.fabric,
       ...Object.values(product.shopBy ?? {}).flat(),
       ...product.colour,
-      ...product.size,
       ...product.aliases,
       ...product.keywords,
     ].join(" ")
@@ -233,14 +269,8 @@ export function closetLineKey(productId, selections = {}) {
   return entries.length ? `${productId}::${JSON.stringify(entries)}` : `${productId}::`;
 }
 
-/** The price a given set of selections resolves to, when determinable. */
+/** The price a given set of selections resolves to. With single fixed pricing, this is always the main price. */
 export function priceForSelections(product, selections = {}) {
   if (!product) return null;
-  if (!product.variants.length) return product.minPrice;
-  const match = product.variants.find((variant) =>
-    Object.entries(variant.options ?? {}).every(
-      ([key, value]) => String(selections?.[key] ?? "") === String(value)
-    )
-  );
-  return match ? match.price : product.minPrice;
+  return product.mainPrice ?? product.price ?? product.minPrice;
 }

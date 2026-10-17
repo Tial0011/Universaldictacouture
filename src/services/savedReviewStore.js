@@ -1,5 +1,24 @@
 export function reviewIds(value) {
+<<<<<<< HEAD
   return Array.isArray(value) ? [...new Set(value.filter((id) => typeof id === "string" && id.trim()))] : [];
+=======
+  if (!Array.isArray(value)) return [];
+  return [...new Set(
+    value
+      .filter((id) => typeof id === "string")
+      .map((id) => id.trim())
+      .filter(Boolean)
+  )];
+}
+
+/** Merge saved product identities without trusting stale guest references. */
+export function mergeValidatedSavedIds(accountIds, guestIds, validGuestIds = guestIds) {
+  const valid = new Set(reviewIds(validGuestIds));
+  return reviewIds([
+    ...reviewIds(accountIds),
+    ...reviewIds(guestIds).filter((id) => valid.has(id)),
+  ]);
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
 }
 
 /** Local bookmarks remain usable while account reads/writes are unavailable. */
@@ -67,7 +86,11 @@ export function createSavedItemsStore({ initial = {}, persist, loadRemote, write
   }
 
   function flush() {
+<<<<<<< HEAD
     if (!writeRemote || !pending.size) return Promise.resolve();
+=======
+    if (!writeRemote || !pending.size) return Promise.resolve(true);
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
     if (writing) return writing;
     writing = Promise.resolve().then(async () => {
       while (pending.size) {
@@ -78,17 +101,43 @@ export function createSavedItemsStore({ initial = {}, persist, loadRemote, write
         } catch {
           writeError = true;
           publish();
+<<<<<<< HEAD
           return;
+=======
+          return false;
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
         }
         if (pending.get(id)?.revision === operation.revision) pending.delete(id);
         writeError = false;
         saveLocal();
         publish();
       }
+<<<<<<< HEAD
+=======
+      return true;
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
     }).finally(() => { writing = null; });
     return writing;
   }
 
+<<<<<<< HEAD
+=======
+  function toggleLocal(id, autoFlush = true) {
+    if (typeof id !== "string" || !id.trim()) return null;
+    const added = !ids.includes(id);
+    const operation = { saved: added, revision: ++revision };
+    ids = apply(ids, new Map([[id, operation]]));
+    if (writeRemote) {
+      pending.set(id, operation);
+      overrides.set(id, operation);
+    }
+    saveLocal();
+    publish();
+    if (autoFlush) void flush();
+    return { added, storage, operation };
+  }
+
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
   publish();
   return {
     getSnapshot: () => snapshot,
@@ -102,6 +151,7 @@ export function createSavedItemsStore({ initial = {}, persist, loadRemote, write
       void flush();
     },
     toggle(id) {
+<<<<<<< HEAD
       if (typeof id !== "string" || !id.trim()) return null;
       const added = !ids.includes(id);
       const operation = { saved: added, revision: ++revision };
@@ -114,6 +164,34 @@ export function createSavedItemsStore({ initial = {}, persist, loadRemote, write
       publish();
       void flush();
       return { added, storage };
+=======
+      const result = toggleLocal(id);
+      return result ? { added: result.added, storage: result.storage } : null;
+    },
+    async toggleConfirmed(id) {
+      const wasSaved = ids.includes(id);
+      const result = toggleLocal(id, false);
+      if (!result) return null;
+      const publicResult = { added: result.added, storage: result.storage };
+      if (!writeRemote) return { ...publicResult, ok: true };
+
+      const operation = result.operation;
+      const ok = await flush();
+      if (ok) return { ...publicResult, ok: true };
+
+      // Roll back only if this failed operation is still the latest intent for
+      // the item. A newer action from another surface must win.
+      const latest = pending.get(id) || overrides.get(id);
+      if (latest?.revision === operation.revision) {
+        const rollback = { saved: wasSaved, revision: ++revision };
+        ids = apply(ids, new Map([[id, rollback]]));
+        pending.delete(id);
+        overrides.delete(id);
+        saveLocal();
+        publish();
+      }
+      return { ...publicResult, ok: false };
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
     },
     replaceGuestIds(next) {
       if (writeRemote) return;

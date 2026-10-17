@@ -4,6 +4,7 @@ const visibility = text("published", "Published on website", { type: "checkbox" 
 export const SCHEMAS = {
   products: {
     title: "Products", singular: "product", description: "Manage your collection, from first draft to published piece.",
+<<<<<<< HEAD
     initial: { name: "", price: "", status: "draft", category: "", shopBy: {}, occasion: [], style: [], fabric: [], images: [], isNewIn: false },
     fields: [
       text("name", "Product name", { required: true }), text("price", "Price (NGN)", { type: "number", hint: "Required before publishing. Enter the base price in naira." }),
@@ -21,6 +22,26 @@ export const SCHEMAS = {
   },
   taxonomy: {
     title: "Categories & attributes", singular: "label", description: "Allocate shop labels for your catalogue. Labels appear in Shop filters immediately (with zero count until a published product uses the exact spelling). Use these spellings when adding products.",
+=======
+    initial: { name: "", price: "", unitLabel: "", status: "draft", category: "", shopBy: {}, occasion: [], style: [], fabric: [], images: [], isNewIn: false },
+    fields: [
+      text("name", "Product name", { required: true, section: "basic" }),
+      text("description", "Product description", { type: "textarea", section: "basic", hint: "Describe the fabric, finish and fit. Shown on the product page and included when customers share this piece (up to 4,000 characters)." }),
+      text("price", "Main Price", { type: "number", section: "pricing", hint: "Required before publishing. Enter the single fixed main price in naira (NGN)." }),
+      text("unitLabel", "Commercial unit", { section: "pricing", hint: "Shown beside the public price. Use the truthful unit for this product, for example per bundle, per set, complete, per keda or per yard." }),
+      text("images", "Product photos", { type: "images", section: "images", hint: "The first photo is the cover. JPEG, PNG or WebP, up to 4 MB each." }),
+      text("category", "Categories", { type: "values", section: "classification", hint: "Separate multiple labels with commas." }),
+      text("shopBy", "Shop By", { type: "shopBy", section: "classification", hint: "Choose the reusable Shop By values that describe this product. Manage the available groups and choices from the Shop By admin page." }),
+      text("colour", "Colour", { type: "values", section: "classification", hint: "Separate multiple labels with commas." }),
+      text("isNewIn", "Feature in New In", { type: "checkbox", section: "merchandising", hint: "New In is curated manually and is separate from Newest First." }),
+      text("keywords", "Search keywords", { type: "values", section: "merchandising", hint: "Use real search terms that help customers find this product." }),
+      text("aliases", "Alternative names", { type: "values", section: "merchandising", hint: "Add genuine synonyms or alternate product names without changing the public product name." }),
+      text("status", "Publication state", { type: "select", section: "publication", options: ["draft", "published", "unpublished", "archived"], hint: "Lifecycle changes use explicit protected actions. Unpublished is not Draft. Restore returns Archived products to Unpublished and never republishes them." }),
+    ],
+  },
+  taxonomy: {
+    title: "Categories & attributes", singular: "label", description: "Manage the catalogue labels used by Shop filters and product classification. Keep spellings consistent across products; Size is not part of Shop V1.",
+>>>>>>> 36986ec94db2bf83503fded0dfe6362a8aed14d9
     initial: { name: "", dimension: "category" },
     fields: [text("name", "Label", { required: true }), text("dimension", "Type", { type: "select", options: DIMENSIONS })],
   },
@@ -57,7 +78,7 @@ export const SCHEMAS = {
     ],
   },
   discoveryModules: {
-    title: "Shop discovery", singular: "section", description: "Create image tiles that guide customers to an occasion or collection. Keep one active section per placement; lower display order takes priority.",
+    title: "Shop Space", singular: "section", description: "Create image tiles that guide customers to an occasion or collection. Keep one active section per placement; lower display order takes priority.",
     initial: { title: "Shop by Occasion", placement: "home", active: false, order: 0, items: [], groups: [] },
     fields: [text("title", "Section title", { required: true }), text("placement", "Show on", { type: "select", options: ["home", "shop"] }), text("order", "Display order", { type: "number" }), text("items", "Discovery tiles", { type: "tiles" }), text("active", "Published on website", { type: "checkbox" })],
   },
