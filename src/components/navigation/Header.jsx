@@ -3,6 +3,7 @@ import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import Logo from "../brand/Logo";
 import { BRAND } from "../brand/brandLanguage";
 import { useAuth } from "../../context/AuthContext";
+import { useAuthGate } from "../../context/AuthGateContext";
 
 import CustomStyleIcon from "./icons/CustomStyleIcon";
 import ReviewsIcon from "./icons/ReviewsIcon";
@@ -78,6 +79,7 @@ function HeaderLink({ to, label, end = false, onNavigate, icon, description }) {
 
 export default function Header() {
   const { user } = useAuth();
+  const { requestAuth } = useAuthGate();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [search, setSearch] = useState("");

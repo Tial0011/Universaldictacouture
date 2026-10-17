@@ -106,6 +106,8 @@ function ShopSkeleton() {
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
+  const { user } = useAuth();
+  const { requestAuth } = useAuthGate();
 
   const { products, isLoading, error, retry } = useCatalogue();
   const catalogue = products;
@@ -200,7 +202,7 @@ export default function Shop() {
     next.set("focus", "search");
     setSearchParams(next, { replace: true });
     requestAuth({ returnTo: "/shop?focus=search", returnState: { shopSearchDraft: state.query } });
-  }, [user, state.query]);
+  }, [user, state.query, searchParams, requestAuth, setSearchParams]);
 
   useEffect(() => {
     if (searchOpen && searchRequested) searchInputRef.current?.focus();

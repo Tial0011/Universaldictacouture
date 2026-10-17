@@ -223,10 +223,6 @@ export function buildSearchParams(state) {
     uniqueTextValues(values).forEach((value) => params.append("shopby", `${group}:${value}`));
   });
 
-  Object.entries(state.shopBy ?? {}).forEach(([group, values]) => {
-    values.forEach((value) => params.append("shopby", `${group}:${value}`));
-  });
-
   if (state.min !== null && state.min !== undefined) params.set("min", String(state.min));
   if (state.max !== null && state.max !== undefined) params.set("max", String(state.max));
   if (state.sort && state.sort !== "newest") params.set("sort", state.sort);

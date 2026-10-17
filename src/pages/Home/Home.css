@@ -1,4 +1,6 @@
 /* Page rhythm and fabric layers shared with the collection. */
+/* Chat is already available in the service strip and mobile navigation; don't cover homepage content with the floating launcher. */
+body:has(.home-cultural-flow) .site-header__chat-launcher { display:none; }
 .home-cultural-flow {background:linear-gradient(rgba(251,248,242,.97),rgba(251,248,242,.96)),var(--pattern-atlas) center top/1440px auto;}
 .home-cultural-flow .home-section {padding-block:clamp(2rem,4vw,4rem);}
 .home-cultural-flow .home-section--shop-by {padding-block:clamp(1.75rem,3vw,3rem) 0;}

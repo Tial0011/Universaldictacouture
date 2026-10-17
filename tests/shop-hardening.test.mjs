@@ -7,6 +7,8 @@ const shopCss = await readFile(new URL("../src/pages/Shop/Shop.css", import.meta
 const productCard = await readFile(new URL("../src/components/product/ProductCard.jsx", import.meta.url), "utf8");
 const productGrid = await readFile(new URL("../src/components/product/ProductGrid.jsx", import.meta.url), "utf8");
 const productImage = await readFile(new URL("../src/components/product/ProductImage.jsx", import.meta.url), "utf8");
+const imageStorage = await readFile(new URL("../src/services/imageStorage.js", import.meta.url), "utf8");
+const imageHandler = await readFile(new URL("../netlify/lib/image-storage.js", import.meta.url), "utf8");
 const drawer = await readFile(new URL("../src/components/shop/FilterDrawer.jsx", import.meta.url), "utf8");
 const chips = await readFile(new URL("../src/components/shop/FilterChips.jsx", import.meta.url), "utf8");
 const catalogueHook = await readFile(new URL("../src/hooks/useCatalogue.js", import.meta.url), "utf8");
@@ -67,9 +69,14 @@ test("Task 9: My Closet heart and exact Shop CTA remain independent accessible c
   assert.doesNotMatch(productCard, /VIEW PIECE|View Piece/);
 });
 
-test("Task 8: image delivery remains responsive/lazy without Product Details gallery preloading", () => {
+test("Task 8: Netlify image delivery stays lazy and avoids Product Details gallery preloading", () => {
   assert.match(productGrid, /imageLoading=\{index < resolvedEagerCount \? "eager" : "lazy"\}/);
-  assert.match(productImage, /srcSet=\{srcSet \|\| undefined\}/);
+  assert.match(imageStorage, /fetch\("\/\.netlify\/functions\/images"/);
+  assert.match(imageStorage, /data\.provider !== "netlify"/);
+  assert.match(imageHandler, /provider: "netlify"/);
+  assert.match(productImage, /src=\{src\}/);
+  assert.match(productImage, /width=\{width\}/);
+  assert.match(productImage, /height=\{height\}/);
   assert.match(productImage, /decoding="async"/);
   assert.match(productImage, /onError=\{\(\) => setFailed\(true\)\}/);
   assert.doesNotMatch(productCard, /product\.images\.map|gallery/i);

@@ -5,6 +5,8 @@ import { readFile } from "node:fs/promises";
 const cardSource = await readFile(new URL("../src/components/product/ProductCard.jsx", import.meta.url), "utf8");
 const gridSource = await readFile(new URL("../src/components/product/ProductGrid.jsx", import.meta.url), "utf8");
 const imageSource = await readFile(new URL("../src/components/product/ProductImage.jsx", import.meta.url), "utf8");
+const imageStorage = await readFile(new URL("../src/services/imageStorage.js", import.meta.url), "utf8");
+const imageHandler = await readFile(new URL("../netlify/lib/image-storage.js", import.meta.url), "utf8");
 const cardCss = await readFile(new URL("../src/components/product/ProductCard.css", import.meta.url), "utf8");
 const shopCss = await readFile(new URL("../src/pages/Shop/Shop.css", import.meta.url), "utf8");
 const copySource = await readFile(new URL("../src/utils/productCopy.js", import.meta.url), "utf8");
@@ -37,10 +39,13 @@ test("Shop price presentation never hard-codes a global per-bundle unit", () => 
   assert.match(cardSource, /product\.hasVariablePricing === true/);
 });
 
-test("catalogue image delivery uses real responsive Cloudinary sources and restrained eager loading", () => {
-  assert.match(cardSource, /SHOP_IMAGE_SOURCES/);
-  assert.match(imageSource, /srcSetSources/);
-  assert.match(imageSource, /srcSet=\{srcSet \|\| undefined\}/);
+test("catalogue image delivery uses stored Netlify URLs and restrained eager loading", () => {
+  assert.match(imageStorage, /fetch\("\/\.netlify\/functions\/images"/);
+  assert.match(imageStorage, /data\.provider !== "netlify"/);
+  assert.match(imageHandler, /provider: "netlify"/);
+  assert.match(imageSource, /src=\{src\}/);
+  assert.match(imageSource, /width=\{width\}/);
+  assert.match(imageSource, /height=\{height\}/);
   assert.match(gridSource, /variant === "shop"[\s\S]*\? 2/);
   assert.match(gridSource, /imageFetchPriority=\{index === 0 \? "high" : "auto"\}/);
 });
