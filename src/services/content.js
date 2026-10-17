@@ -13,7 +13,7 @@ import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import { db } from "../firebase/firestore.js";
 import { isFirebaseConfigured } from "../firebase/config.js";
 import heroReadyToWear from "../assets/images/hero/hero-ready-to-wear.jpg";
-import { DEFAULT_SHOP_BY_GROUPS, shopByDestination } from "./shopBy.js";
+import { cleanShopByLabel, DEFAULT_SHOP_BY_GROUPS, shopByDestination } from "./shopBy.js";
 import { normaliseReviewRecord, selectLatestPublishedReviews, sortPublishedReviews } from "./reviewModel.js";
 import { accountRequest } from "./accountApi";
 
@@ -232,7 +232,7 @@ export function buildShopDiscovery(products, title = "Shop By", groupDefinitions
     products.forEach((product) => {
       const values = product.shopBy?.[key] ?? product[key] ?? [];
       values.forEach((raw) => {
-        const name = String(raw).trim();
+        const name = cleanShopByLabel(raw);
         if (!name) return;
         const entry = found.get(name.toLowerCase()) ?? { name, count: 0, images: [] };
         entry.count += 1;

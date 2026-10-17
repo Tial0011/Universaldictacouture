@@ -35,7 +35,7 @@ export function cleanShopByValues(values) {
   const list = Array.isArray(values) ? values : String(values || "").split(",");
   const seen = new Set();
   return list
-    .map((value) => String(value || "").trim())
+    .map(cleanShopByLabel)
     .filter((value) => {
       if (!value) return false;
       const key = value.toLowerCase();
@@ -45,6 +45,15 @@ export function cleanShopByValues(values) {
     })
     .slice(0, 10);
 
+}
+
+const DISPLAY_LABELS = new Map([
+  ["fasion fiest/special event", "Fashion Fiesta / Special Event"],
+]);
+
+export function cleanShopByLabel(value) {
+  const label = String(value || "").trim();
+  return DISPLAY_LABELS.get(label.toLowerCase()) || label;
 }
 
 function normaliseStoredGroup(raw = {}) {

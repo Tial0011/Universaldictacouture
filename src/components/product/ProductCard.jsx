@@ -45,6 +45,7 @@ function ProductPrice({ product }) {
   const token = typeof (product.unitLabel || product.priceToken) === "string"
     ? (product.unitLabel || product.priceToken).trim()
     : "";
+  const displayUnit = token && /^\d+(?:\.\d+)?$/.test(token) ? `Per ${token}` : token;
 
   return (
     <div className="product-card__price-wrap">
@@ -52,7 +53,7 @@ function ProductPrice({ product }) {
         {useFromPrice ? <span className="product-card__price-prefix">From </span> : null}
         {price || "Price unavailable"}
       </p>
-      {token && <p className="product-card__price-token">{token}</p>}
+      {displayUnit && <p className="product-card__price-token">{displayUnit}</p>}
     </div>
   );
 }

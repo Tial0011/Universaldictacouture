@@ -57,6 +57,7 @@ export default function DiscoveryModule({
   const Heading = headingLevel;
 
   const shouldAutoScroll = railControls || className.includes("discovery--home");
+  const loopRail = shouldAutoScroll && !arrowNavigation;
 
   const groups = module?.groups;
   const arrowNavigation = groupNavigation === "arrows" && groups?.length > 0;
@@ -75,14 +76,14 @@ export default function DiscoveryModule({
   }, [module, groups, currentGroup, arrowNavigation]);
 
   const repeatCount = useMemo(() => {
-    if (items.length < 2) return 1;
+    if (items.length < 2 || !loopRail) return 1;
     if (items.length <= 3) return 6;
     if (items.length <= 6) return 4;
     return 3;
-  }, [items.length]);
+  }, [items.length, loopRail]);
 
   const repeatedItems = useMemo(() => {
-    if (!shouldAutoScroll || items.length <= 1) {
+    if (!loopRail || items.length <= 1) {
       return items.map((item) => ({ item, key: item.id, isDuplicate: false }));
     }
     const result = [];
@@ -96,7 +97,7 @@ export default function DiscoveryModule({
       });
     }
     return result;
-  }, [items, shouldAutoScroll, repeatCount]);
+  }, [items, loopRail, repeatCount]);
 
   const updateRailState = () => {
     const rail = railRef.current;
@@ -122,9 +123,9 @@ export default function DiscoveryModule({
   const handleScroll = () => {
     const rail = railRef.current;
     if (!rail) return;
-    if (shouldAutoScroll && items.length > 1) {
+    if (loopRail && items.length > 1) {
       const children = rail.children;
-      if (children && children.length >= items.length * 2) {
+      if (loopRail && children && children.length >= items.length * 2) {
         const first = children[0];
         const secondSetFirst = children[items.length];
         if (first && secondSetFirst) {
@@ -157,11 +158,11 @@ export default function DiscoveryModule({
       observer?.disconnect();
       window.removeEventListener("resize", updateRailState);
     };
-  }, [currentGroup, items.length, shouldAutoScroll]);
+  }, [currentGroup, items.length, shouldAutoScroll, loopRail]);
 
   // Gentle, calm continuous seamless drift for the discovery rail
   useEffect(() => {
-    if (!shouldAutoScroll || items.length <= 1 || prefersReducedMotion()) return undefined;
+    if (!loopRail || items.length <= 1 || prefersReducedMotion()) return undefined;
     const rail = railRef.current;
     if (!rail) return undefined;
 
@@ -204,7 +205,7 @@ export default function DiscoveryModule({
       clearTimeout(resumeTimerRef.current);
       if (animId) cancelAnimationFrame(animId);
     };
-  }, [currentGroup, items.length, shouldAutoScroll]);
+  }, [currentGroup, items.length, loopRail]);
 
   if (!module || (!groups?.length && !items.length)) return null;
 

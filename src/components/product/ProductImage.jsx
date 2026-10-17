@@ -31,7 +31,9 @@ export default function ProductImage({
         role={label ? "img" : undefined}
         aria-label={label ? `${label} image unavailable` : undefined}
         aria-hidden={label ? undefined : "true"}
-      />
+      >
+        {label ? <span className="product-image__fallback-label">Image unavailable</span> : null}
+      </span>
     );
   }
 
